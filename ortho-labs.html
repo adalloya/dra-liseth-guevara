@@ -638,8 +638,8 @@
 
                         <div class="h-5 w-[1px] bg-white/15 shrink-0"></div>
 
-                        <!-- GRUPO 2: VISIBILIDAD DE ARCADAS Y ARTICULADOR MANDIBULAR -->
-                        <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/5" role="group" aria-label="Arcadas y Articulador Mandibular">
+                        <!-- GRUPO 2: VISIBILIDAD DE ARCADAS Y SLIDER DE APERTURA (SOLO ICONO + SLIDER) -->
+                        <div class="flex items-center space-x-1.5 bg-black/40 p-1 rounded-xl border border-white/5" role="group" aria-label="Arcadas y Apertura Mandibular">
                             <button onclick="setArchVisibility('both')" id="archBtn-both" class="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95" title="Ambas Arcadas (Maxilar y Mandíbula)" aria-label="Ambas Arcadas">
                                 <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
                                     <path d="M4 7 C 4 2.8, 16 2.8, 16 7"/>
@@ -659,24 +659,13 @@
 
                             <div class="h-4 w-[1px] bg-white/10 mx-0.5"></div>
 
-                            <!-- BOTÓN DEDICADO PARA ABRIR / CERRAR BOCA (1-TAP TOGGLE) -->
-                            <button onclick="toggleOpenCloseJaw()" id="jawActionBtn" class="h-8 px-2.5 rounded-lg text-zinc-200 hover:text-white hover:bg-white/10 flex items-center space-x-1.5 transition active:scale-95 border border-transparent shadow-sm" title="Tocar para Abrir o Cerrar la Boca (Articulador 0° - 14°)">
-                                <i id="jawActionIcon" class="ph-bold ph-arrows-out-line-vertical text-sky-400 text-sm"></i>
-                                <span id="jawActionText" class="text-[11px] font-semibold whitespace-nowrap">Abrir Boca</span>
-                                <span id="jawOpenPillVal" class="mono text-[10px] px-1 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">0°</span>
-                            </button>
-                            
-                            <!-- Botón Slider Popover Ajuste Continuo de Grados -->
-                            <div class="relative">
-                                <button onclick="toggleJawPopover()" id="jawToggleBtn" class="w-7 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Graduar Grados Exactos de Apertura (0° a 24°)">
-                                    <i class="ph-bold ph-sliders-horizontal text-xs"></i>
+                            <!-- CONTROL SLIDER DE APERTURA / CIERRE (SOLO ICONO + SLIDER + VALOR, SIN TEXTO) -->
+                            <div class="flex items-center space-x-1.5 px-1 py-0.5" title="Apertura y Cierre de Boca (0° a 24°)">
+                                <button onclick="toggleOpenCloseJaw()" class="w-6 h-6 flex items-center justify-center text-sky-400 hover:text-white transition active:scale-95" title="Tocar para Abrir/Cerrar Rápido (0° / 14°)">
+                                    <i id="jawActionIcon" class="ph-bold ph-arrows-out-line-vertical text-sm"></i>
                                 </button>
-                                <!-- Popover de Apertura Mandibular -->
-                                <div id="jawAperturePopover" class="hidden absolute bottom-11 right-0 sm:left-1/2 sm:-translate-x-1/2 z-30 apple-glass px-3.5 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2.5 pointer-events-auto border border-white/15 min-w-[220px]">
-                                    <span class="text-[11px] text-zinc-300 whitespace-nowrap flex items-center"><i class="ph-bold ph-arrows-out-line-vertical text-sky-400 mr-1.5"></i>Apertura:</span>
-                                    <input type="range" id="jawOpenSlider" min="0" max="24" value="0" oninput="updateJawOpening(this.value)" class="apple-slider flex-1">
-                                    <span id="jawOpenVal" class="mono text-sky-400 text-xs w-6 text-right">0°</span>
-                                </div>
+                                <input type="range" id="jawOpenSlider" min="0" max="24" value="0" oninput="updateJawOpening(this.value)" class="apple-slider w-16 sm:w-24">
+                                <span id="jawOpenVal" class="mono text-[10px] text-sky-400 font-bold w-6 text-right">0°</span>
                             </div>
                         </div>
 
@@ -2798,7 +2787,7 @@
             }
         }
 
-        function updateJawOpening(deg, updateUiState = true) {
+        function updateJawOpening(deg) {
             const degNum = parseFloat(deg);
             const rad = THREE.MathUtils.degToRad(degNum);
             lowerArchGroup.rotation.x = rad;
@@ -2807,42 +2796,17 @@
             
             const valEl = document.getElementById('jawOpenVal');
             if (valEl) valEl.innerText = `${Math.round(degNum)}°`;
-            const pillEl = document.getElementById('jawOpenPillVal');
-            if (pillEl) pillEl.innerText = `${Math.round(degNum)}°`;
             
-            if (updateUiState) {
-                const actionBtn = document.getElementById('jawActionBtn');
-                const actionText = document.getElementById('jawActionText');
-                const actionIcon = document.getElementById('jawActionIcon');
-                if (actionBtn && actionText) {
-                    if (degNum > 2) {
-                        actionText.innerText = "Cerrar Boca";
-                        actionBtn.className = "h-8 px-2.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 flex items-center space-x-1.5 transition active:scale-95 shadow-sm";
-                        if (actionIcon) actionIcon.className = "ph-bold ph-arrows-in-line-vertical text-sky-300 text-sm";
-                    } else {
-                        actionText.innerText = "Abrir Boca";
-                        actionBtn.className = "h-8 px-2.5 rounded-lg text-zinc-200 hover:text-white hover:bg-white/10 flex items-center space-x-1.5 transition active:scale-95 border border-transparent shadow-sm";
-                        if (actionIcon) actionIcon.className = "ph-bold ph-arrows-out-line-vertical text-sky-400 text-sm";
-                    }
+            const actionIcon = document.getElementById('jawActionIcon');
+            if (actionIcon) {
+                if (degNum > 2) {
+                    actionIcon.className = "ph-bold ph-arrows-in-line-vertical text-amber-300 text-sm";
+                } else {
+                    actionIcon.className = "ph-bold ph-arrows-out-line-vertical text-sky-400 text-sm";
                 }
             }
             updateIPR3DLabelsProjection();
         }
-
-        function toggleJawPopover() {
-            const pop = document.getElementById('jawAperturePopover');
-            if (pop) pop.classList.toggle('hidden');
-        }
-
-        document.addEventListener('click', (e) => {
-            const pop = document.getElementById('jawAperturePopover');
-            const btn = document.getElementById('jawToggleBtn');
-            if (pop && !pop.classList.contains('hidden')) {
-                if (!pop.contains(e.target) && btn && !btn.contains(e.target)) {
-                    pop.classList.add('hidden');
-                }
-            }
-        });
 
         function onStageSliderInput(val) {
             if (isPlaying) togglePlay();
