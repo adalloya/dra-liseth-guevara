@@ -296,6 +296,38 @@
         html.light #mobileView3D .text-zinc-400 {
             color: #6e6e73 !important;
         }
+        html.light .apple-pill .bg-black\/40 {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+            border-color: rgba(0, 0, 0, 0.06) !important;
+        }
+        html.light [id^="camBtn-"].bg-white\/20,
+        html.light [id^="archBtn-"].bg-white\/20 {
+            background-color: #0071e3 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3) !important;
+        }
+        html.light [id^="camBtn-"].text-zinc-400,
+        html.light [id^="archBtn-"].text-zinc-400 {
+            color: #6e6e73 !important;
+        }
+        html.light [id^="camBtn-"].text-zinc-400:hover,
+        html.light [id^="archBtn-"].text-zinc-400:hover {
+            color: #1d1d1f !important;
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light #bottomMonthBadge {
+            background-color: #f2f2f7 !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+            color: #0071e3 !important;
+        }
+        html.light #jawAperturePopover {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15) !important;
+        }
+        html.light #jawAperturePopover .text-zinc-300 {
+            color: #1d1d1f !important;
+        }
         html.light input[type=range].apple-slider::-webkit-slider-runnable-track {
             background: rgba(0, 0, 0, 0.14) !important;
         }
@@ -556,94 +588,142 @@
                 <!-- Contenedor de Etiquetas 3D de IPR Flotantes -->
                 <div id="iprLabelsContainer" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
 
-                <!-- 3. DOCK INFERIOR FLOTANTE APPLE VISIONOS (Vistas de Cámara + Capas 3D en barra deslizable horizontal) -->
+                <!-- 3. DOCK DE CONTROLES 3D ORGANIZADO POR TIPOS (Vistas, Arcadas y Capas) -->
                 <div class="absolute bottom-3 left-0 right-0 z-20 px-3 flex flex-col items-center space-y-2 pointer-events-none">
                     
-                    <!-- Chip flotante del Diente Seleccionado (Aparece limpio encima del dock) -->
-                    <div class="apple-pill px-3 py-1 rounded-full flex items-center space-x-2.5 text-[11px] pointer-events-auto">
+                    <!-- Chip flotante del Diente Seleccionado -->
+                    <div class="apple-pill px-3 py-1 rounded-full flex items-center space-x-2.5 text-[11px] pointer-events-auto shadow-sm">
                         <span id="floatingToothFDI" class="px-1.5 py-0.5 rounded-md bg-sky-500 text-black font-bold mono text-[10px]">OD 42</span>
-                        <span id="floatingToothName" class="text-zinc-200 font-medium truncate max-w-[140px] sm:max-w-xs">Incisivo Lat. Inf. Der.</span>
+                        <span id="floatingToothName" class="text-zinc-200 font-medium truncate max-w-[130px] sm:max-w-xs">Incisivo Lat. Inf. Der.</span>
                         <span class="text-zinc-600">|</span>
                         <span id="floatingToothIPR" class="mono text-amber-300 font-semibold">IPR: 0.3M / 0.3D</span>
-                        <button onclick="openSelectedToothSheet()" class="text-sky-400 hover:text-sky-300 font-semibold ml-1 flex items-center">
+                        <button onclick="openSelectedToothSheet()" class="text-sky-400 hover:text-sky-300 font-semibold ml-0.5 flex items-center">
                             <span>Ajustar</span>
                             <i class="ph-bold ph-caret-right ml-0.5"></i>
                         </button>
                     </div>
 
-                    <!-- Dock Horizontal Unificado (Scrollable en móvil, sin apilarse) -->
-                    <div class="apple-pill p-1.5 rounded-2xl flex items-center space-x-1 overflow-x-auto no-scrollbar max-w-full pointer-events-auto">
-                        <!-- Selector de Vistas -->
-                        <button onclick="setCameraView('front')" id="camBtn-front" class="px-2.5 py-1.5 rounded-xl bg-white/15 text-white text-[11px] font-medium whitespace-nowrap transition">Frontal</button>
-                        <button onclick="setCameraView('right')" id="camBtn-right" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap transition">Der</button>
-                        <button onclick="setCameraView('left')" id="camBtn-left" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap transition">Izq</button>
-                        <button onclick="setCameraView('upper')" id="camBtn-upper" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap transition">Oclusal Sup</button>
-                        <button onclick="setCameraView('lower')" id="camBtn-lower" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap transition">Oclusal Inf</button>
+                    <!-- Dock Flotante Organizado por Grupos -->
+                    <div class="apple-pill p-1.5 rounded-2xl flex items-center space-x-2 overflow-x-auto no-scrollbar max-w-full pointer-events-auto shadow-xl">
                         
-                        <div class="h-4 w-[1px] bg-white/15 mx-1 shrink-0"></div>
+                        <!-- GRUPO 1: VISTAS DE CÁMARA (ICONOS) -->
+                        <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/5" role="group" aria-label="Vistas de Cámara">
+                            <button onclick="setCameraView('front')" id="camBtn-front" class="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95" title="Vista Frontal" aria-label="Vista Frontal">
+                                <i class="ph-bold ph-eye text-base"></i>
+                            </button>
+                            <button onclick="setCameraView('right')" id="camBtn-right" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Vista Lateral Derecha" aria-label="Vista Lateral Derecha">
+                                <i class="ph-bold ph-arrow-right text-base"></i>
+                            </button>
+                            <button onclick="setCameraView('left')" id="camBtn-left" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Vista Lateral Izquierda" aria-label="Vista Lateral Izquierda">
+                                <i class="ph-bold ph-arrow-left text-base"></i>
+                            </button>
+                            <button onclick="setCameraView('upper')" id="camBtn-upper" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Vista Oclusal Superior" aria-label="Vista Oclusal Superior">
+                                <i class="ph-bold ph-arrow-up text-base"></i>
+                            </button>
+                            <button onclick="setCameraView('lower')" id="camBtn-lower" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Vista Oclusal Inferior" aria-label="Vista Oclusal Inferior">
+                                <i class="ph-bold ph-arrow-down text-base"></i>
+                            </button>
+                        </div>
 
-                        <!-- Toggles de Capas 3D tipo Píldora -->
-                        <button onclick="toggleLayerBtn('roots')" id="layerBtn-roots" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-fill ph-git-fork"></i><span>Raíces Rx</span>
-                        </button>
-                        <button onclick="toggleLayerBtn('ipr')" id="layerBtn-ipr" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-fill ph-arrows-in-line-horizontal"></i><span>IPR .mm</span>
-                        </button>
-                        <button onclick="toggleLayerBtn('tads')" id="layerBtn-tads" class="px-2.5 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-fill ph-screw"></i><span>TADs + ATP</span>
-                        </button>
-                        <button onclick="toggleLayerBtn('attachments')" id="layerBtn-attachments" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-fill ph-push-pin"></i><span>Ataches</span>
-                        </button>
-                        <button onclick="toggleLayerBtn('tongue')" id="layerBtn-tongue" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-fill ph-waves"></i><span>Lengua</span>
-                        </button>
-                        <button onclick="toggleLayerBtn('ghost')" id="layerBtn-ghost" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-bold ph-selection-background"></i><span>Ghost M0</span>
-                        </button>
-                        <button onclick="togglePhotoPiP(true)" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition">
-                            <i class="ph-bold ph-picture-in-picture"></i><span>Foto PiP</span>
-                        </button>
+                        <div class="h-5 w-[1px] bg-white/15 shrink-0"></div>
+
+                        <!-- GRUPO 2: VISIBILIDAD DE ARCADAS (ICONOS) -->
+                        <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/5" role="group" aria-label="Visibilidad de Arcadas">
+                            <button onclick="setArchVisibility('both')" id="archBtn-both" class="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95" title="Ambas Arcadas (Maxilar y Mandíbula)" aria-label="Ambas Arcadas">
+                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                    <path d="M4 7 C 4 2.8, 16 2.8, 16 7"/>
+                                    <path d="M4 13 C 4 17.2, 16 17.2, 16 13"/>
+                                </svg>
+                            </button>
+                            <button onclick="setArchVisibility('upper')" id="archBtn-upper" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Arcada Superior (Maxilar)" aria-label="Arcada Superior">
+                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                    <path d="M4 14 C 4 5.5, 16 5.5, 16 14"/>
+                                </svg>
+                            </button>
+                            <button onclick="setArchVisibility('lower')" id="archBtn-lower" class="w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95" title="Arcada Inferior (Mandíbula)" aria-label="Arcada Inferior">
+                                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                    <path d="M4 6 C 4 14.5, 16 14.5, 16 6"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="h-5 w-[1px] bg-white/15 shrink-0"></div>
+
+                        <!-- GRUPO 3: CAPAS CLÍNICAS 3D Y HERRAMIENTAS -->
+                        <div class="flex items-center space-x-1" role="group" aria-label="Capas Clínicas 3D">
+                            <button onclick="toggleLayerBtn('roots')" id="layerBtn-roots" class="h-8 px-2.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Raíces Dentales Radiográficas">
+                                <i class="ph-fill ph-git-fork text-xs"></i>
+                                <span class="hidden sm:inline">Raíces</span>
+                            </button>
+                            <button onclick="toggleLayerBtn('ipr')" id="layerBtn-ipr" class="h-8 px-2.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Discos y Medidas de Stripping IPR">
+                                <i class="ph-fill ph-arrows-in-line-horizontal text-xs"></i>
+                                <span class="hidden sm:inline">IPR</span>
+                            </button>
+                            <button onclick="toggleLayerBtn('tads')" id="layerBtn-tads" class="h-8 px-2.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Microtornillos TADs y Barra Palatina">
+                                <i class="ph-fill ph-screw text-xs"></i>
+                                <span class="hidden sm:inline">TADs</span>
+                            </button>
+                            <button onclick="toggleLayerBtn('attachments')" id="layerBtn-attachments" class="h-8 px-2.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Ataches Biomecánicos">
+                                <i class="ph-fill ph-push-pin text-xs"></i>
+                                <span class="hidden sm:inline">Ataches</span>
+                            </button>
+                            <button onclick="toggleLayerBtn('ghost')" id="layerBtn-ghost" class="h-8 px-2.5 rounded-lg text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Superposición Inicial Translúcida (Ghost Mes 0)">
+                                <i class="ph-bold ph-selection-background text-xs"></i>
+                                <span class="hidden sm:inline">Ghost</span>
+                            </button>
+                            
+                            <!-- Botón Articulador / Apertura Mandibular con Popover -->
+                            <div class="relative">
+                                <button onclick="toggleJawPopover()" id="jawToggleBtn" class="h-8 px-2 rounded-lg text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition active:scale-95" title="Apertura Mandibular / Articulador">
+                                    <i class="ph-bold ph-arrows-out-line-vertical text-xs"></i>
+                                    <span id="jawOpenPillVal" class="mono text-[10px] text-sky-400">0°</span>
+                                </button>
+                                <!-- Popover de Apertura Mandibular -->
+                                <div id="jawAperturePopover" class="hidden absolute bottom-11 right-0 sm:left-1/2 sm:-translate-x-1/2 z-30 apple-glass px-3 py-2 rounded-2xl shadow-2xl flex items-center space-x-2.5 pointer-events-auto border border-white/15 min-w-[210px]">
+                                    <span class="text-[11px] text-zinc-300 whitespace-nowrap flex items-center"><i class="ph-bold ph-arrows-out-line-vertical text-sky-400 mr-1"></i>Apertura:</span>
+                                    <input type="range" id="jawOpenSlider" min="0" max="24" value="0" oninput="updateJawOpening(this.value)" class="apple-slider flex-1">
+                                    <span id="jawOpenVal" class="mono text-sky-400 text-xs w-6 text-right">0°</span>
+                                </div>
+                            </div>
+
+                            <button onclick="togglePhotoPiP(true)" class="h-8 px-2.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95" title="Comparar con Foto Intraoral Real">
+                                <i class="ph-bold ph-picture-in-picture text-xs"></i>
+                                <span class="hidden sm:inline">Foto</span>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
-            <!-- 4. BARRA REPRODUCTORA TIMELINE (MES 0 A MES 18 + APERTURA MANDIBULAR) -->
-            <div class="bg-[#111113] border-t border-white/10 px-4 py-3 shrink-0 z-20">
-                <div class="max-w-4xl mx-auto flex flex-col space-y-2.5">
-                    <!-- Controles Play + Slider Principal -->
-                    <div class="flex items-center space-x-3">
-                        <button onclick="resetTimeline()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition shrink-0" title="Mes 0">
-                            <i class="ph-fill ph-skip-back text-xs"></i>
-                        </button>
-                        <button id="playPauseBtn" onclick="togglePlay()" class="h-9 px-4 rounded-full bg-[#0a84ff] hover:bg-[#0070e0] text-white font-semibold text-xs flex items-center space-x-1.5 shadow-lg shadow-blue-500/25 transition shrink-0">
-                            <i id="playIcon" class="ph-fill ph-play text-sm"></i>
-                            <span id="playText">Simular</span>
-                        </button>
-                        <button onclick="finishTimeline()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition shrink-0" title="Mes 18">
-                            <i class="ph-fill ph-skip-forward text-xs"></i>
-                        </button>
+            <!-- 4. BARRA REPRODUCTORA TIMELINE EXCLUSIVA (HASTA ABAJO) -->
+            <div class="bg-[#111113] border-t border-white/10 px-3 sm:px-5 py-2.5 sm:py-3 shrink-0 z-20">
+                <div class="max-w-3xl mx-auto flex items-center space-x-2.5 sm:space-x-3.5">
+                    <!-- Botón Reiniciar a Mes 0 -->
+                    <button onclick="resetTimeline()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition shrink-0 active:scale-95" title="Mes 0 (Estado Inicial)">
+                        <i class="ph-fill ph-skip-back text-xs"></i>
+                    </button>
 
-                        <div class="flex-1 flex items-center space-x-2.5">
-                            <span class="text-[11px] mono text-zinc-400">M0</span>
-                            <input type="range" id="stageSlider" min="0" max="18" step="0.1" value="0" oninput="onStageSliderInput(this.value)" class="apple-slider flex-1">
-                            <span class="text-[11px] mono text-emerald-400 font-semibold">M18</span>
-                        </div>
+                    <!-- Botón Play/Pausa: SOLO EL ICONO DE PLAY, SIN PALABRA SIMULAR -->
+                    <button id="playPauseBtn" onclick="togglePlay()" class="w-10 h-10 rounded-full bg-[#0a84ff] hover:bg-[#0070e0] text-white flex items-center justify-center shadow-lg shadow-blue-500/30 transition shrink-0 active:scale-95 focus:outline-none" title="Reproducir Simulación">
+                        <i id="playIcon" class="ph-fill ph-play text-base translate-x-0.5"></i>
+                    </button>
+
+                    <!-- Botón Finalizar a Mes 18 -->
+                    <button onclick="finishTimeline()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 flex items-center justify-center transition shrink-0 active:scale-95" title="Mes 18 (Resultado Final)">
+                        <i class="ph-fill ph-skip-forward text-xs"></i>
+                    </button>
+
+                    <!-- Scrubber / Slider de Mes 0 a Mes 18 -->
+                    <div class="flex-1 flex items-center space-x-2 sm:space-x-3">
+                        <span class="text-[11px] mono text-zinc-400 shrink-0 font-medium">M0</span>
+                        <input type="range" id="stageSlider" min="0" max="18" step="0.1" value="0" oninput="onStageSliderInput(this.value)" class="apple-slider flex-1">
+                        <span class="text-[11px] mono text-emerald-400 font-semibold shrink-0">M18</span>
                     </div>
 
-                    <!-- Sub-barra: Articulador Mandibular + Filtro Rápido de Arcada -->
-                    <div class="flex items-center justify-between text-[11px] pt-0.5">
-                        <div class="flex items-center space-x-1.5 bg-zinc-900 p-0.5 rounded-lg border border-white/10">
-                            <button onclick="setArchVisibility('both')" id="archBtn-both" class="px-2.5 py-1 rounded-md bg-zinc-700 text-white font-medium transition">Ambas</button>
-                            <button onclick="setArchVisibility('upper')" id="archBtn-upper" class="px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition">Superior</button>
-                            <button onclick="setArchVisibility('lower')" id="archBtn-lower" class="px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition">Inferior</button>
-                        </div>
-
-                        <div class="flex items-center space-x-2 w-44 sm:w-56">
-                            <span class="text-zinc-400 whitespace-nowrap"><i class="ph-bold ph-arrows-out-line-vertical text-sky-400 mr-1"></i>Apertura:</span>
-                            <input type="range" id="jawOpenSlider" min="0" max="24" value="0" oninput="updateJawOpening(this.value)" class="apple-slider flex-1">
-                            <span id="jawOpenVal" class="mono text-sky-400 w-7 text-right">0°</span>
-                        </div>
+                    <!-- Indicador de Mes en la Barra de Simulación -->
+                    <div class="px-2.5 py-1 rounded-full bg-zinc-800/80 border border-white/10 text-xs font-semibold mono text-sky-400 shrink-0 min-w-[56px] text-center shadow-sm">
+                        <span id="bottomMonthBadge">Mes 0</span>
                     </div>
                 </div>
             </div>
@@ -1207,7 +1287,7 @@
         // ============================================================================
         // 2. VARIABLES DE ESTADO 3D Y CAPAS
         // ============================================================================
-        let scene, camera, renderer, controls;
+        let scene, camera, renderer, controls, cameraAnim = null;
         let upperArchGroup, lowerArchGroup, tadsAndTPAGroup, tongueMesh;
         let rawSTLMeshGroup = null;
         let teethObjects = {};
@@ -1503,7 +1583,7 @@
             renderClinicalMediaGallery();
             renderClinicalNotes();
             renderProtocolSequence();
-            selectTooth(42);
+            selectTooth(42, false);
             animate();
         };
 
@@ -1530,6 +1610,12 @@
             controls.maxDistance = 42;
             controls.minDistance = 8;
             controls.target.set(0, -0.2, 1.8);
+            controls.addEventListener('start', () => {
+                if (cameraAnim) {
+                    cancelAnimationFrame(cameraAnim.rafId);
+                    cameraAnim = null;
+                }
+            });
 
             scene.add(new THREE.AmbientLight(0xffffff, 0.72));
 
@@ -1923,6 +2009,8 @@
             const currentIMPA = (98.5 - smoothP * 4.5).toFixed(1);
 
             document.getElementById('islandStageText').innerText = `Mes ${stageInt} / 18`;
+            const bBadge = document.getElementById('bottomMonthBadge');
+            if (bBadge) bBadge.innerText = `Mes ${stageInt}`;
             document.getElementById('islandOBBadge').innerText = `OB: ${currentOB > 0 ? '+' : ''}${currentOB}mm`;
             document.getElementById('popMetricOB').innerText = `${currentOB > 0 ? '+' : ''}${currentOB} mm`;
             document.getElementById('popMetricOJ').innerText = `${currentOJ} mm`;
@@ -2026,7 +2114,7 @@
             }).join('');
         }
 
-        function selectTooth(fdi) {
+        function selectTooth(fdi, focusCam = true) {
             if (!teethObjects[fdi]) return;
             selectedFDI = fdi;
 
@@ -2068,6 +2156,10 @@
             document.getElementById('customLabialSlider').value = tObj.customGoal.dz;
             document.getElementById('customVertSlider').value = tObj.customGoal.dy;
             updateCustomSlidersLabels();
+
+            if (focusCam) {
+                focusCameraOnTooth(fdi);
+            }
         }
 
         function updateCustomSlidersLabels() {
@@ -2490,15 +2582,100 @@
         }
 
         // ============================================================================
-        // 9. CONTROLES DE CÁMARA, CAPAS 3D Y LECTOR .STL NATIVO
+        // 9. ANIMACIÓN SUAVE DE CÁMARA, FOCO DENTAL Y CONTROLES 3D
         // ============================================================================
+        function animateCameraTo(destPos, destTarget, duration = 450) {
+            if (cameraAnim) {
+                cancelAnimationFrame(cameraAnim.rafId);
+                cameraAnim = null;
+            }
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const startTime = performance.now();
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Curva de aceleración Apple EaseInOutCubic
+                const ease = progress < 0.5 
+                    ? 4 * progress * progress * progress 
+                    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                camera.position.lerpVectors(startPos, destPos, ease);
+                controls.target.lerpVectors(startTarget, destTarget, ease);
+                controls.update();
+
+                if (progress < 1) {
+                    cameraAnim = { rafId: requestAnimationFrame(step) };
+                } else {
+                    cameraAnim = null;
+                }
+            }
+            cameraAnim = { rafId: requestAnimationFrame(step) };
+        }
+
+        function focusCameraOnTooth(fdi) {
+            const tObj = teethObjects[fdi];
+            if (!tObj) return;
+
+            const isUpper = fdi < 30;
+            const quadrant = Math.floor(fdi / 10);
+            const num = fdi % 10;
+            const isRight = (quadrant === 1 || quadrant === 4);
+
+            // Asegurar que la arcada que contiene el diente esté visible
+            if (isUpper && !upperArchGroup.visible) {
+                setArchVisibility('upper');
+            } else if (!isUpper && !lowerArchGroup.visible) {
+                setArchVisibility('lower');
+            }
+
+            const toothWorldPos = new THREE.Vector3();
+            tObj.crownMesh.getWorldPosition(toothWorldPos);
+
+            let destTarget = new THREE.Vector3();
+            let destPos = new THREE.Vector3();
+            let activeView = 'front';
+
+            if (num <= 2) {
+                // Incisivos Centrales y Laterales: Vista Frontal orientada
+                activeView = 'front';
+                destTarget.set(toothWorldPos.x * 0.45, toothWorldPos.y, toothWorldPos.z * 0.4);
+                destPos.set(toothWorldPos.x * 0.7, toothWorldPos.y + (isUpper ? 0.9 : -0.9), 20.5);
+            } else if (num === 3) {
+                // Caninos: Vista 3/4 Anterolateral
+                activeView = isRight ? 'right' : 'left';
+                destTarget.set(toothWorldPos.x * 0.6, toothWorldPos.y, toothWorldPos.z * 0.4);
+                destPos.set(isRight ? -16 : 16, toothWorldPos.y + (isUpper ? 1.3 : -1.0), 12.5);
+            } else {
+                // Premolares y Molares: Vista Lateral anatómica directa
+                activeView = isRight ? 'right' : 'left';
+                destTarget.set(toothWorldPos.x * 0.5, toothWorldPos.y, toothWorldPos.z);
+                destPos.set(isRight ? -21 : 21, toothWorldPos.y + (isUpper ? 1.5 : -1.2), Math.max(toothWorldPos.z, -0.5) + 3.8);
+            }
+
+            // Actualizar indicador visual de la vista en el dock
+            ['front', 'right', 'left', 'upper', 'lower'].forEach(v => {
+                const b = document.getElementById(`camBtn-${v}`);
+                if (b) {
+                    b.className = (v === activeView)
+                        ? "w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95"
+                        : "w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95";
+                }
+            });
+
+            animateCameraTo(destPos, destTarget, 480);
+        }
+
         function toggleLayerBtn(layerKey) {
             layerState[layerKey] = !layerState[layerKey];
             const btn = document.getElementById(`layerBtn-${layerKey}`);
-            if (layerState[layerKey]) {
-                btn.className = "px-2.5 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition";
-            } else {
-                btn.className = "px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1 transition";
+            if (btn) {
+                if (layerState[layerKey]) {
+                    btn.className = "h-8 px-2.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95";
+                } else {
+                    btn.className = "h-8 px-2.5 rounded-lg text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95";
+                }
             }
             updateStageVisualization(currentStage);
         }
@@ -2508,39 +2685,42 @@
                 const b = document.getElementById(`camBtn-${v}`);
                 if (b) {
                     b.className = (v === view)
-                        ? "px-2.5 py-1.5 rounded-xl bg-white/15 text-white text-[11px] font-medium whitespace-nowrap transition"
-                        : "px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap transition";
+                        ? "w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95"
+                        : "w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95";
                 }
             });
 
+            let destPos, destTarget;
             switch (view) {
                 case 'front':
                     setArchVisibility('both');
-                    camera.position.set(0, 1.5, 24.5);
-                    controls.target.set(0, -0.2, 1.8);
+                    destPos = new THREE.Vector3(0, 1.5, 24.5);
+                    destTarget = new THREE.Vector3(0, -0.2, 1.8);
                     break;
                 case 'right':
                     setArchVisibility('both');
-                    camera.position.set(-22, 1.5, 2);
-                    controls.target.set(0, 0, 0);
+                    destPos = new THREE.Vector3(-22, 1.5, 2);
+                    destTarget = new THREE.Vector3(0, 0, 0);
                     break;
                 case 'left':
                     setArchVisibility('both');
-                    camera.position.set(22, 1.5, 2);
-                    controls.target.set(0, 0, 0);
+                    destPos = new THREE.Vector3(22, 1.5, 2);
+                    destTarget = new THREE.Vector3(0, 0, 0);
                     break;
                 case 'upper':
                     setArchVisibility('upper');
-                    camera.position.set(0, -19, 1);
-                    controls.target.set(0, 1, 0);
+                    destPos = new THREE.Vector3(0, -19, 1);
+                    destTarget = new THREE.Vector3(0, 1, 0);
                     break;
                 case 'lower':
                     setArchVisibility('lower');
-                    camera.position.set(0, 19, 1);
-                    controls.target.set(0, -1, 0);
+                    destPos = new THREE.Vector3(0, 19, 1);
+                    destTarget = new THREE.Vector3(0, -1, 0);
                     break;
             }
-            controls.update();
+            if (destPos && destTarget) {
+                animateCameraTo(destPos, destTarget, 420);
+            }
         }
 
         function setArchVisibility(mode) {
@@ -2550,8 +2730,8 @@
                 const b = document.getElementById(`archBtn-${m}`);
                 if (b) {
                     b.className = (m === mode)
-                        ? "px-2.5 py-1 rounded-md bg-zinc-700 text-white font-medium transition"
-                        : "px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition";
+                        ? "w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center transition shadow-sm active:scale-95"
+                        : "w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95";
                 }
             });
             updateIPR3DLabelsProjection();
@@ -2562,9 +2742,27 @@
             lowerArchGroup.rotation.x = rad;
             lowerArchGroup.position.y = -Math.sin(rad) * 3.2;
             lowerArchGroup.position.z = -Math.sin(rad) * 1.1;
-            document.getElementById('jawOpenVal').innerText = `${deg}°`;
+            const valEl = document.getElementById('jawOpenVal');
+            if (valEl) valEl.innerText = `${deg}°`;
+            const pillEl = document.getElementById('jawOpenPillVal');
+            if (pillEl) pillEl.innerText = `${deg}°`;
             updateIPR3DLabelsProjection();
         }
+
+        function toggleJawPopover() {
+            const pop = document.getElementById('jawAperturePopover');
+            if (pop) pop.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const pop = document.getElementById('jawAperturePopover');
+            const btn = document.getElementById('jawToggleBtn');
+            if (pop && !pop.classList.contains('hidden')) {
+                if (!pop.contains(e.target) && btn && !btn.contains(e.target)) {
+                    pop.classList.add('hidden');
+                }
+            }
+        });
 
         function onStageSliderInput(val) {
             if (isPlaying) togglePlay();
@@ -2574,25 +2772,31 @@
         function togglePlay() {
             isPlaying = !isPlaying;
             const icon = document.getElementById('playIcon');
-            const text = document.getElementById('playText');
+            const btn = document.getElementById('playPauseBtn');
             const slider = document.getElementById('stageSlider');
 
             if (isPlaying) {
                 if (currentStage >= totalStages) currentStage = 0;
-                icon.className = "ph-fill ph-pause text-sm";
-                text.innerText = "Pausar";
+                if (icon) icon.className = "ph-fill ph-pause text-base";
+                if (btn) {
+                    btn.title = "Pausar Simulación";
+                    btn.classList.add("ring-2", "ring-sky-400/50");
+                }
                 playInterval = setInterval(() => {
                     currentStage += 0.14;
                     if (currentStage >= totalStages) {
                         currentStage = totalStages;
                         togglePlay();
                     }
-                    slider.value = currentStage;
+                    if (slider) slider.value = currentStage;
                     updateStageVisualization(currentStage);
                 }, 32);
             } else {
-                icon.className = "ph-fill ph-play text-sm";
-                text.innerText = "Simular";
+                if (icon) icon.className = "ph-fill ph-play text-base translate-x-0.5";
+                if (btn) {
+                    btn.title = "Reproducir Simulación";
+                    btn.classList.remove("ring-2", "ring-sky-400/50");
+                }
                 clearInterval(playInterval);
             }
         }
@@ -2618,7 +2822,7 @@
             const crowns = Object.values(teethObjects).map(t => t.crownMesh);
             const hits = raycaster.intersectObjects(crowns, false);
             if (hits.length > 0 && hits[0].object.userData.fdi) {
-                selectTooth(hits[0].object.userData.fdi);
+                selectTooth(hits[0].object.userData.fdi, false);
             }
         }
 
