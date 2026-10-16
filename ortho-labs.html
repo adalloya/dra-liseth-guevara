@@ -10,10 +10,11 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: #f5f5f7;
+      color: #1d1d1f;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -32,22 +33,25 @@
       align-items: center;
       justify-content: center;
       padding: 6px 10px;
-      border-radius: 7px;
-      font-size: 10px;
-      font-weight: 600;
-      color: #475569;
-      transition: all 0.15s ease;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #86868b;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
       border: 1px solid transparent;
+      background: transparent;
     }
     .cc-tool-btn:hover {
-      background-color: #f1f5f9;
-      color: #0f172a;
+      background-color: rgba(0, 0, 0, 0.04);
+      color: #1d1d1f;
     }
     .cc-tool-btn.active {
-      background-color: #e0f2fe;
-      color: #0284c7;
-      border-color: #7dd3fc;
+      background-color: #ffffff;
+      color: #0071e3;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      font-weight: 600;
     }
 
     /* 2D Odontogram Tooth Box */
@@ -61,10 +65,11 @@
       box-shadow: 0 6px 15px rgba(14, 165, 233, 0.25);
     }
     .tooth-box.selected-tooth {
-      outline: 2px solid #38bdf8;
+      outline: 2px solid #0071e3;
       outline-offset: 2px;
       transform: scale(1.05);
-      background-color: rgba(14, 165, 233, 0.22) !important;
+      background-color: rgba(0, 113, 227, 0.12) !important;
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.25) !important;
     }
 
     /* Custom Range Sliders */
@@ -75,21 +80,28 @@
     }
     input[type=range].cc-slider::-webkit-slider-runnable-track {
       width: 100%;
-      height: 6px;
+      height: 4px;
       cursor: pointer;
-      background: #cbd5e1;
-      border-radius: 4px;
+      background: #e5e5ea;
+      border-radius: 9999px;
     }
     input[type=range].cc-slider::-webkit-slider-thumb {
       height: 18px;
       width: 18px;
       border-radius: 50%;
-      background: #0ea5e9;
+      background: #ffffff;
       cursor: pointer;
       -webkit-appearance: none;
-      margin-top: -6px;
-      box-shadow: 0 0 10px rgba(14, 165, 233, 0.9);
-      border: 2px solid #ffffff;
+      margin-top: -7px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.12);
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      transition: transform 0.15s ease;
+    }
+    input[type=range].cc-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+    input[type=range].cc-slider::-webkit-slider-thumb:active {
+      background: #0071e3;
     }
 
     @media print {
@@ -112,46 +124,46 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- TOP CLINICAL HEADER -->
-  <header class="bg-slate-900 text-white border-b border-slate-800 relative z-20 no-print shadow-md">
-    <div class="max-w-[1640px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap justify-between items-center gap-2">
+  <!-- TOP CLINICAL HEADER (Apple Frosted Glass Navigation) -->
+  <header class="bg-white/80 backdrop-blur-xl border-b border-black/5 relative z-20 no-print shadow-xs">
+    <div class="max-w-[1640px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap justify-between items-center gap-2.5">
       <!-- Brand & Active Patient -->
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="flex items-center gap-1.5 text-slate-300 hover:text-white transition mr-1 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-sky-500 shadow-sm" title="Volver al Sitio Principal">
-          <i class="fa-solid fa-arrow-left text-xs"></i>
-          <span class="text-xs font-semibold uppercase hidden sm:inline">Sitio Web</span>
+        <a href="index.html" class="flex items-center gap-1.5 text-[#1d1d1f] hover:text-[#0071e3] transition px-3 py-1.5 rounded-full bg-[#f5f5f7] hover:bg-[#e8e8ed] border border-black/5 text-xs font-medium" title="Volver al Sitio Principal">
+          <i class="fa-solid fa-chevron-left text-[10px]"></i>
+          <span class="hidden sm:inline">Dra. Liseth Guevara</span>
         </a>
-        <div class="bg-gradient-to-br from-sky-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-sky-500/20">
-          <i class="fa-solid fa-tooth text-lg text-white"></i>
+        <div class="w-8 h-8 rounded-full bg-[#0071e3] flex items-center justify-center text-white shadow-sm shadow-[#0071e3]/20">
+          <i class="fa-solid fa-tooth text-sm"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-white">OrthoAI Expert Pro</h1>
-            <span class="text-[10px] font-bold bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full border border-sky-500/30">ClinCheck 3D HD v6.0</span>
+            <h1 class="text-sm sm:text-base font-semibold tracking-tight text-[#1d1d1f]">OrthoAI Expert Pro</h1>
+            <span class="text-[10px] font-semibold bg-[#0071e3]/10 text-[#0071e3] px-2.5 py-0.5 rounded-full border border-[#0071e3]/20">3D ClinCheck HD</span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">
-            Paciente: <strong class="text-white" id="headerPatientName">Zúñiga Núñez Martha Gabriela (40 años)</strong> &bull; Referidor: Dra. Liseth Guevara Muñoz (IDI Mérida)
+          <p class="text-[11px] text-[#86868b] hidden sm:block">
+            Paciente: <strong class="text-[#1d1d1f] font-medium" id="headerPatientName">Zúñiga Núñez Martha Gabriela (40 años)</strong> &bull; Referidor: Dra. Liseth Guevara Muñoz
           </p>
         </div>
       </div>
 
-      <!-- Main Navigation Tabs -->
-      <div class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 overflow-x-auto max-w-full">
-        <button onclick="switchMainTab('tab3d')" id="btnTab3d" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow transition whitespace-nowrap flex items-center gap-1.5">
-          <i class="fa-solid fa-cube"></i> 1. ClinCheck 3D &amp; Odontograma
+      <!-- Main Navigation Tabs (Apple Segmented Pill Control) -->
+      <div class="flex items-center bg-[#f5f5f7] p-1 rounded-full border border-black/5 overflow-x-auto max-w-full">
+        <button onclick="switchMainTab('tab3d')" id="btnTab3d" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-[#1d1d1f] shadow-sm transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-cube text-[#0071e3]"></i> 1. ClinCheck 3D &amp; Odontograma
         </button>
-        <button onclick="switchMainTab('tabClinical')" id="btnTabClinical" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5">
-          <i class="fa-solid fa-file-medical"></i> 2. Diagnóstico, Riesgos y Mes a Mes
+        <button onclick="switchMainTab('tabClinical')" id="btnTabClinical" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-file-medical"></i> 2. Diagnóstico &amp; Riesgos
         </button>
-        <button onclick="switchMainTab('tabAI')" id="btnTabAI" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5">
-          <i class="fa-solid fa-wand-magic-sparkles text-sky-600"></i> 3. Analizador IA (Rx + Fotos)
+        <button onclick="switchMainTab('tabAI')" id="btnTabAI" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-[#0071e3]"></i> 3. Analizador IA
         </button>
       </div>
 
-      <!-- Export PDF Action -->
+      <!-- Export PDF Action (Apple Blue Pill Button) -->
       <div class="flex items-center gap-2">
-        <button onclick="exportClinicalPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-pdf"></i> <span class="hidden md:inline">Exportar Expediente PDF</span>
+        <button onclick="exportClinicalPDF()" class="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium px-4 py-1.5 rounded-full shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-down-to-bracket text-[11px]"></i> <span>Expediente PDF</span>
         </button>
       </div>
     </div>
@@ -348,7 +360,7 @@
                 <i class="fa-solid fa-sliders text-sky-600"></i> Editor 3D y Prescripción de Stripping
               </h3>
             </div>
-            <button onclick="resetSelectedTooth()" class="text-xs text-slate-300 hover:text-white bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition">
+            <button onclick="resetSelectedTooth()" class="text-xs text-[#86868b] hover:text-white bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition">
               <i class="fa-solid fa-rotate-left mr-1"></i> Reset
             </button>
           </div>
@@ -443,7 +455,7 @@
           <span class="text-[11px] text-slate-500 flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Sincronizado 3D &amp; 2D
           </span>
-          <button onclick="triggerLiveUpdate()" id="btnLiveUpdate" class="bg-[#0095ff] hover:bg-[#007acc] text-white font-extrabold text-xs px-5 py-2.5 rounded-lg shadow-lg shadow-sky-500/30 transition flex items-center gap-2">
+          <button onclick="triggerLiveUpdate()" id="btnLiveUpdate" class="bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs px-5 py-2.5 rounded-full shadow-sm shadow-[#0071e3]/20 transition flex items-center gap-2">
             <i class="fa-solid fa-rotate"></i> Live Update
           </button>
         </div>
@@ -494,8 +506,8 @@
         </div>
 
         <!-- Occlusal Plane Divider -->
-        <div class="my-5 border-t-2 border-dashed border-indigo-200 flex justify-center">
-          <span class="bg-slate-800 text-sky-600 border border-slate-600 text-[10px] font-bold px-4 py-0.5 rounded-full uppercase -mt-2.5">
+        <div class="my-5 border-t-2 border-dashed border-slate-200 flex justify-center">
+          <span class="bg-white text-[#0071e3] border border-black/10 text-[10px] font-semibold px-4 py-0.5 rounded-full uppercase -mt-2.5 shadow-xs">
             Plano Oclusal &bull; Cierre de Mordida Abierta por Autorrotación Mandibular
           </span>
         </div>
@@ -614,7 +626,7 @@
             <h4 class="text-xs font-bold text-emerald-400 uppercase mb-2">
               <i class="fa-solid fa-kit-medical mr-1"></i> Tratamientos Adicionales Requeridos
             </h4>
-            <ul class="space-y-2 text-xs text-slate-300">
+            <ul class="space-y-2 text-xs text-[#86868b]">
               <li><strong>1. Periodoncia Previa:</strong> Detartraje ultrasónico y profilaxis profunda en sextante anteroinferior.</li>
               <li><strong>2. Terapia Miofuncional + Espuelas:</strong> Recordatorios linguales adheridos para erradicar interposición de lengua.</li>
               <li><strong>3. Exodoncias (18, 28, 38, 48):</strong> Liberación posterior para favorecer intrusión molar.</li>
@@ -642,46 +654,46 @@
         <i class="fa-solid fa-calendar-check text-sky-600"></i> Cronograma Biomecánico Mes con Mes (18 Meses)
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-slate-700 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 0 (PRE-FASE)</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Periodoncia y Exodoncia de 3ros Molares</h4>
-          <p class="text-xs text-slate-300">Detartraje profundo anteroinferior. Exodoncia de 18, 28, 38 y 48 para eliminar el efecto cuña posterior.</p>
+          <p class="text-xs text-[#86868b]">Detartraje profundo anteroinferior. Exodoncia de 18, 28, 38 y 48 para eliminar el efecto cuña posterior.</p>
         </div>
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-sky-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 1 - 2</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Bondeo Diferencial + Espuelas + IPR Inicial</h4>
-          <p class="text-xs text-slate-300">Arcos .014" CuNiTi. Adhesión de espuelas linguales. Iniciar Stripping (0.15 mm Mesial y 0.15 mm Distal en 42, 41, 31, 32).</p>
+          <p class="text-xs text-[#86868b]">Arcos .014" CuNiTi. Adhesión de espuelas linguales. Iniciar Stripping (0.15 mm Mesial y 0.15 mm Distal en 42, 41, 31, 32).</p>
         </div>
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-sky-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 3 - 4</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Desrotación de 42/32 y Nivelación de 41/31</h4>
-          <p class="text-xs text-slate-300">Arcos .016" CuNiTi. Completar IPR Mesial y Distal en 43, 42, 41, 31, 32 y 33 (3.2 mm totales) para nivelar el escalón central sin proinclinar.</p>
+          <p class="text-xs text-[#86868b]">Arcos .016" CuNiTi. Completar IPR Mesial y Distal en 43, 42, 41, 31, 32 y 33 (3.2 mm totales) para nivelar el escalón central sin proinclinar.</p>
         </div>
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 5 - 6</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Coordinación .016"x.022" CuNiTi + ATP + Rx Control</h4>
-          <p class="text-xs text-slate-300">Cierre del diastema central 11-21. Instalación de Barra Transpalatina separada 3 mm del paladar. Rx periapical de control.</p>
+          <p class="text-xs text-[#86868b]">Cierre del diastema central 11-21. Instalación de Barra Transpalatina separada 3 mm del paladar. Rx periapical de control.</p>
         </div>
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 7 - 11</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Intrusión Molar Activa con 2 TADs IZC</h4>
-          <p class="text-xs text-slate-300">Arcos .019"x.025" SS. Tracción elástica de 150 g por lado desde TADs hacia 16-17 y 26-27. Intrusión de -2.2 mm y cierre vertical por autorrotación.</p>
+          <p class="text-xs text-[#86868b]">Arcos .019"x.025" SS. Tracción elástica de 150 g por lado desde TADs hacia 16-17 y 26-27. Intrusión de -2.2 mm y cierre vertical por autorrotación.</p>
         </div>
-        <div class="bg-[#17191e] border border-slate-200 rounded-xl p-4">
+        <div class="bg-[#f5f5f7] border border-black/5 rounded-2xl p-4">
           <span class="bg-purple-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 12 - 18</span>
           <h4 class="font-bold text-sm text-slate-900 mt-2 mb-1">Asentamiento, Overbite +1.8 mm y Retención</h4>
-          <p class="text-xs text-slate-300">Intercuspidación final y retiro en Mes 18. Retenedor fijo lingual 33-43 + Essix superior con recordatorio palatino.</p>
+          <p class="text-xs text-[#86868b]">Intercuspidación final y retiro en Mes 18. Retenedor fijo lingual 33-43 + Essix superior con recordatorio palatino.</p>
         </div>
       </div>
 
       <!-- Signatures -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-6 border-t border-slate-200">
         <div class="text-center">
-          <p class="font-bold text-sm text-white print-text-dark">Dra. Liseth Guevara Muñoz</p>
+          <p class="font-semibold text-sm text-[#1d1d1f]">Dra. Liseth Guevara Muñoz</p>
           <p class="text-xs text-slate-400">Especialista en Ortodoncia &mdash; Firma y Cédula Profesional</p>
         </div>
         <div class="text-center">
-          <p class="font-bold text-sm text-white print-text-dark">Martha Gabriela Zúñiga Núñez</p>
+          <p class="font-semibold text-sm text-[#1d1d1f]">Martha Gabriela Zúñiga Núñez</p>
           <p class="text-xs text-slate-400">Firma de Consentimiento Informado del Paciente</p>
         </div>
       </div>
@@ -706,12 +718,12 @@
       <form onsubmit="runAIClinCheckGenerator(event)" class="space-y-5">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="sm:col-span-2">
-            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Nombre del Paciente</label>
-            <input type="text" id="aiInputName" value="Zúñiga Núñez Martha Gabriela" required class="w-full bg-[#14161a] border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
+            <label class="block text-xs font-medium uppercase text-[#86868b] mb-1">Nombre del Paciente</label>
+            <input type="text" id="aiInputName" value="Zúñiga Núñez Martha Gabriela" required class="w-full bg-[#f5f5f7] border border-black/10 rounded-xl px-3.5 py-2.5 text-sm text-[#1d1d1f] focus:border-[#0071e3] outline-none">
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Edad</label>
-            <input type="number" id="aiInputAge" value="40" required class="w-full bg-[#14161a] border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
+            <label class="block text-xs font-medium uppercase text-[#86868b] mb-1">Edad</label>
+            <input type="number" id="aiInputAge" value="40" required class="w-full bg-[#f5f5f7] border border-black/10 rounded-xl px-3.5 py-2.5 text-sm text-[#1d1d1f] focus:border-[#0071e3] outline-none">
           </div>
         </div>
 
@@ -1706,32 +1718,37 @@
         const totalIpr = +(t.iprM + t.iprD).toFixed(1);
         const isSel = Number(id) === Number(selectedToothId);
 
-        let bgClass = 'bg-emerald-950/50 border-emerald-600/60 text-emerald-300';
+        let bgClass = 'bg-emerald-50/70 border-emerald-300 text-emerald-800';
+        let circleBg = 'bg-white text-emerald-700 border-emerald-300';
         let centerSymbol = '✓';
 
         if (t.status === 'missing_closed') {
-          bgClass = 'bg-slate-900/90 border-slate-700 text-slate-500 opacity-50';
+          bgClass = 'bg-slate-100/80 border-slate-200 text-slate-400 opacity-60';
+          circleBg = 'bg-slate-50 text-slate-400 border-slate-200';
           centerSymbol = '—';
         } else if (t.status === 'extracted_m0') {
-          bgClass = 'bg-slate-900 border-rose-800/70 text-rose-600';
+          bgClass = 'bg-rose-50 border-rose-200 text-rose-600';
+          circleBg = 'bg-white text-rose-600 border-rose-200';
           centerSymbol = '✖';
         } else if (t.status === 'tad_intrusion') {
-          bgClass = 'bg-rose-950/70 border-rose-500 text-rose-300';
+          bgClass = 'bg-sky-50 border-sky-300 text-sky-800';
+          circleBg = 'bg-white text-[#0071e3] border-sky-300';
           centerSymbol = 'TAD';
         } else if (totalIpr > 0) {
           bgClass = t.status === 'ipr_critical'
-            ? 'bg-rose-950/80 border-amber-400 text-amber-300'
-            : 'bg-amber-950/70 border-amber-500/80 text-amber-300';
+            ? 'bg-amber-50/90 border-amber-300 text-amber-900 shadow-xs'
+            : 'bg-amber-50/60 border-amber-200 text-amber-800';
+          circleBg = 'bg-white text-amber-700 border-amber-300';
           centerSymbol = `.${Math.round(totalIpr * 10)}`;
         }
 
-        const mBadge = t.iprM > 0 ? `<span class="text-[8px] font-bold bg-amber-500/25 text-amber-200 px-1 rounded">M:${t.iprM}</span>` : '';
-        const dBadge = t.iprD > 0 ? `<span class="text-[8px] font-bold bg-amber-500/25 text-amber-200 px-1 rounded">D:${t.iprD}</span>` : '';
+        const mBadge = t.iprM > 0 ? `<span class="text-[8px] font-semibold bg-amber-100 text-amber-900 px-1 py-0.2 rounded border border-amber-200/80">M:${t.iprM}</span>` : '';
+        const dBadge = t.iprD > 0 ? `<span class="text-[8px] font-semibold bg-amber-100 text-amber-900 px-1 py-0.2 rounded border border-amber-200/80">D:${t.iprD}</span>` : '';
 
         return `
-          <div onclick="selectTooth(${id})" class="tooth-box border rounded-lg p-1.5 text-center flex flex-col items-center justify-between min-h-[82px] ${bgClass} ${isSel ? 'selected-tooth' : ''}">
-            <span class="text-[11px] font-extrabold">${id}</span>
-            <div class="w-7 h-7 my-0.5 rounded-full border border-current flex items-center justify-center bg-slate-950/60 text-[9px] font-extrabold">
+          <div onclick="selectTooth(${id})" class="tooth-box border rounded-xl p-1 sm:p-1.5 text-center flex flex-col items-center justify-between min-h-[70px] sm:min-h-[82px] ${bgClass} ${isSel ? 'selected-tooth' : ''}">
+            <span class="text-[10px] sm:text-[11px] font-semibold">${id}</span>
+            <div class="w-5 h-5 sm:w-7 sm:h-7 my-0.5 rounded-full border flex items-center justify-center ${circleBg} text-[8px] sm:text-[9px] font-bold shadow-xs">
               ${centerSymbol}
             </div>
             <div class="flex flex-wrap justify-center gap-0.5 leading-none min-h-[12px]">
@@ -1954,8 +1971,8 @@
         const btn = document.getElementById(btnId);
         const isTarget = btnId.toLowerCase().includes(tabId.replace('tab', '').toLowerCase());
         btn.className = isTarget
-          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow transition whitespace-nowrap flex items-center gap-1.5'
-          : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5';
+          ? 'px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-[#1d1d1f] shadow-sm transition whitespace-nowrap flex items-center gap-1.5'
+          : 'px-3.5 py-1.5 rounded-full text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] transition whitespace-nowrap flex items-center gap-1.5';
       });
 
       if (tabId === 'tab3d' && renderer) {
