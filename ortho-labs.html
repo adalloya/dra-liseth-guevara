@@ -32,6 +32,18 @@
     .lightbox-modal {
       transition: opacity 0.25s ease-in-out;
     }
+    
+    /* Odontograma FDI Buttons */
+    .tooth-btn { 
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+    .tooth-btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); 
+    }
+    .tooth-btn:active {
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
@@ -200,6 +212,199 @@
             <span class="font-bold block truncate">4. Lateral Intraoral</span>
             <span class="text-[10px] text-slate-300">Relación Molar y Canina</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Odontograma Biomecánico Interactivo (Sistema FDI) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-tooth text-indigo-600"></i>
+            Odontograma Biomecánico Interactivo (Sistema FDI)
+          </h3>
+          <p class="text-xs text-slate-500">Haz clic en cualquier órgano dentario (OD) para inspeccionar prescripción, rotación, IPR en milímetros y anclaje.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-xs"></span> Normal / Alineado</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs"></span> Stripping / IPR</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-xs"></span> Intrusión Crítica / TADs</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block shadow-xs"></span> Ausente Previa / Exo</span>
+        </div>
+      </div>
+
+      <!-- Cuadrante Superior (18 al 28) -->
+      <div class="mb-5">
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-up-long text-indigo-500 text-[10px]"></i> Arcada Superior (Maxilar)
+          </p>
+          <span class="text-[11px] text-slate-400 font-mono">Derecha (18-11) | Izquierda (21-28)</span>
+        </div>
+        <div class="grid grid-cols-8 md:grid-cols-16 gap-1.5" id="upperArch">
+          <!-- 18 al 11 -->
+          <button onclick="selectTooth(18, 'Tercer Molar Superior Derecho', 'Presencia de tercer molar con indicación de exodoncia en Fase 0 para eliminar cuña posterior.', '0 mm', 'Exodoncia profiláctica')" class="tooth-btn p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-slate-400 font-bold">18</span>
+            <span class="block text-xs font-bold text-slate-500">M3</span>
+          </button>
+          <button onclick="selectTooth(17, 'Segundo Molar Superior Derecho', 'Molar extruido por efecto cuña. Recibe carga intrusiva directa conectada a TAD infracigomático (IZC).', '0 mm', '-2.0 mm Intrusión vertical')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">17</span>
+            <span class="block text-xs font-bold text-rose-700">M2</span>
+          </button>
+          <button onclick="selectTooth(16, 'Primer Molar Superior Derecho', 'Pilar de anclaje conectado a Barra Transpalatina (ATP) despegada 3 mm + cadeneta elástica a microtornillo IZC (150 g).', '0 mm', '-2.0 mm Intrusión vertical')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">16</span>
+            <span class="block text-xs font-bold text-rose-700">M1</span>
+          </button>
+          <button onclick="selectTooth(15, 'Segundo Premolar Superior Derecho', 'Alineación pasiva con arcos ligeros CuNiTi. Mantiene contacto proximal estable con primer molar.', '0 mm', 'Nivelación pasiva')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">15</span>
+            <span class="block text-xs font-bold text-emerald-800">PM2</span>
+          </button>
+          <button onclick="selectTooth(14, 'Primer Premolar Superior Derecho', 'Ausencia previa por tratamiento ortodóntico anterior. Espacio consolidado y cerrado.', '0 mm', 'Espacio Cerrado (Pasivo)')" class="tooth-btn p-2 bg-slate-200 border border-slate-300 rounded-lg text-center opacity-60 cursor-pointer">
+            <span class="block text-[10px] text-slate-500 font-bold">14</span>
+            <span class="block text-xs font-bold text-slate-600">PM1</span>
+          </button>
+          <button onclick="selectTooth(13, 'Canino Superior Derecho', 'Acoplamiento para guía canina funcional bilateral. Desrotación ligera sin vestibularizar la corona.', '0 mm', 'Desrotación y acople')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">13</span>
+            <span class="block text-xs font-bold text-emerald-800">C</span>
+          </button>
+          <button onclick="selectTooth(12, 'Incisivo Lateral Superior Derecho', 'Control de torque palatoradicular con alambre rectangular para armonizar con el plano facial.', '0 mm', 'Expresión de Torque +5°')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">12</span>
+            <span class="block text-xs font-bold text-emerald-800">IL</span>
+          </button>
+          <button onclick="selectTooth(11, 'Incisivo Central Superior Derecho', 'Leve rotación mesiolabial y escalón incisal. Se aplica stripping selectivo de 0.2 mm para retroinclinación.', '0.2 mm', 'Desrotación + Stripping')" class="tooth-btn p-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-amber-600 font-bold">11</span>
+            <span class="block text-xs font-bold text-amber-800">IC</span>
+          </button>
+          <!-- 21 al 28 -->
+          <button onclick="selectTooth(21, 'Incisivo Central Superior Izquierdo', 'Ligero borde incisal desgastado por atrición. Stripping de 0.2 mm para retroinclinación de puente levadizo.', '0.2 mm', 'Desrotación + Stripping')" class="tooth-btn p-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-amber-600 font-bold">21</span>
+            <span class="block text-xs font-bold text-amber-800">IC</span>
+          </button>
+          <button onclick="selectTooth(22, 'Incisivo Lateral Superior Izquierdo', 'Nivelación gingival relativa con bracket posicionado 0.5 mm más gingival.', '0 mm', 'Nivelación de margen')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">22</span>
+            <span class="block text-xs font-bold text-emerald-800">IL</span>
+          </button>
+          <button onclick="selectTooth(23, 'Canino Superior Izquierdo', 'Guía canina funcional. Soporte para espuela palatina de recordatorio lingual.', '0 mm', 'Alineación funcional')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">23</span>
+            <span class="block text-xs font-bold text-emerald-800">C</span>
+          </button>
+          <button onclick="selectTooth(24, 'Primer Premolar Superior Izquierdo', 'Ausencia previa cerrada en el primer tratamiento ortodóntico.', '0 mm', 'Espacio Cerrado (Pasivo)')" class="tooth-btn p-2 bg-slate-200 border border-slate-300 rounded-lg text-center opacity-60 cursor-pointer">
+            <span class="block text-[10px] text-slate-500 font-bold">24</span>
+            <span class="block text-xs font-bold text-slate-600">PM1</span>
+          </button>
+          <button onclick="selectTooth(25, 'Segundo Premolar Superior Izquierdo', 'Intercuspidación con antagonista inferior sin interferencias en céntrica.', '0 mm', 'Nivelación oclusal')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">25</span>
+            <span class="block text-xs font-bold text-emerald-800">PM2</span>
+          </button>
+          <button onclick="selectTooth(26, 'Primer Molar Superior Izquierdo', 'Conexión a Barra Transpalatina (ATP) + anclaje a microtornillo IZC izquierdo para intrusión activa.', '0 mm', '-2.0 mm Intrusión vertical')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">26</span>
+            <span class="block text-xs font-bold text-rose-700">M1</span>
+          </button>
+          <button onclick="selectTooth(27, 'Segundo Molar Superior Izquierdo', 'Intrusión molar posterior simultánea para eliminar fulcrum y permitir rotación antihoraria mandibular.', '0 mm', '-2.0 mm Intrusión vertical')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">27</span>
+            <span class="block text-xs font-bold text-rose-700">M2</span>
+          </button>
+          <button onclick="selectTooth(28, 'Tercer Molar Superior Izquierdo', 'Presencia de tercer molar extruido. Exodoncia obligatoria antes del inicio de mecánica con TADs.', '0 mm', 'Exodoncia profiláctica')" class="tooth-btn p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-slate-400 font-bold">28</span>
+            <span class="block text-xs font-bold text-slate-500">M3</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrante Inferior (48 al 38) -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-down-long text-emerald-500 text-[10px]"></i> Arcada Inferior (Mandibular)
+          </p>
+          <span class="text-[11px] text-slate-400 font-mono">Derecha (48-41) | Izquierda (31-38)</span>
+        </div>
+        <div class="grid grid-cols-8 md:grid-cols-16 gap-1.5" id="lowerArch">
+          <!-- 48 al 41 -->
+          <button onclick="selectTooth(48, 'Tercer Molar Inferior Derecho', 'Tercer molar semi-impactado. Exodoncia en Fase 0 para permitir descompresión retromolar.', '0 mm', 'Exodoncia')" class="tooth-btn p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-slate-400 font-bold">48</span>
+            <span class="block text-xs font-bold text-slate-500">M3</span>
+          </button>
+          <button onclick="selectTooth(47, 'Segundo Molar Inferior Derecho', 'Aplanamiento suave de curva de Spee sin extrusión para preservar altura facial inferior.', '0 mm', 'Nivelación pasiva')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">47</span>
+            <span class="block text-xs font-bold text-emerald-800">M2</span>
+          </button>
+          <button onclick="selectTooth(46, 'Primer Molar Inferior Derecho', 'Enderezamiento de inclinación mesial (Tip-back) con arcos rectangulares .019\"x.025\".', '0 mm', 'Tip-back y desrotación')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">46</span>
+            <span class="block text-xs font-bold text-emerald-800">M1</span>
+          </button>
+          <button onclick="selectTooth(45, 'Segundo Premolar Inferior Derecho', 'Estabilidad del segmento posterior con ligadura metálica continua en bloque.', '0 mm', 'Anclaje en bloque')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">45</span>
+            <span class="block text-xs font-bold text-emerald-800">PM2</span>
+          </button>
+          <button onclick="selectTooth(44, 'Primer Premolar Inferior Derecho', 'Ausencia previa consolidada por exodoncia en tratamiento anterior.', '0 mm', 'Espacio Cerrado (Pasivo)')" class="tooth-btn p-2 bg-slate-200 border border-slate-300 rounded-lg text-center opacity-60 cursor-pointer">
+            <span class="block text-[10px] text-slate-500 font-bold">44</span>
+            <span class="block text-xs font-bold text-slate-600">PM1</span>
+          </button>
+          <button onclick="selectTooth(43, 'Canino Inferior Derecho', 'Apiñamiento moderado con necesidad de IPR interproximal de 0.4 mm para evitar protrusión.', '0.4 mm', 'Stripping + Desrotación')" class="tooth-btn p-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-amber-600 font-bold">43</span>
+            <span class="block text-xs font-bold text-amber-800">C</span>
+          </button>
+          <button onclick="selectTooth(42, 'Incisivo Lateral Inferior Derecho', 'Apiñamiento severo con rotación de ~45°. Requiere stripping de 0.4 mm y cuña de rotación.', '0.4 mm', 'Stripping + Desrotación 45°')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">42</span>
+            <span class="block text-xs font-bold text-rose-700">IL</span>
+          </button>
+          <button onclick="selectTooth(41, 'Incisivo Central Inferior Derecho', 'Diente lingualizado y aprisionado. IPR mesiodistal de 0.3 mm para alinearlo dentro del hueso basal.', '0.3 mm', 'Alineación + IPR 0.3 mm')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">41</span>
+            <span class="block text-xs font-bold text-rose-700">IC</span>
+          </button>
+          <!-- 31 al 38 -->
+          <button onclick="selectTooth(31, 'Incisivo Central Inferior Izquierdo', 'Apiñamiento severo lingualizado. IPR de 0.3 mm para desrotar sin provocar fenestración ósea.', '0.3 mm', 'Alineación + IPR 0.3 mm')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">31</span>
+            <span class="block text-xs font-bold text-rose-700">IC</span>
+          </button>
+          <button onclick="selectTooth(32, 'Incisivo Lateral Inferior Izquierdo', 'Rotación acentuada. Requiere stripping interproximal de 0.4 mm y expresión controlada de torque.', '0.4 mm', 'Stripping + Desrotación')" class="tooth-btn p-2 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-rose-500 font-bold">32</span>
+            <span class="block text-xs font-bold text-rose-700">IL</span>
+          </button>
+          <button onclick="selectTooth(33, 'Canino Inferior Izquierdo', 'Desrotación distal con stripping de 0.4 mm. Soporte para guía de desoclusión canina izquierda.', '0.4 mm', 'Stripping + Desrotación')" class="tooth-btn p-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-amber-600 font-bold">33</span>
+            <span class="block text-xs font-bold text-amber-800">C</span>
+          </button>
+          <button onclick="selectTooth(34, 'Primer Premolar Inferior Izquierdo', 'Ausencia previa cerrada.', '0 mm', 'Espacio Cerrado (Pasivo)')" class="tooth-btn p-2 bg-slate-200 border border-slate-300 rounded-lg text-center opacity-60 cursor-pointer">
+            <span class="block text-[10px] text-slate-500 font-bold">34</span>
+            <span class="block text-xs font-bold text-slate-600">PM1</span>
+          </button>
+          <button onclick="selectTooth(35, 'Segundo Premolar Inferior Izquierdo', 'Nivelación y asentamiento en céntrica.', '0 mm', 'Nivelación')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">35</span>
+            <span class="block text-xs font-bold text-emerald-800">PM2</span>
+          </button>
+          <button onclick="selectTooth(36, 'Primer Molar Inferior Izquierdo', 'Tubo molar .022\" con tip-back de corrección de eje largo.', '0 mm', 'Nivelación pasiva')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">36</span>
+            <span class="block text-xs font-bold text-emerald-800">M1</span>
+          </button>
+          <button onclick="selectTooth(37, 'Segundo Molar Inferior Izquierdo', 'Nivelación pasiva con arco trenzado en fase final.', '0 mm', 'Nivelación')" class="tooth-btn p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-emerald-600 font-bold">37</span>
+            <span class="block text-xs font-bold text-emerald-800">M2</span>
+          </button>
+          <button onclick="selectTooth(38, 'Tercer Molar Inferior Izquierdo', 'Tercer molar retenido. Exodoncia obligatoria en Fase 0.', '0 mm', 'Exodoncia')" class="tooth-btn p-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-center cursor-pointer">
+            <span class="block text-[10px] text-slate-400 font-bold">38</span>
+            <span class="block text-xs font-bold text-slate-500">M3</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Dinámico del Diente Seleccionado -->
+      <div id="toothDetailsPanel" class="mt-6 p-4 sm:p-5 bg-gradient-to-r from-indigo-50/90 to-slate-50 border border-indigo-200 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all duration-300 shadow-xs">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-md font-mono shadow-xs" id="selectedToothNum">Diente OD 41</span>
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base" id="selectedToothTitle">Incisivo Central Inferior Derecho</h4>
+          </div>
+          <p class="text-xs text-slate-600"><strong>Diagnóstico y Estado:</strong> <span id="selectedToothDiag" class="text-slate-800">Diente lingualizado y aprisionado. Requiere IPR mesiodistal para alinearlo dentro del hueso basal.</span></p>
+          <p class="text-xs text-slate-600"><strong>Stripping (IPR) Requerido:</strong> <span id="selectedToothIPR" class="font-bold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded">0.3 mm</span></p>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-indigo-100 shadow-xs w-full md:w-auto md:min-w-[260px]">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <i class="fa-solid fa-arrows-spin text-indigo-500"></i> Movimiento Biomecánico Programado
+          </p>
+          <p class="text-xs sm:text-sm font-bold text-indigo-950 mt-1" id="selectedToothMovement">Alineación + IPR 0.3 mm (Evitar proinclinación)</p>
         </div>
       </div>
     </section>
@@ -772,6 +977,22 @@
         }
       });
       renderStages();
+    }
+
+    // Interactividad del Odontograma FDI
+    function selectTooth(number, name, diag, ipr, movement) {
+      document.getElementById('selectedToothNum').innerText = `Diente OD ${number}`;
+      document.getElementById('selectedToothTitle').innerText = name;
+      document.getElementById('selectedToothDiag').innerText = diag;
+      document.getElementById('selectedToothIPR').innerText = ipr;
+      document.getElementById('selectedToothMovement').innerText = movement;
+      
+      // Feedback visual del panel animado
+      const panel = document.getElementById('toothDetailsPanel');
+      panel.classList.add('ring-2', 'ring-indigo-400', 'bg-indigo-100/90');
+      setTimeout(() => {
+        panel.classList.remove('ring-2', 'ring-indigo-400', 'bg-indigo-100/90');
+      }, 350);
     }
 
     // Lightbox modal helpers
