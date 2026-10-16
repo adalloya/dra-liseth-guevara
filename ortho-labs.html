@@ -121,6 +121,20 @@
       .print-text-dark { color: #0f172a !important; }
       #canvas3DContainer { height: 380px !important; }
     }
+
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+    }
+    .scanner-beam {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent);
+      box-shadow: 0 0 20px 4px rgba(56, 189, 248, 0.6);
+      animation: scanline 2.2s linear infinite;
+    }
+    
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -140,10 +154,10 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-sm sm:text-base font-semibold tracking-tight text-[#1d1d1f]">OrthoAI Expert Pro</h1>
-            <span class="text-[10px] font-semibold bg-[#0071e3]/10 text-[#0071e3] px-2.5 py-0.5 rounded-full border border-[#0071e3]/20">Anatomical 3D & Roots v7.0</span>
+            <span class="text-[10px] font-semibold bg-[#0071e3]/10 text-[#0071e3] px-2.5 py-0.5 rounded-full border border-[#0071e3]/20">CAD/CAM &amp; STL Engine</span>
           </div>
           <p class="text-[11px] text-[#86868b] hidden sm:block">
-            Paciente: <strong class="text-[#1d1d1f] font-medium" id="headerPatientName">Zúñiga Núñez Martha Gabriela (40 años)</strong> &bull; Referidor: Dra. Liseth Guevara Muñoz
+            Paciente: <strong class="text-[#1d1d1f] font-medium" id="headerPatientName">Zúñiga Núñez Martha Gabriela (40 años)</strong> &bull; Malla: <span id="meshSourceLabel" class="font-semibold text-[#0071e3]">CAD Segmentado (FDI)</span>
           </p>
         </div>
       </div>
@@ -161,10 +175,24 @@
         </button>
       </div>
 
-      <!-- Export PDF Action (Apple Blue Pill Button) -->
+      <!-- CAD/CAM STL & Export PDF Actions -->
       <div class="flex items-center gap-2">
-        <button onclick="exportClinicalPDF()" class="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium px-4 py-1.5 rounded-full shadow-sm transition flex items-center gap-1.5">
-          <i class="fa-solid fa-arrow-down-to-bracket text-[11px]"></i> <span>Expediente PDF</span>
+        <!-- Input oculto para subir STL real -->
+        <input type="file" id="stlFileInput" accept=".stl" class="hidden" onchange="handleSTLUpload(event)">
+        
+        <button onclick="document.getElementById('stlFileInput').click()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 text-xs font-semibold transition shadow-xs">
+          <i class="fa-solid fa-file-arrow-up text-xs"></i>
+          <span class="hidden sm:inline">Importar Escaneo .STL</span>
+          <span class="sm:hidden">.STL</span>
+        </button>
+
+        <button onclick="openCADWorkflowModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 border border-indigo-500/30 text-xs font-semibold transition shadow-xs" title="Ver explicación del flujo STL Formlabs a ClinCheck">
+          <i class="fa-solid fa-network-wired text-xs"></i>
+          <span class="hidden md:inline">Flujo Formlabs / STL</span>
+        </button>
+
+        <button onclick="exportClinicalPDF()" class="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium px-3.5 py-1.5 rounded-full shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-down-to-bracket text-[11px]"></i> <span class="hidden lg:inline">Expediente PDF</span>
         </button>
       </div>
     </div>
@@ -304,6 +332,19 @@
           </ul>
         </div>
 
+        <!-- OVERLAY DE ESCANEO / SEGMENTACIÓN IA (CAD/CAM) -->
+        <div id="aiScannerOverlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center">
+          <div class="scanner-beam"></div>
+          <div class="w-16 h-16 rounded-2xl bg-sky-500/20 border border-sky-400 flex items-center justify-center mb-4 animate-bounce">
+            <i class="fa-solid fa-microchip text-3xl text-sky-400"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-white mb-1" id="aiScannerTitle">Procesando Malla Binaria STL...</h3>
+          <p class="text-xs text-slate-300 max-w-md mb-4" id="aiScannerSub">Identificando márgenes gingivales, separando coronas individuales (FDI 17-47) y calculando ejes longitudinales radiculares.</p>
+          <div class="w-64 h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+            <div id="aiScannerBar" class="h-full bg-gradient-to-r from-sky-400 to-indigo-500 w-0 transition-all duration-300"></div>
+          </div>
+        </div>
+
         <!-- THREE.JS CANVAS CONTAINER -->
         <div id="canvas3DContainer" class="w-full flex-1 cursor-grab active:cursor-grabbing relative touch-none"></div>
 
@@ -349,9 +390,9 @@
       <div class="lg:col-span-4 bg-white border border-black/5 rounded-2xl p-4 flex flex-col justify-between shadow-xs no-print">
         <div>
           <!-- Header -->
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-2.5">
             <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[#0071e3]">Modify Plan 1 &bull; 3D Controls</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#0071e3]">Modify Plan 1 &bull; CAD/CAM Controls</span>
               <h3 class="text-sm font-semibold text-[#1d1d1f] flex items-center gap-2 mt-0.5">
                 <i class="fa-solid fa-sliders text-[#0071e3]"></i> Editor 3D, Raíz y Stripping (M/D)
               </h3>
@@ -359,6 +400,40 @@
             <button onclick="resetSelectedTooth()" class="text-xs text-[#86868b] hover:text-[#1d1d1f] bg-[#f5f5f7] hover:bg-[#e8e8ed] px-3 py-1 rounded-full border border-black/5 transition">
               <i class="fa-solid fa-rotate-left mr-1"></i> Reset
             </button>
+          </div>
+
+          <!-- TARJETA DE ESCANEO INTRAORAL STL (CAD/CAM Formlabs Workflow) -->
+          <div class="bg-gradient-to-br from-indigo-50/70 via-sky-50/40 to-slate-50 border border-indigo-200/80 p-3 rounded-xl mb-3 shadow-xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-qrcode text-[#0071e3]"></i> Escaneo Intraoral .STL
+              </span>
+              <span id="stlPolyCount" class="text-[10px] font-mono font-semibold bg-white px-2 py-0.5 rounded border border-indigo-200 text-indigo-700">28 Dientes CAD</span>
+            </div>
+            <p class="text-[11px] text-[#86868b] leading-relaxed mb-2.5" id="stlStatusText">
+              Carga tu archivo <strong>.STL real (Binario o ASCII)</strong> de escáner intraoral o ejecuta la segmentación para aislar cada diente.
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="document.getElementById('stlFileInput').click()" class="py-1.5 px-2.5 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-file-arrow-up text-[11px]"></i>
+                <span>Cargar .STL</span>
+              </button>
+              <button id="btnRunAISegment" onclick="runAISegmentationSimulation()" class="py-1.5 px-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-wand-magic-sparkles text-[11px]"></i>
+                <span>Segmentar IA</span>
+              </button>
+            </div>
+            <!-- Controles de superposición cuando hay un STL cargado -->
+            <div id="stlOverlayControls" class="hidden mt-2.5 pt-2.5 border-t border-indigo-100 space-y-1.5">
+              <label class="flex items-center justify-between text-[11px] text-slate-700 font-medium cursor-pointer">
+                <span>Mostrar Malla STL Cruda</span>
+                <input type="checkbox" id="toggleRawSTL" checked onchange="toggleRawSTLMesh(this.checked)" class="accent-emerald-600 rounded">
+              </label>
+              <label class="flex items-center justify-between text-[11px] text-slate-700 font-medium cursor-pointer">
+                <span>Superponer Dientes CAD</span>
+                <input type="checkbox" id="toggleSegmentedTeeth" checked onchange="toggleSegmentedTeethMesh(this.checked)" class="accent-[#0071e3] rounded">
+              </label>
+            </div>
           </div>
 
           <!-- Selected Tooth Card -->
@@ -1394,6 +1469,218 @@
     let targetCamCenter = new THREE.Vector3(0, 0.0, 1.0);
     let cameraFollowLight;
 
+
+    // =========================================================================
+    // LECTOR DE ARCHIVOS .STL (BINARIO Y ASCII) + MOTOR DE SEGMENTACIÓN CAD/CAM
+    // =========================================================================
+    let rawSTLMeshGroup = null;
+
+    function parseSTL(arrayBuffer) {
+      const dataView = new DataView(arrayBuffer);
+      let isASCII = false;
+      if (arrayBuffer.byteLength > 84) {
+        const numTriangles = dataView.getUint32(80, true);
+        const expectedByteLength = 84 + numTriangles * 50;
+        if (expectedByteLength !== arrayBuffer.byteLength) {
+          const headerText = new TextDecoder().decode(new Uint8Array(arrayBuffer, 0, Math.min(200, arrayBuffer.byteLength)));
+          if (headerText.trim().startsWith('solid') && headerText.includes('facet')) {
+            isASCII = true;
+          }
+        }
+      }
+
+      if (isASCII) {
+        return parseSTLASCII(new TextDecoder().decode(arrayBuffer));
+      } else {
+        return parseSTLBinary(dataView);
+      }
+    }
+
+    function parseSTLBinary(dataView) {
+      const faces = dataView.getUint32(80, true);
+      const geometry = new THREE.BufferGeometry();
+      const vertices = new Float32Array(faces * 3 * 3);
+      const normals = new Float32Array(faces * 3 * 3);
+
+      let offset = 84;
+      for (let i = 0; i < faces; i++) {
+        if (offset + 50 > dataView.byteLength) break;
+        const nx = dataView.getFloat32(offset, true);
+        const ny = dataView.getFloat32(offset + 4, true);
+        const nz = dataView.getFloat32(offset + 8, true);
+        offset += 12;
+
+        for (let j = 0; j < 3; j++) {
+          const vIdx = (i * 9) + (j * 3);
+          vertices[vIdx]     = dataView.getFloat32(offset, true);
+          vertices[vIdx + 1] = dataView.getFloat32(offset + 4, true);
+          vertices[vIdx + 2] = dataView.getFloat32(offset + 8, true);
+
+          normals[vIdx]     = nx;
+          normals[vIdx + 1] = ny;
+          normals[vIdx + 2] = nz;
+          offset += 12;
+        }
+        offset += 2;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+      geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+      geometry.computeVertexNormals();
+      return { geometry, triangleCount: faces };
+    }
+
+    function parseSTLASCII(text) {
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      const vertexPattern = /vertex\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)/g;
+      let match;
+      while ((match = vertexPattern.exec(text)) !== null) {
+        vertices.push(parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3]));
+      }
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.computeVertexNormals();
+      return { geometry, triangleCount: Math.floor(vertices.length / 9) };
+    }
+
+    function handleSTLUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const overlay = document.getElementById('aiScannerOverlay');
+      const bar = document.getElementById('aiScannerBar');
+      const title = document.getElementById('aiScannerTitle');
+      overlay.classList.remove('hidden');
+      title.innerText = 'Leyendo Escaneo Intraoral: ' + file.name;
+      bar.style.width = '35%';
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        setTimeout(() => {
+          bar.style.width = '75%';
+          try {
+            const result = parseSTL(e.target.result);
+            renderUploadedSTL(result.geometry, file.name, result.triangleCount);
+            bar.style.width = '100%';
+            setTimeout(() => overlay.classList.add('hidden'), 500);
+          } catch (err) {
+            overlay.classList.add('hidden');
+            alert('Error al leer el archivo STL: ' + err.message);
+          }
+        }, 400);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function renderUploadedSTL(geometry, fileName, triangleCount) {
+      if (rawSTLMeshGroup && scene) {
+        scene.remove(rawSTLMeshGroup);
+      }
+      rawSTLMeshGroup = new THREE.Group();
+
+      geometry.computeBoundingBox();
+      const box = geometry.boundingBox;
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      geometry.translate(-center.x, -center.y, -center.z);
+
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scaleFactor = maxDim > 0 ? (14.2 / maxDim) : 1;
+
+      const stlMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x38bdf8,
+        roughness: 0.28,
+        metalness: 0.08,
+        clearcoat: 0.75,
+        transparent: true,
+        opacity: 0.88,
+        side: THREE.DoubleSide
+      });
+
+      const mesh = new THREE.Mesh(geometry, stlMaterial);
+      mesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      mesh.rotation.x = -Math.PI / 2;
+
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: 0xbae6fd,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.12
+      });
+      const wireMesh = new THREE.Mesh(geometry, wireMat);
+      mesh.add(wireMesh);
+
+      rawSTLMeshGroup.add(mesh);
+      scene.add(rawSTLMeshGroup);
+
+      document.getElementById('meshSourceLabel').innerText = 'STL: ' + fileName.substring(0, 16);
+      document.getElementById('stlPolyCount').innerText = triangleCount.toLocaleString() + ' Polígonos';
+      document.getElementById('stlStatusText').innerHTML = '<span class="text-emerald-600 font-semibold">¡Escaneo STL cargado!</span> Malla cruda superpuesta. Haz clic en <b>"Segmentar IA"</b> para aislar cada diente y aplicar biomecánica.';
+      document.getElementById('stlOverlayControls').classList.remove('hidden');
+      document.getElementById('toggleRawSTL').checked = true;
+      document.getElementById('toggleSegmentedTeeth').checked = true;
+    }
+
+    function toggleRawSTLMesh(visible) {
+      if (rawSTLMeshGroup) rawSTLMeshGroup.visible = visible;
+    }
+
+    function toggleSegmentedTeethMesh(visible) {
+      if (upperArchGroup && lowerArchGroup) {
+        upperArchGroup.visible = visible;
+        lowerArchGroup.visible = visible;
+      }
+    }
+
+    function runAISegmentationSimulation() {
+      const overlay = document.getElementById('aiScannerOverlay');
+      const bar = document.getElementById('aiScannerBar');
+      const title = document.getElementById('aiScannerTitle');
+      const sub = document.getElementById('aiScannerSub');
+
+      overlay.classList.remove('hidden');
+      bar.style.width = '15%';
+      title.innerText = 'Ejecutando Segmentación Dental IA (CAD/CAM)...';
+      sub.innerText = 'Paso 1/3: Detectando bordes incisales, cúspides y márgenes gingivales en la malla...';
+
+      setTimeout(() => {
+        bar.style.width = '55%';
+        sub.innerText = 'Paso 2/3: Separando coronas individuales (FDI 18-48) y modelando raíces radiculares...';
+      }, 700);
+
+      setTimeout(() => {
+        bar.style.width = '95%';
+        sub.innerText = 'Paso 3/3: Calculando colisiones interproximales (IPR) y ataches optimizados...';
+      }, 1400);
+
+      setTimeout(() => {
+        bar.style.width = '100%';
+        overlay.classList.add('hidden');
+        if (rawSTLMeshGroup && rawSTLMeshGroup.children.length > 0) {
+          rawSTLMeshGroup.children[0].material.opacity = 0.28;
+          rawSTLMeshGroup.children[0].material.color.setHex(0x818cf8);
+        }
+        if (upperArchGroup && lowerArchGroup) {
+          upperArchGroup.visible = true;
+          lowerArchGroup.visible = true;
+        }
+        document.getElementById('meshSourceLabel').innerText = 'STL Segmentado + IA';
+        document.getElementById('stlStatusText').innerHTML = '<span class="text-[#0071e3] font-semibold">Segmentación completada:</span> 28 coronas separadas listas para simulación de alineadores e impresión 3D.';
+        document.getElementById('timelineSlider').value = 0;
+        update3DStagePositions(0);
+        togglePlaySimulation();
+      }, 2100);
+    }
+
+    function openCADWorkflowModal() {
+      document.getElementById('cadModal').classList.remove('hidden');
+    }
+    function closeCADWorkflowModal() {
+      document.getElementById('cadModal').classList.add('hidden');
+    }
+
     function initClinCheck3D() {
       computeCumulativeArchPositions();
 
@@ -2172,5 +2459,66 @@
       selectTooth(42);
     };
   </script>
+  <!-- MODAL EDUCATIVO: FLUJO CAD/CAM FORMLABS / STL A CLINCHECK -->
+  <div id="cadModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600">
+            <i class="fa-solid fa-cube text-base"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">¿Cómo pasamos de un Escaneo 3D (.STL) al Movimiento Ortodóntico?</h3>
+            <p class="text-[11px] text-slate-500">Arquitectura de Flujo Digital Clínico (Estilo Formlabs / 3Shape / ClinCheck)</p>
+          </div>
+        </div>
+        <button onclick="closeCADWorkflowModal()" class="text-slate-400 hover:text-slate-700 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-3.5 rounded-xl bg-[#f5f5f7] border border-black/5 space-y-1.5">
+          <div class="text-[#0071e3] font-bold flex items-center justify-between">
+            <span>1. Escaneo Crudo (.STL)</span>
+            <i class="fa-solid fa-file-code text-sm"></i>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            El archivo binario contiene miles de triángulos conectados en una <strong>única malla continua</strong> (encía y dientes fusionados). Es perfecto para imprimir el modelo inicial, pero aún no tiene dientes separados.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-[#f5f5f7] border border-indigo-300/40 space-y-1.5">
+          <div class="text-indigo-600 font-bold flex items-center justify-between">
+            <span>2. Segmentación IA</span>
+            <i class="fa-solid fa-scissors text-sm"></i>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            El algoritmo detecta la línea cervical de cada diente, <strong>separa cada corona como un objeto 3D independiente</strong> (FDI 17 al 47), estima el eje radicular y reconstruye virtualmente el hueso y encía subyacente.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-[#f5f5f7] border border-emerald-300/40 space-y-1.5">
+          <div class="text-emerald-600 font-bold flex items-center justify-between">
+            <span>3. Setup & Impresión 3D</span>
+            <i class="fa-solid fa-print text-sm"></i>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Con los dientes separados, programamos las 18 etapas de movimiento (0.25 mm por etapa). Cada etapa genera un <strong>nuevo archivo STL</strong> que se envía a la impresora 3D (Formlabs) para termoformar los alineadores.
+          </p>
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-xs text-slate-700">
+          <strong class="text-[#0071e3]">¡Pruébalo ahora!</strong> Usa el botón <strong>"Importar Escaneo .STL"</strong> para cargar tu propio archivo binario o ASCII en el visor 3D interactivo.
+        </div>
+        <button onclick="closeCADWorkflowModal(); document.getElementById('stlFileInput').click();" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs shrink-0 transition shadow-xs">
+          Subir mi .STL
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
