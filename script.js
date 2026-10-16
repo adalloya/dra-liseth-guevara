@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initMapInteractivity();
     // Start polling for images for the comparison slider
-    initComparisons();
+    initGallery();
     initSlideshow();
 });
 
@@ -53,9 +53,9 @@ function initGallery() {
     thumbsRow.innerHTML = '';
     casesData.forEach((c, index) => {
         const thumb = document.createElement('div');
-        thumb.className = `thumb - item ${index === 0 ? 'active' : ''} `;
+        thumb.className = `thumb-item ${index === 0 ? 'active' : ''} `;
         thumb.onclick = () => loadCase(index);
-        thumb.innerHTML = `< img src = "${c.after}" alt = "${c.label}" > `; // Use 'after' as thumb
+        thumb.innerHTML = `<img src="${c.after}" alt="${c.label}">`; // Use 'after' as thumb
         thumbsRow.appendChild(thumb);
     });
 
@@ -76,14 +76,14 @@ function loadCase(index) {
 
     // Render Main Slider HTML
     mainWrapper.innerHTML = `
-    < div class="img-comp-container" >
+        <div class="img-comp-container">
             <div class="img-comp-img">
                 <img src="${c.after}" alt="Después">
             </div>
             <div class="img-comp-img img-comp-overlay">
                 <img src="${c.before}" alt="Antes">
             </div>
-        </div >
+        </div>
     `;
 
     // Initialize Slider Logic
