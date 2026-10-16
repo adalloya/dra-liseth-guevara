@@ -1,10 +1,41 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initMapInteractivity();
-    // Start polling for images for the comparison slider
     initGallery();
     initSlideshow();
+    initMobileDrawer();
 });
+
+/* --- Mobile Drawer Navigation (Mobile First) --- */
+function initMobileDrawer() {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const drawer = document.getElementById('mobileNavDrawer');
+    const backdrop = document.getElementById('drawerBackdrop');
+    const closeBtn = document.getElementById('closeDrawerBtn');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    if (!menuBtn || !drawer || !backdrop) return;
+
+    function openDrawer() {
+        drawer.classList.add('active');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('active');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', closeDrawer);
+    });
+}
 
 /* --- Map Interactivity --- */
 function initMapInteractivity() {
