@@ -2,7 +2,7 @@
 <html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>OrthoAI Pro v8.0 — Apple Cupertino Clinical Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,6 +11,57 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
+        /* Safe Area Support para navegadores móviles (Evita que la barra de URL tape los iconos) */
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            min-height: 100dvh;
+            overflow: hidden;
+        }
+
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .mobile-safe-nav {
+                padding-bottom: max(env(safe-area-inset-bottom), 14px) !important;
+            }
+        }
+
+        /* ESTILOS DE IMPRESIÓN / EXPEDIENTE PDF CLÍNICO DE ALTA GAMA */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #111827 !important;
+                overflow: visible !important;
+                height: auto !important;
+                min-height: auto !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            }
+            .no-print, header, nav, #mobileView3D, #rightWorkspacePanel, #cadModal, #patientEditModal, #mediaLightboxModal, #pwaInstallBanner, #iosInstallSheet {
+                display: none !important;
+            }
+            #clinicalPdfDossier {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 15mm 12mm !important;
+                background: #ffffff !important;
+                color: #111827 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .print-card {
+                background: #ffffff !important;
+                border: 1px solid #e5e7eb !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .print-table th {
+                background: #f3f4f6 !important;
+                color: #1f2937 !important;
+            }
+        }
+
         /* Tipografía nativa estilo Apple SF Pro / JetBrains Mono */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -372,25 +423,13 @@
          1. TOP NAVIGATION BAR (ESTILO MACOS SEQUOIA / IPADOS 18)
     ====================================================================== -->
     <header class="h-14 px-3 sm:px-5 border-b border-white/10 bg-[#0d0d0f]/90 backdrop-blur-xl flex items-center justify-between shrink-0 z-30 no-print">
-        <!-- Brand + Paciente Activo -->
-        <div class="flex items-center space-x-3 min-w-0">
+        <!-- Brand (Solo OrthoAi Pro sin logo azul) -->
+        <div class="flex items-center space-x-2.5 min-w-0">
             <a href="index.html" class="flex items-center gap-1.5 text-zinc-300 hover:text-white transition px-2.5 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium mr-1" title="Volver al Sitio Principal">
                 <i class="ph-bold ph-caret-left text-[11px]"></i>
                 <span class="hidden sm:inline">Dra. Liseth</span>
             </a>
-            <div class="w-9 h-9 rounded-2xl bg-gradient-to-b from-[#0a84ff] to-[#0051a8] flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
-                <i class="ph-fill ph-tooth text-white text-lg"></i>
-            </div>
-            <div class="min-w-0">
-                <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-sm tracking-tight text-white truncate">OrthoAI Pro</span>
-                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/10 text-sky-300 border border-white/10 hidden sm:inline">v8.0 Cupertino</span>
-                </div>
-                <button onclick="openPatientModal()" class="flex items-center space-x-1.5 text-left group">
-                    <span id="headerPatientName" class="text-xs text-zinc-300 font-medium truncate max-w-[165px] sm:max-w-xs group-hover:text-sky-400 transition">Martha Gabriela Zúñiga Núñez (40a)</span>
-                    <i class="ph-bold ph-pencil-simple text-[11px] text-zinc-500 group-hover:text-sky-400"></i>
-                </button>
-            </div>
+            <span class="font-bold text-base tracking-tight text-white whitespace-nowrap">OrthoAi Pro</span>
         </div>
 
         <!-- Segmented Control Central (Desktop Mode Switcher) -->
@@ -432,6 +471,11 @@
                 <span class="hidden sm:inline">+ Fotos / Rx</span>
             </button>
 
+            <button onclick="openExportPDFModal()" class="px-2.5 py-1.5 rounded-xl bg-[#0a84ff]/20 hover:bg-[#0a84ff]/30 border border-[#0a84ff]/40 text-xs font-semibold text-sky-300 flex items-center space-x-1.5 transition shadow-sm" title="Exportar Expediente Clínico PDF">
+                <i class="ph-bold ph-file-pdf text-sm text-sky-400"></i>
+                <span class="hidden md:inline">Expediente PDF</span>
+            </button>
+
             <button onclick="openPatientModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-zinc-200 transition" title="Editar Ficha del Paciente o Agregar Nota">
                 <i class="ph-bold ph-user-gear text-sm"></i>
             </button>
@@ -452,8 +496,16 @@
             <!-- LIENZO 3D PURO Y DESPEJADO -->
             <div id="canvas-wrapper" class="flex-1 relative">
                 
-                <!-- 1. DYNAMIC ISLAND PILL (Arriba al centro - Ultra compacta, NO tapa los dientes) -->
-                <div class="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2 pointer-events-auto max-w-[94vw]">
+                <!-- 1. DYNAMIC ISLAND PILL CON PACIENTE CENTRADO ENCIMA DEL INDICADOR DE MES -->
+                <div class="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-1.5 pointer-events-auto max-w-[95vw] text-center">
+                    <!-- Nombre del Paciente Centrado con Espacio Completo -->
+                    <button onclick="openPatientModal()" class="apple-pill px-4 py-1.5 rounded-full flex items-center space-x-2 text-xs font-semibold text-zinc-200 hover:text-white transition shadow-sm border border-white/15" title="Editar Ficha del Paciente">
+                        <i class="ph-bold ph-user text-sky-400 text-xs"></i>
+                        <span id="topPatientName">Martha Gabriela Zúñiga Núñez (40 años)</span>
+                        <i class="ph-bold ph-pencil-simple text-[10px] text-zinc-400"></i>
+                    </button>
+
+                    <!-- Indicador de Mes / Etapa Dynamic Island -->
                     <div class="apple-pill px-3.5 py-1.5 rounded-full flex items-center space-x-2.5 text-xs">
                         <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse shrink-0"></span>
                         <span id="islandStageText" class="font-semibold text-white whitespace-nowrap">Mes 0 / 18</span>
@@ -859,7 +911,8 @@
          3. TAB BAR INFERIOR NATIVO DE iOS 18 (EXCLUSIVO PARA MÓVIL < 1024px)
          Evita cualquier superposición y permite alternar vistas con el pulgar.
     ====================================================================== -->
-    <nav class="lg:hidden h-16 bg-[#0d0d0f]/95 backdrop-blur-2xl border-t border-white/10 grid grid-cols-4 items-center px-2 shrink-0 z-30 no-print">
+    <!-- TAB BAR INFERIOR MOBILE SIEMPRE ENCIMA DE LA BARRA DE URL -->
+    <nav class="lg:hidden bg-[#0d0d0f]/95 backdrop-blur-2xl border-t border-white/10 grid grid-cols-4 items-center px-2 shrink-0 z-40 no-print mobile-safe-nav" style="padding-bottom: max(env(safe-area-inset-bottom, 0px), 14px); min-height: 64px;">
         <button onclick="setMobileActiveTab('3d')" id="mobTab-3d" class="flex flex-col items-center justify-center py-1 text-[#0a84ff]">
             <i class="ph-fill ph-cube-transparent text-xl"></i>
             <span class="text-[10px] font-semibold mt-0.5">Visor 3D</span>
@@ -1215,6 +1268,229 @@
             selectTooth(selectedFDI);
         }
 
+
+        // ============================================================================
+        // EXPEDIENTE CLÍNICO PDF DE ALTO NIVEL EDITORIAL & SNAPSHOT 3D
+        // ============================================================================
+        function generateClinicalPDFHTML() {
+            const patientName = document.getElementById('cardPatientName').innerText;
+            const patientMeta = document.getElementById('cardPatientMeta').innerText;
+            const doctorName = document.getElementById('cardDoctorName').innerText;
+            const clinicName = document.getElementById('cardClinicName').innerText;
+            const diagText = document.getElementById('cardPatientDiag').innerText;
+
+            let canvasImgData = "";
+            try {
+                if (renderer && renderer.domElement) {
+                    canvasImgData = renderer.domElement.toDataURL('image/png');
+                }
+            } catch (e) {
+                console.warn("Could not capture 3D canvas snapshot:", e);
+            }
+
+            const iprRows = [43, 42, 41, 31, 32, 33, 11, 21].map(fdi => {
+                const d = toothIPRData[fdi];
+                const total = (d.mesial + d.distal).toFixed(2);
+                return `
+                    <tr class="border-b border-gray-200">
+                        <td class="py-1.5 font-bold text-sky-700">OD ${fdi} (${toothNames[fdi]})</td>
+                        <td class="py-1.5 text-center font-mono font-semibold">${d.mesial.toFixed(2)} mm</td>
+                        <td class="py-1.5 text-center font-mono font-semibold">${d.distal.toFixed(2)} mm</td>
+                        <td class="py-1.5 text-center font-mono font-extrabold text-slate-900 bg-amber-50">${total} mm</td>
+                        <td class="py-1.5 text-gray-600 text-[10px] leading-tight">${d.why}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <div class="space-y-6">
+                    <!-- ENCABEZADO CLÍNICO DE ALTA JERARQUÍA -->
+                    <div class="flex items-center justify-between border-b-2 border-sky-600 pb-4">
+                        <div>
+                            <div class="text-xl font-extrabold tracking-tight text-slate-900">DRA. LISETH GUEVARA MUÑOZ</div>
+                            <div class="text-xs font-semibold text-sky-700 uppercase tracking-wider">Especialista en Ortodoncia &amp; Ortopedia Dentofacial</div>
+                            <div class="text-[11px] text-gray-500 mt-0.5">${clinicName} &bull; Certificación CAD/CAM &amp; ClinCheck Pro</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 rounded bg-sky-100 text-sky-800 font-mono font-bold text-xs border border-sky-200">EXP: #8819-MGA</span>
+                            <div class="text-[10px] text-gray-400 mt-1">Fecha: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                    </div>
+
+                    <!-- FICHA DEL PACIENTE -->
+                    <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-gray-500 block">Paciente</span>
+                            <span class="text-sm font-extrabold text-slate-900">${patientName}</span>
+                            <div class="text-xs text-gray-600 mt-0.5">${patientMeta}</div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-gray-500 block">Doctora Tratante</span>
+                            <span class="text-sm font-extrabold text-slate-900">${doctorName}</span>
+                            <div class="text-xs text-gray-600 mt-0.5">Planificación Biomecánica: 18 Meses (TADs IZC + IPR)</div>
+                        </div>
+                    </div>
+
+                    <!-- ALERTA RADIOGRÁFICA Y DIAGNÓSTICO -->
+                    <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-1">
+                        <div class="font-bold text-amber-900 flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
+                            DIAGNÓSTICO BASAL &amp; ALERTA DE ENANISMO RADICULAR (Rx Panorámica IDI)
+                        </div>
+                        <p class="text-amber-900 text-[11px] leading-relaxed">
+                            ${diagText}
+                        </p>
+                    </div>
+
+                    <!-- CAPTURA 3D DEL MODELO DIGITAL (SETUP ACTUAL) -->
+                    ${canvasImgData ? `
+                    <div class="border border-gray-200 rounded-xl p-3 bg-slate-900 text-white text-center">
+                        <div class="text-[10px] uppercase tracking-wider text-sky-400 font-bold mb-1">Registro Tridimensional Digital (OrthoAI CAD/CAM Engine)</div>
+                        <img src="${canvasImgData}" alt="Setup 3D" class="max-h-56 mx-auto rounded-lg object-contain">
+                        <div class="text-[10px] text-gray-400 mt-1">Simulación cinemática actual: ${document.getElementById('islandStageText').innerText} (${document.getElementById('islandPhaseShort').innerText})</div>
+                    </div>
+                    ` : ''}
+
+                    <!-- TABLA MAESTRA DE STRIPPING (IPR) MESIAL Y DISTAL -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-900">Prescripción Milimétrica de Stripping (IPR) por Órgano Dentario</h4>
+                            <span class="text-xs font-mono font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Total Anteroinferior: 2.00 mm</span>
+                        </div>
+                        <table class="w-full text-left text-xs border border-gray-200">
+                            <thead>
+                                <tr class="bg-gray-100 text-[10px] uppercase text-gray-600 border-b border-gray-200">
+                                    <th class="py-1.5 px-2">Órgano Dentario</th>
+                                    <th class="py-1.5 px-2 text-center">Cara Mesial</th>
+                                    <th class="py-1.5 px-2 text-center">Cara Distal</th>
+                                    <th class="py-1.5 px-2 text-center">Total Diente</th>
+                                    <th class="py-1.5 px-2">Justificación Biomecánica</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${iprRows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PROTOCOLO CLÍNICO POR FASES -->
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-900">Secuencia Biomecánica Programada (18 Meses)</h4>
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <div class="p-2.5 rounded-lg border border-gray-200 bg-gray-50">
+                                <div class="font-bold text-sky-700">Fase 1 (Mes 1 - 5)</div>
+                                <div class="text-[11px] text-gray-600 mt-0.5">IPR de 2.0mm de 33 a 43. Desrotación de 42 y 32. Instalación de ATP con perla de Tucat.</div>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-gray-200 bg-gray-50">
+                                <div class="font-bold text-sky-700">Fase 2 (Mes 6 - 12)</div>
+                                <div class="text-[11px] text-gray-600 mt-0.5">Intrusión molar superior activa (2.2 mm) con 2 TADs infracigomáticos (IZC). Autorrotación mandibular.</div>
+                            </div>
+                            <div class="p-2.5 rounded-lg border border-gray-200 bg-gray-50">
+                                <div class="font-bold text-sky-700">Fase 3 (Mes 13 - 18)</div>
+                                <div class="text-[11px] text-gray-600 mt-0.5">Cierre de diastema central 11-21, sobremordida positiva final (+1.8 mm) y retención estética.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIRMAS DE VALIDACIÓN CLÍNICA -->
+                    <div class="grid grid-cols-2 gap-8 pt-8 mt-6 border-t border-gray-300 text-center">
+                        <div>
+                            <div class="h-12 flex items-end justify-center font-serif italic text-gray-400">Dra. Liseth Guevara Muñoz</div>
+                            <div class="border-t border-gray-400 pt-1 text-xs font-bold text-slate-900">${doctorName}</div>
+                            <div class="text-[10px] text-gray-500">Especialista en Ortodoncia &bull; Cédula Prof. y Firma</div>
+                        </div>
+                        <div>
+                            <div class="h-12 flex items-end justify-center font-serif italic text-gray-400">${patientName}</div>
+                            <div class="border-t border-gray-400 pt-1 text-xs font-bold text-slate-900">${patientName}</div>
+                            <div class="text-[10px] text-gray-500">Consentimiento Informado del Paciente</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openExportPDFModal() {
+            const wrapper = document.getElementById('pdfDocumentWrapper');
+            const dossier = document.getElementById('clinicalPdfDossier');
+            const html = generateClinicalPDFHTML();
+            wrapper.innerHTML = html;
+            dossier.innerHTML = html;
+            document.getElementById('pdfPreviewModal').classList.remove('hidden');
+        }
+
+        function closeExportPDFModal() {
+            document.getElementById('pdfPreviewModal').classList.add('hidden');
+        }
+
+        function triggerActualPrint() {
+            window.print();
+        }
+
+        // ============================================================================
+        // GESTIÓN PWA / INSTALACIÓN COMO WEBAPP EN ANDROID & IOS
+        // ============================================================================
+        let deferredPWAPrompt = null;
+
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
+                   document.referrer.includes('android-app://');
+        }
+
+        function initPWAInstallation() {
+            if (isAppInstalled()) return; // Nunca sale si ya está instalada
+
+            // Escuchar evento de Chrome / Android
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPWAPrompt = e;
+                if (!sessionStorage.getItem('pwa_dismissed')) {
+                    showPWABanner();
+                }
+            });
+
+            // Para iOS Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !sessionStorage.getItem('pwa_dismissed')) {
+                setTimeout(showPWABanner, 2500);
+            }
+        }
+
+        function showPWABanner() {
+            if (isAppInstalled()) return;
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.classList.remove('hidden');
+        }
+
+        function dismissPWABanner() {
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.classList.add('hidden');
+            // Si el usuario lo cierra, no vuelve a salir en esta sesión inmediata, pero volverá a salir en visitas futuras
+            sessionStorage.setItem('pwa_dismissed', 'true');
+        }
+
+        function triggerPWAInstall() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (deferredPWAPrompt) {
+                deferredPWAPrompt.prompt();
+                deferredPWAPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        dismissPWABanner();
+                    }
+                    deferredPWAPrompt = null;
+                });
+            } else if (isIOS) {
+                document.getElementById('iosInstallSheet').classList.remove('hidden');
+            } else {
+                alert("Para instalar OrthoAI Pro, usa la opción 'Instalar aplicación' o 'Agregar a la pantalla principal' en el menú de tu navegador.");
+            }
+        }
+
+        function closeIOSInstallSheet() {
+            document.getElementById('iosInstallSheet').classList.add('hidden');
+            dismissPWABanner();
+        }
+
         window.onload = function () {
             const savedTheme = localStorage.getItem('ortho_theme') || 'dark';
             setTheme(savedTheme);
@@ -1222,6 +1498,7 @@
             buildFDIButtons();
             buildMasterIPRTable();
             buildDentalArches();
+            initPWAInstallation();
             loadMarthaGabrielaCase();
             renderClinicalMediaGallery();
             renderClinicalNotes();
@@ -2107,7 +2384,8 @@
             const clinic = document.getElementById('editClinicName').value.trim();
             const diag = document.getElementById('editPatientDiag').value.trim();
 
-            document.getElementById('headerPatientName').innerText = `${name}`;
+            const topPat = document.getElementById('topPatientName');
+            if (topPat) topPat.innerText = `${name} (${age})`;
             document.getElementById('cardPatientName').innerText = name;
             document.getElementById('cardPatientMeta').innerText = `${age} • Exp: #8819-IDI`;
             document.getElementById('cardDoctorName').innerText = doc;
@@ -2434,5 +2712,98 @@
             renderer.render(scene, camera);
         }
     </script>
+
+    <!-- =====================================================================
+         PWA INSTALL BANNER (ANDROID & IOS ACCESO PANTALLA COMPLETA)
+    ====================================================================== -->
+    <div id="pwaInstallBanner" class="hidden fixed bottom-20 left-3 right-3 sm:left-auto sm:right-6 sm:w-96 apple-glass border border-white/20 p-3.5 rounded-2xl shadow-2xl z-50 flex items-center justify-between gap-3 animate-fade-in no-print">
+        <div class="flex items-center space-x-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0a84ff] to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
+                <i class="ph-fill ph-tooth text-xl"></i>
+            </div>
+            <div class="min-w-0">
+                <h4 class="text-xs font-bold text-white truncate">Instalar OrthoAI Pro</h4>
+                <p class="text-[11px] text-zinc-300 leading-tight">Acceso rápido a pantalla completa sin barra de navegación.</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-1.5 shrink-0">
+            <button onclick="triggerPWAInstall()" class="px-3.5 py-1.5 rounded-full bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold shadow transition">
+                Instalar
+            </button>
+            <button onclick="dismissPWABanner()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Cerrar">
+                <i class="ph-bold ph-x text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SHEET INSTRUCCIONES IOS PARA AGREGAR A INICIO -->
+    <div id="iosInstallSheet" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-4 no-print">
+        <div class="apple-glass border border-white/20 w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0a84ff] to-indigo-600 flex items-center justify-center text-white mx-auto shadow-lg">
+                <i class="ph-fill ph-arrow-square-out text-2xl"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-white">Instalar en tu iPhone o iPad</h3>
+                <p class="text-xs text-zinc-300 mt-1 leading-relaxed">
+                    Sigue estos 2 sencillos pasos en Safari para disfrutar de la pantalla completa sin barras:
+                </p>
+            </div>
+            <div class="space-y-2.5 text-left text-xs bg-black/50 p-3.5 rounded-2xl border border-white/10">
+                <div class="flex items-start space-x-2.5">
+                    <span class="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold shrink-0 text-[11px]">1</span>
+                    <span class="text-zinc-200">Toca el botón <strong>Compartir</strong> (<i class="ph-bold ph-export inline text-sky-400"></i>) en la barra de Safari.</span>
+                </div>
+                <div class="flex items-start space-x-2.5">
+                    <span class="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold shrink-0 text-[11px]">2</span>
+                    <span class="text-zinc-200">Desplázate hacia abajo y selecciona <strong>"Agregar a Inicio"</strong> (<i class="ph-bold ph-plus-square inline text-sky-400"></i>).</span>
+                </div>
+            </div>
+            <button onclick="closeIOSInstallSheet()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL PREVISUALIZADOR DEL EXPEDIENTE CLÍNICO PDF DE ALTO NIVEL
+    ====================================================================== -->
+    <div id="pdfPreviewModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex flex-col justify-between p-3 sm:p-6 no-print">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3 max-w-5xl mx-auto w-full">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400">
+                    <i class="ph-bold ph-file-pdf text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Previsualización del Expediente Clínico PDF</h3>
+                    <p class="text-[11px] text-zinc-400">Formato editorial listo para impresión o descarga PDF</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="triggerActualPrint()" class="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold flex items-center space-x-1.5 shadow-lg transition">
+                    <i class="ph-bold ph-printer text-sm"></i>
+                    <span>Imprimir / Guardar como PDF</span>
+                </button>
+                <button onclick="closeExportPDFModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Visor del Documento -->
+        <div class="flex-1 overflow-y-auto my-3 flex justify-center p-2">
+            <div id="pdfDocumentWrapper" class="w-full max-w-4xl bg-white text-slate-900 rounded-2xl p-6 sm:p-10 shadow-2xl space-y-6 text-xs">
+                <!-- Se inyecta dinámicamente con snapshot 3D, tablas y firmas -->
+            </div>
+        </div>
+
+        <div class="max-w-5xl mx-auto w-full flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/10">
+            <span>OrthoAI Expert Pro v8.0 • Reporte Clínico Oficial</span>
+            <button onclick="closeExportPDFModal()" class="text-zinc-300 hover:text-white">Cerrar Ventana</button>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR EXCLUSIVO PARA IMPRESIÓN DIRECTA (@media print) -->
+    <div id="clinicalPdfDossier" class="hidden"></div>
+
 </body>
 </html>
