@@ -1247,6 +1247,8 @@ a {
     color: var(--white);
     padding: 15px;
     border-radius: 50px;
+}
+
 /* --- Top Announcement Bar (Cohesive Header UX) --- */
 .top-announcement-bar {
     background: linear-gradient(90deg, #1E3968 0%, #0077C8 100%);
@@ -1369,40 +1371,51 @@ a {
 
 /* --- Mobile Navigation Drawer (Mobile First) --- */
 .mobile-nav-drawer {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 82%;
-    max-width: 320px;
-    height: 100vh;
-    background: var(--white);
-    z-index: 2000;
-    box-shadow: -5px 0 25px rgba(0,0,0,0.15);
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 24px;
-}
-
-.mobile-nav-drawer.active {
-    right: 0;
+    display: none;
 }
 
 .drawer-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 1999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    display: none;
 }
 
-.drawer-backdrop.active {
-    opacity: 1;
-    pointer-events: auto;
+@media (max-width: 768px) {
+    .mobile-nav-drawer {
+        display: flex;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 82%;
+        max-width: 320px;
+        height: 100vh;
+        background: var(--white);
+        z-index: 2000;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 24px;
+    }
+
+    .mobile-nav-drawer.active {
+        right: 0;
+    }
+
+    .drawer-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .drawer-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
 
 .mobile-nav-header {
