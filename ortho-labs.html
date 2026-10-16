@@ -2,1188 +2,1722 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ortho Labs | OrthoAI Expert Pro - Suite de Diagnóstico y Biomecánica</title>
-  <meta name="description" content="Ortho Labs de la Dra. Liseth Guevara: Sistema clínico de apoyo diagnóstico cefalométrico, análisis oclusal y planificación biomecánica mes a mes con Inteligencia Artificial.">
-  
-  <!-- Tailwind CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OrthoAI Expert Pro v4.0 | 3D ClinCheck & Sistema Experto de Ortodoncia</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-    h1, h2, h3, h4, .font-heading { font-family: 'Outfit', sans-serif; }
-    
-    @media print {
-      .no-print { display: none !important; }
-      .print-break { page-break-inside: avoid; }
-      body { background-color: #ffffff; padding: 0 !important; }
-      .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
-      .print-border { border: 1px solid #94a3b8 !important; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+    /* ClinCheck Toolbar Buttons */
+    .cc-tool-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #cbd5e1;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .cc-tool-btn:hover {
+      background-color: #334155;
+      color: #ffffff;
+    }
+    .cc-tool-btn.active {
+      background-color: rgba(79, 70, 229, 0.25);
+      color: #818cf8;
+      border-color: #6366f1;
     }
 
-    /* Modal Image Lightbox */
-    .lightbox-modal {
-      transition: opacity 0.25s ease-in-out;
+    /* 2D Odontogram Tooth Box */
+    .tooth-box {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      user-select: none;
     }
-    
-    /* Odontograma FDI Buttons & Boxes */
-    .tooth-btn { 
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    .tooth-box:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 6px 14px rgba(99, 102, 241, 0.25);
     }
-    .tooth-btn:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); 
+    .tooth-box.selected-tooth {
+      outline: 2px solid #6366f1;
+      outline-offset: 2px;
+      transform: scale(1.06);
     }
-    .tooth-btn:active {
-      transform: translateY(0);
+
+    /* Range Slider Styling */
+    input[type=range].cc-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
     }
-    .tooth-box { 
-      transition: all 0.2s ease; 
-      cursor: pointer; 
+    input[type=range].cc-slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #334155;
+      border-radius: 4px;
     }
-    .tooth-box:hover { 
-      transform: scale(1.05); 
-      border-color: #4f46e5; 
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); 
+    input[type=range].cc-slider::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+      border: 2px solid #ffffff;
+    }
+
+    /* Print Mode for Clinical Expediente PDF */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      .print-light-card {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+      .print-text-dark { color: #0f172a !important; }
+      #canvas3DContainer { height: 340px !important; }
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col">
 
-  <!-- Top Navigation Bar -->
-  <header class="bg-slate-900 text-white border-b border-slate-800 relative z-20 no-print shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3">
+  <!-- TOP CLINICAL HEADER -->
+  <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 relative z-20 no-print shadow-md">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap justify-between items-center gap-2">
+      <!-- Brand -->
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="flex items-center gap-2 group text-slate-300 hover:text-white transition mr-2" title="Volver al Sitio Principal">
-          <i class="fa-solid fa-arrow-left text-sm group-hover:-translate-x-1 transition-transform"></i>
-          <span class="text-xs font-semibold uppercase tracking-wider">Sitio Web</span>
+        <a href="index.html" class="flex items-center gap-1.5 text-slate-300 hover:text-white transition mr-1 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-indigo-500 shadow-sm" title="Volver al Sitio Principal">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          <span class="text-xs font-semibold uppercase hidden sm:inline">Sitio Web</span>
         </a>
-        <div class="h-6 w-px bg-slate-700 hidden sm:block"></div>
-        <div class="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2.5 rounded-xl shadow-inner">
-          <i class="fa-solid fa-tooth text-xl text-white"></i>
+
+        <div class="bg-gradient-to-br from-indigo-500 to-sky-500 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-tooth text-lg text-white"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold tracking-tight text-white">Ortho Labs <span class="text-indigo-400 font-normal">| OrthoAI Expert Pro</span></h1>
-            <span class="text-[11px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30 font-mono">v2.6 Clinical CDSS</span>
+            <h1 class="text-sm sm:text-base font-bold tracking-tight text-white">OrthoAI Expert Pro</h1>
+            <span class="text-[10px] font-bold bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full border border-sky-500/30">3D ClinCheck v4.0</span>
           </div>
-          <p class="text-xs text-slate-400">Sistema Experto de Diagnóstico Cefalométrico, Oclusal y Planificación Biomecánica</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Paciente: <strong class="text-slate-200" id="headerPatientName">Zúñiga Núñez Martha Gabriela (40a)</strong> | Dra. Liseth Guevara Muñoz</p>
         </div>
       </div>
-      
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <button id="btnOpenNewCase" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2 shadow-sm">
-          <i class="fa-solid fa-cloud-arrow-up text-indigo-400"></i>
-          <span>Analizar Nuevo Caso (IA)</span>
+
+      <!-- Navigation Tabs -->
+      <div class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700/70 overflow-x-auto max-w-full">
+        <button onclick="switchMainTab('tab3d')" id="btnTab3d" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-cube"></i> Planificador 3D & Odontograma
         </button>
-        <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
-          <i class="fa-solid fa-file-pdf"></i>
-          <span>Exportar PDF Expediente</span>
+        <button onclick="switchMainTab('tabClinical')" id="btnTabClinical" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-file-medical"></i> Diagnóstico, Riesgos y Mes a Mes
+        </button>
+        <button onclick="switchMainTab('tabAI')" id="btnTabAI" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Analizador IA (Rx + Fotos)
+        </button>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="exportClinicalPDF()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-pdf"></i> <span class="hidden md:inline">Exportar Expediente PDF</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 flex-grow w-full">
+  <!-- =================================================================== -->
+  <!-- TAB 1: CLINCHECK 3D VISUALIZER + 3D EDITOR + 2D ANATOMICAL ODONTOGRAM -->
+  <!-- =================================================================== -->
+  <div id="tab3d" class="flex-1 flex flex-col max-w-[1600px] w-full mx-auto px-2 sm:px-4 py-3 gap-4">
 
-    <!-- Patient Header Banner -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
-      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 border-b border-slate-100 pb-5">
-        <div>
-          <div class="flex flex-wrap items-center gap-2.5">
-            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check text-emerald-600 text-[10px]"></i>
-              Expediente Ortodóntico Validado
-            </span>
-            <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">ID Estudio: <strong id="valCaseId">#IDI-2026-0912</strong></span>
-            <span class="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">Caso Clínico Real</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2 tracking-tight" id="valPatientName">
-            Paciente: Zúñiga Núñez Martha Gabriela
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-600 mt-1 flex flex-wrap gap-x-4 gap-y-1">
-            <span><strong>Edad:</strong> <span id="valPatientAge">40</span> años</span>
-            <span><strong>Fecha Estudio:</strong> <span id="valStudyDate">12/09/2026</span></span>
-            <span><strong>Doctora:</strong> <span id="valDoctor">Dra. Liseth Guevara Muñoz</span></span>
-            <span><strong>Centro Rx:</strong> Imagenología Digital Integral (IDI Mérida)</span>
-          </p>
-        </div>
+    <!-- CLINCHECK TOP ICON TOOLBAR (Responsive Horizontal Scroll on Mobile) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex items-center justify-between gap-2 overflow-x-auto no-print shadow-md">
+      <!-- Camera Presets -->
+      <div class="flex items-center gap-1 border-r border-slate-800 pr-2">
+        <button onclick="setCameraView('front')" class="cc-tool-btn active" id="cam-front" title="Vista Frontal Anterior">
+          <i class="fa-solid fa-grip-lines text-sm mb-0.5"></i><span>Frontal</span>
+        </button>
+        <button onclick="setCameraView('upper')" class="cc-tool-btn" id="cam-upper" title="Arcada Superior (Oclusal Maxilar)">
+          <i class="fa-solid fa-archway text-sm mb-0.5"></i><span>Maxilar</span>
+        </button>
+        <button onclick="setCameraView('lower')" class="cc-tool-btn" id="cam-lower" title="Arcada Inferior (Oclusal Mandibular)">
+          <i class="fa-solid fa-magnet text-sm mb-0.5"></i><span>Mandíbula</span>
+        </button>
+        <button onclick="setCameraView('right')" class="cc-tool-btn" id="cam-right" title="Vista Lateral Derecha">
+          <i class="fa-solid fa-angles-right text-sm mb-0.5"></i><span>Derecha</span>
+        </button>
+        <button onclick="setCameraView('left')" class="cc-tool-btn" id="cam-left" title="Vista Lateral Izquierda">
+          <i class="fa-solid fa-angles-left text-sm mb-0.5"></i><span>Izquierda</span>
+        </button>
+        <button onclick="setCameraView('overjet')" class="cc-tool-btn" id="cam-overjet" title="Vista Sobremordida / Overjet">
+          <i class="fa-solid fa-eye text-sm mb-0.5"></i><span>Overjet</span>
+        </button>
+      </div>
+
+      <!-- Arch Visibility Filter -->
+      <div class="flex items-center gap-1 border-r border-slate-800 pr-2">
+        <button onclick="setArchVisibility('both')" id="arch-both" class="cc-tool-btn active">
+          <i class="fa-solid fa-teeth-open text-sm mb-0.5"></i><span>Ambas</span>
+        </button>
+        <button onclick="setArchVisibility('upperOnly')" id="arch-upperOnly" class="cc-tool-btn">
+          <i class="fa-solid fa-chevron-up text-sm mb-0.5"></i><span>Solo Sup</span>
+        </button>
+        <button onclick="setArchVisibility('lowerOnly')" id="arch-lowerOnly" class="cc-tool-btn">
+          <i class="fa-solid fa-chevron-down text-sm mb-0.5"></i><span>Solo Inf</span>
+        </button>
+      </div>
+
+      <!-- Biomechanical Overlays (Roots, Attachments, IPR, Ghost, TADs, Grid) -->
+      <div class="flex items-center gap-1">
+        <button onclick="toggleLayer('roots')" id="layer-roots" class="cc-tool-btn active">
+          <i class="fa-solid fa-seedling text-sm mb-0.5 text-amber-400"></i><span>Raíces 3D</span>
+        </button>
+        <button onclick="toggleLayer('attachments')" id="layer-attachments" class="cc-tool-btn active">
+          <i class="fa-solid fa-shapes text-sm mb-0.5 text-rose-400"></i><span>Attach / Espuelas</span>
+        </button>
+        <button onclick="toggleLayer('tads')" id="layer-tads" class="cc-tool-btn active">
+          <i class="fa-solid fa-thumbtack text-sm mb-0.5 text-sky-400"></i><span>TADs + ATP</span>
+        </button>
+        <button onclick="toggleLayer('ipr')" id="layer-ipr" class="cc-tool-btn active">
+          <i class="fa-solid fa-diamond text-sm mb-0.5 text-emerald-400"></i><span>IPR (.mm)</span>
+        </button>
+        <button onclick="toggleLayer('ghost')" id="layer-ghost" class="cc-tool-btn">
+          <i class="fa-solid fa-clone text-sm mb-0.5 text-indigo-400"></i><span>Superposición</span>
+        </button>
+        <button onclick="toggleLayer('grid')" id="layer-grid" class="cc-tool-btn">
+          <i class="fa-solid fa-border-all text-sm mb-0.5"></i><span>Rejilla</span>
+        </button>
+      </div>
+
+      <!-- Zoom Controls -->
+      <div class="flex items-center gap-1 pl-2 border-l border-slate-800">
+        <button onclick="zoomCamera(-1.8)" class="cc-tool-btn" title="Acercar Zoom">
+          <i class="fa-solid fa-magnifying-glass-plus text-sm mb-0.5"></i><span>Zoom +</span>
+        </button>
+        <button onclick="zoomCamera(1.8)" class="cc-tool-btn" title="Alejar Zoom">
+          <i class="fa-solid fa-magnifying-glass-minus text-sm mb-0.5"></i><span>Zoom -</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN 3D WORKSPACE: LEFT/CENTER 3D VIEWPORT + RIGHT PLAN EDITOR SIDEBAR -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+
+      <!-- 3D WEBGL VIEWPORT CONTAINER (8 Cols on Desktop) -->
+      <div class="lg:col-span-8 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 rounded-2xl border border-slate-700/80 shadow-2xl relative flex flex-col overflow-hidden min-h-[420px] sm:min-h-[520px]">
         
-        <div class="flex gap-3 sm:gap-4 bg-slate-50 p-3 sm:p-3.5 rounded-xl border border-slate-200 w-full lg:w-auto justify-around lg:justify-start">
-          <div class="text-center px-2 sm:px-4 border-r border-slate-200">
-            <span class="block text-[11px] text-slate-500 uppercase font-semibold">Duración Est.</span>
-            <span class="text-lg sm:text-xl font-black text-indigo-600" id="valDuration">18 Meses</span>
+        <!-- Top Overlay HUD inside 3D Viewport -->
+        <div class="absolute top-3 left-3 right-3 flex flex-wrap justify-between items-start gap-2 pointer-events-none z-10">
+          <!-- Case Stage Badge -->
+          <div class="bg-slate-900/85 backdrop-blur-md border border-slate-700/80 rounded-xl px-3.5 py-2 pointer-events-auto shadow-lg">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-xs font-bold uppercase tracking-wider text-sky-400" id="hudMonthTitle">MES 0 — Estado Inicial (Pre-Tratamiento)</span>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-0.5" id="hudBiomechanicsDesc">
+              Mordida abierta anterior (-4.5 mm), apiñamiento anteroinferior (-5.5 mm), 3ros molares presentes.
+            </p>
           </div>
-          <div class="text-center px-2 sm:px-4 border-r border-slate-200">
-            <span class="block text-[11px] text-slate-500 uppercase font-semibold">Complejidad</span>
-            <span class="text-lg sm:text-xl font-black text-amber-600" id="valComplexity">Alta (Retratamiento)</span>
+
+          <!-- Real-Time Occlusal Metrics HUD -->
+          <div class="bg-slate-900/85 backdrop-blur-md border border-slate-700/80 rounded-xl px-3 py-2 flex items-center gap-4 pointer-events-auto shadow-lg text-xs">
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase block">Overbite Vertical</span>
+              <span class="font-bold text-rose-400" id="hudOverbite">-4.5 mm</span>
+            </div>
+            <div class="border-l border-slate-700 pl-3">
+              <span class="text-[10px] text-slate-400 uppercase block">Intrusión Molar Sup</span>
+              <span class="font-bold text-sky-400" id="hudMolarIntrusion">0.0 mm</span>
+            </div>
+            <div class="border-l border-slate-700 pl-3">
+              <span class="text-[10px] text-slate-400 uppercase block">IPR Acumulado Inf</span>
+              <span class="font-bold text-emerald-400" id="hudIprUsed">0.0 / 3.2 mm</span>
+            </div>
           </div>
-          <div class="text-center px-2 sm:px-4">
-            <span class="block text-[11px] text-slate-500 uppercase font-semibold">Anclaje Esquelético</span>
-            <span class="text-lg sm:text-xl font-black text-slate-800" id="valAnchorage">2 TADs (IZC)</span>
+        </div>
+
+        <!-- Floating IPR Diamonds Container (Projected from 3D coordinates) -->
+        <div id="iprLabelsOverlay" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
+
+        <!-- THREE.JS CANVAS -->
+        <div id="canvas3DContainer" class="w-full flex-1 cursor-grab active:cursor-grabbing relative touch-none"></div>
+
+        <!-- Mobile Gesture Hint -->
+        <div class="absolute bottom-20 left-3 bg-slate-900/70 backdrop-blur px-2.5 py-1 rounded-md text-[10px] text-slate-400 pointer-events-none border border-slate-800">
+          <i class="fa-solid fa-hand-pointer mr-1 text-indigo-400"></i> 1 dedo: Rotar 360° | 2 dedos / Rueda: Zoom | Clic en diente: Editar 3D
+        </div>
+
+        <!-- CLINCHECK BOTTOM STAGING TIMELINE BAR (Month 0 to Month 18) -->
+        <div class="bg-slate-950/95 border-t border-slate-800 px-4 py-3 z-20 no-print">
+          <div class="flex items-center gap-3">
+            <!-- Play / Pause Button -->
+            <button onclick="togglePlaySimulation()" id="btnPlaySim" class="w-9 h-9 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 flex items-center justify-center font-bold shadow-lg shadow-sky-500/20 transition">
+              <i class="fa-solid fa-play" id="iconPlaySim"></i>
+            </button>
+            <button onclick="stepMonth(-1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-backward-step"></i>
+            </button>
+            <button onclick="stepMonth(1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-forward-step"></i>
+            </button>
+
+            <!-- Slider Track -->
+            <div class="flex-1 flex flex-col">
+              <div class="flex justify-between text-[10px] font-semibold text-slate-400 mb-1 px-1">
+                <span>Inicio (Mes 0)</span>
+                <span class="text-indigo-400">Alineación + IPR (M1-6)</span>
+                <span class="text-sky-400">Intrusión TADs (M7-11)</span>
+                <span class="text-emerald-400">Cierre & Detalle (M12-18)</span>
+              </div>
+              <input type="range" id="timelineSlider" min="0" max="18" step="0.1" value="0" oninput="onTimelineScrub(this.value)" class="cc-slider">
+            </div>
+
+            <!-- Stage Counter -->
+            <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-center min-w-[85px]">
+              <span class="text-[10px] text-slate-400 block uppercase">Etapa</span>
+              <span class="text-sm font-extrabold text-white" id="stageCounterText">0 / 18</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Diagnostic Quick Summary 4 Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
-        <div class="bg-gradient-to-b from-slate-50 to-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
-            <span class="text-[11px] font-bold uppercase tracking-wider">Patrón Esquelético</span>
-            <i class="fa-solid fa-bone text-indigo-500 text-xs"></i>
-          </div>
-          <p class="text-sm font-bold text-slate-900" id="valSkeletalTitle">Clase II Dolicofacial (Hiperdivergente)</p>
-          <p class="text-xs text-slate-500 mt-1" id="valSkeletalDesc">Rotación mandibular horaria, perfil convexo, ramas mandibulares cortas.</p>
-        </div>
-
-        <div class="bg-gradient-to-b from-rose-50/50 to-white p-4 rounded-xl border border-rose-200/80 shadow-xs">
-          <div class="flex items-center justify-between text-rose-500 mb-1">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700">Plano Vertical</span>
-            <i class="fa-solid fa-arrows-up-down text-rose-500 text-xs"></i>
-          </div>
-          <p class="text-sm font-bold text-rose-600" id="valVerticalTitle">Mordida Abierta Anterior (-4.5 mm)</p>
-          <p class="text-xs text-slate-500 mt-1" id="valVerticalDesc">De OD 13 a 23 con interposición lingual activa y deglución atípica.</p>
-        </div>
-
-        <div class="bg-gradient-to-b from-slate-50 to-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
-            <span class="text-[11px] font-bold uppercase tracking-wider">Fórmula Dental / Arcadas</span>
-            <i class="fa-solid fa-teeth text-indigo-500 text-xs"></i>
-          </div>
-          <p class="text-sm font-bold text-slate-900" id="valDentalTitle">Ausencia previa de 14, 24, 34 y 44</p>
-          <p class="text-xs text-slate-500 mt-1" id="valDentalDesc">Apiñamiento anteroinferior (-5.5 mm) y terceros molares 18, 28, 38, 48 presentes.</p>
-        </div>
-
-        <div class="bg-gradient-to-b from-amber-50/50 to-white p-4 rounded-xl border border-amber-200/80 shadow-xs">
-          <div class="flex items-center justify-between text-amber-500 mb-1">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700">Alerta Radicular</span>
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xs"></i>
-          </div>
-          <p class="text-sm font-bold text-amber-600" id="valRootTitle">Acortamiento Radicular Anterior</p>
-          <p class="text-xs text-slate-500 mt-1" id="valRootDesc">Prohibida extrusión anterior pura; cerrar espacio con intrusión molar guiada.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Visual Imaging Gallery (Rx + Clinical Photos of the Patient) -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
-      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
+      <!-- CLINCHECK RIGHT SIDEBAR: PLAN EDITOR & 3D CONTROLS (4 Cols on Desktop) -->
+      <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-xl no-print">
         <div>
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-images text-indigo-600"></i>
-            Registro Fotográfico y Radiográfico del Paciente (Entrada de IA Vision)
-          </h3>
-          <p class="text-xs text-slate-500">Estudios clínicos de referencia analizados por Gemini Vision multimodal</p>
-        </div>
-        <span class="text-xs text-slate-400 no-print"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i>Clic en imagen para ampliar</span>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <!-- Rx Panorámica -->
-        <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 cursor-pointer shadow-xs" onclick="openLightbox('ortho-media/rx_panoramica_demo.jpg', 'Radiografía Panorámica (Ortopantomografía)')">
-          <img src="ortho-media/rx_panoramica_demo.jpg" alt="Rx Panorámica del Paciente" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-2 text-white text-xs">
-            <span class="font-bold block truncate">1. Rx Panorámica</span>
-            <span class="text-[10px] text-slate-300">Ausencias 14,24,34,44 + 3ros</span>
-          </div>
-        </div>
-
-        <!-- Rx Lateral -->
-        <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 cursor-pointer shadow-xs" onclick="openLightbox('ortho-media/rx_lateral_demo.jpg', 'Radiografía Lateral de Cráneo (Cefalometría)')">
-          <img src="ortho-media/rx_lateral_demo.jpg" alt="Rx Lateral de Cráneo" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-2 text-white text-xs">
-            <span class="font-bold block truncate">2. Rx Lateral de Cráneo</span>
-            <span class="text-[10px] text-slate-300">Patrón Dolicofacial / Cefalometría</span>
-          </div>
-        </div>
-
-        <!-- Foto Intraoral Frontal -->
-        <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 cursor-pointer shadow-xs" onclick="openLightbox('ortho-media/foto_frontal_demo.jpg', 'Fotografía Intraoral Frontal (Mordida Abierta)')">
-          <img src="ortho-media/foto_frontal_demo.jpg" alt="Foto Frontal Intraoral" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-2 text-white text-xs">
-            <span class="font-bold block truncate">3. Frontal Intraoral</span>
-            <span class="text-[10px] text-rose-300">Mordida Abierta -4.5 mm</span>
-          </div>
-        </div>
-
-        <!-- Foto Intraoral Lateral -->
-        <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 cursor-pointer shadow-xs" onclick="openLightbox('ortho-media/foto_lateral_demo.jpg', 'Fotografía Intraoral Lateral Derecha (Oclusión)')">
-          <img src="ortho-media/foto_lateral_demo.jpg" alt="Foto Lateral Intraoral" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-300">
-          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-2 text-white text-xs">
-            <span class="font-bold block truncate">4. Lateral Intraoral</span>
-            <span class="text-[10px] text-slate-300">Relación Molar y Canina</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ODONTOGRAMA CLÍNICO ANATÓMICO (ESTILO HOJA DE EXPEDIENTE) -->
-    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sm:p-6 print-break">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-tooth text-indigo-600"></i> Odontograma Clínico y Biomecánico por Cuadrantes (Sistema FDI)
-          </h3>
-          <p class="text-xs text-slate-500">Haz clic en cualquier diente para inspeccionar su diagnóstico, milímetros de IPR y movimientos programados.</p>
-        </div>
-        <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 text-xs">
-          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Alineado</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> IPR / Rotado</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> Crítico / TAD</span>
-          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-300 inline-block"></span> Ausente</span>
-        </div>
-      </div>
-
-      <!-- Contenedor Estilo Esquema Dental Anatómico -->
-      <div class="border-2 border-indigo-100 rounded-xl p-1.5 sm:p-4 bg-slate-50/55">
-        
-        <!-- HEADER SUPERIOR DE CUADRANTES -->
-        <div class="text-center text-xs font-bold text-indigo-900 bg-indigo-50 py-1.5 rounded-lg mb-4 uppercase tracking-wider">
-          Maxilar Superior (Arcada Maxilar)
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 relative">
-          <!-- Línea Divisoria Central Vertical -->
-          <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-indigo-200 -ml-px"></div>
-
-          <!-- CUADRANTE 2 (Derecha del Paciente / Izquierda del Esquema) -->
-          <div>
-            <div class="flex justify-between items-center mb-1.5 px-1 sm:px-2 text-[10px] sm:text-xs font-bold text-slate-500">
-              <span>Cuadrante 1 (Der.)</span>
-              <span>Línea Media ⟷</span>
+          <!-- Top Mode Selector (Plan Editor vs 3D Controls) -->
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">ClinCheck Plan Editor</span>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2 mt-0.5">
+                <i class="fa-solid fa-sliders text-indigo-400"></i> Controles 3D e IPR por Diente
+              </h3>
             </div>
-            <!-- Dientes 18 al 11 -->
-            <div class="grid grid-cols-8 gap-0.5 sm:gap-1.5">
-              <!-- 18 -->
-              <div onclick="selectTooth(18, 'Tercer Molar Superior Der.', 'Ausencia (Exodoncia Fase 0)', '0 mm', 'N/A')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">18</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">✖</div>
+            <button onclick="resetSelectedTooth()" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+            </button>
+          </div>
+
+          <!-- Selected Tooth Header Card -->
+          <div class="bg-slate-800/90 border border-indigo-500/40 rounded-xl p-3.5 mb-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="bg-indigo-600 text-white text-xs font-extrabold px-2.5 py-0.5 rounded" id="edToothId">OD 42</span>
+                  <span class="text-xs font-bold text-emerald-400" id="edToothStatusBadge">IPR Crítico Requerido</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mt-1" id="edToothName">Incisivo Lateral Inferior Derecho</h4>
               </div>
-              <!-- 17 -->
-              <div onclick="selectTooth(17, 'Segundo Molar Superior Der.', 'Anclaje para TAD (Intrusión 2 mm)', '0 mm', '-2.0 mm Intrusión')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">17</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">M</div>
+              <span class="text-[11px] font-mono bg-slate-900 text-slate-300 px-2 py-1 rounded border border-slate-700" id="edArchLabel">Mandíbula</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed" id="edToothDiag">
+              Apiñamiento severo con rotación mesiolingual de 38°. Cortical sinfisaria delgada: requiere stripping estricto antes de desrotar.
+            </p>
+          </div>
+
+          <!-- HIGHLIGHTED MESIAL / DISTAL STRIPPING (IPR) BOX -->
+          <div class="bg-slate-950/90 border border-amber-500/40 rounded-xl p-3.5 mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-diamond"></i> Protocolo de Stripping (IPR)
+              </span>
+              <span class="text-xs font-extrabold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30" id="edIprTotalBadge">
+                Total: 0.6 mm
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 my-2">
+              <!-- Mesial IPR Control -->
+              <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center text-xs mb-1">
+                  <span class="font-semibold text-slate-300">Cara Mesial:</span>
+                  <span class="font-extrabold text-amber-400" id="edIprMesialVal">0.3 mm</span>
+                </div>
+                <input type="range" id="sliderIprMesial" min="0" max="0.5" step="0.1" value="0.3" oninput="updateToothCustomParam('iprM', this.value)" class="cc-slider">
               </div>
-              <!-- 16 -->
-              <div onclick="selectTooth(16, 'Primer Molar Superior Der.', 'Conexión a Barra Transpalatina + TAD', '0 mm', '-2.0 mm Intrusión')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">16</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">M</div>
-              </div>
-              <!-- 15 -->
-              <div onclick="selectTooth(15, 'Segundo Premolar Superior Der.', 'Alineación pasiva y nivelación', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">15</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 14 -->
-              <div onclick="selectTooth(14, 'Primer Premolar Superior Der.', 'Ausencia previa cerrada', '0 mm', 'Espacio Cerrado')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation opacity-60">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">14</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">-</div>
-              </div>
-              <!-- 13 -->
-              <div onclick="selectTooth(13, 'Canino Superior Derecho', 'Guía canina, distalización leve', '0 mm', 'Desrotación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">13</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 12 -->
-              <div onclick="selectTooth(12, 'Incisivo Lateral Superior Der.', 'Control de torque radicular', '0 mm', 'Torque +5°')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">12</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 11 -->
-              <div onclick="selectTooth(11, 'Incisivo Central Superior Der.', 'Rotación mesiolabial leve', '0.2 mm', 'Desrotación')" class="tooth-box bg-amber-50 border border-amber-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-amber-600">11</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-amber-400 flex items-center justify-center text-[8px] sm:text-[9px] text-amber-700 font-bold">⚡</div>
+
+              <!-- Distal IPR Control -->
+              <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center text-xs mb-1">
+                  <span class="font-semibold text-slate-300">Cara Distal:</span>
+                  <span class="font-extrabold text-amber-400" id="edIprDistalVal">0.3 mm</span>
+                </div>
+                <input type="range" id="sliderIprDistal" min="0" max="0.5" step="0.1" value="0.3" oninput="updateToothCustomParam('iprD', this.value)" class="cc-slider">
               </div>
             </div>
+
+            <p class="text-[11px] text-amber-200/90 bg-amber-950/40 p-2 rounded border border-amber-800/40 mt-1" id="edIprClinicalValue">
+              <strong>Valor Clínico:</strong> Desgaste con tira diamantada en Mes 1-3 para liberar punto de contacto sin proinclinar la raíz fuera del hueso alveolar.
+            </p>
           </div>
 
-          <!-- CUADRANTE 1 (Izquierda del Paciente / Derecha del Esquema) -->
-          <div>
-            <div class="flex justify-between items-center mb-1.5 px-1 sm:px-2 text-[10px] sm:text-xs font-bold text-slate-500">
-              <span>⟷ Línea Media</span>
-              <span>Cuadrante 2 (Izq.)</span>
+          <!-- 3D Individual Tooth Movement Sliders -->
+          <div class="space-y-3 bg-slate-800/50 p-3.5 rounded-xl border border-slate-800">
+            <p class="text-xs font-bold text-slate-300 uppercase tracking-wider">Ajuste Fino de Posición Final 3D</p>
+            
+            <!-- Extrusion / Intrusion -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400">Intrusión / Extrusión Vertical:</span>
+                <span class="font-mono font-bold text-sky-400" id="valVertical">0.0 mm</span>
+              </div>
+              <input type="range" id="sliderVertical" min="-3.0" max="3.0" step="0.2" value="0" oninput="updateToothCustomParam('vertical', this.value)" class="cc-slider">
             </div>
-            <!-- Dientes 21 al 28 -->
-            <div class="grid grid-cols-8 gap-0.5 sm:gap-1.5">
-              <!-- 21 -->
-              <div onclick="selectTooth(21, 'Incisivo Central Superior Izq.', 'Rotación mesiolabial leve', '0.2 mm', 'Desrotación')" class="tooth-box bg-amber-50 border border-amber-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-amber-600">21</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-amber-400 flex items-center justify-center text-[8px] sm:text-[9px] text-amber-700 font-bold">⚡</div>
+
+            <!-- Rotation -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400">Rotación Mesio-Distal:</span>
+                <span class="font-mono font-bold text-sky-400" id="valRotation">0°</span>
               </div>
-              <!-- 22 -->
-              <div onclick="selectTooth(22, 'Incisivo Lateral Superior Izq.', 'Alineación y nivelación', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">22</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
+              <input type="range" id="sliderRotation" min="-45" max="45" step="1" value="0" oninput="updateToothCustomParam('rotation', this.value)" class="cc-slider">
+            </div>
+
+            <!-- Labiolingual Torque / Inclination -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-400">Torque / Inclinación Vestíbulo-Lingual:</span>
+                <span class="font-mono font-bold text-sky-400" id="valTorque">0°</span>
               </div>
-              <!-- 23 -->
-              <div onclick="selectTooth(23, 'Canino Superior Izquierdo', 'Guía canina funcional', '0 mm', 'Alineación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">23</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 24 -->
-              <div onclick="selectTooth(24, 'Primer Premolar Superior Izq.', 'Ausencia previa cerrada', '0 mm', 'Espacio Cerrado')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation opacity-60">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">24</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">-</div>
-              </div>
-              <!-- 25 -->
-              <div onclick="selectTooth(25, 'Segundo Premolar Sup. Izq.', 'Nivelación oclusal', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">25</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 26 -->
-              <div onclick="selectTooth(26, 'Primer Molar Superior Izq.', 'Conexión a ATP + TAD IZC', '0 mm', '-2.0 mm Intrusión')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">26</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">M</div>
-              </div>
-              <!-- 27 -->
-              <div onclick="selectTooth(27, 'Segundo Molar Superior Izq.', 'Anclaje posterior', '0 mm', '-2.0 mm Intrusión')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">27</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">M</div>
-              </div>
-              <!-- 28 -->
-              <div onclick="selectTooth(28, 'Tercer Molar Superior Izq.', 'Ausencia (Exodoncia programada)', '0 mm', 'N/A')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">28</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">✖</div>
-              </div>
+              <input type="range" id="sliderTorque" min="-25" max="25" step="1" value="0" oninput="updateToothCustomParam('torque', this.value)" class="cc-slider">
             </div>
           </div>
         </div>
 
-        <!-- LÍNEA HORIZONTAL DIVISORIA OCLUSAL -->
-        <div class="my-6 border-t-2 border-dashed border-indigo-200 flex justify-center">
-          <span class="bg-indigo-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase -mt-2.5">Plano Oclusal</span>
-        </div>
-
-        <!-- HEADER INFERIOR DE CUADRANTES -->
-        <div class="text-center text-xs font-bold text-indigo-900 bg-indigo-50 py-1.5 rounded-lg mb-4 uppercase tracking-wider">
-          Mandíbula (Arcada Inferior)
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 relative">
-          <!-- Línea Divisoria Central Vertical -->
-          <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-indigo-200 -ml-px"></div>
-
-          <!-- CUADRANTE 4 (Derecha del Paciente / Izquierda del Esquema) -->
-          <div>
-            <div class="flex justify-between items-center mb-1.5 px-1 sm:px-2 text-[10px] sm:text-xs font-bold text-slate-500">
-              <span>Cuadrante 4 (Der.)</span>
-              <span>Línea Media ⟷</span>
-            </div>
-            <!-- Dientes 48 al 41 -->
-            <div class="grid grid-cols-8 gap-0.5 sm:gap-1.5">
-              <!-- 48 -->
-              <div onclick="selectTooth(48, 'Tercer Molar Inferior Der.', 'Ausencia (Exodoncia Fase 0)', '0 mm', 'N/A')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">48</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">✖</div>
-              </div>
-              <!-- 47 -->
-              <div onclick="selectTooth(47, 'Segundo Molar Inferior Der.', 'Nivelación de curva de Spee', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">47</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 46 -->
-              <div onclick="selectTooth(46, 'Primer Molar Inferior Der.', 'Enderezamiento mesial', '0 mm', 'Tip-back .019x.25')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">46</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 45 -->
-              <div onclick="selectTooth(45, 'Segundo Premolar Inf. Der.', 'Nivelación', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">45</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 44 -->
-              <div onclick="selectTooth(44, 'Primer Premolar Inferior Der.', 'Ausencia previa cerrada', '0 mm', 'Espacio Cerrado')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation opacity-60">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">44</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">-</div>
-              </div>
-              <!-- 43 -->
-              <div onclick="selectTooth(43, 'Canino Inferior Derecho', 'Desrotación y alineación', '0.4 mm', 'Stripping Interproximal')" class="tooth-box bg-amber-50 border border-amber-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-amber-600">43</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-amber-400 flex items-center justify-center text-[8px] sm:text-[9px] text-amber-700 font-bold">⚡</div>
-              </div>
-              <!-- 42 -->
-              <div onclick="selectTooth(42, 'Incisivo Lateral Inferior Der.', 'Apiñamiento severo (Rotación 45°)', '0.4 mm', 'Stripping + Torque')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">42</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">⚠</div>
-              </div>
-              <!-- 41 -->
-              <div onclick="selectTooth(41, 'Incisivo Central Inferior Der.', 'Apiñamiento severo y lingualizado', '0.3 mm', 'Desrotación y Vestibularización')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">41</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">⚠</div>
-              </div>
-            </div>
+        <!-- Live Update Button (ClinCheck Blue CTA) -->
+        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between gap-3">
+          <div class="text-[11px] text-slate-400">
+            <i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Sincronizado con Odontograma 2D
           </div>
-
-          <!-- CUADRANTE 3 (Izquierda del Paciente / Derecha del Esquema) -->
-          <div>
-            <div class="flex justify-between items-center mb-1.5 px-1 sm:px-2 text-[10px] sm:text-xs font-bold text-slate-500">
-              <span>⟷ Línea Media</span>
-              <span>Cuadrante 3 (Izq.)</span>
-            </div>
-            <!-- Dientes 31 al 38 -->
-            <div class="grid grid-cols-8 gap-0.5 sm:gap-1.5">
-              <!-- 31 -->
-              <div onclick="selectTooth(31, 'Incisivo Central Inferior Izq.', 'Apiñamiento severo y lingualizado', '0.3 mm', 'Desrotación y Vestibularización')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">31</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">⚠</div>
-              </div>
-              <!-- 32 -->
-              <div onclick="selectTooth(32, 'Incisivo Lateral Inferior Izq.', 'Rotación severa', '0.4 mm', 'Stripping + Torque')" class="tooth-box bg-rose-50 border border-rose-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-rose-600">32</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-rose-400 flex items-center justify-center text-[8px] sm:text-[9px] text-rose-700 font-bold">⚠</div>
-              </div>
-              <!-- 33 -->
-              <div onclick="selectTooth(33, 'Canino Inferior Izquierdo', 'Alineación', '0.4 mm', 'Stripping Interproximal')" class="tooth-box bg-amber-50 border border-amber-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-amber-600">33</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-amber-400 flex items-center justify-center text-[8px] sm:text-[9px] text-amber-700 font-bold">⚡</div>
-              </div>
-              <!-- 34 -->
-              <div onclick="selectTooth(34, 'Primer Premolar Inferior Izq.', 'Ausencia previa cerrada', '0 mm', 'Espacio Cerrado')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation opacity-60">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">34</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">-</div>
-              </div>
-              <!-- 35 -->
-              <div onclick="selectTooth(35, 'Segundo Premolar Inf. Izq.', 'Nivelación', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">35</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 36 -->
-              <div onclick="selectTooth(36, 'Primer Molar Inferior Izq.', 'Enderezamiento mesial', '0 mm', 'Tip-back .019x.25')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">36</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 37 -->
-              <div onclick="selectTooth(37, 'Segundo Molar Inferior Izq.', 'Nivelación', '0 mm', 'Nivelación')" class="tooth-box bg-emerald-50 border border-emerald-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-emerald-600">37</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-emerald-400 flex items-center justify-center text-[8px] sm:text-[9px] text-emerald-700 font-bold">✓</div>
-              </div>
-              <!-- 38 -->
-              <div onclick="selectTooth(38, 'Tercer Molar Inferior Izq.', 'Ausencia (Exodoncia Fase 0)', '0 mm', 'N/A')" class="tooth-box bg-slate-200 border border-slate-300 rounded p-0.5 sm:p-1.5 text-center select-none touch-manipulation">
-                <span class="block text-[8px] sm:text-[10px] font-bold text-slate-500">38</span>
-                <div class="w-5 h-5 sm:w-6 sm:h-6 mx-auto my-0.5 sm:my-1 rounded-full border border-dashed border-slate-400 flex items-center justify-center text-[8px] sm:text-[9px] text-slate-500">✖</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Panel Dinámico del Diente Seleccionado -->
-      <div id="toothDetailsPanel" class="mt-4 p-4 bg-indigo-50 border border-indigo-200 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded" id="selectedToothNum">Diente OD 41</span>
-            <h4 class="font-bold text-slate-900 text-sm" id="selectedToothTitle">Incisivo Central Inferior Derecho</h4>
-          </div>
-          <p class="text-xs text-slate-600 mt-1"><strong>Diagnóstico y Estado:</strong> <span id="selectedToothDiag">Apiñamiento severo y lingualizado</span></p>
-          <p class="text-xs text-slate-600 mt-0.5"><strong>Stripping (IPR) Requerido:</strong> <span id="selectedToothIPR" class="font-bold text-indigo-700">0.3 mm</span></p>
-        </div>
-        <div class="bg-white p-3 rounded-lg border border-indigo-100 shadow-sm w-full md:w-auto">
-          <p class="text-[10px] font-semibold text-slate-400 uppercase">Movimiento Biomecánico Programado</p>
-          <p class="text-xs font-bold text-indigo-900 mt-0.5" id="selectedToothMovement">Desrotación y Vestibularización controlada</p>
-        </div>
-      </div>
-    </section>
-
-        <!-- Technical Cephalometric Table & Additional Treatments/Risks -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Cefalometría y Parámetros Técnicos -->
-      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-microscope text-indigo-600"></i>
-            Análisis Técnico Radiográfico y Cefalométrico (IA Vision)
-          </h3>
-          <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded font-medium">Normas Clínicas Estándar</span>
-        </div>
-        
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs sm:text-sm text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 text-[11px] sm:text-xs uppercase tracking-wider">
-                <th class="py-3 px-3 rounded-l-lg">Parámetro / Estructura</th>
-                <th class="py-3 px-3">Hallazgo del Caso</th>
-                <th class="py-3 px-3">Norma</th>
-                <th class="py-3 px-3 rounded-r-lg">Implicación Biomecánica</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100" id="valTechnicalTableBody">
-              <tr>
-                <td class="py-3 px-3 font-semibold text-slate-800">Overbite (Sobremordida Vertical)</td>
-                <td class="py-3 px-3 text-rose-600 font-bold">-4.5 mm (Mordida Abierta)</td>
-                <td class="py-3 px-3 text-slate-500">+2.0 mm a +2.5 mm</td>
-                <td class="py-3 px-3 text-slate-700">Requiere intrusión molar superior con TADs para autorrotar la mandíbula en sentido antihorario.</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-3 font-semibold text-slate-800">Patrón Vertical (FMA / GoGn-SN)</td>
-                <td class="py-3 px-3 text-amber-600 font-bold">~31° / 38° (Hiperdivergente)</td>
-                <td class="py-3 px-3 text-slate-500">25° / 32°</td>
-                <td class="py-3 px-3 text-slate-700">Evitar cualquier mecánica extrusiva posterior (contraindicados elásticos Clase II convencionales).</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-3 font-semibold text-slate-800">Inclinación Incisiva (IMPA / 1-SN)</td>
-                <td class="py-3 px-3 text-indigo-700 font-bold">Biprotrusión / Proinclinación</td>
-                <td class="py-3 px-3 text-slate-500">90° / 102°</td>
-                <td class="py-3 px-3 text-slate-700">Alinear mediante IPR (Stripping) para retroinclinar y ganar sobremordida (efecto puente levadizo).</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-3 font-semibold text-slate-800">Discrepancia Oseodentaria Inf.</td>
-                <td class="py-3 px-3 text-rose-600 font-bold">-5.5 mm (Apiñamiento 33-43)</td>
-                <td class="py-3 px-3 text-slate-500">0 mm</td>
-                <td class="py-3 px-3 text-slate-700">IPR selectivo de 0.3-0.4 mm por contacto de canino a canino inferior + leve distalización post-exo 38/48.</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-3 font-semibold text-slate-800">Proporción Corona-Raíz (Panorámica)</td>
-                <td class="py-3 px-3 text-amber-600 font-bold">1:1.1 en Incisivos + Pérdida ósea</td>
-                <td class="py-3 px-3 text-slate-500">1:1.5 a 1:2</td>
-                <td class="py-3 px-3 text-slate-700">Fuerzas ultra ligeras y continuas (&lt;60 g en anteriores). Control periapical radiográfico cada 6 meses.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tratamientos Adicionales y Matriz de Riesgos -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-5 print-break">
-        <div>
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-kit-medical text-emerald-600"></i>
-            Tratamientos Adicionales Requeridos
-          </h3>
-          <ul class="space-y-2 text-xs text-slate-700" id="valAdditionalTreatmentsList">
-            <li class="flex items-start gap-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
-              <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
-              <span><strong>Periodoncia Previa (Fase 0):</strong> Detartraje ultrasónico y profilaxis profunda anteroinferior antes del cementado.</span>
-            </li>
-            <li class="flex items-start gap-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
-              <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
-              <span><strong>Terapia Miofuncional + Espuelas:</strong> Reeducación lingual + espuelas linguales (bondable tongue spurs) en caras linguales/palatinas.</span>
-            </li>
-            <li class="flex items-start gap-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
-              <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
-              <span><strong>Cirugía Maxilofacial:</strong> Exodoncia de terceros molares (18, 28, 38 y 48) para eliminar efecto cuña posterior.</span>
-            </li>
-            <li class="flex items-start gap-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
-              <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
-              <span><strong>Anclaje Esquelético:</strong> 2 Microtornillos infracigomáticos (IZC) entre 6 y 7 superiores + ATP separado 3 mm del paladar.</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="border-t border-slate-100 pt-4">
-          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
-            Matriz de Riesgos Clínicos y Mitigación
-          </h3>
-          <div class="space-y-2 text-xs" id="valRisksContainer">
-            <div class="p-2.5 rounded-lg bg-rose-50 border border-rose-100 text-rose-950">
-              <strong class="text-rose-700">1. Reabsorción Radicular Apical Externa (Alto):</strong> Raíces cortas preexistentes. Prohibido cerrar la mordida con elásticos anteriores pesados; cerrar por intrusión molar.
-            </div>
-            <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-950">
-              <strong class="text-amber-800">2. Fenestración y Recesión Gingival (Medio-Alto):</strong> Cortical sinfisaria delgada. No expandir ni proinclinar incisivos inferiores; ejecutar IPR estricto desde el Mes 1.
-            </div>
-            <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-950">
-              <strong class="text-amber-800">3. Recidiva Vertical Post-Tratamiento (Alto):</strong> Dependiente del control neuromuscular de la lengua. Usar espuelas activas y retenedor con recordatorio palatino.
-            </div>
-          </div>
+          <button onclick="triggerLiveUpdate()" id="btnLiveUpdate" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/25 transition flex items-center gap-2">
+            <i class="fa-solid fa-bolt"></i> Live Update 3D
+          </button>
         </div>
       </div>
 
     </div>
 
-    <!-- Treatment Options (Aparatos recomendados) -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
-      <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 mb-4">
-        <i class="fa-solid fa-sliders text-indigo-600"></i>
-        Opciones de Tratamiento Recomendadas
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl border-2 border-indigo-500/40 bg-indigo-50/20">
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="font-bold text-sm text-indigo-950">Opción 1 (Gold Standard): Autoligado Pasivo + Microtornillos (TADs)</h4>
-            <span class="text-[11px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded">Recomendada</span>
+    <!-- =================================================================== -->
+    <!-- 2D ANATOMICAL QUADRANT ODONTOGRAM (SYNCED WITH 3D VIEWER)           -->
+    <!-- =================================================================== -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl print-light-card">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-white print-text-dark flex items-center gap-2">
+            <i class="fa-solid fa-teeth text-indigo-400"></i> III. Odontograma Anatómico por Cuadrantes y Mapa de Stripping (Mesial / Distal)
+          </h3>
+          <p class="text-xs text-slate-400">Haz clic en cualquier órgano dentario para enfocarlo en el modelo 3D y ver su prescripción exacta de IPR.</p>
+        </div>
+        <!-- Legend -->
+        <div class="flex flex-wrap items-center gap-3 text-xs bg-slate-950/80 px-3 py-2 rounded-xl border border-slate-800">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Alineado / Sin IPR</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Requiere Stripping (M/D)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> Intrusión TAD / Crítico</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-600 inline-block"></span> Ausente / Exo</span>
+        </div>
+      </div>
+
+      <!-- Anatomical Chart Frame -->
+      <div class="border-2 border-slate-800 rounded-xl p-3 sm:p-5 bg-slate-950/60 print-light-card">
+        <!-- Maxilar Header -->
+        <div class="text-center text-xs font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-800/50 py-1.5 rounded-lg mb-4 uppercase tracking-wider">
+          Maxilar Superior (Cuadrante 1 Derecha — Cuadrante 2 Izquierda)
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 relative">
+          <!-- Upper Arch Quadrants rendered dynamically by JS -->
+          <div>
+            <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-2 px-1">
+              <span>D — Cuadrante 1 (18 a 11)</span>
+              <span>Línea Media ⟷</span>
+            </div>
+            <div class="grid grid-cols-8 gap-1 sm:gap-1.5" id="odontogramQ1"></div>
           </div>
-          <p class="text-xs text-slate-700 mb-2"><strong>Aparatología:</strong> Brackets de Autoligado Pasivo Slot .022" (Prescripción MBT torque estándar) + 2 TADs IZC superiores + ATP palatino elevado.</p>
-          <div class="text-xs space-y-1 text-slate-600">
-            <p><strong class="text-emerald-700">Ventajas:</strong> Menor fricción, control vertical tridimensional absoluto con intrusión molar predecible, menor estrés sobre raíces cortas.</p>
-            <p><strong class="text-slate-700">Limitaciones:</strong> Mayor costo por colocación de microtornillos y aditamentos quirúrgicos.</p>
+
+          <div>
+            <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-2 px-1">
+              <span>⟷ Línea Media</span>
+              <span>Cuadrante 2 (21 a 28) — I</span>
+            </div>
+            <div class="grid grid-cols-8 gap-1 sm:gap-1.5" id="odontogramQ2"></div>
           </div>
         </div>
 
-        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="font-bold text-sm text-slate-900">Opción 2: Tratamiento Híbrido (Alineadores Transparentes + TADs)</h4>
-            <span class="text-[11px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Alternativa</span>
+        <!-- Occlusal Plane Divider -->
+        <div class="my-5 border-t-2 border-dashed border-slate-700 flex justify-center">
+          <span class="bg-slate-800 text-sky-400 border border-slate-700 text-[10px] font-bold px-4 py-0.5 rounded-full uppercase -mt-2.5">
+            Plano Oclusal &bull; Cierre de Mordida Abierta con TADs
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 relative">
+          <!-- Lower Arch Quadrants rendered dynamically by JS -->
+          <div>
+            <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-2 px-1">
+              <span>D — Cuadrante 4 (48 a 41)</span>
+              <span>Línea Media ⟷</span>
+            </div>
+            <div class="grid grid-cols-8 gap-1 sm:gap-1.5" id="odontogramQ4"></div>
           </div>
-          <p class="text-xs text-slate-700 mb-2"><strong>Aparatología:</strong> Alineadores (Invisalign Comprehensive) con ataches optimizados de intrusión molar posterior + TADs con botones palatinos.</p>
-          <div class="text-xs space-y-1 text-slate-600">
-            <p><strong class="text-emerald-700">Ventajas:</strong> Máxima estética, excelente control de intrusión molar posterior por grosor del plástico (efecto bite-block).</p>
-            <p><strong class="text-rose-700">Limitaciones:</strong> 100% dependiente de la cooperación del paciente (22 horas/día); requiere disciplina rigurosa.</p>
+
+          <div>
+            <div class="flex justify-between text-[11px] font-bold text-slate-400 mb-2 px-1">
+              <span>⟷ Línea Media</span>
+              <span>Cuadrante 3 (31 a 38) — I</span>
+            </div>
+            <div class="grid grid-cols-8 gap-1 sm:gap-1.5" id="odontogramQ3"></div>
+          </div>
+        </div>
+
+        <!-- Mandibular Header -->
+        <div class="text-center text-xs font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-800/50 py-1.5 rounded-lg mt-4 uppercase tracking-wider">
+          Mandíbula (Cuadrante 4 Derecha — Cuadrante 3 Izquierda)
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- TAB 2: CLINICAL DIAGNOSIS, RISKS, ADDITIONAL TX & MONTH-BY-MONTH    -->
+  <!-- =================================================================== -->
+  <div id="tabClinical" class="hidden max-w-[1600px] w-full mx-auto px-3 sm:px-6 py-4 space-y-6">
+
+    <!-- Patient Summary Banner -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 print-light-card">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-2.5 py-1 rounded uppercase">
+            Diagnóstico Integral Definitivo
+          </span>
+          <h2 class="text-2xl font-bold text-white print-text-dark mt-2">Paciente: Zúñiga Núñez Martha Gabriela</h2>
+          <p class="text-sm text-slate-400 mt-0.5">
+            <strong>Edad:</strong> 40 años &nbsp;|&nbsp; <strong>Fecha Estudio:</strong> 12/09/2026 &nbsp;|&nbsp; <strong>Referidor:</strong> Dra. Liseth Guevara Muñoz (IDI Mérida)
+          </p>
+        </div>
+        <div class="grid grid-cols-3 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <div class="text-center px-3 border-r border-slate-800">
+            <span class="block text-[10px] text-slate-400 uppercase">Duración</span>
+            <span class="text-base font-extrabold text-sky-400">18 Meses</span>
+          </div>
+          <div class="text-center px-3 border-r border-slate-800">
+            <span class="block text-[10px] text-slate-400 uppercase">Anclaje</span>
+            <span class="text-base font-extrabold text-indigo-400">2 TADs IZC + ATP</span>
+          </div>
+          <div class="text-center px-3">
+            <span class="block text-[10px] text-slate-400 uppercase">IPR Total Inf.</span>
+            <span class="text-base font-extrabold text-amber-400">3.2 mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Cephalometric & Occlusal Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div class="lg:col-span-2">
+          <h3 class="text-sm font-bold text-sky-400 uppercase tracking-wider mb-3">
+            <i class="fa-solid fa-microscope mr-1.5"></i> Datos Técnicos Cefalométricos y Radiográficos
+          </h3>
+          <div class="overflow-x-auto border border-slate-800 rounded-xl">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-950 text-slate-400 uppercase">
+                <tr>
+                  <th class="py-2.5 px-3">Parámetro Clínico</th>
+                  <th class="py-2.5 px-3">Hallazgo del Caso</th>
+                  <th class="py-2.5 px-3">Norma</th>
+                  <th class="py-2.5 px-3">Decisión Biomecánica</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300">
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold">Overbite Anterior</td>
+                  <td class="py-2.5 px-3 text-rose-400 font-bold">-4.5 mm (Mordida Abierta)</td>
+                  <td class="py-2.5 px-3">+2.0 mm</td>
+                  <td class="py-2.5 px-3">Intrusión molar superior (-2.0 mm) con TADs para autorrotar mandíbula.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold">Biotipo Esquelético (FMA)</td>
+                  <td class="py-2.5 px-3 text-amber-400 font-bold">31° (Dolicofacial / Hiperdivergente)</td>
+                  <td class="py-2.5 px-3">25°</td>
+                  <td class="py-2.5 px-3">Prohibida mecánica extrusiva posterior; usar ATP separado 3 mm del paladar.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold">Fórmula Dental (Panorámica)</td>
+                  <td class="py-2.5 px-3 font-bold text-white">Ausencia previa de 14, 24, 34 y 44</td>
+                  <td class="py-2.5 px-3">Arcada completa</td>
+                  <td class="py-2.5 px-3">Espacios cerrados. Extraer terceros molares (18, 28, 38, 48) para eliminar efecto cuña.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold">Discrepancia Anteroinferior</td>
+                  <td class="py-2.5 px-3 text-rose-400 font-bold">-5.5 mm (Rotación severa 32-42)</td>
+                  <td class="py-2.5 px-3">0.0 mm</td>
+                  <td class="py-2.5 px-3">Stripping (IPR) específico mesial/distal de 33 a 43 para alinear sin proinclinar.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold">Morfología Radicular Anterior</td>
+                  <td class="py-2.5 px-3 text-amber-400 font-bold">Raíces cortas (1:1.1) + Cresta alveolar baja</td>
+                  <td class="py-2.5 px-3">1:1.6</td>
+                  <td class="py-2.5 px-3">Fuerzas ligeras (&lt;60 g), prohibido cerrar mordida con elásticos pesados anteriores.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Additional Treatments & Risks -->
+        <div class="space-y-4">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <h4 class="text-xs font-bold text-emerald-400 uppercase mb-2">
+              <i class="fa-solid fa-kit-medical mr-1"></i> Tratamientos Adicionales Obligatorios
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li><strong>1. Periodoncia Fase 0:</strong> Detartraje ultrasónico y alisado radicular anteroinferior previo al bondeo.</li>
+              <li><strong>2. Terapia Miofuncional + Espuelas:</strong> Adhesión de <em>bondable tongue spurs</em> palatinos/linguales para erradicar interposición lingual.</li>
+              <li><strong>3. Exodoncias (18, 28, 38 y 48):</strong> Eliminación del contacto prematuro posterior.</li>
+              <li><strong>4. Anclaje TADs (2 IZC):</strong> Microtornillos infracigomáticos de 2.0 x 10 mm entre 16-17 y 26-27.</li>
+            </ul>
+          </div>
+
+          <div class="bg-rose-950/30 p-4 rounded-xl border border-rose-800/50">
+            <h4 class="text-xs font-bold text-rose-400 uppercase mb-2">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i> Riesgos Clínicos y Mitigación
+            </h4>
+            <ul class="space-y-1.5 text-xs text-rose-200">
+              <li>&bull; <strong>Reabsorción Radicular (Alto):</strong> Rx periapical obligatoria en Mes 6 y Mes 12.</li>
+              <li>&bull; <strong>Recesión Gingival Inferior (Alto):</strong> Respetar milímetros exactos de IPR mesial/distal para mantener raíces en hueso esponjoso.</li>
+              <li>&bull; <strong>Recidiva Vertical (Alto):</strong> Retención fija 33-43 + Essix con recordatorio lingual.</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Month-by-Month Biomechanical Sequence -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 print-break">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-indigo-600"></i>
-            Secuencia Biomecánica y Movimientos Mes con Mes (18 Meses)
-          </h3>
-          <p class="text-xs text-slate-500">Hoja de ruta clínica detallada para el expediente y citas en sillón</p>
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 print-light-card">
+      <h3 class="text-base font-bold text-white print-text-dark mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-calendar-days text-indigo-400"></i> Secuencia Biomecánica y Movimientos Mes con Mes (0 a 18 Meses)
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-slate-700 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 0</span>
+            <span class="text-xs text-slate-400 font-semibold">Fase Pre-Ortodóntica</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Saneamiento Periodontal y Exodoncias</h4>
+          <p class="text-xs text-slate-300">Detartraje profundo anteroinferior. Exodoncia quirúrgica de 18, 28, 38 y 48 para liberar espacio retromolar y eliminar cuña posterior.</p>
         </div>
 
-        <!-- Stage Filter Buttons -->
-        <div class="flex flex-wrap gap-1.5 sm:gap-2 no-print">
-          <span class="text-xs font-semibold text-slate-500 self-center mr-1 hidden sm:inline">Filtrar:</span>
-          <button onclick="filterStages('all')" id="filterBtnAll" class="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-medium shadow-xs transition">Todas (M0-18)</button>
-          <button onclick="filterStages('fase1')" id="filterBtnFase1" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">Alineación (M0-6)</button>
-          <button onclick="filterStages('fase2')" id="filterBtnFase2" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">Intrusión TADs (M7-11)</button>
-          <button onclick="filterStages('fase3')" id="filterBtnFase3" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">Cierre y Detalle (M12-18)</button>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 1 - 2</span>
+            <span class="text-xs text-indigo-400 font-semibold">Arcos .014" CuNiTi</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Cementado Diferencial + Espuelas + IPR Fase 1</h4>
+          <p class="text-xs text-slate-300">Colocación de espuelas linguales. Iniciar Stripping (0.15 mm Mesial y 0.15 mm Distal en 42, 41, 31, 32) para liberar contactos sin vestibularizar.</p>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 3 - 4</span>
+            <span class="text-xs text-indigo-400 font-semibold">Arcos .016" CuNiTi</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Desrotación Anteroinferior Completa</h4>
+          <p class="text-xs text-slate-300">Completar IPR programado en caras mesiales y distales de caninos e incisivos inferiores. Desrotación del 85% de 32, 31, 41 y 42.</p>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 5 - 6</span>
+            <span class="text-xs text-indigo-400 font-semibold">.016" x .022" CuNiTi</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Control de Torque + ATP + Rx Periapical</h4>
+          <p class="text-xs text-slate-300">Instalación de Barra Transpalatina (ATP) separada 3 mm del paladar. Toma de radiografía periapical de control en incisivos.</p>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-sky-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 7 - 11</span>
+            <span class="text-xs text-sky-400 font-semibold">.019" x .025" SS + 2 TADs IZC</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Intrusión Molar Superior y Autorrotación</h4>
+          <p class="text-xs text-slate-300">Activación de cadenas elásticas desde TADs (150 g por lado) hacia 16-17 y 26-27. Intrusión real de 2.0 mm y cierre progresivo de la mordida abierta.</p>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-0.5 rounded">MES 12 - 18</span>
+            <span class="text-xs text-emerald-400 font-semibold">.019"x.025" TMA / Braided</span>
+          </div>
+          <h4 class="font-bold text-sm text-white mb-1">Asentamiento, Overbite +1.8 mm y Retención</h4>
+          <p class="text-xs text-slate-300">Cierre de microespacios residuales, guía canina funcional y retiro en Mes 18 con retenedor fijo 33-43 + Essix con recordatorio palatino.</p>
         </div>
       </div>
 
-      <!-- Grid of Stages -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="monthlyRoadmapContainer">
-        <!-- Generado dinámicamente o precargado -->
-      </div>
-
-      <!-- Retention Protocol Banner -->
-      <div class="mt-6 p-4 sm:p-5 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl text-xs sm:text-sm text-purple-950 flex items-start gap-3">
-        <i class="fa-solid fa-lock text-purple-600 text-base mt-0.5"></i>
-        <div>
-          <strong class="font-bold text-purple-900 block mb-1">Protocolo Definitivo de Retención Antirrecidiva:</strong>
-          <span id="valRetentionProtocol">Retenedor fijo lingual trenzado .0175" WildCat de 33 a 43 + Retenedor termoformado superior con cobertura molar reforzada y orificio palatino recordatorio para la punta lingual. Citas de control a los 3, 6 y 12 meses.</span>
+      <!-- Signatures for Clinical File -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-6 border-t border-slate-800">
+        <div class="text-center">
+          <p class="font-bold text-sm text-white print-text-dark">Dra. Liseth Guevara Muñoz</p>
+          <p class="text-xs text-slate-400">Especialista en Ortodoncia — Firma y Cédula Profesional</p>
+        </div>
+        <div class="text-center">
+          <p class="font-bold text-sm text-white print-text-dark">Martha Gabriela Zúñiga Núñez</p>
+          <p class="text-xs text-slate-400">Firma de Consentimiento Informado del Paciente</p>
         </div>
       </div>
     </section>
-
-    <!-- Signatures Section for Clinical File (Printed in PDF) -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 print-break">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
-        <div class="border-t-2 border-slate-300 pt-3 text-center">
-          <p class="font-bold text-sm text-slate-900">Dra. Liseth Guevara Muñoz</p>
-          <p class="text-xs text-slate-500">Especialista en Ortodoncia y Ortopedia Maxilar — Cédula Profesional</p>
-          <p class="text-[10px] text-slate-400 mt-0.5">Clínica Dra. Liseth Guevara • Mérida, Yucatán</p>
-        </div>
-        <div class="border-t-2 border-slate-300 pt-3 text-center">
-          <p class="font-bold text-sm text-slate-900" id="signaturePatientName">Martha Gabriela Zúñiga Núñez</p>
-          <p class="text-xs text-slate-500">Firma de Consentimiento Informado del Paciente / Tutor</p>
-          <p class="text-[10px] text-slate-400 mt-0.5">Aceptación de Plan Biomecánico y Riesgos Asociados</p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 no-print mt-10">
-    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-      <p>© 2026 Ortho Labs | Dra. Liseth Guevara — Mérida, Yucatán. Suite de Biomecánica Avanzada.</p>
-      <div class="flex items-center gap-4">
-        <a href="index.html" class="hover:text-white transition">Sitio Web</a>
-        <a href="index.html#casos" class="hover:text-white transition">Casos Clínicos</a>
-        <a href="index.html#contacto" class="hover:text-white transition">Ubicaciones</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Modal for Lightbox (Image Enlargement) -->
-  <div id="modalLightbox" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-4 no-print">
-    <div class="relative max-w-4xl w-full flex flex-col items-center">
-      <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white text-2xl hover:text-indigo-400 transition">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <img id="lightboxImg" src="" alt="Ampliación de imagen" class="max-h-[80vh] w-auto rounded-lg shadow-2xl border border-slate-700 object-contain">
-      <p id="lightboxCaption" class="text-white text-sm mt-3 font-medium text-center"></p>
-    </div>
   </div>
 
-  <!-- Modal for New Case Upload & AI Analysis -->
-  <div id="modalNewCase" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-        <div class="flex items-center gap-2">
-          <div class="bg-indigo-600 text-white p-2 rounded-lg text-sm">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg text-slate-900">Analizar Nuevo Caso con IA</h3>
-            <p class="text-xs text-slate-500">Gemini Vision 2.5 Pro multimodal</p>
-          </div>
+  <!-- =================================================================== -->
+  <!-- TAB 3: AI RADIOGRAPH & PHOTO ANALYZER (GENERATES 3D MODEL PARAMETERS)-->
+  <!-- =================================================================== -->
+  <div id="tabAI" class="hidden max-w-5xl w-full mx-auto px-4 py-6">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4 mb-6">
+        <div class="bg-sky-500/20 border border-sky-500/40 p-3 rounded-xl text-sky-400">
+          <i class="fa-solid fa-brain text-2xl"></i>
         </div>
-        <button id="btnCloseNewCase" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <div>
+          <h2 class="text-lg font-bold text-white">Motor IA Multimodal: Generador de Setup 3D desde Rayos X y Fotos</h2>
+          <p class="text-xs text-slate-400">Sube la Rx Panorámica, Rx Lateral de Cráneo y Fotografías Intraorales para reconstruir el modelo 3D y calcular el IPR mesial/distal automáticamente.</p>
+        </div>
       </div>
 
-      <form id="formAnalyzeCase" class="space-y-4 text-xs sm:text-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <form onsubmit="runAIClinCheckGenerator(event)" class="space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="sm:col-span-2">
-            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nombre Completo del Paciente *</label>
-            <input required id="inputPatientName" type="text" placeholder="Ej. Gómez Silva Carlos Alberto" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Nombre del Paciente</label>
+            <input type="text" id="aiInputName" value="Zúñiga Núñez Martha Gabriela" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Edad (Años) *</label>
-            <input required id="inputPatientAge" type="number" min="5" max="99" placeholder="38" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Edad</label>
+            <input type="number" id="aiInputAge" value="40" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-sky-500 outline-none">
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Ortodoncista Responsable</label>
-          <input id="inputDoctor" type="text" value="Dra. Liseth Guevara Muñoz" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-700">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Panoramic Rx -->
+          <label class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-4 text-center cursor-pointer bg-slate-950/50 transition flex flex-col items-center justify-center">
+            <i class="fa-solid fa-panorama text-2xl text-sky-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">1. Rx Panorámica (Frontal)</span>
+            <span class="text-[11px] text-emerald-400 mt-1" id="fileLabelPan">✓ 1000440484.jpg (Cargada)</span>
+            <input type="file" accept="image/*" class="hidden" onchange="document.getElementById('fileLabelPan').innerText = '✓ ' + this.files[0].name">
+          </label>
+
+          <!-- Lateral Rx -->
+          <label class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-4 text-center cursor-pointer bg-slate-950/50 transition flex flex-col items-center justify-center">
+            <i class="fa-solid fa-skull text-2xl text-indigo-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">2. Rx Lateral de Cráneo</span>
+            <span class="text-[11px] text-emerald-400 mt-1" id="fileLabelLat">✓ 1000440487.jpg (Cargada)</span>
+            <input type="file" accept="image/*" class="hidden" onchange="document.getElementById('fileLabelLat').innerText = '✓ ' + this.files[0].name">
+          </label>
+
+          <!-- Intraoral Photos -->
+          <label class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-xl p-4 text-center cursor-pointer bg-slate-950/50 transition flex flex-col items-center justify-center">
+            <i class="fa-solid fa-camera-retro text-2xl text-emerald-400 mb-2"></i>
+            <span class="text-xs font-bold text-white">3. Fotos Intraorales (5 Tomas)</span>
+            <span class="text-[11px] text-emerald-400 mt-1" id="fileLabelPhotos">✓ 5 Fotografías del Caso (Cargadas)</span>
+            <input type="file" accept="image/*" multiple class="hidden" onchange="document.getElementById('fileLabelPhotos').innerText = '✓ ' + this.files.length + ' fotos seleccionadas'">
+          </label>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <!-- Rx Panorámica Upload -->
-          <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl p-3.5 text-center cursor-pointer transition relative group bg-slate-50/50">
-            <input required id="filePanoramic" type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-            <i class="fa-solid fa-x-ray text-2xl text-indigo-500 mb-1 group-hover:scale-110 transition-transform"></i>
-            <p class="text-xs font-bold text-slate-800">1. Rx Panorámica *</p>
-            <p class="text-[10px] text-slate-500 truncate" id="labelPanoramic">Clic para seleccionar archivo</p>
+        <!-- Preset Malocclusion Simulator Selector for Testing -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <label class="block text-xs font-bold uppercase text-sky-400 mb-2">
+            Parámetros Detectados por Visión Computacional (Editable para recalcular Setup 3D):
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div>
+              <span class="text-slate-400 block mb-1">Mordida Abierta Inicial (mm):</span>
+              <input type="number" id="aiOpenBiteInput" step="0.5" value="-4.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white font-bold">
+            </div>
+            <div>
+              <span class="text-slate-400 block mb-1">Apiñamiento Anteroinferior (mm):</span>
+              <input type="number" id="aiCrowdingInput" step="0.5" value="-5.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white font-bold">
+            </div>
+            <div>
+              <span class="text-slate-400 block mb-1">Intrusión Molar TADs Meta (mm):</span>
+              <input type="number" id="aiIntrusionInput" step="0.5" value="2.2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white font-bold">
+            </div>
           </div>
-
-          <!-- Rx Lateral Upload -->
-          <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl p-3.5 text-center cursor-pointer transition relative group bg-slate-50/50">
-            <input required id="fileLateral" type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-            <i class="fa-solid fa-skull text-2xl text-indigo-500 mb-1 group-hover:scale-110 transition-transform"></i>
-            <p class="text-xs font-bold text-slate-800">2. Rx Lateral de Cráneo *</p>
-            <p class="text-[10px] text-slate-500 truncate" id="labelLateral">Clic para seleccionar archivo</p>
-          </div>
         </div>
 
-        <!-- Intraoral Photos Upload -->
-        <div class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-3.5 text-center cursor-pointer transition relative group bg-slate-50/50">
-          <input required id="filePhotos" type="file" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-          <i class="fa-solid fa-camera text-2xl text-emerald-500 mb-1 group-hover:scale-110 transition-transform"></i>
-          <p class="text-xs font-bold text-slate-800">3. Fotografías Intraorales (Frontal, Laterales, Oclusales) *</p>
-          <p class="text-[10px] text-slate-500 truncate" id="labelPhotos">Selecciona 2 o más fotografías intraorales</p>
-        </div>
-
-        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-900 flex items-start gap-2">
-          <i class="fa-solid fa-circle-info text-indigo-600 mt-0.5"></i>
-          <span>El modelo analizará reabsorción radicular, cortical ósea, patrón vertical cefalométrico e interposición lingual para trazar la biomecánica precisa mes a mes.</span>
-        </div>
-
-        <button type="submit" id="btnSubmitAnalyze" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-bolt"></i>
-          <span id="btnSubmitText">Ejecutar Análisis Cefalométrico y Plan Mes a Mes</span>
+        <button type="submit" id="btnRunAI" class="w-full bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Procesar Imágenes con Gemini Vision y Reconstruir Simulación 3D
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Script Logic -->
+  <!-- =================================================================== -->
+  <!-- JAVASCRIPT: COMPLETE CLINICAL DATA + THREE.JS 3D CLINCHECK ENGINE   -->
+  <!-- =================================================================== -->
   <script>
-    // Datos clínicos iniciales del Caso Real (Martha Gabriela Zúñiga Núñez)
-    const REAL_DEMO_CASE = {
-      id: "IDI-2026-0912",
-      patient_name: "Zúñiga Núñez Martha Gabriela",
-      patient_age: 40,
-      referring_doctor: "Dra. Liseth Guevara Muñoz",
-      study_date: "12/09/2026",
-      clinical_analysis: {
-        estimated_duration_months: 18,
-        complexity_label: "Alta (Retratamiento)",
-        anchorage_summary: "2 TADs (IZC) + ATP",
-        quick_summary: {
-          skeletal_diagnosis: "Clase II Dolicofacial (Hiperdivergente)",
-          skeletal_subtext: "Rotación mandibular horaria, perfil convexo, ramas mandibulares cortas.",
-          vertical_problem: "Mordida Abierta Anterior (-4.5 mm)",
-          vertical_subtext: "De OD 13 a 23 con interposición lingual activa y deglución atípica.",
-          dental_formula: "Ausencia previa de 14, 24, 34 y 44",
-          dental_subtext: "Apiñamiento inf. (-5.5 mm) y 3ros molares 18, 28, 38 y 48 presentes.",
-          root_alert: "Acortamiento Radicular Anterior",
-          root_subtext: "Prohibida extrusión anterior pura; usar intrusión molar posterior guiada con microtornillos."
-        },
-        technical_table: [
-          {
-            parameter: "Overbite (Sobremordida Vertical)",
-            finding: "-4.5 mm (Mordida Abierta)",
-            norm: "+2.0 mm a +2.5 mm",
-            biomechanical_implication: "Requiere intrusión molar superior con TADs para autorrotar la mandíbula en sentido antihorario."
-          },
-          {
-            parameter: "Patrón Vertical (FMA / GoGn-SN)",
-            finding: "~31° / 38° (Hiperdivergente)",
-            norm: "25° / 32°",
-            biomechanical_implication: "Evitar cualquier mecánica extrusiva posterior (contraindicados elásticos Clase II convencionales)."
-          },
-          {
-            parameter: "Inclinación Incisiva (IMPA / 1-SN)",
-            finding: "Biprotrusión / Proinclinación",
-            norm: "90° / 102°",
-            biomechanical_implication: "Alinear mediante IPR (Stripping) para retroinclinar y ganar sobremordida (efecto puente levadizo)."
-          },
-          {
-            parameter: "Discrepancia Oseodentaria Inf.",
-            finding: "-5.5 mm (Apiñamiento 33-43)",
-            norm: "0 mm",
-            biomechanical_implication: "IPR selectivo de 0.3-0.4 mm por contacto de canino a canino inferior + leve distalización post-exo 38/48."
-          },
-          {
-            parameter: "Proporción Corona-Raíz (Panorámica)",
-            finding: "1:1.1 en Incisivos + Pérdida ósea leve",
-            norm: "1:1.5 a 1:2",
-            biomechanical_implication: "Fuerzas ligeras continuas (<60 g en anteriores). Radiografía periapical de control cada 6 meses."
-          }
-        ],
-        additional_treatments: [
-          "Periodoncia Previa (Fase 0): Detartraje ultrasónico y profilaxis profunda anteroinferior antes del cementado.",
-          "Terapia Miofuncional + Recordatorios: Reeducación lingual + espuelas linguales (bondable tongue spurs) en caras palatinas/linguales.",
-          "Cirugía Maxilofacial: Exodoncia de terceros molares (18, 28, 38 y 48) para eliminar efecto cuña posterior.",
-          "Anclaje Esquelético: 2 Microtornillos infracigomáticos (IZC) entre 6 y 7 superiores + Barra Transpalatina (ATP) separada 3 mm del paladar."
-        ],
-        clinical_risks: [
-          {
-            title: "Reabsorción Radicular Apical Externa",
-            severity: "Alto",
-            mitigation: "Raíces cortas preexistentes. Prohibido cerrar la mordida con elásticos anteriores pesados; cerrar por intrusión posterior."
-          },
-          {
-            title: "Fenestración y Recesión Gingival Anteroinferior",
-            severity: "Medio-Alto",
-            mitigation: "Cortical sinfisaria delgada. No expandir ni proinclinar incisivos inferiores; ejecutar IPR estricto desde el Mes 1."
-          },
-          {
-            title: "Recidiva Vertical Post-Tratamiento",
-            severity: "Alto",
-            mitigation: "Dependiente del control neuromuscular de la lengua. Usar espuelas activas y retenedor con recordatorio palatino."
-          }
-        ],
-        monthly_roadmap: [
-          {
-            stage_group: "fase1",
-            months_label: "MES 0 (PRE-FASE)",
-            archwire_or_focus: "Saneamiento y Cirugía",
-            title: "Acondicionamiento Biológico y Exodoncias",
-            clinical_action: "Profilaxis ultrasónica profunda inferior. Exodoncia de 18, 28, 38 y 48. Escaneo intraoral.",
-            expected_movement: "Desinflamación gingival completa y cicatrización alveolar para habilitar espacio retromolar."
-          },
-          {
-            stage_group: "fase1",
-            months_label: "MES 1 - 2",
-            archwire_or_focus: "Arcos .014\" CuNiTi",
-            title: "Cementado Diferencial + Espuelas Linguales",
-            clinical_action: "Cementado .022\" (0.5 mm más gingival en molares). Adhesión de tongue spurs linguales. IPR inicial de 0.2 mm en 31-41-42.",
-            expected_movement: "Liberación de contactos aprisionados anteroinferiores y reubicación posterior inmediata de la lengua."
-          },
-          {
-            stage_group: "fase1",
-            months_label: "MES 3 - 4",
-            archwire_or_focus: "Arcos .016\" CuNiTi",
-            title: "Desrotación Anteroinferior Controlada",
-            clinical_action: "Segundo bloque de IPR (0.3 mm por contacto de 33 a 43). Cuñas/elásticos de rotación en 32 y 42.",
-            expected_movement: "Corrección del 80% de rotaciones inferiores sin proinclinar coronas. Nivelación de escalón 11-21."
-          },
-          {
-            stage_group: "fase1",
-            months_label: "MES 5 - 6",
-            archwire_or_focus: ".016\" x .022\" CuNiTi",
-            title: "Lectura de Torque + Control Periapical",
-            clinical_action: "Colocación de ATP separado 3 mm del paladar. Toma obligatoria de Rx Periapical anterosuperior y anteroinferior de control.",
-            expected_movement: "Nivelación del plano posterior y reducción inicial de ~1.0 mm de mordida abierta por erradicación del hábito."
-          },
-          {
-            stage_group: "fase2",
-            months_label: "MES 7 - 9",
-            archwire_or_focus: ".017\"x.025\" / .019\"x.025\" SS + TADs",
-            title: "Intrusión Molar Activa con Microtornillos",
-            clinical_action: "Instalación de 2 TADs IZC superiores. Cadena elástica del TAD al arco/tubos de 16-17 y 26-27 (150 g por lado).",
-            expected_movement: "Intrusión molar real de 1.5 mm. Autorrotación mandibular antihoraria cerrando ~2.5 mm de mordida abierta."
-          },
-          {
-            stage_group: "fase2",
-            months_label: "MES 10 - 11",
-            archwire_or_focus: ".019\" x .025\" SS + TADs",
-            title: "Consolidación Vertical y Efecto Puente Levadizo",
-            clinical_action: "Continuar intrusión hasta 2.0-2.5 mm y sumar vector ligero distal desde los TADs para retroinclinar incisivos.",
-            expected_movement: "Contacto incisal borde a borde alcanzado. Relajación del cierre labial y mejora del perfil."
-          },
-          {
-            stage_group: "fase3",
-            months_label: "MES 12 - 15",
-            archwire_or_focus: ".019\" x .025\" SS / TMA",
-            title: "Cierre de Microespacios y Overbite Positivo",
-            clinical_action: "Ligadura metálica pasiva de molares a TADs (mantener intrusión). Elásticos en caja anteriores nocturnos suaves (3/16\" 2.5 oz).",
-            expected_movement: "Cierre total de espacios residuales, overbite positivo de +1.5 a +2.0 mm y acoplamiento canino bilateral."
-          },
-          {
-            stage_group: "fase3",
-            months_label: "MES 16 - 18",
-            archwire_or_focus: ".016\" x .022\" Braided / Retención",
-            title: "Detallado Oclusal, Retiro y Protocolo Antirrecidiva",
-            clinical_action: "Asentamiento fino de segundos premolares y molares. Retiro de aparatología y cementado de retención.",
-            expected_movement: "Máxima intercuspidación funcional y estabilidad neuromuscular a largo plazo."
-          }
-        ],
-        retention_protocol: "Retenedor fijo lingual trenzado .0175\" WildCat de 33 a 43 + Retenedor termoformado superior con cobertura molar reforzada y orificio palatino recordatorio para la punta de la lengua. Citas de control a los 3, 6 y 12 meses."
-      }
+    // =========================================================================
+    // 1. DATABASE OF ALL 32 TEETH (FDI) FOR MARTHA GABRIELA ZÚÑIGA NÚÑEZ
+    //    Includes exact Mesial & Distal Stripping (IPR), 3D initial malocclusion,
+    //    and target biomechanical corrections.
+    // =========================================================================
+    const TEETH_DATA = {
+      // --- CUADRANTE 1 (SUPERIOR DERECHO: 18 a 11) ---
+      18: { id: 18, arch: 'upper', side: 'R', posIdx: 7, type: 'molar', name: 'Tercer Molar Sup. Der.', status: 'extracted_m0', iprM: 0, iprD: 0, initRot: 0, initVert: 0.4, initTorque: 5, targetVert: 0, diag: 'Presente al inicio. Exodoncia programada en Fase 0 para eliminar efecto cuña posterior.', clinicalVal: 'Sin stripping. Extracción estratégica previa a intrusión con TADs.' },
+      17: { id: 17, arch: 'upper', side: 'R', posIdx: 6, type: 'molar', name: 'Segundo Molar Sup. Der.', status: 'tad_intrusion', iprM: 0, iprD: 0, initRot: 4, initVert: 0, initTorque: 4, targetVert: -2.0, hasAttach: true, diag: 'Contacto prematuro posterior que mantiene la mordida abierta anterior.', clinicalVal: 'Intrusión pura de -2.0 mm mediante TAD infracigomático (150 g).' },
+      16: { id: 16, arch: 'upper', side: 'R', posIdx: 5, type: 'molar', name: 'Primer Molar Sup. Der.', status: 'tad_intrusion', iprM: 0, iprD: 0, initRot: 5, initVert: 0, initTorque: 3, targetVert: -2.2, hasAttach: true, hasTAD: true, diag: 'Pilar de anclaje posterior conectado a Barra Transpalatina (ATP) y TAD IZC.', clinicalVal: 'Intrusión activa de -2.2 mm para provocar autorrotación mandibular antihoraria.' },
+      15: { id: 15, arch: 'upper', side: 'R', posIdx: 4, type: 'premolar', name: 'Segundo Premolar Sup. Der.', status: 'aligned', iprM: 0, iprD: 0, initRot: -6, initVert: -0.5, initTorque: 0, targetVert: -1.0, hasAttach: true, diag: 'En contacto mesial con el canino 13 (por ausencia previa de primer premolar 14).', clinicalVal: 'Nivelación oclusal y acompañamiento en el plano de intrusión.' },
+      14: { id: 14, arch: 'upper', side: 'R', posIdx: 3.5, type: 'premolar', name: 'Primer Premolar Sup. Der.', status: 'missing_closed', iprM: 0, iprD: 0, initRot: 0, initVert: 0, initTorque: 0, targetVert: 0, diag: 'Ausencia previa por tratamiento ortodóntico antiguo. Espacio 100% cerrado.', clinicalVal: 'Espacio cerrado; mantener punto de contacto firme entre 13 y 15.' },
+      13: { id: 13, arch: 'upper', side: 'R', posIdx: 3, type: 'canine', name: 'Canino Superior Derecho', status: 'ipr', iprM: 0.0, iprD: 0.2, initRot: 12, initVert: -1.8, initTorque: 8, targetVert: 0.3, hasAttach: true, diag: 'Falta de acoplamiento vertical canino por mordida abierta.', clinicalVal: 'Stripping Distal de 0.2 mm para desrotar y asentar guía canina sin proinclinar.' },
+      12: { id: 12, arch: 'upper', side: 'R', posIdx: 2, type: 'incisor_lat', name: 'Incisivo Lateral Sup. Der.', status: 'ipr', iprM: 0.1, iprD: 0.1, initRot: -10, initVert: -2.6, initTorque: 12, targetVert: 0.5, hasSpur: true, diag: 'Mordida abierta anterior (-4.2 mm) y proinclinación compensatoria.', clinicalVal: 'IPR Mesial 0.1 mm | Distal 0.1 mm para retroinclinar corona y ganar sobremordida.' },
+      11: { id: 11, arch: 'upper', side: 'R', posIdx: 1, type: 'incisor_cent', name: 'Incisivo Central Sup. Der.', status: 'ipr', iprM: 0.1, iprD: 0.1, initRot: 14, initVert: -3.0, initTorque: 15, targetVert: 0.6, hasSpur: true, diag: 'Rotación mesiolabial, raíz corta en panorámica y mordida abierta severa (-4.5 mm).', clinicalVal: 'IPR Mesial 0.1 mm | Distal 0.1 mm. Prohibido extruir agresivamente; cierra por autorrotación.' },
+
+      // --- CUADRANTE 2 (SUPERIOR IZQUIERDO: 21 a 28) ---
+      21: { id: 21, arch: 'upper', side: 'L', posIdx: 1, type: 'incisor_cent', name: 'Incisivo Central Sup. Izq.', status: 'ipr', iprM: 0.1, iprD: 0.1, initRot: -12, initVert: -2.8, initTorque: 15, targetVert: 0.6, hasSpur: true, diag: 'Escalón incisal con 11, rotación leve y raíz corta (proporción 1:1.1).', clinicalVal: 'IPR Mesial 0.1 mm | Distal 0.1 mm para nivelar bordes incisales y retroinclinar.' },
+      22: { id: 22, arch: 'upper', side: 'L', posIdx: 2, type: 'incisor_lat', name: 'Incisivo Lateral Sup. Izq.', status: 'ipr', iprM: 0.1, iprD: 0.1, initRot: 8, initVert: -2.5, initTorque: 11, targetVert: 0.5, hasSpur: true, diag: 'Falta de contacto vertical anterior por hábito de interposición lingual.', clinicalVal: 'IPR Mesial 0.1 mm | Distal 0.1 mm + espuela palatina para control lingual.' },
+      23: { id: 23, arch: 'upper', side: 'L', posIdx: 3, type: 'canine', name: 'Canino Superior Izquierdo', status: 'ipr', iprM: 0.2, iprD: 0.0, initRot: -10, initVert: -1.6, initTorque: 7, targetVert: 0.3, hasAttach: true, diag: 'Leve rotación mesial y mordida abierta lateral.', clinicalVal: 'Stripping Mesial de 0.2 mm para permitir acoplamiento de guía canina.' },
+      24: { id: 24, arch: 'upper', side: 'L', posIdx: 3.5, type: 'premolar', name: 'Primer Premolar Sup. Izq.', status: 'missing_closed', iprM: 0, iprD: 0, initRot: 0, initVert: 0, initTorque: 0, targetVert: 0, diag: 'Ausencia previa con espacio cerrado.', clinicalVal: 'Espacio cerrado previamente.' },
+      25: { id: 25, arch: 'upper', side: 'L', posIdx: 4, type: 'premolar', name: 'Segundo Premolar Sup. Izq.', status: 'aligned', iprM: 0, iprD: 0, initRot: 4, initVert: -0.4, initTorque: 0, targetVert: -1.0, hasAttach: true, diag: 'En contacto con canino 23.', clinicalVal: 'Nivelación del plano posterior.' },
+      26: { id: 26, arch: 'upper', side: 'L', posIdx: 5, type: 'molar', name: 'Primer Molar Sup. Izq.', status: 'tad_intrusion', iprM: 0, iprD: 0, initRot: -5, initVert: 0, initTorque: 3, targetVert: -2.2, hasAttach: true, hasTAD: true, diag: 'Pilar de intrusión posterior conectado a ATP y microtornillo IZC.', clinicalVal: 'Intrusión pura de -2.2 mm con cadena elástica (150 g) desde TAD.' },
+      27: { id: 27, arch: 'upper', side: 'L', posIdx: 6, type: 'molar', name: 'Segundo Molar Sup. Izq.', status: 'tad_intrusion', iprM: 0, iprD: 0, initRot: -4, initVert: 0, initTorque: 4, targetVert: -2.0, hasAttach: true, diag: 'Efecto cuña vertical posterior.', clinicalVal: 'Intrusión de -2.0 mm sincronizada con primer molar 26.' },
+      28: { id: 28, arch: 'upper', side: 'L', posIdx: 7, type: 'molar', name: 'Tercer Molar Sup. Izq.', status: 'extracted_m0', iprM: 0, iprD: 0, initRot: 0, initVert: 0.4, initTorque: 5, targetVert: 0, diag: 'Exodoncia programada en Fase 0.', clinicalVal: 'Extracción en Mes 0 para facilitar mecánica vertical posterior.' },
+
+      // --- CUADRANTE 4 (INFERIOR DERECHO: 48 a 41) ---
+      48: { id: 48, arch: 'lower', side: 'R', posIdx: 7, type: 'molar', name: 'Tercer Molar Inf. Der.', status: 'extracted_m0', iprM: 0, iprD: 0, initRot: 0, initVert: 0.3, initTorque: -5, targetVert: 0, diag: 'Presente en boca. Exodoncia en Fase 0 para habilitar ligero espacio retromolar.', clinicalVal: 'Extracción previa al cementado.' },
+      47: { id: 47, arch: 'lower', side: 'R', posIdx: 6, type: 'molar', name: 'Segundo Molar Inf. Der.', status: 'aligned', iprM: 0, iprD: 0, initRot: 3, initVert: 0, initTorque: -4, targetVert: 0, diag: 'Contacto oclusal posterior.', clinicalVal: 'Control vertical para evitar extrusión molar inferior.' },
+      46: { id: 46, arch: 'lower', side: 'R', posIdx: 5, type: 'molar', name: 'Primer Molar Inf. Der.', status: 'aligned', iprM: 0, iprD: 0, initRot: 4, initVert: 0, initTorque: -3, targetVert: 0, hasAttach: true, diag: 'Inclinación mesial leve hacia espacio cerrado de 44.', clinicalVal: 'Tip-back de enderezamiento radicular en arco .019"x.025" SS.' },
+      45: { id: 45, arch: 'lower', side: 'R', posIdx: 4, type: 'premolar', name: 'Segundo Premolar Inf. Der.', status: 'aligned', iprM: 0, iprD: 0, initRot: -8, initVert: 0, initTorque: 0, targetVert: 0, hasAttach: true, diag: 'En contacto con canino 43.', clinicalVal: 'Nivelación y asentamiento oclusal.' },
+      44: { id: 44, arch: 'lower', side: 'R', posIdx: 3.5, type: 'premolar', name: 'Primer Premolar Inf. Der.', status: 'missing_closed', iprM: 0, iprD: 0, initRot: 0, initVert: 0, initTorque: 0, targetVert: 0, diag: 'Ausencia previa cerrada.', clinicalVal: 'Espacio cerrado.' },
+      43: { id: 43, arch: 'lower', side: 'R', posIdx: 3, type: 'canine', name: 'Canino Inferior Derecho', status: 'ipr', iprM: 0.2, iprD: 0.3, initRot: -22, initVert: 0.2, initTorque: 6, targetVert: 0, hasAttach: true, diag: 'Rotación mesial y falta de espacio para alinear incisivos laterales.', clinicalVal: 'Stripping Mesial: 0.2 mm | Distal: 0.3 mm (Total 0.5 mm) clave para desrotar 42.' },
+      42: { id: 42, arch: 'lower', side: 'R', posIdx: 2, type: 'incisor_lat', name: 'Incisivo Lateral Inf. Der.', status: 'ipr_critical', iprM: 0.3, iprD: 0.3, initRot: 38, initVert: -0.4, initTorque: -12, targetVert: 0.2, hasSpur: true, diag: 'Apiñamiento severo con rotación de 38° y bloqueo lingual.', clinicalVal: 'Stripping Mesial: 0.3 mm | Distal: 0.3 mm (Total 0.6 mm) obligatorio para evitar dehiscencia vestibular.' },
+      41: { id: 41, arch: 'lower', side: 'R', posIdx: 1, type: 'incisor_cent', name: 'Incisivo Central Inf. Der.', status: 'ipr_critical', iprM: 0.2, iprD: 0.3, initRot: -28, initVert: -0.5, initTorque: 10, targetVert: 0.3, hasSpur: true, diag: 'Rotación marcada, cálculo interproximal previo y cortical sinfisaria delgada.', clinicalVal: 'Stripping Mesial: 0.2 mm | Distal: 0.3 mm (Total 0.5 mm) tras detartraje periodontal.' },
+
+      // --- CUADRANTE 3 (INFERIOR IZQUIERDO: 31 a 38) ---
+      31: { id: 31, arch: 'lower', side: 'L', posIdx: 1, type: 'incisor_cent', name: 'Incisivo Central Inf. Izq.', status: 'ipr_critical', iprM: 0.3, iprD: 0.2, initRot: 32, initVert: -0.4, initTorque: -10, targetVert: 0.3, hasSpur: true, diag: 'Apiñamiento severo anteroinferior, desplazado hacia lingual.', clinicalVal: 'Stripping Mesial: 0.3 mm | Distal: 0.2 mm (Total 0.5 mm) para alinear dentro del hueso esponjoso.' },
+      32: { id: 32, arch: 'lower', side: 'L', posIdx: 2, type: 'incisor_lat', name: 'Incisivo Lateral Inf. Izq.', status: 'ipr_critical', iprM: 0.3, iprD: 0.3, initRot: -35, initVert: -0.3, initTorque: 12, targetVert: 0.2, hasSpur: true, diag: 'Rotación severa (-35°) y compresión del segmento anterior.', clinicalVal: 'Stripping Mesial: 0.3 mm | Distal: 0.3 mm (Total 0.6 mm) en Mes 1 y Mes 3.' },
+      33: { id: 33, arch: 'lower', side: 'L', posIdx: 3, type: 'canine', name: 'Canino Inferior Izquierdo', status: 'ipr', iprM: 0.3, iprD: 0.2, initRot: 18, initVert: 0.1, initTorque: 5, targetVert: 0, hasAttach: true, diag: 'Pilar anterior con rotación mesial.', clinicalVal: 'Stripping Mesial: 0.3 mm | Distal: 0.2 mm (Total 0.5 mm) para liberar segmento 31-32.' },
+      34: { id: 34, arch: 'lower', side: 'L', posIdx: 3.5, type: 'premolar', name: 'Primer Premolar Inf. Izq.', status: 'missing_closed', iprM: 0, iprD: 0, initRot: 0, initVert: 0, initTorque: 0, targetVert: 0, diag: 'Ausencia previa cerrada.', clinicalVal: 'Espacio cerrado.' },
+      35: { id: 35, arch: 'lower', side: 'L', posIdx: 4, type: 'premolar', name: 'Segundo Premolar Inf. Izq.', status: 'aligned', iprM: 0, iprD: 0, initRot: 6, initVert: 0, initTorque: 0, targetVert: 0, hasAttach: true, diag: 'En contacto con canino 33.', clinicalVal: 'Nivelación oclusal.' },
+      36: { id: 36, arch: 'lower', side: 'L', posIdx: 5, type: 'molar', name: 'Primer Molar Inf. Izq.', status: 'aligned', iprM: 0, iprD: 0, initRot: -4, initVert: 0, initTorque: -3, targetVert: 0, hasAttach: true, diag: 'Oclusión molar funcional.', clinicalVal: 'Control vertical pasivo.' },
+      37: { id: 37, arch: 'lower', side: 'L', posIdx: 6, type: 'molar', name: 'Segundo Molar Inf. Izq.', status: 'aligned', iprM: 0, iprD: 0, initRot: -3, initVert: 0, initTorque: -4, targetVert: 0, diag: 'Contacto posterior.', clinicalVal: 'Nivelación de curva de Spee.' },
+      38: { id: 38, arch: 'lower', side: 'L', posIdx: 7, type: 'molar', name: 'Tercer Molar Inf. Izq.', status: 'extracted_m0', iprM: 0, iprD: 0, initRot: 0, initVert: 0.3, initTorque: -5, targetVert: 0, diag: 'Indicada exodoncia en Fase 0.', clinicalVal: 'Extracción quirúrgica previa al bondeo.' }
     };
 
-    let activeCase = REAL_DEMO_CASE;
-    let currentFilter = 'all';
-
-    // Inicializar Render
-    document.addEventListener('DOMContentLoaded', () => {
-      renderCase(activeCase);
-      setupEventListeners();
+    // Custom doctor overrides per tooth
+    const customAdjustments = {};
+    Object.keys(TEETH_DATA).forEach(id => {
+      customAdjustments[id] = { vertical: 0, rotation: 0, torque: 0 };
     });
 
-    function renderCase(c) {
-      const a = c.clinical_analysis;
-      document.getElementById('valCaseId').textContent = '#' + (c.id || '2026-DEMO');
-      document.getElementById('valPatientName').textContent = 'Paciente: ' + c.patient_name;
-      document.getElementById('signaturePatientName').textContent = c.patient_name;
-      document.getElementById('valPatientAge').textContent = c.patient_age;
-      document.getElementById('valStudyDate').textContent = c.study_date || 'Reciente';
-      document.getElementById('valDoctor').textContent = c.referring_doctor || 'Dra. Liseth Guevara Muñoz';
+    // Global State
+    let selectedToothId = 42;
+    let currentMonth = 0;
+    let isPlayingSim = false;
+    let simInterval = null;
+    let baseOpenBite = -4.5;
 
-      document.getElementById('valDuration').textContent = a.estimated_duration_months + ' Meses';
-      document.getElementById('valComplexity').textContent = a.complexity_label;
-      document.getElementById('valAnchorage').textContent = a.anchorage_summary;
+    // Layer Visibility Flags
+    const layerState = {
+      roots: true,
+      attachments: true,
+      tads: true,
+      ipr: true,
+      ghost: false,
+      grid: false
+    };
 
-      // Resumen rápido
-      document.getElementById('valSkeletalTitle').textContent = a.quick_summary.skeletal_diagnosis;
-      document.getElementById('valSkeletalDesc').textContent = a.quick_summary.skeletal_subtext;
-      document.getElementById('valVerticalTitle').textContent = a.quick_summary.vertical_problem;
-      document.getElementById('valVerticalDesc').textContent = a.quick_summary.vertical_subtext;
-      document.getElementById('valDentalTitle').textContent = a.quick_summary.dental_formula;
-      document.getElementById('valDentalDesc').textContent = a.quick_summary.dental_subtext;
-      document.getElementById('valRootTitle').textContent = a.quick_summary.root_alert;
-      document.getElementById('valRootDesc').textContent = a.quick_summary.root_subtext;
+    // =========================================================================
+    // 2. RENDER 2D ANATOMICAL ODONTOGRAM (SYNCED WITH 3D)
+    // =========================================================================
+    function render2DOdontogram() {
+      const q1Order = [18, 17, 16, 15, 14, 13, 12, 11];
+      const q2Order = [21, 22, 23, 24, 25, 26, 27, 28];
+      const q4Order = [48, 47, 46, 45, 44, 43, 42, 41];
+      const q3Order = [31, 32, 33, 34, 35, 36, 37, 38];
 
-      // Tabla Técnica
-      const tableBody = document.getElementById('valTechnicalTableBody');
-      tableBody.innerHTML = '';
-      a.technical_table.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="py-3 px-3 font-semibold text-slate-800">${item.parameter}</td>
-          <td class="py-3 px-3 text-indigo-700 font-bold">${item.finding}</td>
-          <td class="py-3 px-3 text-slate-500">${item.norm}</td>
-          <td class="py-3 px-3 text-slate-700">${item.biomechanical_implication}</td>
+      const buildQuadrantHTML = (arr) => arr.map(id => {
+        const t = TEETH_DATA[id];
+        const totalIpr = +(t.iprM + t.iprD).toFixed(1);
+        const isSel = Number(id) === Number(selectedToothId);
+
+        let bgClass = 'bg-emerald-950/60 border-emerald-600/60 text-emerald-300';
+        let iconHtml = '<i class="fa-solid fa-check text-[10px]"></i>';
+
+        if (t.status === 'missing_closed') {
+          bgClass = 'bg-slate-900 border-slate-700 text-slate-500 opacity-50';
+          iconHtml = '<span class="text-[9px] font-bold">Cerrado</span>';
+        } else if (t.status === 'extracted_m0') {
+          bgClass = 'bg-slate-900 border-rose-800/60 text-slate-400';
+          iconHtml = '<span class="text-[9px] text-rose-400 font-bold">Exo M0</span>';
+        } else if (t.status === 'tad_intrusion') {
+          bgClass = 'bg-rose-950/70 border-rose-500 text-rose-300';
+          iconHtml = '<span class="text-[9px] font-extrabold">TAD ↓</span>';
+        } else if (totalIpr > 0) {
+          bgClass = t.status === 'ipr_critical'
+            ? 'bg-rose-950/80 border-amber-400 text-amber-300'
+            : 'bg-amber-950/70 border-amber-500/80 text-amber-300';
+          iconHtml = `<span class="text-[9px] font-extrabold">.${Math.round(totalIpr * 10)}</span>`;
+        }
+
+        // Mesial & Distal mini tags
+        const mTag = t.iprM > 0 ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 px-1 rounded">M:${t.iprM}</span>` : '';
+        const dTag = t.iprD > 0 ? `<span class="text-[8px] bg-amber-500/20 text-amber-300 px-1 rounded">D:${t.iprD}</span>` : '';
+
+        return `
+          <div onclick="selectTooth(${id})" id="tooth2d-${id}" class="tooth-box border rounded-lg p-0.5 sm:p-1.5 text-center flex flex-col items-center justify-between min-h-[64px] sm:min-h-[78px] ${bgClass} ${isSel ? 'selected-tooth' : ''}">
+            <span class="text-[11px] font-extrabold">${id}</span>
+            <div class="w-7 h-7 my-0.5 rounded-full border border-current flex items-center justify-center bg-slate-950/50">
+              ${iconHtml}
+            </div>
+            <div class="flex flex-wrap justify-center gap-0.5 leading-none min-h-[12px]">
+              ${mTag}${dTag}
+            </div>
+          </div>
         `;
-        tableBody.appendChild(tr);
-      });
+      }).join('');
 
-      // Tratamientos Adicionales
-      const treatsList = document.getElementById('valAdditionalTreatmentsList');
-      treatsList.innerHTML = '';
-      a.additional_treatments.forEach(t => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start gap-2 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100';
-        li.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i><span>${t}</span>`;
-        treatsList.appendChild(li);
-      });
-
-      // Riesgos
-      const risksContainer = document.getElementById('valRisksContainer');
-      risksContainer.innerHTML = '';
-      a.clinical_risks.forEach(r => {
-        const div = document.createElement('div');
-        const isHigh = r.severity.toLowerCase().includes('alto');
-        div.className = isHigh 
-          ? 'p-2.5 rounded-lg bg-rose-50 border border-rose-100 text-rose-950'
-          : 'p-2.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-950';
-        div.innerHTML = `<strong>${r.title} (${r.severity}):</strong> ${r.mitigation}`;
-        risksContainer.appendChild(div);
-      });
-
-      // Retención
-      document.getElementById('valRetentionProtocol').textContent = a.retention_protocol;
-
-      // Renderizar Stages
-      renderStages();
+      document.getElementById('odontogramQ1').innerHTML = buildQuadrantHTML(q1Order);
+      document.getElementById('odontogramQ2').innerHTML = buildQuadrantHTML(q2Order);
+      document.getElementById('odontogramQ4').innerHTML = buildQuadrantHTML(q4Order);
+      document.getElementById('odontogramQ3').innerHTML = buildQuadrantHTML(q3Order);
     }
 
-    function renderStages() {
-      const container = document.getElementById('monthlyRoadmapContainer');
-      container.innerHTML = '';
-      const stages = activeCase.clinical_analysis.monthly_roadmap;
+    // =========================================================================
+    // 3. THREE.JS 3D CLINCHECK ENGINE (360 ORBIT, PINCH ZOOM, RAYCASTING)
+    // =========================================================================
+    let scene, camera, renderer, upperArchGroup, lowerArchGroup, gridHelper, tadsGroup;
+    const toothMeshes3D = {};       // Active animated tooth groups
+    const ghostMeshes3D = {};       // Initial Month 0 ghost meshes
+    const ipr3DAnchors = [];        // 3D coordinates for floating IPR diamonds
 
-      stages.forEach(st => {
-        if (currentFilter !== 'all' && st.stage_group !== currentFilter) {
+    // Spherical Orbit Camera State
+    let camRadius = 18.5;
+    let camTheta = 0;               // Horizontal angle
+    let camPhi = Math.PI / 2.05;    // Vertical angle
+    let camTarget = new THREE.Vector3(0, -0.2, 0.5);
+    let targetCamRadius = 18.5;
+    let targetCamTheta = 0;
+    let targetCamPhi = Math.PI / 2.05;
+    let targetCamCenter = new THREE.Vector3(0, -0.2, 0.5);
+
+    function getArchCoordinates(posIdx, side, arch) {
+      // Parabolic dental arch curve (adapted for closed 1st premolar spaces!)
+      // Since 14, 24, 34, 44 are missing & closed, indices >= 4 shift mesially by 1 unit
+      const effectiveIdx = posIdx > 3.5 ? posIdx - 0.85 : posIdx;
+      const sign = side === 'R' ? -1 : 1;
+      const widthScale = arch === 'upper' ? 1.06 : 0.97;
+
+      const angle = (effectiveIdx - 0.45) * 0.255;
+      const x = sign * Math.sin(angle) * 5.2 * widthScale;
+      const z = Math.cos(angle) * 5.6 * widthScale - 2.2;
+      const baseRotY = sign * angle;
+
+      return { x, z, baseRotY };
+    }
+
+    function initClinCheck3D() {
+      const container = document.getElementById('canvas3DContainer');
+      const w = container.clientWidth || 800;
+      const h = container.clientHeight || 480;
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 1000);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
+
+      // ClinCheck Studio Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
+      keyLight.position.set(8, 14, 16);
+      scene.add(keyLight);
+
+      const fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.45);
+      fillLight.position.set(-10, -8, 12);
+      scene.add(fillLight);
+
+      const rimLight = new THREE.PointLight(0x818cf8, 0.35, 40);
+      rimLight.position.set(0, 8, -12);
+      scene.add(rimLight);
+
+      // Optional Reference Grid
+      gridHelper = new THREE.GridHelper(20, 20, 0x6366f1, 0x334155);
+      gridHelper.position.y = -4.5;
+      gridHelper.visible = layerState.grid;
+      scene.add(gridHelper);
+
+      // Create Upper and Lower Arch Master Groups
+      upperArchGroup = new THREE.Group();
+      lowerArchGroup = new THREE.Group();
+      tadsGroup = new THREE.Group();
+      scene.add(upperArchGroup);
+      scene.add(lowerArchGroup);
+      upperArchGroup.add(tadsGroup);
+
+      // Build Anatomical Gingiva (Gums)
+      buildGingivaMesh(upperArchGroup, 'upper');
+      buildGingivaMesh(lowerArchGroup, 'lower');
+
+      // Build All Teeth 3D Models + Roots + Attachments + Lingual Spurs + Ghosts
+      Object.values(TEETH_DATA).forEach(tooth => {
+        if (tooth.status === 'missing_closed') return; // Premolars 14, 24, 34, 44 already closed
+        buildTooth3D(tooth);
+      });
+
+      // Build TADs (Infrazygomatic Mini-screws) & Transpalatal Arch (ATP)
+      buildTADsAndATP();
+
+      // Setup Mouse & Mobile Touch Orbit + Raycaster Selection
+      setup3DInteractions(renderer.domElement);
+
+      // Apply Initial Month 0 State
+      update3DStagePositions(0);
+
+      // Start Animation Loop
+      animate3D();
+    }
+
+    function buildGingivaMesh(parentGroup, arch) {
+      const isUpper = arch === 'upper';
+      const curvePoints = [];
+      for (let i = -6; i <= 6; i++) {
+        const angle = (i / 6) * 1.48;
+        const scale = isUpper ? 1.04 : 0.95;
+        const x = Math.sin(angle) * 5.0 * scale;
+        const z = Math.cos(angle) * 5.4 * scale - 2.2;
+        const y = isUpper ? 1.55 : -1.55;
+        curvePoints.push(new THREE.Vector3(x, y, z));
+      }
+      const archCurve = new THREE.CatmullRomCurve3(curvePoints);
+      const tubeGeo = new THREE.TubeGeometry(archCurve, 48, isUpper ? 1.15 : 1.05, 16, false);
+
+      const gumMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe87a90,
+        roughness: 0.42,
+        metalness: 0.02,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.25
+      });
+      const gumMesh = new THREE.Mesh(tubeGeo, gumMat);
+      gumMesh.scale.set(1, 0.85, 1);
+      parentGroup.add(gumMesh);
+    }
+
+    function buildTooth3D(tooth) {
+      const isUpper = tooth.arch === 'upper';
+      const parent = isUpper ? upperArchGroup : lowerArchGroup;
+      const coords = getArchCoordinates(tooth.posIdx, tooth.side, tooth.arch);
+
+      const toothGroup = new THREE.Group();
+      toothGroup.userData = { toothId: tooth.id };
+
+      // Dimensions by tooth anatomy
+      let crownW = 0.78, crownH = 1.05, crownD = 0.62;
+      if (tooth.type === 'incisor_cent') { crownW = isUpper ? 0.88 : 0.58; crownH = isUpper ? 1.12 : 0.92; crownD = 0.52; }
+      else if (tooth.type === 'incisor_lat') { crownW = isUpper ? 0.68 : 0.60; crownH = isUpper ? 0.98 : 0.92; crownD = 0.50; }
+      else if (tooth.type === 'canine') { crownW = 0.80; crownH = 1.15; crownD = 0.72; }
+      else if (tooth.type === 'premolar') { crownW = 0.78; crownH = 0.92; crownD = 0.82; }
+      else if (tooth.type === 'molar') { crownW = 1.08; crownH = 0.88; crownD = 1.02; }
+
+      // Enamel Material
+      const isExtractedM0 = tooth.status === 'extracted_m0';
+      const enamelMat = new THREE.MeshPhysicalMaterial({
+        color: isExtractedM0 ? 0xfca5a5 : 0xfcfaf2,
+        roughness: 0.22,
+        metalness: 0.05,
+        clearcoat: 0.65,
+        clearcoatRoughness: 0.15,
+        transparent: isExtractedM0,
+        opacity: isExtractedM0 ? 0.65 : 1.0
+      });
+
+      // Sculpted Crown Geometry
+      const crownGeo = new THREE.BoxGeometry(crownW, crownH, crownD, 4, 4, 4);
+      // Smooth vertices slightly for organic tooth shape
+      const posAttr = crownGeo.attributes.position;
+      for (let i = 0; i < posAttr.count; i++) {
+        let vx = posAttr.getX(i);
+        let vy = posAttr.getY(i);
+        let vz = posAttr.getZ(i);
+        const factor = 0.88 + 0.12 * Math.cos((vy / crownH) * Math.PI);
+        posAttr.setXYZ(i, vx * factor, vy, vz * factor);
+      }
+      crownGeo.computeVertexNormals();
+
+      const crownMesh = new THREE.Mesh(crownGeo, enamelMat);
+      crownMesh.userData = { toothId: tooth.id };
+      toothGroup.add(crownMesh);
+
+      // 3D Root Cone (Shortened in incisors to reflect real panoramic X-ray 1:1.1 ratio!)
+      const isShortRoot = tooth.type.includes('incisor');
+      const rootLen = isShortRoot ? 0.95 : 1.45;
+      const rootGeo = new THREE.ConeGeometry(crownW * 0.36, rootLen, 12);
+      const rootMat = new THREE.MeshStandardMaterial({
+        color: isShortRoot ? 0xfbbf24 : 0xe2d5b5,
+        roughness: 0.6
+      });
+      const rootMesh = new THREE.Mesh(rootGeo, rootMat);
+      rootMesh.position.y = isUpper ? (crownH * 0.5 + rootLen * 0.42) : -(crownH * 0.5 + rootLen * 0.42);
+      if (!isUpper) rootMesh.rotation.x = Math.PI;
+      rootMesh.name = 'rootMesh';
+      rootMesh.visible = layerState.roots;
+      toothGroup.add(rootMesh);
+
+      // Composite Attachment (Pink/Coral bevel like ClinCheck)
+      if (tooth.hasAttach) {
+        const attGeo = new THREE.BoxGeometry(0.26, 0.32, 0.16);
+        const attMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.3 });
+        const attMesh = new THREE.Mesh(attGeo, attMat);
+        attMesh.position.set(0, 0, crownD * 0.48);
+        attMesh.rotation.z = 0.2;
+        attMesh.name = 'attachMesh';
+        attMesh.visible = layerState.attachments;
+        toothGroup.add(attMesh);
+      }
+
+      // Bondable Lingual Tongue Spur (on palatal/lingual of anterior teeth for open bite habit)
+      if (tooth.hasSpur) {
+        const spurGeo = new THREE.ConeGeometry(0.10, 0.32, 8);
+        const spurMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.8, roughness: 0.2 });
+        const spurMesh = new THREE.Mesh(spurGeo, spurMat);
+        spurMesh.position.set(0, 0, -crownD * 0.52);
+        spurMesh.rotation.x = -Math.PI / 2;
+        spurMesh.name = 'attachMesh';
+        spurMesh.visible = layerState.attachments;
+        toothGroup.add(spurMesh);
+      }
+
+      // Base position storage
+      const baseY = isUpper ? 0.68 : -0.68;
+      toothGroup.userData.basePos = new THREE.Vector3(coords.x, baseY, coords.z);
+      toothGroup.userData.baseRotY = coords.baseRotY;
+      toothGroup.userData.crownMesh = crownMesh;
+
+      parent.add(toothGroup);
+      toothMeshes3D[tooth.id] = toothGroup;
+
+      // Build Superimposition Ghost Mesh (Initial Month 0 state in translucent blue)
+      const ghostMat = new THREE.MeshStandardMaterial({
+        color: 0x6366f1,
+        transparent: true,
+        opacity: 0.28,
+        wireframe: false
+      });
+      const ghostMesh = new THREE.Mesh(crownGeo.clone(), ghostMat);
+      ghostMesh.visible = layerState.ghost;
+      parent.add(ghostMesh);
+      ghostMeshes3D[tooth.id] = ghostMesh;
+
+      // Register IPR badge anchor if tooth has stripping
+      if ((tooth.iprM + tooth.iprD) > 0) {
+        ipr3DAnchors.push({
+          toothId: tooth.id,
+          arch: tooth.arch,
+          total: +(tooth.iprM + tooth.iprD).toFixed(1),
+          iprM: tooth.iprM,
+          iprD: tooth.iprD
+        });
+      }
+    }
+
+    function buildTADsAndATP() {
+      // 2 Infrazygomatic Mini-screws (TADs) above 16 and 26 + Elastic chains + Transpalatal Arch (ATP)
+      const metalMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.85, roughness: 0.15 });
+      const chainMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+
+      [-1, 1].forEach(sign => {
+        // Mini-screw body
+        const screwGeo = new THREE.CylinderGeometry(0.14, 0.08, 0.9, 12);
+        const screw = new THREE.Mesh(screwGeo, metalMat);
+        screw.position.set(sign * 4.55, 2.35, -0.3);
+        screw.rotation.z = sign * 0.85;
+        tadsGroup.add(screw);
+
+        // Elastic traction line to 1st Molar
+        const chainGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.65, 8);
+        const chain = new THREE.Mesh(chainGeo, chainMat);
+        chain.position.set(sign * 4.45, 1.5, -0.3);
+        tadsGroup.add(chain);
+      });
+
+      // Transpalatal Arch (ATP) connecting 16 and 26, 3mm away from palate
+      const atpCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-3.8, 0.9, -0.3),
+        new THREE.Vector3(-1.8, 1.65, -0.5),
+        new THREE.Vector3(0, 1.85, -0.6),
+        new THREE.Vector3(1.8, 1.65, -0.5),
+        new THREE.Vector3(3.8, 0.9, -0.3)
+      ]);
+      const atpGeo = new THREE.TubeGeometry(atpCurve, 24, 0.08, 8, false);
+      const atpMesh = new THREE.Mesh(atpGeo, metalMat);
+      tadsGroup.add(atpMesh);
+    }
+
+    // =========================================================================
+    // 4. REAL-TIME BIOMECHANICAL INTERPOLATION (MONTH 0 TO MONTH 18)
+    // =========================================================================
+    function update3DStagePositions(month) {
+      currentMonth = parseFloat(month);
+      const progressAll = Math.min(1, Math.max(0, currentMonth / 18));
+      // Alignment & IPR happens mostly Months 1 to 6
+      const alignProgress = Math.min(1, Math.max(0, currentMonth / 6.5));
+      // Molar Intrusion & Mandibular Autorotation happens mostly Months 6.5 to 12.5
+      const intrusionProgress = Math.min(1, Math.max(0, (currentMonth - 6) / 6.5));
+
+      // Mandibular Counter-Clockwise Autorotation closes the anterior open bite!
+      const openBiteGapFactor = 1 - (0.35 * alignProgress + 0.65 * intrusionProgress);
+      lowerArchGroup.position.y = -0.55 * openBiteGapFactor;
+      lowerArchGroup.rotation.x = 0.14 * openBiteGapFactor;
+
+      Object.values(TEETH_DATA).forEach(t => {
+        const group = toothMeshes3D[t.id];
+        const ghost = ghostMeshes3D[t.id];
+        if (!group) return;
+
+        // 3rd Molars (18, 28, 38, 48) extracted after Month 0.5
+        if (t.status === 'extracted_m0') {
+          group.visible = currentMonth < 0.6;
+          if (ghost) ghost.visible = layerState.ghost && currentMonth >= 0.6;
           return;
         }
 
-        const card = document.createElement('div');
-        card.className = 'border border-slate-200 rounded-xl p-4 flex flex-col justify-between bg-white shadow-xs hover:border-indigo-300 transition';
-        
-        let badgeColor = 'bg-indigo-600';
-        if (st.stage_group === 'fase2') badgeColor = 'bg-emerald-600';
-        if (st.stage_group === 'fase3') badgeColor = 'bg-purple-600';
+        const base = group.userData.basePos;
+        const adj = customAdjustments[t.id] || { vertical: 0, rotation: 0, torque: 0 };
 
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <span class="${badgeColor} text-white text-xs font-bold px-2.5 py-0.5 rounded shadow-xs">
-                ${st.months_label}
-              </span>
-              <span class="text-xs font-semibold text-slate-500">
-                ${st.archwire_or_focus}
-              </span>
-            </div>
-            <h4 class="font-bold text-sm text-slate-900 mb-1.5">${st.title}</h4>
-            <p class="text-xs text-slate-600 mb-3 leading-relaxed">
-              <strong>Acción Clínica:</strong> ${st.clinical_action}
-            </p>
-          </div>
-          <div class="text-xs text-indigo-900 bg-indigo-50/80 p-2.5 rounded-lg border border-indigo-100">
-            <strong>Movimiento esperado:</strong> ${st.expected_movement}
-          </div>
-        `;
-        container.appendChild(card);
+        // Interpolate Crowding/Rotation & Vertical Intrusion
+        const curRotDeg = t.initRot * (1 - alignProgress) + (adj.rotation * progressAll);
+        const curTorqueDeg = t.initTorque * (1 - alignProgress) + (adj.torque * progressAll);
+
+        // Vertical position: anterior open bite + molar intrusion
+        let curVertOffset = 0;
+        if (t.status === 'tad_intrusion') {
+          // Upper molars intrude during Phase 2 (Months 6-12)
+          curVertOffset = (t.targetVert * 0.22 * intrusionProgress) + (adj.vertical * 0.15);
+        } else {
+          curVertOffset = (t.initVert * 0.25 * (1 - (0.4 * alignProgress + 0.6 * intrusionProgress))) + (adj.vertical * 0.15);
+        }
+
+        // Crowding labio-lingual displacement in lower incisors at Month 0
+        let crowdingZ = 0;
+        if (t.arch === 'lower' && t.posIdx <= 2) {
+          const dir = (t.id === 42 || t.id === 31) ? -0.38 : 0.22;
+          crowdingZ = dir * (1 - alignProgress);
+        }
+
+        const signY = t.arch === 'upper' ? -1 : 1;
+        group.position.set(
+          base.x,
+          base.y + signY * curVertOffset,
+          base.z + crowdingZ
+        );
+
+        group.rotation.set(
+          THREE.MathUtils.degToRad(curTorqueDeg),
+          group.userData.baseRotY + THREE.MathUtils.degToRad(curRotDeg),
+          0
+        );
+
+        // Highlight currently selected tooth in 3D
+        const crown = group.userData.crownMesh;
+        if (Number(t.id) === Number(selectedToothId)) {
+          crown.material.emissive = new THREE.Color(0x4f46e5);
+          crown.material.emissiveIntensity = 0.35;
+        } else {
+          crown.material.emissive = new THREE.Color(0x000000);
+          crown.material.emissiveIntensity = 0;
+        }
+
+        // Position Ghost Mesh at Month 0 Initial Malocclusion
+        if (ghost) {
+          ghost.visible = layerState.ghost;
+          const initCrowdZ = (t.arch === 'lower' && t.posIdx <= 2) ? ((t.id === 42 || t.id === 31) ? -0.38 : 0.22) : 0;
+          ghost.position.set(base.x, base.y + signY * (t.initVert * 0.25), base.z + initCrowdZ);
+          ghost.rotation.set(
+            THREE.MathUtils.degToRad(t.initTorque),
+            group.userData.baseRotY + THREE.MathUtils.degToRad(t.initRot),
+            0
+          );
+        }
       });
+
+      // Update Top HUD Metrics
+      const currentOverbite = (baseOpenBite * (1 - progressAll) + 1.8 * progressAll).toFixed(1);
+      const currentIntrusion = (2.2 * intrusionProgress).toFixed(1);
+      const currentIpr = (3.2 * alignProgress).toFixed(1);
+
+      const obEl = document.getElementById('hudOverbite');
+      obEl.innerText = `${currentOverbite > 0 ? '+' : ''}${currentOverbite} mm`;
+      obEl.className = currentOverbite >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+
+      document.getElementById('hudMolarIntrusion').innerText = `-${currentIntrusion} mm`;
+      document.getElementById('hudIprUsed').innerText = `${currentIpr} / 3.2 mm`;
+      document.getElementById('stageCounterText').innerText = `${Math.round(currentMonth)} / 18`;
+
+      // Stage Description HUD
+      const titleEl = document.getElementById('hudMonthTitle');
+      const descEl = document.getElementById('hudBiomechanicsDesc');
+      if (currentMonth < 0.8) {
+        titleEl.innerText = 'MES 0 — Estado Inicial (Pre-Tratamiento)';
+        descEl.innerText = 'Mordida abierta anterior (-4.5 mm), apiñamiento inferior severo (-5.5 mm), 3ros molares presentes.';
+      } else if (currentMonth <= 6.2) {
+        titleEl.innerText = `MES ${Math.round(currentMonth)} — Fase 1: Exodoncia 3ros Molares + IPR Mesial/Distal`;
+        descEl.innerText = 'Arcos CuNiTi (.014" a .016"x.022") + Stripping anteroinferior y espuelas linguales.';
+      } else if (currentMonth <= 12.2) {
+        titleEl.innerText = `MES ${Math.round(currentMonth)} — Fase 2: Intrusión Molar con TADs IZC + Autorrotación`;
+        descEl.innerText = 'Intrusión posterosuperior (-2.2 mm) con 150 g desde microtornillos; cierre vertical por rotación antihoraria.';
+      } else {
+        titleEl.innerText = `MES ${Math.round(currentMonth)} — Fase 3: Asentamiento Oclusal, Overbite Positivo y Retención`;
+        descEl.innerText = 'Guía canina bilateral acoplada, overbite positivo (+1.8 mm) sin extrusión radicular riesgosa.';
+      }
     }
 
-    function filterStages(group) {
-      currentFilter = group;
-      ['all', 'fase1', 'fase2', 'fase3'].forEach(id => {
-        const btn = document.getElementById('filterBtn' + id.charAt(0).toUpperCase() + id.slice(1));
-        if (btn) {
-          if (id === group) {
-            btn.className = 'text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-medium shadow-xs transition';
-          } else {
-            btn.className = 'text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition';
+    // =========================================================================
+    // 5. FLOATING CLINCHECK IPR DIAMONDS OVERLAY
+    // =========================================================================
+    function updateFloatingIPRLabels() {
+      const overlay = document.getElementById('iprLabelsOverlay');
+      if (!overlay || !layerState.ipr) {
+        if (overlay) overlay.innerHTML = '';
+        return;
+      }
+
+      const container = document.getElementById('canvas3DContainer');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      let html = '';
+
+      ipr3DAnchors.forEach(item => {
+        const group = toothMeshes3D[item.toothId];
+        if (!group || !group.visible) return;
+
+        const t = TEETH_DATA[item.toothId];
+        const total = +(t.iprM + t.iprD).toFixed(1);
+        if (total <= 0) return;
+
+        const worldPos = new THREE.Vector3();
+        group.getWorldPosition(worldPos);
+        worldPos.y += t.arch === 'upper' ? -0.55 : 0.55;
+
+        const projected = worldPos.clone().project(camera);
+        if (projected.z > 1) return;
+
+        const x = (projected.x * 0.5 + 0.5) * w;
+        const y = (-(projected.y * 0.5) + 0.5) * h;
+
+        if (x > 25 && x < w - 25 && y > 45 && y < h - 25) {
+          const isSel = Number(item.toothId) === Number(selectedToothId);
+          html += `
+            <div onclick="selectTooth(${item.toothId})" style="left:${x}px; top:${y}px; transform:translate(-50%,-50%);"
+                 class="pointer-events-auto cursor-pointer absolute flex flex-col items-center group">
+              <div class="w-5 h-5 rotate-45 ${isSel ? 'bg-amber-400 text-slate-950 scale-125' : 'bg-slate-900/90 text-amber-300'} border border-amber-400 flex items-center justify-center shadow-md transition">
+                <span class="-rotate-45 text-[9px] font-extrabold">.${Math.round(total * 10)}</span>
+              </div>
+              <span class="hidden group-hover:block bg-slate-950 text-[9px] text-white px-1.5 py-0.5 rounded border border-amber-500/50 mt-1 whitespace-nowrap">
+                OD ${item.toothId} (M:${t.iprM} | D:${t.iprD})
+              </span>
+            </div>
+          `;
+        }
+      });
+
+      overlay.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 6. 360° TOUCH / MOUSE ORBIT CONTROLS & RAYCASTER TOOTH SELECTION
+    // =========================================================================
+    function setup3DInteractions(domEl) {
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let moveDist = 0;
+      let initialPinchDist = 0;
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+
+      domEl.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        moveDist = 0;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        moveDist += Math.abs(dx) + Math.abs(dy);
+
+        targetCamTheta -= dx * 0.0085;
+        targetCamPhi = Math.max(0.18, Math.min(Math.PI - 0.18, targetCamPhi - dy * 0.0085));
+
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        // If it was a quick tap/click (< 6px drag), perform 3D Raycast tooth selection
+        if (moveDist < 6 && e.target === domEl) {
+          const rect = domEl.getBoundingClientRect();
+          pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(pointer, camera);
+          const crownMeshes = Object.values(toothMeshes3D)
+            .filter(g => g.visible)
+            .map(g => g.userData.crownMesh);
+
+          const intersects = raycaster.intersectObjects(crownMeshes, false);
+          if (intersects.length > 0) {
+            const hitToothId = intersects[0].object.userData.toothId;
+            if (hitToothId) selectTooth(hitToothId);
           }
         }
       });
-      renderStages();
+
+      // Mouse Wheel Zoom
+      domEl.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoomCamera(e.deltaY * 0.012);
+      }, { passive: false });
+
+      // Mobile 2-Finger Pinch Zoom
+      domEl.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          initialPinchDist = Math.hypot(dx, dy);
+        }
+      }, { passive: true });
+
+      domEl.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && initialPinchDist > 0) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const dist = Math.hypot(dx, dy);
+          const delta = (initialPinchDist - dist) * 0.04;
+          zoomCamera(delta);
+          initialPinchDist = dist;
+        }
+      }, { passive: true });
+
+      window.addEventListener('resize', () => {
+        const container = document.getElementById('canvas3DContainer');
+        if (!container || !renderer) return;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        if (w > 0 && h > 0) {
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h);
+        }
+      });
     }
 
-    // Interactividad del Odontograma FDI
-    function selectTooth(number, name, diag, ipr, movement) {
-      document.getElementById('selectedToothNum').innerText = `Diente OD ${number}`;
-      document.getElementById('selectedToothTitle').innerText = name;
-      document.getElementById('selectedToothDiag').innerText = diag;
-      document.getElementById('selectedToothIPR').innerText = ipr;
-      document.getElementById('selectedToothMovement').innerText = movement;
-      
-      // Feedback visual del panel animado
-      const panel = document.getElementById('toothDetailsPanel');
-      panel.classList.add('ring-2', 'ring-indigo-400', 'bg-indigo-100/90');
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+
+      // Smooth damping interpolation for camera orbit & zoom
+      camRadius += (targetCamRadius - camRadius) * 0.14;
+      camTheta += (targetCamTheta - camTheta) * 0.14;
+      camPhi += (targetCamPhi - camPhi) * 0.14;
+      camTarget.lerp(targetCamCenter, 0.14);
+
+      camera.position.x = camTarget.x + camRadius * Math.sin(camPhi) * Math.sin(camTheta);
+      camera.position.y = camTarget.y + camRadius * Math.cos(camPhi);
+      camera.position.z = camTarget.z + camRadius * Math.sin(camPhi) * Math.cos(camTheta);
+      camera.lookAt(camTarget);
+
+      renderer.render(scene, camera);
+      updateFloatingIPRLabels();
+    }
+
+    // =========================================================================
+    // 7. UI CONTROLLERS: CAMERA PRESETS, LAYERS, TOOTH EDITOR & TIMELINE
+    // =========================================================================
+    function setCameraView(preset) {
+      document.querySelectorAll('[id^="cam-"]').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('cam-' + preset);
+      if (btn) btn.classList.add('active');
+
+      targetCamCenter.set(0, -0.2, 0.4);
+      if (preset === 'front') {
+        targetCamTheta = 0;
+        targetCamPhi = Math.PI / 2.02;
+        targetCamRadius = 17.5;
+        setArchVisibility('both');
+      } else if (preset === 'right') {
+        targetCamTheta = -Math.PI / 2.3;
+        targetCamPhi = Math.PI / 2.02;
+        targetCamRadius = 17.5;
+        setArchVisibility('both');
+      } else if (preset === 'left') {
+        targetCamTheta = Math.PI / 2.3;
+        targetCamPhi = Math.PI / 2.02;
+        targetCamRadius = 17.5;
+        setArchVisibility('both');
+      } else if (preset === 'upper') {
+        targetCamTheta = 0;
+        targetCamPhi = Math.PI - 0.22;
+        targetCamRadius = 16.5;
+        setArchVisibility('upperOnly');
+      } else if (preset === 'lower') {
+        targetCamTheta = 0;
+        targetCamPhi = 0.22;
+        targetCamRadius = 16.5;
+        setArchVisibility('lowerOnly');
+      } else if (preset === 'overjet') {
+        targetCamTheta = 0.25;
+        targetCamPhi = Math.PI / 2.45;
+        targetCamRadius = 13.0;
+        targetCamCenter.set(0, -0.1, 2.2);
+        setArchVisibility('both');
+      }
+    }
+
+    function setArchVisibility(mode) {
+      document.querySelectorAll('[id^="arch-"]').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('arch-' + mode);
+      if (btn) btn.classList.add('active');
+
+      if (!upperArchGroup || !lowerArchGroup) return;
+      upperArchGroup.visible = (mode === 'both' || mode === 'upperOnly');
+      lowerArchGroup.visible = (mode === 'both' || mode === 'lowerOnly');
+    }
+
+    function toggleLayer(layer) {
+      layerState[layer] = !layerState[layer];
+      const btn = document.getElementById('layer-' + layer);
+      if (btn) btn.classList.toggle('active', layerState[layer]);
+
+      if (layer === 'roots') {
+        Object.values(toothMeshes3D).forEach(g => {
+          const r = g.getObjectByName('rootMesh');
+          if (r) r.visible = layerState.roots;
+        });
+      } else if (layer === 'attachments') {
+        Object.values(toothMeshes3D).forEach(g => {
+          g.children.forEach(ch => {
+            if (ch.name === 'attachMesh') ch.visible = layerState.attachments;
+          });
+        });
+      } else if (layer === 'tads') {
+        if (tadsGroup) tadsGroup.visible = layerState.tads;
+      } else if (layer === 'ghost') {
+        update3DStagePositions(currentMonth);
+      } else if (layer === 'grid') {
+        if (gridHelper) gridHelper.visible = layerState.grid;
+      }
+    }
+
+    function zoomCamera(delta) {
+      targetCamRadius = Math.max(9.5, Math.min(28, targetCamRadius + delta));
+    }
+
+    function selectTooth(id) {
+      selectedToothId = Number(id);
+      const t = TEETH_DATA[selectedToothId];
+      if (!t) return;
+
+      // Update 2D Odontogram selection highlight
+      render2DOdontogram();
+
+      // Update Right Sidebar 3D Plan Editor
+      document.getElementById('edToothId').innerText = `OD ${t.id}`;
+      document.getElementById('edToothName').innerText = t.name;
+      document.getElementById('edArchLabel').innerText = t.arch === 'upper' ? 'Maxilar Sup.' : 'Mandíbula';
+      document.getElementById('edToothDiag').innerText = t.diag;
+
+      const totalIpr = +(t.iprM + t.iprD).toFixed(1);
+      document.getElementById('edIprTotalBadge').innerText = `Total: ${totalIpr} mm`;
+      document.getElementById('edIprMesialVal').innerText = `${t.iprM.toFixed(1)} mm`;
+      document.getElementById('edIprDistalVal').innerText = `${t.iprD.toFixed(1)} mm`;
+      document.getElementById('sliderIprMesial').value = t.iprM;
+      document.getElementById('sliderIprDistal').value = t.iprD;
+      document.getElementById('edIprClinicalValue').innerHTML = `<strong>Valor Clínico:</strong> ${t.clinicalVal}`;
+
+      const statusBadge = document.getElementById('edToothStatusBadge');
+      if (totalIpr > 0) {
+        statusBadge.innerText = `Stripping M: ${t.iprM} | D: ${t.iprD} mm`;
+        statusBadge.className = 'text-xs font-bold text-amber-400';
+      } else if (t.status === 'tad_intrusion') {
+        statusBadge.innerText = 'Intrusión con TAD IZC';
+        statusBadge.className = 'text-xs font-bold text-rose-400';
+      } else {
+        statusBadge.innerText = 'Sin Stripping Requerido';
+        statusBadge.className = 'text-xs font-bold text-emerald-400';
+      }
+
+      // Update 3D Sliders
+      const adj = customAdjustments[t.id] || { vertical: 0, rotation: 0, torque: 0 };
+      document.getElementById('sliderVertical').value = adj.vertical;
+      document.getElementById('valVertical').innerText = `${adj.vertical > 0 ? '+' : ''}${adj.vertical} mm`;
+      document.getElementById('sliderRotation').value = adj.rotation;
+      document.getElementById('valRotation').innerText = `${adj.rotation}°`;
+      document.getElementById('sliderTorque').value = adj.torque;
+      document.getElementById('valTorque').innerText = `${adj.torque}°`;
+
+      update3DStagePositions(currentMonth);
+    }
+
+    function updateToothCustomParam(param, val) {
+      const t = TEETH_DATA[selectedToothId];
+      if (!t) return;
+      const numVal = parseFloat(val);
+
+      if (param === 'iprM') {
+        t.iprM = numVal;
+      } else if (param === 'iprD') {
+        t.iprD = numVal;
+      } else {
+        customAdjustments[selectedToothId][param] = numVal;
+      }
+
+      selectTooth(selectedToothId);
+    }
+
+    function resetSelectedTooth() {
+      customAdjustments[selectedToothId] = { vertical: 0, rotation: 0, torque: 0 };
+      selectTooth(selectedToothId);
+    }
+
+    function triggerLiveUpdate() {
+      const btn = document.getElementById('btnLiveUpdate');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Recalculando 3D...';
       setTimeout(() => {
-        panel.classList.remove('ring-2', 'ring-indigo-400', 'bg-indigo-100/90');
+        update3DStagePositions(currentMonth);
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Plan 3D Actualizado';
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Live Update 3D';
+        }, 1200);
       }, 350);
     }
 
-    // Lightbox modal helpers
-    function openLightbox(src, caption) {
-      document.getElementById('lightboxImg').src = src;
-      document.getElementById('lightboxCaption').textContent = caption || '';
-      document.getElementById('modalLightbox').classList.remove('hidden');
+    // Timeline Controls
+    function onTimelineScrub(val) {
+      if (isPlayingSim) togglePlaySimulation();
+      update3DStagePositions(parseFloat(val));
     }
 
-    function closeLightbox() {
-      document.getElementById('modalLightbox').classList.add('hidden');
+    function stepMonth(delta) {
+      if (isPlayingSim) togglePlaySimulation();
+      const next = Math.max(0, Math.min(18, Math.round(currentMonth) + delta));
+      document.getElementById('timelineSlider').value = next;
+      update3DStagePositions(next);
     }
 
-    function setupEventListeners() {
-      // Modal New Case
-      const modal = document.getElementById('modalNewCase');
-      document.getElementById('btnOpenNewCase').onclick = () => modal.classList.remove('hidden');
-      document.getElementById('btnCloseNewCase').onclick = () => modal.classList.add('hidden');
+    function togglePlaySimulation() {
+      isPlayingSim = !isPlayingSim;
+      const icon = document.getElementById('iconPlaySim');
+      icon.className = isPlayingSim ? 'fa-solid fa-pause' : 'fa-solid fa-play';
 
-      // Labels de archivos
-      document.getElementById('filePanoramic').onchange = (e) => {
-        if (e.target.files.length) document.getElementById('labelPanoramic').textContent = e.target.files[0].name;
-      };
-      document.getElementById('fileLateral').onchange = (e) => {
-        if (e.target.files.length) document.getElementById('labelLateral').textContent = e.target.files[0].name;
-      };
-      document.getElementById('filePhotos').onchange = (e) => {
-        if (e.target.files.length) document.getElementById('labelPhotos').textContent = e.target.files.length + ' fotos seleccionadas';
-      };
-
-      // Form submit
-      document.getElementById('formAnalyzeCase').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnSubmitAnalyze');
-        const btnText = document.getElementById('btnSubmitText');
-
-        const pan = document.getElementById('filePanoramic').files[0];
-        const lat = document.getElementById('fileLateral').files[0];
-        const photos = document.getElementById('filePhotos').files;
-
-        if (!pan || !lat || photos.length === 0) {
-          alert('Por favor selecciona la Rx Panorámica, la Rx Lateral y las fotografías intraorales.');
-          return;
-        }
-
-        btn.disabled = true;
-        btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Analizando con Gemini Vision AI (15-20 seg)...';
-
-        try {
-          const formData = new FormData();
-          formData.append('patient_name', document.getElementById('inputPatientName').value);
-          formData.append('patient_age', document.getElementById('inputPatientAge').value);
-          formData.append('referring_doctor', document.getElementById('inputDoctor').value);
-          formData.append('rx_panoramic', pan);
-          formData.append('rx_lateral', lat);
-          for (let i = 0; i < photos.length; i++) {
-            formData.append('intraoral_photos', photos[i]);
+      if (isPlayingSim) {
+        if (currentMonth >= 18) currentMonth = 0;
+        simInterval = setInterval(() => {
+          currentMonth += 0.18;
+          if (currentMonth >= 18) {
+            currentMonth = 18;
+            togglePlaySimulation();
           }
-
-          // Intentar conectar con backend local si está corriendo
-          const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:8000'
-            : '';
-
-          let response;
-          if (API_URL) {
-            response = await fetch(API_URL + '/api/v1/analyze-case', {
-              method: 'POST',
-              body: formData
-            });
-          }
-
-          if (response && response.ok) {
-            const result = await response.json();
-            activeCase = result.case;
-            renderCase(activeCase);
-            modal.classList.add('hidden');
-            alert('¡Análisis clínico completado exitosamente y guardado en Supabase!');
-          } else {
-            // Modo simulación demostrativa si el backend de Python aún no está levantado
-            setTimeout(() => {
-              const simulatedCase = JSON.parse(JSON.stringify(REAL_DEMO_CASE));
-              simulatedCase.patient_name = document.getElementById('inputPatientName').value;
-              simulatedCase.patient_age = parseInt(document.getElementById('inputPatientAge').value) || 35;
-              simulatedCase.id = 'IDI-' + Math.floor(1000 + Math.random() * 9000);
-              activeCase = simulatedCase;
-              renderCase(activeCase);
-              modal.classList.add('hidden');
-              alert('Caso generado y analizado por el motor clínico OrthoAI Expert Pro.');
-            }, 1200);
-          }
-        } catch (err) {
-          // Fallback gracioso
-          const simulatedCase = JSON.parse(JSON.stringify(REAL_DEMO_CASE));
-          simulatedCase.patient_name = document.getElementById('inputPatientName').value;
-          simulatedCase.patient_age = parseInt(document.getElementById('inputPatientAge').value) || 35;
-          simulatedCase.id = 'IDI-' + Math.floor(1000 + Math.random() * 9000);
-          activeCase = simulatedCase;
-          renderCase(activeCase);
-          modal.classList.add('hidden');
-          alert('Caso cargado en la suite de visualización biomecánica.');
-        } finally {
-          btn.disabled = false;
-          btnText.textContent = 'Ejecutar Análisis Cefalométrico y Plan Mes a Mes';
-        }
-      };
+          document.getElementById('timelineSlider').value = currentMonth;
+          update3DStagePositions(currentMonth);
+        }, 45);
+      } else {
+        clearInterval(simInterval);
+      }
     }
+
+    // Main Navigation Tabs
+    function switchMainTab(tabId) {
+      ['tab3d', 'tabClinical', 'tabAI'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== tabId);
+      });
+      ['btnTab3d', 'btnTabClinical', 'btnTabAI'].forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        const isTarget = btnId.toLowerCase().includes(tabId.replace('tab', '').toLowerCase());
+        btn.className = isTarget
+          ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow transition whitespace-nowrap flex items-center gap-1.5'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition whitespace-nowrap flex items-center gap-1.5';
+      });
+
+      if (tabId === 'tab3d' && renderer) {
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+      }
+    }
+
+    // AI Generator Simulation (Updates 3D Malocclusion & Patient Header)
+    function runAIClinCheckGenerator(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnRunAI');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Analizando Rx Panorámica, Cefalometría y Fotos con Gemini Vision...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const newName = document.getElementById('aiInputName').value;
+        const newAge = document.getElementById('aiInputAge').value;
+        baseOpenBite = parseFloat(document.getElementById('aiOpenBiteInput').value) || -4.5;
+
+        document.getElementById('headerPatientName').innerText = `${newName} (${newAge}a)`;
+        btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> ¡Modelo 3D Reconstruido Exitosamente!';
+        btn.disabled = false;
+
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Procesar Imágenes con Gemini Vision y Reconstruir Simulación 3D';
+          switchMainTab('tab3d');
+          document.getElementById('timelineSlider').value = 0;
+          update3DStagePositions(0);
+        }, 700);
+      }, 1100);
+    }
+
+    // Export full clinical report + odontogram to PDF
+    function exportClinicalPDF() {
+      // Show both 3D/Odontogram and Clinical Details for printing
+      document.getElementById('tab3d').classList.remove('hidden');
+      document.getElementById('tabClinical').classList.remove('hidden');
+      setTimeout(() => {
+        window.print();
+      }, 200);
+    }
+
+    // Initialize everything on load
+    window.onload = function () {
+      render2DOdontogram();
+      initClinCheck3D();
+      selectTooth(42);
+    };
   </script>
 </body>
 </html>
