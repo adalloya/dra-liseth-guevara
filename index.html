@@ -77,12 +77,12 @@
 
 <body>
 
-    <!-- Top Announcement Bar (Cohesivo con el diseño de la clínica) -->
+    <!-- Top Announcement Bar -->
     <div class="top-announcement-bar">
         <div class="container announcement-content">
-            <span class="announcement-pill"><i class="fas fa-brain"></i> Ortho Labs</span>
-            <span class="announcement-text">Diagnóstico ortodóntico 3D y análisis biomecánico con Inteligencia Artificial.</span>
-            <a href="ortho-labs.html" class="announcement-link">Ver Suite Clínica <i class="fas fa-arrow-right"></i></a>
+            <span class="announcement-pill"><i class="fas fa-sparkles"></i> Tecnología 3D</span>
+            <span class="announcement-text">Ortodoncia digital de alta precisión, escaneo intraoral y alineadores en Mérida.</span>
+            <a href="#tecnologia" class="announcement-link">Conocer Más <i class="fas fa-arrow-down"></i></a>
         </div>
     </div>
 
@@ -98,13 +98,14 @@
             </a>
             <div class="nav-links">
                 <a href="#casos">Casos de Éxito</a>
+                <a href="#tecnologia">Tecnología 3D</a>
                 <a href="#opiniones">Opiniones</a>
                 <a href="#contacto">Ubicación</a>
-                <a href="ortho-labs.html" class="nav-ortho-labs-link">
-                    <i class="fas fa-brain"></i> Ortho Labs <span class="nav-badge">IA Suite</span>
-                </a>
             </div>
             <div class="nav-actions">
+                <button type="button" onclick="openDoctorLoginModal()" class="btn btn-doctor-portal" title="Acceso Exclusivo Personal Médico">
+                    <i class="fas fa-lock"></i> <span>Portal Dra.</span>
+                </button>
                 <a href="https://wa.me/529996025731?text=Hola,%20quisiera%20agendar%20una%20cita" target="_blank"
                     class="btn btn-primary">
                     <i class="fab fa-whatsapp"></i> Agendar Cita
@@ -130,14 +131,14 @@
         </div>
         <div class="mobile-nav-links">
             <a href="#casos" class="mobile-link"><i class="fas fa-smile"></i> Casos de Éxito</a>
+            <a href="#tecnologia" class="mobile-link"><i class="fas fa-cube"></i> Tecnología 3D</a>
             <a href="#opiniones" class="mobile-link"><i class="fas fa-star"></i> Opiniones</a>
-            <a href="#ortho-labs" class="mobile-link"><i class="fas fa-brain"></i> Ortho Labs (IA)</a>
             <a href="#contacto" class="mobile-link"><i class="fas fa-map-marker-alt"></i> Ubicación y Horarios</a>
         </div>
         <div class="mobile-nav-footer">
-            <a href="ortho-labs.html" class="btn btn-ortho-labs w-full mb-3">
-                <i class="fas fa-flask"></i> Entrar a Ortho Labs
-            </a>
+            <button type="button" onclick="openDoctorLoginModal(); document.getElementById('mobileNavDrawer').classList.remove('active'); document.getElementById('drawerBackdrop').classList.remove('active');" class="btn btn-doctor-portal w-full mb-3" style="justify-content: center; padding: 10px;">
+                <i class="fas fa-lock"></i> Acceso Privado Dra. Liseth
+            </button>
             <a href="https://wa.me/529996025731?text=Hola,%20quisiera%20agendar%20una%20cita" target="_blank"
                 class="btn btn-primary w-full">
                 <i class="fab fa-whatsapp"></i> Agendar Cita en WhatsApp
@@ -166,8 +167,8 @@
                         class="btn btn-primary btn-lg">
                         <i class="fab fa-whatsapp"></i> Agendar Cita
                     </a>
-                    <a href="ortho-labs.html" class="apple-link-cta">
-                        Explorar Ortho Labs 3D <i class="fas fa-chevron-right"></i>
+                    <a href="#tecnologia" class="apple-link-cta">
+                        Conoce Nuestra Tecnología 3D <i class="fas fa-chevron-right"></i>
                     </a>
                 </div>
             </div>
@@ -292,52 +293,52 @@
         </div>
     </section>
 
-    <!-- Ortho Labs AI Section (Diseño Cohesivo, Mobile First y Elegante) -->
-    <section class="section ortho-labs-home-section" id="ortho-labs">
+    <!-- Digital Technology & 3D Planning Section -->
+    <section class="section ortho-labs-home-section" id="tecnologia">
         <div class="container">
             <div class="ortho-labs-grid">
                 <div class="ortho-labs-text-col">
                     <div class="ortho-tag-badge">
-                        <i class="fas fa-brain"></i>
-                        <span>Tecnología Exclusiva &bull; Ortho Labs 3D</span>
+                        <i class="fas fa-cube"></i>
+                        <span>Tecnología Digital • Escaneo Intraoral &amp; 3D</span>
                     </div>
                     <h2 class="ortho-labs-heading">
-                        La ortodoncia se encuentra con la <span class="text-highlight-teal">Inteligencia Artificial</span>.
+                        Ortodoncia de vanguardia con <span class="text-highlight-teal">planificación 3D</span>.
                     </h2>
                     <p class="ortho-labs-description">
-                        En la clínica de la <strong>Dra. Liseth Guevara</strong> cada sonrisa se diseña con rigor científico. Nuestro sistema <strong>OrthoAI Expert Pro</strong> analiza cefalometría, corticales óseas y oclusión para trazar el tratamiento ideal mes a mes, minimizando riesgos radiculares y acelerando tus resultados.
+                        En la clínica de la <strong>Dra. Liseth Guevara</strong> cada sonrisa se diseña con rigor científico. Utilizamos escaneo 3D sin pastas ni moldes molestos y software biomecánico computarizado para predecir cada movimiento dental, minimizando el tiempo de tratamiento y logrando resultados óptimos.
                     </p>
                     
                     <div class="ortho-features-list">
                         <div class="ortho-feature-item">
-                            <div class="feature-icon-circle"><i class="fas fa-tooth"></i></div>
+                            <div class="feature-icon-circle"><i class="fas fa-scanner"></i></div>
                             <div>
-                                <h4>Odontograma Interactivo FDI</h4>
-                                <p>Inspección pieza por pieza, stripping (IPR) milimétrico y anclaje.</p>
+                                <h4>Escaneo Óptico Intraoral 3D</h4>
+                                <p>Captura digital en minutos de tu anatomía dental exacta, sin yesos ni náuseas.</p>
+                            </div>
+                        </div>
+                        <div class="ortho-feature-item">
+                            <div class="feature-icon-circle"><i class="fas fa-wand-magic-sparkles"></i></div>
+                            <div>
+                                <h4>Simulación de tu Sonrisa Final</h4>
+                                <p>Visualiza en pantalla el resultado antes de comenzar el uso de alineadores o brackets.</p>
                             </div>
                         </div>
                         <div class="ortho-feature-item">
                             <div class="feature-icon-circle"><i class="fas fa-shield-halved"></i></div>
                             <div>
-                                <h4>Matriz de Protección Radicular</h4>
-                                <p>Mecánica segura para preservar raíces cortas mediante intrusión molar con TADs.</p>
-                            </div>
-                        </div>
-                        <div class="ortho-feature-item">
-                            <div class="feature-icon-circle"><i class="fas fa-file-pdf"></i></div>
-                            <div>
-                                <h4>Expediente Clínico Digital</h4>
-                                <p>Reportes de biomecánica exportables a PDF con firma médica autorizada.</p>
+                                <h4>Tratamiento Guiado y Biomecánico</h4>
+                                <p>Control milimétrico del anclaje y fuerzas ligeras para proteger la salud de tus raíces.</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="ortho-actions-row">
-                        <a href="ortho-labs.html" class="btn btn-primary btn-lg">
-                            <i class="fas fa-cube"></i> Abrir Suite 3D ClinCheck
+                        <a href="https://wa.me/529996025731?text=Hola%20Dra.%20Liseth,%20me%20gustar%C3%ADa%20una%20valoraci%C3%B3n%20con%20escaneo%20digital%203D" target="_blank" class="btn btn-primary btn-lg">
+                            <i class="fab fa-whatsapp"></i> Agendar Valoración 3D
                         </a>
-                        <a href="https://wa.me/529996025731?text=Hola%20Dra.%20Liseth,%20me%20gustar%C3%ADa%20una%20valoraci%C3%B3n%20con%20an%C3%A1lisis%20de%20Ortho%20Labs" target="_blank" class="apple-link-cta">
-                            Agendar Valoración IA <i class="fas fa-chevron-right"></i>
+                        <a href="#casos" class="apple-link-cta">
+                            Ver Casos Clínicos <i class="fas fa-chevron-right"></i>
                         </a>
                     </div>
                 </div>
@@ -346,49 +347,55 @@
                     <div class="ortho-case-card">
                         <div class="card-glass-header">
                             <div>
-                                <span class="case-status-badge"><i class="fas fa-circle-check"></i> Caso Clínico Activo</span>
-                                <span class="case-id">ID #IDI-2026-0912</span>
+                                <span class="case-status-badge"><i class="fas fa-circle-check"></i> Consultorio Especializado</span>
+                                <span class="case-id">Mérida, Yucatán</span>
                             </div>
                             <span class="doctor-badge">Dra. Liseth Guevara</span>
                         </div>
                         
                         <div class="patient-quick-meta">
-                            <h4>Martha Gabriela Zúñiga (40 años)</h4>
-                            <p>Mordida Abierta Anterior (-4.5 mm) • Dolicofacial • 2 TADs (IZC)</p>
+                            <h4>Flujo Digital Clínico de Vanguardia</h4>
+                            <p>Diagnóstico estético • Alineadores Invisalign • Ortodoncia Avanzada</p>
                         </div>
 
-                        <!-- Miniaturas interactivas -->
+                        <!-- Miniaturas de tecnología -->
                         <div class="ortho-media-dual-preview">
                             <div class="preview-img-box">
-                                <img src="ortho-media/rx_panoramica_demo.jpg" alt="Rx Panorámica Paciente">
-                                <span class="img-label">Rx Panorámica</span>
+                                <img src="clinic-chair.jpg" alt="Instalaciones Digitales">
+                                <span class="img-label">Escaneo Digital</span>
                             </div>
                             <div class="preview-img-box">
-                                <img src="ortho-media/foto_frontal_demo.jpg" alt="Foto Frontal Paciente">
-                                <span class="img-label">Oclusión Frontal</span>
+                                <img src="invisalign-case-green.png" alt="Alineadores Transparentes">
+                                <span class="img-label">Alineadores 3D</span>
                             </div>
                         </div>
 
-                        <!-- Resumen biomecánico card -->
+                        <!-- Resumen tecnológico -->
                         <div class="biomechanical-pill-card">
                             <div class="pill-stat">
-                                <span class="stat-label">Duración</span>
-                                <span class="stat-val text-cyan">18 Meses</span>
+                                <span class="stat-label">Precisión</span>
+                                <span class="stat-val text-cyan">Micrométrica</span>
                             </div>
                             <div class="pill-stat">
-                                <span class="stat-label">Complejidad</span>
-                                <span class="stat-val text-amber">Alta Retrat.</span>
+                                <span class="stat-label">Comodidad</span>
+                                <span class="stat-val text-amber">Sin Yesos</span>
                             </div>
                             <div class="pill-stat">
-                                <span class="stat-label">Anclaje</span>
-                                <span class="stat-val">2 TADs IZC</span>
+                                <span class="stat-label">Atención</span>
+                                <span class="stat-val">100% Personalizada</span>
                             </div>
                         </div>
 
-                        <a href="ortho-labs.html" class="btn-card-inspect">
-                            <span>Ver odontograma FDI y plan mes a mes</span>
-                            <i class="fas fa-arrow-right"></i>
+                        <a href="https://wa.me/529996025731?text=Hola%20Dra.%20Liseth,%20quisiera%20m%C3%A1s%20informaci%C3%B3n%20sobre%20el%20tratamiento%20digital" target="_blank" class="btn-card-inspect">
+                            <span>Solicitar consulta de valoración digital</span>
+                            <i class="fab fa-whatsapp"></i>
                         </a>
+
+                        <div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px;">
+                            <button type="button" onclick="openDoctorLoginModal()" style="background: none; border: none; font-size: 0.72rem; color: #86868b; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s;" onmouseover="this.style.color='#0071e3'" onmouseout="this.style.color='#86868b'">
+                                <i class="fas fa-lock"></i> Acceso al Portal Clínico Privado (Dra. Liseth)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -653,7 +660,100 @@
         </a>
     </div>
 
+    <!-- =====================================================================
+         Doctor Private Portal Login Modal (Acceso Exclusivo Médicos)
+    ====================================================================== -->
+    <div id="doctorLoginModal" class="doc-modal-overlay">
+        <div class="doc-modal-card">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #4f46e5); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.3;">Portal Clínico Privado</h3>
+                        <p style="font-size: 0.78rem; color: #64748b; margin: 2px 0 0 0;">Dra. Liseth Guevara &bull; OrthoAI Pro Suite</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDoctorLoginModal()" style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Banner Credenciales Provisionales -->
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 12px 14px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px;">
+                        <i class="fas fa-key"></i> Credenciales Provisionales
+                    </span>
+                    <button type="button" onclick="quickFillDoctorLogin()" style="background: #16a34a; color: white; border: none; border-radius: 999px; font-size: 0.7rem; font-weight: 600; padding: 3px 10px; cursor: pointer;">
+                        Auto-llenar
+                    </button>
+                </div>
+                <div style="font-size: 0.78rem; color: #15803d; font-family: monospace;">
+                    <div><strong>Usuario:</strong> dra.liseth@orthoai.com</div>
+                    <div><strong>Contraseña:</strong> Ortho2026!</div>
+                </div>
+            </div>
+
+            <form id="doctorLoginForm" onsubmit="handleDoctorLogin(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #334155; margin-bottom: 5px;">Correo o Usuario de Especialista</label>
+                    <input type="email" id="docLoginEmail" required placeholder="dra.liseth@orthoai.com" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.88rem; color: #0f172a; outline: none; background: #f8fafc;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #334155; margin-bottom: 5px;">Contraseña de Seguridad</label>
+                    <input type="password" id="docLoginPassword" required placeholder="••••••••••••" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.88rem; color: #0f172a; outline: none; background: #f8fafc;">
+                </div>
+
+                <div id="docLoginError" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 0.78rem; border-radius: 10px; padding: 8px 12px; text-align: center;">
+                    Credenciales incorrectas. Usa las credenciales provisionales arriba.
+                </div>
+
+                <button type="submit" style="margin-top: 6px; width: 100%; padding: 12px; background: #0071e3; color: white; border: none; border-radius: 14px; font-size: 0.92rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35);">
+                    <i class="fas fa-sign-in-alt"></i> Acceder a OrthoAI Suite
+                </button>
+            </form>
+
+            <div style="margin-top: 18px; text-align: center;">
+                <span style="font-size: 0.72rem; color: #94a3b8; display: inline-flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-shield-alt"></i> Sesión médica encriptada &bull; HIPAA Compliant
+                </span>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script>
+        function openDoctorLoginModal() {
+            const modal = document.getElementById('doctorLoginModal');
+            if (modal) modal.classList.add('active');
+        }
+        function closeDoctorLoginModal() {
+            const modal = document.getElementById('doctorLoginModal');
+            if (modal) modal.classList.remove('active');
+        }
+        function quickFillDoctorLogin() {
+            document.getElementById('docLoginEmail').value = 'dra.liseth@orthoai.com';
+            document.getElementById('docLoginPassword').value = 'Ortho2026!';
+            document.getElementById('docLoginError').style.display = 'none';
+        }
+        function handleDoctorLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('docLoginEmail').value.trim();
+            const pass = document.getElementById('docLoginPassword').value.trim();
+            const err = document.getElementById('docLoginError');
+            
+            if ((email === 'dra.liseth@orthoai.com' || email === 'dra.liseth' || email === 'admin') && (pass === 'Ortho2026!' || pass === 'admin')) {
+                localStorage.setItem('ortho_authenticated', 'true');
+                localStorage.setItem('ortho_doctor_name', 'Dra. Liseth Guevara Muñoz');
+                err.style.display = 'none';
+                window.location.href = 'ortho-labs.html';
+            } else {
+                err.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 
 </html>

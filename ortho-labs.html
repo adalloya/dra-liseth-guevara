@@ -318,117 +318,168 @@
 
         /* ===================================================================
            TEMA CLARO (VERSIÓN CON FONDO BLANCO APPLE ESTILO CUPERTINO)
+           Alto Contraste, Tipografía Nítida y Cero Pasteles Ilegibles
         =================================================================== */
         html.light {
-            --apple-bg: #f5f5f7;
-            --apple-card: rgba(255, 255, 255, 0.90);
+            --apple-bg: #f8fafc;
+            --apple-card: rgba(255, 255, 255, 0.95);
             --apple-card-solid: #ffffff;
-            --apple-border: rgba(0, 0, 0, 0.08);
+            --apple-border: rgba(15, 23, 42, 0.08);
             --apple-blue: #0071e3;
         }
 
         html.light body {
-            background-color: #f5f5f7 !important;
-            color: #1d1d1f !important;
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
         }
 
         html.light header {
-            background-color: rgba(255, 255, 255, 0.88) !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
+            background-color: rgba(255, 255, 255, 0.94) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
         }
         html.light header .text-white {
-            color: #1d1d1f !important;
+            color: #0f172a !important;
         }
         html.light header .text-zinc-300,
         html.light header .text-zinc-400 {
-            color: #6e6e73 !important;
+            color: #475569 !important;
         }
         html.light header .bg-white\/10 {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-            color: #1d1d1f !important;
+            background-color: rgba(15, 23, 42, 0.05) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            color: #0f172a !important;
         }
-        html.light header .bg-zinc-900\/90 {
-            background-color: #e5e5ea !important;
-            border-color: rgba(0, 0, 0, 0.06) !important;
-        }
-        html.light header #deskTabOdonto.bg-zinc-800 {
-            background-color: #ffffff !important;
-            color: #1d1d1f !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        html.light header .bg-zinc-900\/90,
+        html.light header .bg-zinc-900 {
+            background-color: #e2e8f0 !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
         }
 
+        /* --- Corrección Exhaustiva de Colores en Modo Claro (Cero Textos Pálidos) --- */
+        html.light .text-amber-300,
+        html.light .text-amber-400 {
+            color: #92400e !important; /* amber-800: ámbar oscuro legible */
+        }
+        html.light .bg-amber-500\/10,
+        html.light .bg-amber-500\/15,
+        html.light .bg-amber-500\/20 {
+            background-color: #fef3c7 !important; /* amber-100 */
+            border-color: #fcd34d !important; /* amber-300 */
+            color: #92400e !important;
+        }
+
+        html.light .text-sky-300,
+        html.light .text-sky-400 {
+            color: #0369a1 !important; /* sky-700: azul médico nítido */
+        }
+        html.light .bg-sky-500\/10,
+        html.light .bg-sky-500\/15,
+        html.light .bg-sky-500\/20 {
+            background-color: #e0f2fe !important; /* sky-100 */
+            border-color: #7dd3fc !important; /* sky-300 */
+            color: #0369a1 !important;
+        }
+
+        html.light .text-rose-300,
+        html.light .text-rose-400 {
+            color: #9f1239 !important; /* rose-800: carmesí de contraste */
+        }
+        html.light .bg-rose-500\/10,
+        html.light .bg-rose-500\/15,
+        html.light .bg-rose-500\/20 {
+            background-color: #ffe4e6 !important; /* rose-100 */
+            border-color: #fda4af !important; /* rose-300 */
+            color: #9f1239 !important;
+        }
+
+        html.light .text-emerald-300,
+        html.light .text-emerald-400 {
+            color: #065f46 !important; /* emerald-800 */
+        }
+        html.light .bg-emerald-500\/10,
+        html.light .bg-emerald-500\/15,
+        html.light .bg-emerald-500\/20 {
+            background-color: #d1fae5 !important; /* emerald-100 */
+            border-color: #6ee7b7 !important; /* emerald-300 */
+            color: #065f46 !important;
+        }
+
+        html.light .text-purple-300,
+        html.light .text-purple-400 {
+            color: #6b21a8 !important; /* purple-800 */
+        }
+        html.light .bg-purple-500\/10,
+        html.light .bg-purple-500\/15,
+        html.light .bg-purple-500\/20 {
+            background-color: #f3e8ff !important; /* purple-100 */
+            border-color: #d8b4fe !important; /* purple-300 */
+            color: #6b21a8 !important;
+        }
+
+        html.light .text-indigo-300,
+        html.light .text-indigo-400 {
+            color: #3730a3 !important; /* indigo-800 */
+        }
+        html.light .bg-indigo-500\/10,
+        html.light .bg-indigo-500\/15,
+        html.light .bg-indigo-500\/20 {
+            background-color: #e0e7ff !important;
+            border-color: #a5b4fc !important;
+            color: #3730a3 !important;
+        }
+
+        /* Lienzo 3D en Modo Claro */
         html.light #mobileView3D {
-            background-color: #f5f5f7 !important;
+            background-color: #f1f5f9 !important;
         }
-
         html.light #canvas-wrapper {
-            background: radial-gradient(circle at 50% 45%, #e2e8f0 0%, #cbd5e1 58%, #94a3b8 100%) !important;
+            background: radial-gradient(circle at 50% 45%, #f1f5f9 0%, #e2e8f0 55%, #cbd5e1 100%) !important;
         }
 
+        /* Píldoras e Islas Flotantes en 3D */
         html.light .apple-pill {
-            background: rgba(255, 255, 255, 0.92) !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12) !important;
+            background: rgba(255, 255, 255, 0.96) !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
+            box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
         }
         html.light .apple-pill .text-white,
         html.light .apple-pill .text-zinc-200,
         html.light .apple-pill .text-zinc-300 {
-            color: #1d1d1f !important;
+            color: #0f172a !important;
         }
         html.light .apple-pill .text-zinc-400 {
-            color: #6e6e73 !important;
+            color: #475569 !important;
         }
         html.light .apple-pill .text-zinc-600 {
-            color: #c7c7cc !important;
+            color: #94a3b8 !important;
         }
-        html.light .apple-pill .bg-white\/15 {
-            background-color: rgba(0, 0, 0, 0.08) !important;
-            color: #1d1d1f !important;
+        html.light .apple-pill .bg-white\/15,
+        html.light .apple-pill .bg-white\/10 {
+            background-color: rgba(15, 23, 42, 0.06) !important;
+            color: #0f172a !important;
         }
 
-        html.light #stageInfoPopover {
-            background: rgba(255, 255, 255, 0.96) !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
+        /* Popovers y PiP en 3D */
+        html.light #stageInfoPopover,
+        html.light #photoComparePiP,
+        html.light #jawAperturePopover {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+            color: #0f172a !important;
         }
-        html.light #stageInfoPopover .text-zinc-200 {
-            color: #3a3a3c !important;
+        html.light #stageInfoPopover .text-zinc-200,
+        html.light #photoComparePiP .text-zinc-300,
+        html.light #jawAperturePopover .text-zinc-300 {
+            color: #1e293b !important;
         }
         html.light #stageInfoPopover .text-zinc-400 {
-            color: #86868b !important;
-        }
-        html.light #stageInfoPopover .border-white\/10 {
-            border-color: rgba(0, 0, 0, 0.08) !important;
+            color: #64748b !important;
         }
 
-        html.light #photoComparePiP {
-            background: rgba(255, 255, 255, 0.94) !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
-        }
-        html.light #photoComparePiP .text-zinc-300 {
-            color: #1d1d1f !important;
-        }
-
-        html.light #mobileView3D .bg-\[\#111113\] {
-            background-color: #ffffff !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-        }
-        html.light #mobileView3D .bg-zinc-800 {
-            background-color: #f2f2f7 !important;
-            color: #1d1d1f !important;
-        }
-        html.light #mobileView3D .bg-zinc-900 {
-            background-color: #e5e5ea !important;
-            border-color: rgba(0, 0, 0, 0.06) !important;
-        }
-        html.light #mobileView3D .text-zinc-400 {
-            color: #6e6e73 !important;
-        }
-        html.light .apple-pill .bg-black\/40 {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-            border-color: rgba(0, 0, 0, 0.06) !important;
-        }
+        /* Dock Flotante y Botones de Capas en Modo Claro */
         html.light [id^="camBtn-"].bg-white\/20,
         html.light [id^="archBtn-"].bg-white\/20 {
             background-color: #0071e3 !important;
@@ -437,154 +488,151 @@
         }
         html.light [id^="camBtn-"].text-zinc-400,
         html.light [id^="archBtn-"].text-zinc-400 {
-            color: #6e6e73 !important;
+            color: #64748b !important;
         }
         html.light [id^="camBtn-"].text-zinc-400:hover,
         html.light [id^="archBtn-"].text-zinc-400:hover {
-            color: #1d1d1f !important;
-            background-color: rgba(0, 0, 0, 0.05) !important;
+            color: #0f172a !important;
+            background-color: rgba(15, 23, 42, 0.06) !important;
+        }
+
+        /* Timeline en Modo Claro */
+        html.light #mobileView3D .bg-\[\#111113\] {
+            background-color: #ffffff !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03) !important;
+        }
+        html.light #mobileView3D .bg-zinc-800 {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+        }
+        html.light #mobileView3D .bg-zinc-800:hover {
+            background-color: #e2e8f0 !important;
         }
         html.light #bottomMonthBadge {
-            background-color: #f2f2f7 !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-            color: #0071e3 !important;
+            background-color: #e0f2fe !important;
+            border-color: #7dd3fc !important;
+            color: #0284c7 !important;
+            font-weight: 700 !important;
         }
-        html.light #jawAperturePopover {
-            background: rgba(255, 255, 255, 0.96) !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15) !important;
-        }
-        html.light #jawAperturePopover .text-zinc-300 {
-            color: #1d1d1f !important;
-        }
-        html.light #jawActionBtn.bg-sky-500\/20 {
-            background-color: rgba(0, 113, 227, 0.15) !important;
-            border-color: rgba(0, 113, 227, 0.3) !important;
-            color: #0071e3 !important;
-        }
-        html.light #jawActionBtn.text-zinc-200 {
-            color: #1d1d1f !important;
-        }
-        html.light #jawActionBtn.text-zinc-200:hover {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-        }
+
+        /* Sliders en Modo Claro */
         html.light input[type=range].apple-slider::-webkit-slider-runnable-track {
-            background: rgba(0, 0, 0, 0.14) !important;
+            background: rgba(15, 23, 42, 0.15) !important;
         }
         html.light input[type=range].apple-slider::-webkit-slider-thumb {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
         }
 
-        html.light #rightWorkspacePanel {
+        /* Superficies de Tarjetas, Paneles e Historia Clínica */
+        html.light .apple-card-surface,
+        html.light .patient-card-surface {
+            background: #ffffff !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+        html.light .patient-card-surface:hover {
+            border-color: #0071e3 !important;
+            box-shadow: 0 8px 24px -4px rgba(0, 113, 227, 0.12) !important;
+        }
+        html.light .text-white {
+            color: #0f172a !important;
+        }
+        html.light .text-zinc-100,
+        html.light .text-zinc-200 {
+            color: #1e293b !important;
+        }
+        html.light .text-zinc-300,
+        html.light .text-zinc-400 {
+            color: #475569 !important;
+        }
+        html.light .text-zinc-500 {
+            color: #64748b !important;
+        }
+        html.light .bg-zinc-900,
+        html.light .bg-zinc-950 {
             background-color: #ffffff !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
         }
-        html.light #rightWorkspacePanel .text-white {
-            color: #1d1d1f !important;
+        html.light .bg-black\/60,
+        html.light .bg-black\/50,
+        html.light .bg-black\/40 {
+            background-color: #f8fafc !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
         }
-        html.light #rightWorkspacePanel .text-zinc-200,
-        html.light #rightWorkspacePanel .text-zinc-300 {
-            color: #3a3a3c !important;
+        html.light .border-white\/10,
+        html.light .border-white\/15,
+        html.light .border-white\/5 {
+            border-color: rgba(15, 23, 42, 0.08) !important;
         }
-        html.light #rightWorkspacePanel .text-zinc-400 {
-            color: #86868b !important;
+        html.light input,
+        html.light textarea,
+        html.light select {
+            background-color: #f8fafc !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
+            color: #0f172a !important;
         }
-        html.light .apple-card-surface {
-            background: #fbfbfd !important;
-            border: 1px solid rgba(0, 0, 0, 0.07) !important;
-            box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04) !important;
-        }
-        html.light #rightWorkspacePanel .bg-gradient-to-b {
-            background: linear-gradient(to bottom, #f0f7ff, #ffffff) !important;
-            border-color: rgba(0, 113, 227, 0.2) !important;
-        }
-        html.light #rightWorkspacePanel .bg-black\/60,
-        html.light #rightWorkspacePanel .bg-black\/50,
-        html.light #rightWorkspacePanel .bg-black\/40 {
-            background-color: #f2f2f7 !important;
-            border-color: rgba(0, 0, 0, 0.06) !important;
-        }
-        html.light #rightWorkspacePanel .bg-zinc-900\/90,
-        html.light #rightWorkspacePanel .bg-zinc-900 {
+        html.light input:focus,
+        html.light textarea:focus,
+        html.light select:focus {
+            border-color: #0071e3 !important;
             background-color: #ffffff !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-        }
-        html.light #rightWorkspacePanel .bg-zinc-950 {
-            background-color: #f2f2f7 !important;
-        }
-        html.light #rightWorkspacePanel .border-white\/10,
-        html.light #rightWorkspacePanel .border-white\/5 {
-            border-color: rgba(0, 0, 0, 0.06) !important;
-        }
-        html.light #rightWorkspacePanel .bg-white\/10 {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-            color: #1d1d1f !important;
-        }
-        html.light #rightWorkspacePanel input,
-        html.light #rightWorkspacePanel textarea {
-            background-color: #ffffff !important;
-            border-color: rgba(0, 0, 0, 0.12) !important;
-            color: #1d1d1f !important;
-        }
-        html.light #rightWorkspacePanel tr:hover {
-            background-color: rgba(0, 0, 0, 0.03) !important;
         }
 
-        html.light nav.lg\:hidden {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-        }
-        html.light nav.lg\:hidden .text-zinc-400 {
-            color: #86868b !important;
-        }
-
+        /* Odontograma FDI en Modo Claro */
         html.light .fdi-unselected {
-            background-color: #f2f2f7 !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-            color: #1d1d1f !important;
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
         }
         html.light .fdi-unselected:hover {
             border-color: #0071e3 !important;
+            background-color: #ffffff !important;
         }
 
+        /* Modales en Modo Claro */
         html.light #patientEditModal .apple-glass,
+        html.light #newPatientModal .apple-glass,
+        html.light #inAppLoginModal .apple-glass,
         html.light #cadModal .apple-glass {
             background: #ffffff !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            border-color: rgba(15, 23, 42, 0.1) !important;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.25) !important;
         }
         html.light #patientEditModal .text-white,
+        html.light #newPatientModal .text-white,
+        html.light #inAppLoginModal .text-white,
         html.light #cadModal .text-white {
-            color: #1d1d1f !important;
+            color: #0f172a !important;
         }
         html.light #patientEditModal .text-zinc-200,
+        html.light #newPatientModal .text-zinc-200,
         html.light #cadModal .text-zinc-200,
         html.light #patientEditModal .text-zinc-300,
+        html.light #newPatientModal .text-zinc-300,
         html.light #cadModal .text-zinc-300 {
-            color: #3a3a3c !important;
+            color: #1e293b !important;
         }
         html.light #patientEditModal .text-zinc-400,
+        html.light #newPatientModal .text-zinc-400,
         html.light #cadModal .text-zinc-400 {
-            color: #86868b !important;
+            color: #64748b !important;
         }
         html.light #patientEditModal .border-white\/10,
+        html.light #newPatientModal .border-white\/10,
         html.light #cadModal .border-white\/10 {
-            border-color: rgba(0, 0, 0, 0.08) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
         }
         html.light #patientEditModal input,
-        html.light #patientEditModal textarea {
-            background-color: #f2f2f7 !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
-            color: #1d1d1f !important;
-        }
-        html.light #cadModal .bg-black\/60 {
-            background-color: #f2f2f7 !important;
-            border-color: rgba(0, 0, 0, 0.08) !important;
-        }
-        html.light #patientEditModal .bg-white\/10,
-        html.light #cadModal .bg-white\/10 {
-            background-color: rgba(0, 0, 0, 0.06) !important;
-            color: #1d1d1f !important;
+        html.light #newPatientModal input,
+        html.light #patientEditModal textarea,
+        html.light #newPatientModal textarea,
+        html.light #newPatientModal select {
+            background-color: #f8fafc !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
+            color: #0f172a !important;
         }
 
         html.light .clincheck-top-toolbar {
@@ -679,103 +727,767 @@
             color: #1d1d1f !important;
         }
 
+
+        /* Dropdown de Herramientas Clínicas */
+        #toolsDropdownMenu {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        html.light #toolsDropdownMenu {
+            background-color: #ffffff !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+        html.light #toolsDropdownMenu button:hover {
+            background-color: rgba(15, 23, 42, 0.05) !important;
+        }
+        html.light #toolsDropdownMenu .text-white {
+            color: #0f172a !important;
+        }
+        html.light #toolsDropdownMenu .text-zinc-200 {
+            color: #1e293b !important;
+        }
+        html.light #toolsDropdownMenu .text-zinc-400 {
+            color: #64748b !important;
+        }
+
+        /* Estilos de las Tarjetas de Pacientes */
+        .patient-card-surface {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .patient-card-surface:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vista de Historia Clínica Sub-tabs */
+        .history-tab-btn {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .history-tab-btn.active {
+            background: rgba(10, 132, 255, 0.15);
+            color: #38bdf8;
+            border-color: rgba(14, 165, 233, 0.4);
+        }
+        html.light .history-tab-btn.active {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #7dd3fc !important;
+            font-weight: 700 !important;
+        }
+        html.light .history-tab-btn {
+            color: #475569 !important;
+        }
+        html.light .history-tab-btn:hover {
+            color: #0f172a !important;
+            background-color: rgba(15, 23, 42, 0.05) !important;
+        }
+
+        html.light,
+        html.light body,
+        html.light #viewPatientsList,
+        html.light #viewPatientHistory {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        html.light header {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+        html.light header .text-white {
+            color: #0f172a !important;
+        }
+
+        html.light #headerBackBtn {
+            background-color: rgba(15, 23, 42, 0.06) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            color: #1e293b !important;
+        }
+        html.light #headerBackBtn:hover {
+            background-color: rgba(15, 23, 42, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light #headerViewSwitcher {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light #headerViewSwitcher button {
+            color: #475569 !important;
+        }
+        html.light #headerViewSwitcher button.bg-zinc-800 {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html.light #headerPatientChip {
+            background-color: rgba(15, 23, 42, 0.05) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            color: #334155 !important;
+        }
+        html.light #headerPatientChipName {
+            color: #0f172a !important;
+        }
+
+        html.light #toolsDropdownBtn,
+        html.light #themeToggleBtn {
+            background-color: rgba(15, 23, 42, 0.06) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            color: #1e293b !important;
+        }
+        html.light #toolsDropdownBtn:hover,
+        html.light #themeToggleBtn:hover {
+            background-color: rgba(15, 23, 42, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        html.light #patientSearchInput {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html.light #patientSearchInput::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html.light #filterBtn-all.bg-zinc-800,
+        html.light #filterBtn-treatment.bg-zinc-800,
+        html.light #filterBtn-planning.bg-zinc-800,
+        html.light #filterBtn-retention.bg-zinc-800 {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        }
+
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden select-none bg-black">
 
-    <!-- =====================================================================
+        <!-- =====================================================================
          1. TOP NAVIGATION BAR (ESTILO MACOS SEQUOIA / IPADOS 18)
     ====================================================================== -->
-    <header class="h-14 px-3 sm:px-5 border-b border-white/10 bg-[#0d0d0f]/90 backdrop-blur-xl flex items-center justify-between shrink-0 z-30 no-print">
-        <!-- Brand (Solo OrthoAi Pro sin logo azul) -->
+    <header class="h-14 px-3 sm:px-5 border-b border-white/10 bg-[#0d0d0f]/95 backdrop-blur-xl flex items-center justify-between shrink-0 z-30 no-print">
+        <!-- Izquierda: Botón Dinámico de Navegación y Marca -->
         <div class="flex items-center space-x-2.5 min-w-0">
-            <a href="index.html" class="flex items-center gap-1.5 text-zinc-300 hover:text-white transition px-2.5 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium mr-1" title="Volver al Sitio Principal">
-                <i class="ph-bold ph-caret-left text-[11px]"></i>
-                <span class="hidden sm:inline">Dra. Liseth</span>
-            </a>
-            <span class="font-bold text-base tracking-tight text-white whitespace-nowrap">OrthoAi Pro</span>
+            <button id="headerBackBtn" onclick="handleHeaderBack()" class="flex items-center gap-1.5 text-zinc-300 hover:text-white transition px-2.5 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium shrink-0" title="Volver">
+                <i id="headerBackIcon" class="ph-bold ph-caret-left text-[11px]"></i>
+                <span id="headerBackText" class="hidden sm:inline">Pacientes</span>
+            </button>
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-base tracking-tight text-white whitespace-nowrap">OrthoAi Pro</span>
+                <span class="hidden md:inline px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/25 text-[10px] font-semibold text-sky-400">Portal Dra. Liseth</span>
+            </div>
         </div>
 
-        <!-- Segmented Control Central (Desktop Mode Switcher) -->
-        <div class="hidden lg:flex items-center bg-zinc-900/90 p-1 rounded-xl border border-white/10 text-xs font-medium">
-            <button onclick="setDesktopRightPanel('odontogram')" id="deskTabOdonto" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition flex items-center space-x-1.5">
-                <i class="ph-fill ph-tooth text-sky-400"></i>
-                <span>Odontograma & IPR</span>
-            </button>
-            <button onclick="setDesktopRightPanel('media')" id="deskTabMedia" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
-                <i class="ph-fill ph-images text-emerald-400"></i>
-                <span>Fotos y Rx (8)</span>
-            </button>
-            <button onclick="setDesktopRightPanel('clinical')" id="deskTabClinical" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+        <!-- Centro: Switcher de Vista Principal (Historia Clínica vs Visor 3D) -->
+        <div id="headerViewSwitcher" class="flex items-center bg-zinc-900/90 p-1 rounded-xl border border-white/10 text-xs font-medium">
+            <button onclick="showAppView('history')" id="headerTabHistory" class="px-3.5 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition flex items-center space-x-1.5">
                 <i class="ph-fill ph-clipboard-text text-amber-400"></i>
-                <span>Expediente & Plan</span>
+                <span class="hidden sm:inline">Historia Clínica</span>
+                <span class="sm:hidden">Historia</span>
+            </button>
+            <button onclick="showAppView('viewer3d')" id="headerTab3D" class="px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+                <i class="ph-fill ph-cube text-sky-400"></i>
+                <span class="hidden sm:inline">Visor 3D</span>
+                <span class="sm:hidden">3D</span>
             </button>
         </div>
 
-        <!-- Acciones Rápidas Derecha -->
+        <!-- Derecha: Chip Paciente Activo, Menú Herramientas, Tema y Salir -->
         <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-            <!-- Botón Selector Modo Oscuro / Fondo Blanco -->
+            <!-- Chip Paciente Activo con Botón Cambiar -->
+            <div id="headerPatientChip" class="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300">
+                <div id="headerPatientAvatar" class="w-5 h-5 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white text-[10px] font-bold">MG</div>
+                <span id="headerPatientChipName" class="font-semibold text-white max-w-[120px] truncate">Martha Gabriela</span>
+                <button onclick="showAppView('patients')" class="text-[10px] text-sky-400 hover:underline">Cambiar</button>
+            </div>
+
+            <!-- Menú Desplegable Agrupado de Herramientas Clínicas -->
+            <div class="relative">
+                <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white flex items-center space-x-1.5 transition" title="Herramientas Clínicas y Flujos">
+                    <i class="ph-bold ph-wrench text-sky-400 text-sm"></i>
+                    <span class="hidden md:inline">Herramientas</span>
+                    <i class="ph-bold ph-caret-down text-[10px] text-zinc-400"></i>
+                </button>
+                <!-- Menú Dropdown -->
+                <div id="toolsDropdownMenu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-zinc-900 border border-white/15 shadow-2xl p-2 z-50 text-xs space-y-1">
+                    <div class="px-2.5 py-1 text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Flujos Clínicos & Biomecánica</div>
+                    <button onclick="openExportPDFModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-file-pdf text-rose-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Exportar Expediente PDF</div>
+                            <div class="text-[10px] text-zinc-400">Reporte editorial completo de 18 meses</div>
+                        </div>
+                    </button>
+                    <button onclick="openDigitalSignaturesModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-signature text-amber-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Firmas Digitales Biométricas</div>
+                            <div class="text-[10px] text-zinc-400">Consentimiento y evolución médica</div>
+                        </div>
+                    </button>
+                    <button onclick="openDoctorSiteRecordsModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-squares-four text-emerald-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Fotos, Rayos X y 3D</div>
+                            <div class="text-[10px] text-zinc-400">Suite 3 Columnas ClinCheck Doctor Site</div>
+                        </div>
+                    </button>
+                    <div class="pt-1 border-t border-white/10 px-2.5 py-1 text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Modelos 3D & Hardware</div>
+                    <button onclick="openDualSTLModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-layers text-purple-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Motor Dual .STL</div>
+                            <div class="text-[10px] text-zinc-400">Maxilar y Mandíbula simultáneos</div>
+                        </div>
+                    </button>
+                    <button onclick="openLiveCameraModal(2); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-camera text-rose-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Cámara en Vivo (WebRTC)</div>
+                            <div class="text-[10px] text-zinc-400">Captura fotográfica directa</div>
+                        </div>
+                    </button>
+                    <button onclick="openCADWorkflowModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-git-diff text-indigo-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Flujo Formlabs CAD/CAM</div>
+                            <div class="text-[10px] text-zinc-400">Impresión de modelos y alineadores</div>
+                        </div>
+                    </button>
+                    <div class="pt-1 border-t border-white/10 px-2.5 py-1 text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Nube & Base de Datos</div>
+                    <button onclick="openSupabaseConfigModal(); closeToolsDropdown();" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-200 flex items-center space-x-2.5 transition">
+                        <i class="ph-bold ph-database text-emerald-400 text-base"></i>
+                        <div>
+                            <div class="font-semibold text-white">Conexión Supabase Cloud</div>
+                            <div class="text-[10px] text-zinc-400">Sincronización multi-dispositivo</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector Modo Oscuro / Fondo Blanco -->
             <button id="themeToggleBtn" onclick="toggleTheme()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white flex items-center space-x-1.5 transition" title="Alternar entre versión oscura y fondo blanco">
                 <i id="themeToggleIcon" class="ph-bold ph-sun text-amber-400 text-sm"></i>
-                <span id="themeToggleText" class="hidden sm:inline">Fondo Blanco</span>
-            </button>
-            <!-- Motor Dual STL -->
-            <button onclick="openDualSTLModal()" class="hidden md:inline-flex px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-medium text-purple-300 items-center space-x-1.5 transition" title="Cargar Modelos Dual .STL (Maxilar y Mandíbula)">
-                <i class="ph-bold ph-layers text-sm"></i>
-                <span class="hidden xl:inline">Dual .STL</span>
-            </button>
-            <!-- Captura de Cámara en Vivo -->
-            <button onclick="openLiveCameraModal(2)" class="hidden md:inline-flex px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-medium text-rose-300 items-center space-x-1.5 transition" title="Captura de Cámara en Vivo (Webcam / Móvil)">
-                <i class="ph-bold ph-camera text-sm"></i>
-                <span class="hidden xl:inline">Cámara</span>
-            </button>
-            <!-- Firmas Digitales Biométricas -->
-            <button onclick="openDigitalSignaturesModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-xs font-medium text-amber-300 items-center space-x-1.5 transition" title="Firmas Digitales Biométricas">
-                <i class="ph-bold ph-signature text-sm"></i>
-                <span class="hidden xl:inline">Firmas</span>
-            </button>
-            <!-- Conexión Supabase Cloud -->
-            <button onclick="openSupabaseConfigModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-medium text-emerald-300 items-center space-x-1.5 transition" title="Conexión Supabase Cloud">
-                <i class="ph-bold ph-database text-sm"></i>
-                <span class="hidden xl:inline">Cloud</span>
-            </button>
-            <input type="file" id="stlFileInput" accept=".stl" class="hidden" onchange="handleSTLUpload(event)">
-            <button onclick="document.getElementById('stlFileInput').click()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white items-center space-x-1.5 transition" title="Importar Escaneo Intraoral .STL">
-                <i class="ph-bold ph-cube text-sky-400 text-sm"></i>
-                <span class="hidden md:inline">Importar .STL</span>
+                <span id="themeToggleText" class="hidden lg:inline">Fondo Blanco</span>
             </button>
 
-            <button onclick="openCADWorkflowModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-medium text-indigo-300 items-center space-x-1.5 transition" title="Ver Flujo Digital Formlabs CAD/CAM">
-                <i class="ph-bold ph-git-diff text-sm"></i>
-                <span class="hidden md:inline">Flujo Formlabs</span>
-            </button>
-
-            <button onclick="openDoctorSiteRecordsModal()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-semibold text-emerald-300 flex items-center space-x-1.5 transition shadow-sm" title="Abrir Suite Completa de Registros Clínicos, Rayos X y Escaneos 3D (Estilo ClinCheck Doctor Site)">
-                <i class="ph-bold ph-squares-four text-sm text-emerald-400"></i>
-                <span class="hidden sm:inline">Fotos, Rx &amp; 3D</span>
-            </button>
-
-            <button onclick="openExportPDFModal()" class="px-2.5 py-1.5 rounded-xl bg-[#0a84ff]/20 hover:bg-[#0a84ff]/30 border border-[#0a84ff]/40 text-xs font-semibold text-sky-300 flex items-center space-x-1.5 transition shadow-sm" title="Exportar Expediente Clínico PDF">
-                <i class="ph-bold ph-file-pdf text-sm text-sky-400"></i>
-                <span class="hidden md:inline">Expediente PDF</span>
-            </button>
-
-            <button onclick="openPatientModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-zinc-200 transition" title="Editar Ficha del Paciente o Agregar Nota">
-                <i class="ph-bold ph-user-gear text-sm"></i>
+            <!-- Cerrar Sesión Doctora -->
+            <button onclick="logoutDoctor()" class="p-2 rounded-xl bg-white/10 hover:bg-red-500/20 hover:border-red-500/30 text-zinc-300 hover:text-red-400 border border-white/10 transition" title="Cerrar Sesión del Portal Médico">
+                <i class="ph-bold ph-sign-out text-sm"></i>
             </button>
         </div>
     </header>
 
-    <!-- =====================================================================
-         2. WORKSPACE PRINCIPAL (SPLIT-VIEW EN DESKTOP / TABS LIMPIOS EN MOBILE)
+        <!-- =====================================================================
+         2. VISTAS PRINCIPALES DE LA PLATAFORMA (PACIENTES / HISTORIA / VISOR 3D)
     ====================================================================== -->
-    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+    <div class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- =================================================================
+             VISTA 1: ADMIN DE PACIENTES (DIRECTORIO CLÍNICO PRIVADO)
+        ================================================================== -->
+        <div id="viewPatientsList" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#09090b]">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <!-- Banner de Bienvenida y Métricas del Consultorio -->
+                <div class="apple-card-surface p-5 rounded-3xl border border-white/10 bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-800/80">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20">
+                                <i class="ph-bold ph-user-circle text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight">Directorio Clínico de Pacientes</h1>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-semibold text-[10px]">Portal Dra. Liseth</span>
+                                </div>
+                                <p class="text-xs text-zinc-400 mt-0.5">Casos activos en tratamiento con alineadores, diagnóstico biomecánico y modelos 3D</p>
+                            </div>
+                        </div>
+                        <!-- Botón Nuevo Paciente -->
+                        <button onclick="openNewPatientModal()" class="px-4 py-2.5 rounded-2xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/25 transition active:scale-95 shrink-0">
+                            <i class="ph-bold ph-plus-circle text-base"></i>
+                            <span>+ Nuevo Paciente</span>
+                        </button>
+                    </div>
 
-        <!-- -----------------------------------------------------------------
-             SECCIÓN IZQUIERDA / PRINCIPAL: VISOR 3D + REPRODUCTOR CLINCHECK
-             En Mobile es la Vista 1 ("3D") sin ningún texto que estorbe.
-        ------------------------------------------------------------------ -->
-        <main id="mobileView3D" class="flex-1 flex flex-col bg-black overflow-hidden relative">
+                    <!-- Métricas Rápidas -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-white/10">
+                        <div class="p-3 rounded-2xl bg-white/5 border border-white/5">
+                            <div class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Total Pacientes</div>
+                            <div id="statTotalPatients" class="text-xl font-bold text-white mt-0.5">3 Casos</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/20">
+                            <div class="text-[10px] uppercase font-bold text-sky-400 tracking-wider">En Tratamiento</div>
+                            <div id="statActivePatients" class="text-xl font-bold text-sky-300 mt-0.5">2 Activos</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                            <div class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Planificación 3D</div>
+                            <div id="statPlanningPatients" class="text-xl font-bold text-amber-300 mt-0.5">1 En Plan</div>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                            <div class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">Supabase Sync</div>
+                            <div class="text-xl font-bold text-emerald-300 mt-0.5 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-xs">Conectado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Búsqueda y Filtros de Estado -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <!-- Input de Búsqueda -->
+                    <div class="relative flex-1 max-w-md">
+                        <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
+                        <input type="text" id="patientSearchInput" onkeyup="filterPatientsList()" placeholder="Buscar paciente por nombre, edad o diagnóstico..." class="w-full bg-zinc-900 border border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-sky-500 transition shadow-inner">
+                    </div>
+                    <!-- Filtros por Estado -->
+                    <div class="flex items-center space-x-1 bg-zinc-900 p-1 rounded-2xl border border-white/10 text-xs shrink-0">
+                        <button onclick="setPatientFilter('all')" id="filterBtn-all" class="px-3 py-1.5 rounded-xl bg-zinc-800 text-white font-medium shadow-sm transition">Todos (3)</button>
+                        <button onclick="setPatientFilter('treatment')" id="filterBtn-treatment" class="px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white transition">En Tratamiento</button>
+                        <button onclick="setPatientFilter('planning')" id="filterBtn-planning" class="px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white transition">Planificación</button>
+                        <button onclick="setPatientFilter('retention')" id="filterBtn-retention" class="px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white transition">Retención</button>
+                    </div>
+                </div>
+
+                <!-- Grid Dinámico de Pacientes -->
+                <div id="patientsGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dinámico por JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================
+             VISTA 2: HISTORIA CLÍNICA / EXPEDIENTE (VISTA PRINCIPAL DEL CASO)
+        ================================================================== -->
+        <div id="viewPatientHistory" class="hidden flex-1 overflow-y-auto p-4 sm:p-6 max-w-7xl mx-auto w-full space-y-5 bg-[#09090b]">
+            <!-- Hero Card del Paciente -->
+            <div class="apple-card-surface p-5 rounded-3xl border border-white/10 bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-800/80 shadow-xl">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <!-- Datos Principales -->
+                    <div class="flex items-start sm:items-center space-x-4">
+                        <div id="historyPatientAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-sky-500/25 shrink-0">
+                            MG
+                        </div>
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h1 id="historyPatientName" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Martha Gabriela Zúñiga Núñez</h1>
+                                <span id="historyStatusBadge" class="px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-semibold text-xs">En Tratamiento</span>
+                            </div>
+                            <p id="historyPatientMeta" class="text-xs text-zinc-400 mt-1">40 años &bull; ID Exp: #8819-IDI &bull; Comprehensive Package (18 Meses) &bull; Dra. Liseth Guevara</p>
+                            <p id="historyDiagnosisShort" class="text-xs text-sky-400/90 font-medium mt-1">Maloclusión Clase III esquelética con Mordida Abierta Anterior (-4.5 mm)</p>
+                        </div>
+                    </div>
+
+                    <!-- Botones Principales de Acción -->
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <!-- BOTÓN HERO 3D DESTACADO -->
+                        <button onclick="showAppView('viewer3d')" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-sky-500/30 transition transform active:scale-95">
+                            <i class="ph-bold ph-cube text-base"></i>
+                            <span>Abrir Visor 3D ClinCheck</span>
+                        </button>
+                        <button onclick="openExportPDFModal()" class="px-3 py-2 rounded-2xl bg-white/10 hover:bg-white/15 text-zinc-200 hover:text-white border border-white/10 text-xs font-semibold flex items-center space-x-1.5 transition">
+                            <i class="ph-bold ph-file-pdf text-rose-400 text-sm"></i>
+                            <span class="hidden sm:inline">Exportar PDF</span>
+                        </button>
+                        <button onclick="openDigitalSignaturesModal()" class="px-3 py-2 rounded-2xl bg-white/10 hover:bg-white/15 text-zinc-200 hover:text-white border border-white/10 text-xs font-semibold flex items-center space-x-1.5 transition">
+                            <i class="ph-bold ph-signature text-amber-400 text-sm"></i>
+                            <span class="hidden sm:inline">Firmas</span>
+                        </button>
+                        <button onclick="openPatientModal()" class="p-2.5 rounded-2xl bg-white/10 hover:bg-white/15 text-zinc-200 hover:text-white border border-white/10 transition" title="Editar Ficha del Paciente">
+                            <i class="ph-bold ph-pencil-simple text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegación por Sub-Pestañas de la Historia Clínica -->
+            <div class="flex items-center space-x-1 overflow-x-auto pb-1 border-b border-white/10 text-xs font-medium no-scrollbar">
+                <button onclick="setHistoryTab('ficha')" id="histTab-ficha" class="history-tab-btn active px-4 py-2 rounded-xl flex items-center space-x-2 whitespace-nowrap">
+                    <i class="ph-fill ph-identification-card text-sky-400"></i>
+                    <span>1. Ficha &amp; Diagnóstico</span>
+                </button>
+                <button onclick="setHistoryTab('fotos')" id="histTab-fotos" class="history-tab-btn px-4 py-2 rounded-xl text-zinc-400 hover:text-white flex items-center space-x-2 whitespace-nowrap">
+                    <i class="ph-fill ph-images text-emerald-400"></i>
+                    <span>2. Fotos y Rayos X (8)</span>
+                </button>
+                <button onclick="setHistoryTab('odonto')" id="histTab-odonto" class="history-tab-btn px-4 py-2 rounded-xl text-zinc-400 hover:text-white flex items-center space-x-2 whitespace-nowrap">
+                    <i class="ph-fill ph-tooth text-sky-400"></i>
+                    <span>3. Odontograma &amp; IPR</span>
+                </button>
+                <button onclick="setHistoryTab('biomecanica')" id="histTab-biomecanica" class="history-tab-btn px-4 py-2 rounded-xl text-zinc-400 hover:text-white flex items-center space-x-2 whitespace-nowrap">
+                    <i class="ph-fill ph-path text-amber-400"></i>
+                    <span>4. Plan Biomecánico &amp; TADs</span>
+                </button>
+                <button onclick="setHistoryTab('evolucion')" id="histTab-evolucion" class="history-tab-btn px-4 py-2 rounded-xl text-zinc-400 hover:text-white flex items-center space-x-2 whitespace-nowrap">
+                    <i class="ph-fill ph-notebook text-purple-400"></i>
+                    <span>5. Evolución &amp; Notas de Citas</span>
+                </button>
+            </div>
+
+            <!-- Contenido de las Sub-Pestañas -->
+            <div id="historyTabContent">
+                <!-- Tab 1: Ficha & Diagnóstico -->
+                <div id="histContent-ficha" class="space-y-4">
+                    <!-- Datos Clínicos Ficha Completa -->
+                    <div class="apple-card-surface p-5 rounded-3xl border border-white/10 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="ph-fill ph-file-text text-sky-400"></i>
+                                <span>Diagnóstico Clínico y Análisis Cefalométrico</span>
+                            </h3>
+                            <button onclick="openPatientModal()" class="text-xs text-sky-400 hover:underline flex items-center space-x-1">
+                                <i class="ph-bold ph-pencil-simple"></i>
+                                <span>Editar Datos Clínicos</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Diagnóstico Principal</div>
+                                <div id="historyPatientDiagFull" class="font-semibold text-white leading-relaxed">Maloclusión Clase III esquelética con Mordida Abierta Anterior (-4.5 mm), biprotrusión y hábito de empuje lingual activo.</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Biotipo Facial &amp; Perfil</div>
+                                <div id="historyBiotype" class="font-medium text-zinc-200">Dolicofacial severo, tercio inferior aumentado, perfil cóncavo con incompetencia labial.</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Relación Molar &amp; Canina</div>
+                                <div id="historyMolarClass" class="font-medium text-zinc-200">Clase III Molar bilateral • Clase III Canina bilateral invertida (-1.5 mm).</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Sobremordida &amp; Resalte</div>
+                                <div id="historyOverbite" class="font-medium text-amber-300">Overbite: -4.5 mm (Mordida abierta) • Overjet: -1.5 mm (Mordida cruzada ant.)</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Hábitos Orales Deletéreos</div>
+                                <div id="historyHabits" class="font-medium text-rose-300">Deglución atípica con interposición lingual anterior activa al hablar y tragar.</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-zinc-400">Anclaje Biomecánico &amp; TADs</div>
+                                <div id="historyTads" class="font-medium text-sky-300">2 Microtornillos IZC (Cresta Infrazigomática) + Barra Transpalatina (ATP).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Fotos y Rayos X -->
+                <div id="histContent-fotos" class="hidden space-y-4">
+                    <div id="panelMedia" class="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white tracking-tight">Estudios Fotográficos y Radiográficos</h2>
+                        <p class="text-xs text-zinc-400">Toca cualquier estudio para abrir en Pantalla Completa o reemplazar</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openDoctorSiteRecordsModal()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition shrink-0">
+                            <i class="ph-bold ph-squares-four"></i>
+                            <span>Suite 3 Columnas</span>
+                        </button>
+                        <input type="file" id="batchPhotoInput" accept="image/*" multiple class="hidden" onchange="handleBatchPhotoUpload(event)">
+                        <button onclick="document.getElementById('batchPhotoInput').click()" class="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold flex items-center space-x-1.5 shadow-md transition shrink-0">
+                            <i class="ph-bold ph-upload-simple"></i>
+                            <span class="hidden sm:inline">Subir Fotos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botón de apertura a pantalla completa estilo ClinCheck Doctor Site -->
+                <button onclick="openDoctorSiteRecordsModal()" class="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/15 to-purple-500/15 hover:from-sky-500/25 hover:via-indigo-500/25 hover:to-purple-500/25 border border-sky-400/30 text-sky-300 font-semibold text-xs flex items-center justify-between transition shadow-sm">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
+                            <i class="ph-bold ph-squares-four text-base"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-white text-xs font-bold">Suite ClinCheck Doctor Site (3 Columnas)</div>
+                            <div class="text-[11px] text-zinc-400">Fotos Individuales (12) • Rayo X (3) • Escaneo y 3D</div>
+                        </div>
+                    </div>
+                    <i class="ph-bold ph-arrow-square-out text-base text-sky-400"></i>
+                </button>
+
+                <!-- Banner informativo amigable -->
+                <div class="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/25 flex items-start space-x-2.5 text-xs text-zinc-300">
+                    <i class="ph-fill ph-sparkle text-sky-400 text-base shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong>Sincronización Clínica Activa:</strong> Puedes tocar el botón <strong>"Cargar Foto"</strong> en cada tarjeta para adjuntar las fotografías originales desde tu iPhone, iPad o Mac, o pulsar <strong>"Ver en PiP 3D"</strong> para compararlas lado a lado con el modelo 3D.
+                    </div>
+                </div>
+
+                <!-- Grid de 8 Registros Clínicos (2 Rx + 6 Fotos Intraorales) -->
+                <div id="clinicalMediaGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Renderizado dinámico con ilustraciones clínicas de alta precisión + soporte de imagen subida -->
+                </div>
+            </div>
+                </div>
+
+                <!-- Tab 3: Odontograma & IPR -->
+                <div id="histContent-odonto" class="hidden space-y-4">
+                    <div id="panelOdontogram" class="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                <!-- Encabezado de Sección -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-white tracking-tight">Odontograma & Stripping (IPR)</h2>
+                        <p class="text-xs text-zinc-400">Desglose exacto Mesial y Distal por órgano dentario</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold mono">
+                        Total Inf: 2.0 mm
+                    </span>
+                </div>
+
+                <!-- Mapa Anatómico por Cuadrantes FDI -->
+                <div class="apple-card-surface p-3.5 space-y-3">
+                    <div class="flex items-center justify-between text-[11px] text-zinc-400">
+                        <span>Toca cualquier diente para inspeccionar su IPR y raíces</span>
+                        <span class="text-rose-400 font-medium">✕ = Extraído (14,24,34,44)</span>
+                    </div>
+
+                    <!-- Arcada Superior (18 a 28) -->
+                    <div>
+                        <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold mb-1.5 text-center">Arcada Superior (Maxilar)</div>
+                        <div id="fdiGridUpper" class="grid grid-cols-7 gap-1"></div>
+                    </div>
+
+                    <!-- Arcada Inferior (48 a 38) -->
+                    <div class="pt-1 border-t border-white/5">
+                        <div id="fdiGridLower" class="grid grid-cols-7 gap-1 mt-1.5"></div>
+                        <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold mt-1.5 text-center">Arcada Inferior (Mandíbula)</div>
+                    </div>
+                </div>
+
+                <!-- TARJETA DETALLADA DEL DIENTE SELECCIONADO (Mesial vs Distal + Ajustes 3D) -->
+                <div class="apple-card-surface p-4 border border-sky-500/30 bg-gradient-to-b from-[#161922] to-[#121214] space-y-3.5">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div id="cardToothBadge" class="w-12 h-12 rounded-2xl bg-sky-500 text-black font-extrabold mono text-lg flex items-center justify-center shadow-md">
+                                42
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h3 id="cardToothTitle" class="text-sm font-bold text-white">Incisivo Lateral Inf. Derecho</h3>
+                                </div>
+                                <p id="cardToothRootStatus" class="text-xs text-amber-300 mt-0.5">
+                                    Raíz Única Corta (1:1.1) • Límite intrusión: 0.8 mm
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="resetSelectedToothCustom()" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-zinc-300 transition">
+                            Restaurar
+                        </button>
+                    </div>
+
+                    <!-- Desglose Visual de Stripping (IPR): CARA MESIAL vs CARA DISTAL -->
+                    <div class="bg-black/60 p-3 rounded-2xl border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-400 flex items-center">
+                                <i class="ph-fill ph-sparkle mr-1.5"></i> Prescripción de Stripping (IPR) en este Diente
+                            </span>
+                            <span id="cardToothTotalIPR" class="text-xs font-bold mono text-white bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
+                                Total: 0.60 mm
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center items-center">
+                            <div class="p-2.5 rounded-xl bg-zinc-900/90 border border-amber-500/25">
+                                <div class="text-[10px] text-zinc-400 uppercase">Cara Mesial</div>
+                                <div id="cardIPRMesial" class="text-sm font-bold mono text-amber-300 mt-0.5">0.30 mm</div>
+                                <div class="text-[9px] text-zinc-500">Hacia línea media</div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-9 h-9 rounded-full bg-zinc-800 border border-white/15 flex items-center justify-center text-xs font-bold mono text-white" id="cardCenterFDI">42</div>
+                                <span class="text-[9px] text-zinc-500 mt-1">Corona</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-zinc-900/90 border border-amber-500/25">
+                                <div class="text-[10px] text-zinc-400 uppercase">Cara Distal</div>
+                                <div id="cardIPRDistal" class="text-sm font-bold mono text-amber-300 mt-0.5">0.30 mm</div>
+                                <div class="text-[9px] text-zinc-500">Hacia posterior</div>
+                            </div>
+                        </div>
+                        <p id="cardIPRClinicalWhy" class="text-[11px] text-zinc-300 mt-2.5 leading-relaxed">
+                            <strong>Valor Clínico:</strong> Desbloquea la rotación severa (+38°) del lateral inferior derecho sin proinclinar los incisivos hacia la cortical vestibular delgada.
+                        </p>
+                    </div>
+
+                    <!-- Sliders Manuales de Biomecánica 3D -->
+                    <div class="space-y-2.5 pt-1">
+                        <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Ajuste Manual en Vivo (Setup 3D)</div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-zinc-300">Rotación Mesio-Distal</span>
+                                <span id="customRotVal" class="mono text-sky-400 font-semibold">0°</span>
+                            </div>
+                            <input type="range" id="customRotSlider" min="-40" max="40" step="1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-zinc-300">Torque / In-Out Labio-Lingual</span>
+                                <span id="customLabialVal" class="mono text-sky-400 font-semibold">0.0 mm</span>
+                            </div>
+                            <input type="range" id="customLabialSlider" min="-3" max="3" step="0.1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-zinc-300">Intrusión / Extrusión Vertical</span>
+                                <span id="customVertVal" class="mono text-sky-400 font-semibold">0.0 mm</span>
+                            </div>
+                            <input type="range" id="customVertSlider" min="-2.5" max="2.5" step="0.1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla Completa de Stripping por Diente (Mesial y Distal) -->
+                <div class="apple-card-surface p-4 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center justify-between">
+                        <span>Tabla Maestra de Stripping (IPR) por Diente</span>
+                        <span class="text-[10px] text-amber-400 font-normal">Disco Diamantado / Tiras</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-white/10 text-[10px] uppercase text-zinc-400">
+                                    <th class="py-2 pr-2">Diente</th>
+                                    <th class="py-2 px-2 text-center">Mesial</th>
+                                    <th class="py-2 px-2 text-center">Distal</th>
+                                    <th class="py-2 px-2 text-center">Total</th>
+                                    <th class="py-2 pl-2">Etapa / Justificación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="iprMasterTableBody" class="divide-y divide-white/5 mono text-[11px]">
+                                <!-- Dinámico por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+                </div>
+
+                <!-- Tab 4: Plan Biomecánico -->
+                <div id="histContent-biomecanica" class="hidden space-y-4">
+                    <!-- Secuencia de Fases y Anclaje -->
+                    <div class="apple-card-surface p-5 rounded-3xl border border-white/10 space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="ph-fill ph-path text-amber-400"></i>
+                                <span>Secuencia Biomecánica del Caso (Mes 0 a Mes 18)</span>
+                            </h3>
+                            <button onclick="showAppView('viewer3d')" class="px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-300 font-semibold text-xs flex items-center space-x-1 hover:bg-sky-500/30 transition">
+                                <i class="ph-bold ph-cube"></i>
+                                <span>Simular en 3D</span>
+                            </button>
+                        </div>
+                        <div id="protocolStepsContainerHistory" class="space-y-3">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 5: Evolución & Citas -->
+                <div id="histContent-evolucion" class="hidden space-y-4">
+                    <div id="panelClinical" class="flex-1 overflow-y-auto p-4 space-y-4">
+                
+                <!-- Tarjeta de Datos del Paciente Editable -->
+                <div class="apple-card-surface p-4 space-y-3 border border-white/10">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div id="cardPatientAvatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                                MG
+                            </div>
+                            <div>
+                                <h3 id="cardPatientName" class="text-sm font-bold text-white">Martha Gabriela Zúñiga Núñez</h3>
+                                <p id="cardPatientMeta" class="text-xs text-zinc-400">40 años • Fecha Nac: 12/09/1986 • Exp: #8819-IDI</p>
+                            </div>
+                        </div>
+                        <button onclick="openPatientModal()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-medium text-sky-400 flex items-center space-x-1 transition">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                            <span>Editar</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
+                        <div class="bg-black/40 p-2.5 rounded-xl">
+                            <span class="text-[10px] text-zinc-500 uppercase block">Doctora Referidora</span>
+                            <span id="cardDoctorName" class="font-semibold text-zinc-200">Dra. Liseth Guevara Muñoz</span>
+                        </div>
+                        <div class="bg-black/40 p-2.5 rounded-xl">
+                            <span class="text-[10px] text-zinc-500 uppercase block">Centro Radiológico</span>
+                            <span id="cardClinicName" class="font-semibold text-zinc-200">IDI Mérida (12/09/2026)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-500/10 border border-rose-500/25 p-3 rounded-xl text-xs space-y-1">
+                        <div class="font-bold text-rose-300 flex items-center">
+                            <i class="ph-fill ph-warning-circle mr-1.5"></i> Alerta Radiográfica Crítica (Panorámica + Lateral)
+                        </div>
+                        <p id="cardPatientDiag" class="text-zinc-300 text-[11px] leading-relaxed">
+                            Mordida abierta anterior severa (-4.5mm), enanismo radicular generalizado con ápices redondeados en sector anterior (proporción 1:1.1) y ausencia de los 4 primeros premolares (14, 24, 34, 44). Prohibida extrusión incisiva con elásticos anteriores.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bitácora de Notas Clínicas Interactiva (+ Agregar nueva información) -->
+                <div class="apple-card-surface p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center">
+                            <i class="ph-fill ph-notebook mr-1.5 text-sky-400"></i> Notas Clínicas y Evolución
+                        </h3>
+                        <span id="notesCountBadge" class="text-[10px] mono text-zinc-400">3 registros</span>
+                    </div>
+
+                    <!-- Formulario rápido para agregar nueva nota o hallazgo -->
+                    <div class="flex space-x-2">
+                        <input type="text" id="newClinicalNoteInput" placeholder="Agregar hallazgo, indicación o nota de cita..." class="flex-1 bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                        <button onclick="addQuickClinicalNote()" class="px-3 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold shrink-0 transition">
+                            + Agregar
+                        </button>
+                    </div>
+
+                    <div id="clinicalNotesList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <!-- Dinámico por JS -->
+                    </div>
+                </div>
+
+                <!-- Cronograma Biomecánico de 18 Meses (Interactivo con el 3D) -->
+                <div class="apple-card-surface p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300">Secuencia Biomecánica (18 Meses)</h3>
+                        <button onclick="window.print()" class="text-[11px] text-sky-400 hover:underline flex items-center">
+                            <i class="ph-bold ph-printer mr-1"></i> Imprimir PDF
+                        </button>
+                    </div>
+                    <div id="protocolStepsContainer" class="space-y-2"></div>
+                </div>
+
+                <!-- Validación de Consentimiento y Firmas Biométricas -->
+                <div class="apple-card-surface p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center">
+                            <i class="ph-fill ph-signature mr-1.5 text-amber-400"></i> Consentimiento &amp; Firmas Biométricas
+                        </h3>
+                        <button onclick="openDigitalSignaturesModal()" class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold flex items-center space-x-1">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                            <span>Firmar en Pantalla</span>
+                        </button>
+                    </div>
+                    <div id="expedienteSignaturesPreview">
+                        <div class="p-3 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-400 flex items-center justify-between">
+                            <span>Pendiente de firma digital por paciente y especialista</span>
+                            <button onclick="openDigitalSignaturesModal()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px]">Firmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================
+             VISTA 3: VISOR 3D CLINCHECK (PURO Y ENFOCADO EN EL MODELO)
+        ================================================================== -->
+        <div id="view3DViewer" class="hidden flex-1 flex flex-col relative overflow-hidden bg-black">
+            <main id="mobileView3D" class="flex-1 flex flex-col bg-black overflow-hidden relative">
             
             <!-- LIENZO 3D PURO Y DESPEJADO -->
             <div id="canvas-wrapper" class="flex-1 relative">
@@ -1042,323 +1754,10 @@
              PANEL LATERAL DERECHO (EN DESKTOP) / VISTAS COMPLEMENTARIAS (EN MOBILE)
              En móvil se alterna limpiamente con la barra de navegación inferior.
         ------------------------------------------------------------------ -->
-        <aside id="rightWorkspacePanel" class="hidden lg:flex w-full lg:w-[460px] xl:w-[500px] border-l border-white/10 bg-[#0c0c0e] flex-col overflow-hidden shrink-0 z-20">
-            
-            <!-- =============================================================
-                 VISTA A: ODONTOGRAMA INTERACTIVO + TABLA DE STRIPPING (IPR)
-            ============================================================== -->
-            <div id="panelOdontogram" class="flex-1 overflow-y-auto p-4 space-y-4">
-                
-                <!-- Encabezado de Sección -->
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-bold text-white tracking-tight">Odontograma & Stripping (IPR)</h2>
-                        <p class="text-xs text-zinc-400">Desglose exacto Mesial y Distal por órgano dentario</p>
-                    </div>
-                    <span class="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold mono">
-                        Total Inf: 2.0 mm
-                    </span>
-                </div>
-
-                <!-- Mapa Anatómico por Cuadrantes FDI -->
-                <div class="apple-card-surface p-3.5 space-y-3">
-                    <div class="flex items-center justify-between text-[11px] text-zinc-400">
-                        <span>Toca cualquier diente para inspeccionar su IPR y raíces</span>
-                        <span class="text-rose-400 font-medium">✕ = Extraído (14,24,34,44)</span>
-                    </div>
-
-                    <!-- Arcada Superior (18 a 28) -->
-                    <div>
-                        <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold mb-1.5 text-center">Arcada Superior (Maxilar)</div>
-                        <div id="fdiGridUpper" class="grid grid-cols-7 gap-1"></div>
-                    </div>
-
-                    <!-- Arcada Inferior (48 a 38) -->
-                    <div class="pt-1 border-t border-white/5">
-                        <div id="fdiGridLower" class="grid grid-cols-7 gap-1 mt-1.5"></div>
-                        <div class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold mt-1.5 text-center">Arcada Inferior (Mandíbula)</div>
-                    </div>
-                </div>
-
-                <!-- TARJETA DETALLADA DEL DIENTE SELECCIONADO (Mesial vs Distal + Ajustes 3D) -->
-                <div class="apple-card-surface p-4 border border-sky-500/30 bg-gradient-to-b from-[#161922] to-[#121214] space-y-3.5">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div id="cardToothBadge" class="w-12 h-12 rounded-2xl bg-sky-500 text-black font-extrabold mono text-lg flex items-center justify-center shadow-md">
-                                42
-                            </div>
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <h3 id="cardToothTitle" class="text-sm font-bold text-white">Incisivo Lateral Inf. Derecho</h3>
-                                </div>
-                                <p id="cardToothRootStatus" class="text-xs text-amber-300 mt-0.5">
-                                    Raíz Única Corta (1:1.1) • Límite intrusión: 0.8 mm
-                                </p>
-                            </div>
-                        </div>
-                        <button onclick="resetSelectedToothCustom()" class="text-[11px] px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-zinc-300 transition">
-                            Restaurar
-                        </button>
-                    </div>
-
-                    <!-- Desglose Visual de Stripping (IPR): CARA MESIAL vs CARA DISTAL -->
-                    <div class="bg-black/60 p-3 rounded-2xl border border-white/10">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[11px] font-semibold uppercase tracking-wider text-amber-400 flex items-center">
-                                <i class="ph-fill ph-sparkle mr-1.5"></i> Prescripción de Stripping (IPR) en este Diente
-                            </span>
-                            <span id="cardToothTotalIPR" class="text-xs font-bold mono text-white bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
-                                Total: 0.60 mm
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 text-center items-center">
-                            <div class="p-2.5 rounded-xl bg-zinc-900/90 border border-amber-500/25">
-                                <div class="text-[10px] text-zinc-400 uppercase">Cara Mesial</div>
-                                <div id="cardIPRMesial" class="text-sm font-bold mono text-amber-300 mt-0.5">0.30 mm</div>
-                                <div class="text-[9px] text-zinc-500">Hacia línea media</div>
-                            </div>
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="w-9 h-9 rounded-full bg-zinc-800 border border-white/15 flex items-center justify-center text-xs font-bold mono text-white" id="cardCenterFDI">42</div>
-                                <span class="text-[9px] text-zinc-500 mt-1">Corona</span>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-zinc-900/90 border border-amber-500/25">
-                                <div class="text-[10px] text-zinc-400 uppercase">Cara Distal</div>
-                                <div id="cardIPRDistal" class="text-sm font-bold mono text-amber-300 mt-0.5">0.30 mm</div>
-                                <div class="text-[9px] text-zinc-500">Hacia posterior</div>
-                            </div>
-                        </div>
-                        <p id="cardIPRClinicalWhy" class="text-[11px] text-zinc-300 mt-2.5 leading-relaxed">
-                            <strong>Valor Clínico:</strong> Desbloquea la rotación severa (+38°) del lateral inferior derecho sin proinclinar los incisivos hacia la cortical vestibular delgada.
-                        </p>
-                    </div>
-
-                    <!-- Sliders Manuales de Biomecánica 3D -->
-                    <div class="space-y-2.5 pt-1">
-                        <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Ajuste Manual en Vivo (Setup 3D)</div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-zinc-300">Rotación Mesio-Distal</span>
-                                <span id="customRotVal" class="mono text-sky-400 font-semibold">0°</span>
-                            </div>
-                            <input type="range" id="customRotSlider" min="-40" max="40" step="1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-zinc-300">Torque / In-Out Labio-Lingual</span>
-                                <span id="customLabialVal" class="mono text-sky-400 font-semibold">0.0 mm</span>
-                            </div>
-                            <input type="range" id="customLabialSlider" min="-3" max="3" step="0.1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-zinc-300">Intrusión / Extrusión Vertical</span>
-                                <span id="customVertVal" class="mono text-sky-400 font-semibold">0.0 mm</span>
-                            </div>
-                            <input type="range" id="customVertSlider" min="-2.5" max="2.5" step="0.1" value="0" oninput="applyCustomToothAdjustment()" class="apple-slider w-full">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabla Completa de Stripping por Diente (Mesial y Distal) -->
-                <div class="apple-card-surface p-4 space-y-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center justify-between">
-                        <span>Tabla Maestra de Stripping (IPR) por Diente</span>
-                        <span class="text-[10px] text-amber-400 font-normal">Disco Diamantado / Tiras</span>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="border-b border-white/10 text-[10px] uppercase text-zinc-400">
-                                    <th class="py-2 pr-2">Diente</th>
-                                    <th class="py-2 px-2 text-center">Mesial</th>
-                                    <th class="py-2 px-2 text-center">Distal</th>
-                                    <th class="py-2 px-2 text-center">Total</th>
-                                    <th class="py-2 pl-2">Etapa / Justificación</th>
-                                </tr>
-                            </thead>
-                            <tbody id="iprMasterTableBody" class="divide-y divide-white/5 mono text-[11px]">
-                                <!-- Dinámico por JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- =============================================================
-                 VISTA B: GALERÍA DE FOTOS INTRAORALES Y RAYOS X + SUBIDA REAL
-            ============================================================== -->
-            <div id="panelMedia" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
-                
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-bold text-white tracking-tight">Estudios Fotográficos y Radiográficos</h2>
-                        <p class="text-xs text-zinc-400">Toca cualquier estudio para abrir en Pantalla Completa o reemplazar</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="openDoctorSiteRecordsModal()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition shrink-0">
-                            <i class="ph-bold ph-squares-four"></i>
-                            <span>Suite 3 Columnas</span>
-                        </button>
-                        <input type="file" id="batchPhotoInput" accept="image/*" multiple class="hidden" onchange="handleBatchPhotoUpload(event)">
-                        <button onclick="document.getElementById('batchPhotoInput').click()" class="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold flex items-center space-x-1.5 shadow-md transition shrink-0">
-                            <i class="ph-bold ph-upload-simple"></i>
-                            <span class="hidden sm:inline">Subir Fotos</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Botón de apertura a pantalla completa estilo ClinCheck Doctor Site -->
-                <button onclick="openDoctorSiteRecordsModal()" class="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/15 to-purple-500/15 hover:from-sky-500/25 hover:via-indigo-500/25 hover:to-purple-500/25 border border-sky-400/30 text-sky-300 font-semibold text-xs flex items-center justify-between transition shadow-sm">
-                    <div class="flex items-center space-x-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
-                            <i class="ph-bold ph-squares-four text-base"></i>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-white text-xs font-bold">Suite ClinCheck Doctor Site (3 Columnas)</div>
-                            <div class="text-[11px] text-zinc-400">Fotos Individuales (12) • Rayo X (3) • Escaneo y 3D</div>
-                        </div>
-                    </div>
-                    <i class="ph-bold ph-arrow-square-out text-base text-sky-400"></i>
-                </button>
-
-                <!-- Banner informativo amigable -->
-                <div class="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/25 flex items-start space-x-2.5 text-xs text-zinc-300">
-                    <i class="ph-fill ph-sparkle text-sky-400 text-base shrink-0 mt-0.5"></i>
-                    <div>
-                        <strong>Sincronización Clínica Activa:</strong> Puedes tocar el botón <strong>"Cargar Foto"</strong> en cada tarjeta para adjuntar las fotografías originales desde tu iPhone, iPad o Mac, o pulsar <strong>"Ver en PiP 3D"</strong> para compararlas lado a lado con el modelo 3D.
-                    </div>
-                </div>
-
-                <!-- Grid de 8 Registros Clínicos (2 Rx + 6 Fotos Intraorales) -->
-                <div id="clinicalMediaGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- Renderizado dinámico con ilustraciones clínicas de alta precisión + soporte de imagen subida -->
-                </div>
-            </div>
-
-            <!-- =============================================================
-                 VISTA C: EXPEDIENTE DEL PACIENTE, NOTAS Y PLAN DE 18 MESES
-            ============================================================== -->
-            <div id="panelClinical" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
-                
-                <!-- Tarjeta de Datos del Paciente Editable -->
-                <div class="apple-card-surface p-4 space-y-3 border border-white/10">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                                MG
-                            </div>
-                            <div>
-                                <h3 id="cardPatientName" class="text-sm font-bold text-white">Martha Gabriela Zúñiga Núñez</h3>
-                                <p id="cardPatientMeta" class="text-xs text-zinc-400">40 años • Fecha Nac: 12/09/1986 • Exp: #8819-IDI</p>
-                            </div>
-                        </div>
-                        <button onclick="openPatientModal()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-medium text-sky-400 flex items-center space-x-1 transition">
-                            <i class="ph-bold ph-pencil-simple"></i>
-                            <span>Editar</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
-                        <div class="bg-black/40 p-2.5 rounded-xl">
-                            <span class="text-[10px] text-zinc-500 uppercase block">Doctora Referidora</span>
-                            <span id="cardDoctorName" class="font-semibold text-zinc-200">Dra. Liseth Guevara Muñoz</span>
-                        </div>
-                        <div class="bg-black/40 p-2.5 rounded-xl">
-                            <span class="text-[10px] text-zinc-500 uppercase block">Centro Radiológico</span>
-                            <span id="cardClinicName" class="font-semibold text-zinc-200">IDI Mérida (12/09/2026)</span>
-                        </div>
-                    </div>
-
-                    <div class="bg-rose-500/10 border border-rose-500/25 p-3 rounded-xl text-xs space-y-1">
-                        <div class="font-bold text-rose-300 flex items-center">
-                            <i class="ph-fill ph-warning-circle mr-1.5"></i> Alerta Radiográfica Crítica (Panorámica + Lateral)
-                        </div>
-                        <p id="cardPatientDiag" class="text-zinc-300 text-[11px] leading-relaxed">
-                            Mordida abierta anterior severa (-4.5mm), enanismo radicular generalizado con ápices redondeados en sector anterior (proporción 1:1.1) y ausencia de los 4 primeros premolares (14, 24, 34, 44). Prohibida extrusión incisiva con elásticos anteriores.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Bitácora de Notas Clínicas Interactiva (+ Agregar nueva información) -->
-                <div class="apple-card-surface p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center">
-                            <i class="ph-fill ph-notebook mr-1.5 text-sky-400"></i> Notas Clínicas y Evolución
-                        </h3>
-                        <span id="notesCountBadge" class="text-[10px] mono text-zinc-400">3 registros</span>
-                    </div>
-
-                    <!-- Formulario rápido para agregar nueva nota o hallazgo -->
-                    <div class="flex space-x-2">
-                        <input type="text" id="newClinicalNoteInput" placeholder="Agregar hallazgo, indicación o nota de cita..." class="flex-1 bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
-                        <button onclick="addQuickClinicalNote()" class="px-3 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold shrink-0 transition">
-                            + Agregar
-                        </button>
-                    </div>
-
-                    <div id="clinicalNotesList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        <!-- Dinámico por JS -->
-                    </div>
-                </div>
-
-                <!-- Cronograma Biomecánico de 18 Meses (Interactivo con el 3D) -->
-                <div class="apple-card-surface p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300">Secuencia Biomecánica (18 Meses)</h3>
-                        <button onclick="window.print()" class="text-[11px] text-sky-400 hover:underline flex items-center">
-                            <i class="ph-bold ph-printer mr-1"></i> Imprimir PDF
-                        </button>
-                    </div>
-                    <div id="protocolStepsContainer" class="space-y-2"></div>
-                </div>
-
-                <!-- Validación de Consentimiento y Firmas Biométricas -->
-                <div class="apple-card-surface p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center">
-                            <i class="ph-fill ph-signature mr-1.5 text-amber-400"></i> Consentimiento &amp; Firmas Biométricas
-                        </h3>
-                        <button onclick="openDigitalSignaturesModal()" class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold flex items-center space-x-1">
-                            <i class="ph-bold ph-pencil-simple"></i>
-                            <span>Firmar en Pantalla</span>
-                        </button>
-                    </div>
-                    <div id="expedienteSignaturesPreview">
-                        <div class="p-3 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-400 flex items-center justify-between">
-                            <span>Pendiente de firma digital por paciente y especialista</span>
-                            <button onclick="openDigitalSignaturesModal()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px]">Firmar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </aside>
+        </div>
     </div>
 
-    <!-- =====================================================================
-         3. TAB BAR INFERIOR NATIVO DE iOS 18 (EXCLUSIVO PARA MÓVIL < 1024px)
-         Evita cualquier superposición y permite alternar vistas con el pulgar.
-    ====================================================================== -->
-    <!-- TAB BAR INFERIOR MOBILE SIEMPRE ENCIMA DE LA BARRA DE URL -->
-    <nav class="lg:hidden bg-[#0d0d0f]/95 backdrop-blur-2xl border-t border-white/10 grid grid-cols-4 items-center px-2 shrink-0 z-40 no-print mobile-safe-nav" style="padding-bottom: max(env(safe-area-inset-bottom, 0px), 14px); min-height: 64px;">
-        <button onclick="setMobileActiveTab('3d')" id="mobTab-3d" class="flex flex-col items-center justify-center py-1 text-[#0a84ff]">
-            <i class="ph-fill ph-cube-transparent text-xl"></i>
-            <span class="text-[10px] font-semibold mt-0.5">Visor 3D</span>
-        </button>
-        <button onclick="setMobileActiveTab('odontogram')" id="mobTab-odontogram" class="flex flex-col items-center justify-center py-1 text-zinc-400">
-            <i class="ph-fill ph-tooth text-xl"></i>
-            <span class="text-[10px] font-medium mt-0.5">Odontograma</span>
-        </button>
-        <button onclick="setMobileActiveTab('media')" id="mobTab-media" class="flex flex-col items-center justify-center py-1 text-zinc-400 relative">
-            <i class="ph-fill ph-images text-xl"></i>
-            <span class="text-[10px] font-medium mt-0.5">Fotos y Rx</span>
-            <span class="absolute top-1 right-6 w-2 h-2 rounded-full bg-emerald-400"></span>
-        </button>
-        <button onclick="setMobileActiveTab('clinical')" id="mobTab-clinical" class="flex flex-col items-center justify-center py-1 text-zinc-400">
-            <i class="ph-fill ph-clipboard-text text-xl"></i>
-            <span class="text-[10px] font-medium mt-0.5">Expediente</span>
-        </button>
-    </nav>
+
 
     <!-- =====================================================================
          4. MODAL APPLE PHOTOS LIGHTBOX (INSPECCIÓN DE RX / FOTOS + COMPARACIÓN)
@@ -1515,6 +1914,113 @@
                     Subir mi .STL
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL NUEVO PACIENTE (EXPEDIENTE CLÍNICO)
+    ====================================================================== -->
+    <div id="newPatientModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="apple-glass border border-white/20 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl space-y-4 animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400">
+                        <i class="ph-bold ph-user-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Nuevo Expediente de Paciente</h3>
+                        <p class="text-[11px] text-zinc-400">Registrar nuevo caso ortodóntico para simulación y seguimiento</p>
+                    </div>
+                </div>
+                <button onclick="closeNewPatientModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <form id="newPatientForm" onsubmit="handleSaveNewPatient(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Nombre Completo del Paciente *</label>
+                    <input type="text" id="newPatientName" required placeholder="Ej. Ana Lucía Méndez Ruiz" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Edad / F. Nacimiento *</label>
+                        <input type="text" id="newPatientAge" required placeholder="Ej. 24 años (15/03/2002)" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Estado del Tratamiento</label>
+                        <select id="newPatientStatus" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                            <option value="treatment">En Tratamiento</option>
+                            <option value="planning">Planificación 3D</option>
+                            <option value="retention">En Retención</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Doctora Tratante</label>
+                        <input type="text" id="newPatientDoctor" value="Dra. Liseth Guevara Muñoz" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Duración Estimada</label>
+                        <input type="text" id="newPatientDuration" placeholder="Ej. 18 Meses (Alineadores)" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Clínica / Sucursal</label>
+                    <input type="text" id="newPatientClinic" value="Mérida, Yucatán" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Diagnóstico Clínico Principal *</label>
+                    <textarea id="newPatientDiag" required rows="2" placeholder="Ej. Maloclusión Clase II div 1 con apiñamiento anterosuperior y curva de Spee profunda..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400 leading-relaxed"></textarea>
+                </div>
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+                    <button type="button" onclick="closeNewPatientModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-zinc-300">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white shadow-lg flex items-center space-x-1.5 transition active:scale-95">
+                        <i class="ph-bold ph-floppy-disk"></i>
+                        <span>Crear Expediente</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL DE AUTENTICACIÓN IN-APP (FALLBACK SI ACCEDE DIRECTO)
+    ====================================================================== -->
+    <div id="inAppLoginModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div class="apple-glass border border-white/20 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-5 animate-fade-in text-white text-center">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-sky-500/30">
+                <i class="ph-bold ph-lock-key"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white tracking-tight">Acceso Privado Dra. Liseth</h3>
+                <p class="text-xs text-zinc-400 mt-1">Este expediente clínico y visor 3D es de uso exclusivo para especialistas ortodoncistas autorizados.</p>
+            </div>
+            <form id="inAppLoginForm" onsubmit="handleInAppLogin(event)" class="space-y-3 text-left">
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Correo Profesional</label>
+                    <input type="email" id="inAppLoginEmail" required placeholder="dra.liseth@orthoai.com" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Contraseña Médica</label>
+                    <input type="password" id="inAppLoginPass" required placeholder="••••••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                </div>
+                <div id="inAppLoginError" class="hidden text-xs text-rose-400 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-center font-medium"></div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs shadow-lg shadow-blue-500/25 transition active:scale-95">
+                    Ingresar al Portal Clínico
+                </button>
+                <div class="flex items-center justify-between pt-1">
+                    <button type="button" onclick="autoFillInAppDoctorCredentials()" class="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">
+                        Autocompletar Credenciales
+                    </button>
+                    <a href="index.html" class="text-[11px] text-zinc-400 hover:text-white underline">
+                        Volver a Inicio
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1970,21 +2476,667 @@
             dismissPWABanner();
         }
 
+        // ============================================================================
+        // 2. SISTEMA MULTI-PACIENTES & NAVEGACIÓN HIERÁRQUICA CLINICAL SUITE
+        // ============================================================================
+        let currentAppView = 'history';
+        let activePatientId = 'patient-8819';
+        let currentPatientFilter = 'all';
+
+        const defaultPatientsDatabase = [
+            {
+                id: 'patient-8819',
+                name: 'Martha Gabriela Zúñiga Núñez',
+                initials: 'MG',
+                avatarGradient: 'from-sky-500 to-indigo-600',
+                age: '40 años (12/09/1986)',
+                recordNum: '#IDI-2026-0912',
+                doctor: 'Dra. Liseth Guevara Muñoz',
+                clinic: 'IDI Mérida, Yucatán',
+                package: 'Comprehensive Package (18 Meses)',
+                status: 'treatment',
+                statusLabel: 'En Tratamiento',
+                badgeClass: 'bg-sky-500/15 border border-sky-500/30 text-sky-400',
+                diagnosisShort: 'Clase III esquelética con Mordida Abierta Anterior (-4.5 mm)',
+                diagnosisFull: 'Maloclusión Clase III esquelética con Mordida Abierta Anterior (-4.5 mm), biprotrusión, enanismo radicular en sector anterior (proporción 1:1.1) y ausencia de los 4 primeros premolares (14, 24, 34, 44).',
+                biotype: 'Dolicofacial severo, tercio inferior aumentado, perfil cóncavo con incompetencia labial.',
+                molarClass: 'Clase III Molar bilateral • Clase III Canina bilateral invertida (-1.5 mm).',
+                overbite: 'Overbite: -4.5 mm (Mordida abierta) • Overjet: -1.5 mm (Mordida cruzada ant.)',
+                habits: 'Deglución atípica con interposición lingual anterior activa al hablar y tragar.',
+                tads: '2 Microtornillos IZC (Cresta Infrazigomática) + Barra Transpalatina (ATP).',
+                totalMonths: 18,
+                currentMonth: 0,
+                openBite: '-4.5 mm',
+                iprTotal: '2.0 mm',
+                notes: [
+                    { date: "12/09/2026", author: "Dra. Liseth Guevara", text: "Recepción de estudios IDI Mérida. Se confirma enanismo radicular generalizado con ápices redondeados y mordida abierta anterior severa (-4.5mm)." },
+                    { date: "14/09/2026", author: "CDSS OrthoAI", text: "Contraindicados elásticos intermaxilares anteriores. Se indica intrusión molar superior con 2 microtornillos IZC + Barra Transpalatina (ATP) y perla de Tucat." },
+                    { date: "16/10/2026", author: "Planificación 3D", text: "Se programa IPR selectivo anteroinferior (2.0 mm total repartido de 33 a 43) para alinear incisivos inferiores sin aumentar el IMPA." }
+                ]
+            },
+            {
+                id: 'patient-9024',
+                name: 'Carlos Eduardo Ramos Peña',
+                initials: 'CR',
+                avatarGradient: 'from-amber-500 to-orange-600',
+                age: '28 años (04/05/1998)',
+                recordNum: '#CRD-2026-1044',
+                doctor: 'Dra. Liseth Guevara Muñoz',
+                clinic: 'DentalCare Tabasco 2000',
+                package: 'Moderate Package (14 Meses)',
+                status: 'planning',
+                statusLabel: 'Planificación 3D',
+                badgeClass: 'bg-amber-500/15 border border-amber-500/30 text-amber-400',
+                diagnosisShort: 'Clase II división 1 con apiñamiento severo y sobremordida horizontal (+5.5 mm)',
+                diagnosisFull: 'Maloclusión Clase II división 1 con resalte incisivo acentuado (overjet 5.5 mm), apiñamiento severo anterosuperior, curva de Spee profunda y retrognatismo mandibular leve compensado.',
+                biotype: 'Braquifacial con musculatura maseterina potente, perfil convexo y sellado labial forzado.',
+                molarClass: 'Clase II Molar bilateral (cúspide a cúspide) • Clase II Canina derecha e izquierda (3.0 mm).',
+                overbite: 'Overbite: +3.5 mm (Sobremordida aumentada) • Overjet: +5.5 mm (Resalte aumentado)',
+                habits: 'Respiración bucal mixta nocturna y leve queilofagia en labio inferior.',
+                tads: 'Planificado anclaje esquelético posterior unilateral si no se logra distalización secuencial.',
+                totalMonths: 14,
+                currentMonth: 0,
+                openBite: '+3.5 mm',
+                iprTotal: '1.8 mm',
+                notes: [
+                    { date: "05/10/2026", author: "Dra. Liseth Guevara", text: "Inicio de registro clínico digital. Escaneo intraoral STL maxilar y mandibular completado sin incidencias." },
+                    { date: "08/10/2026", author: "Planificación 3D", text: "Modelado de curva de Spee y distalización secuencial molar superior para corrección de Clase II." }
+                ]
+            },
+            {
+                id: 'patient-9102',
+                name: 'Sofía Morales Valdés',
+                initials: 'SM',
+                avatarGradient: 'from-emerald-500 to-teal-600',
+                age: '17 años (18/11/2009)',
+                recordNum: '#CRD-2026-0811',
+                doctor: 'Dra. Liseth Guevara Muñoz',
+                clinic: 'Clínica Integral Mérida Norte',
+                package: 'Lite Package (12 Meses)',
+                status: 'treatment',
+                statusLabel: 'En Tratamiento',
+                badgeClass: 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400',
+                diagnosisShort: 'Mordida cruzada posterior unilateral derecha y overbite profundo (+4.0 mm)',
+                diagnosisFull: 'Mordida cruzada posterior unilateral derecha (16, 15 vs 46, 45) con desviación de línea media mandibular hacia la derecha (1.5 mm) y sobremordida vertical anterior profunda (+4.0 mm).',
+                biotype: 'Mesofacial con asimetría mandibular postural funcional derecha, perfil armónico recto.',
+                molarClass: 'Clase I Molar izquierda, Clase II subdivisión derecha por mordida cruzada en tijera invertida.',
+                overbite: 'Overbite: +4.0 mm (Mordida profunda) • Overjet: +2.0 mm (Normal)',
+                habits: 'Masticación unilateral predominante derecha sin hábitos deletéreos de succión ni empuje lingual.',
+                tads: 'Botón palatino sector 1 asistido por elásticos cruzados nocturnos.',
+                totalMonths: 12,
+                currentMonth: 4,
+                openBite: '+4.0 mm',
+                iprTotal: '1.2 mm',
+                notes: [
+                    { date: "20/08/2026", author: "Dra. Liseth Guevara", text: "Colocación de alineador #4. Desbloqueo transversal del sector 1 progresando favorablemente." },
+                    { date: "22/09/2026", author: "Dra. Liseth Guevara", text: "Revisión mensual: línea media mandibular centrada en 0.8 mm. Ajuste de tracking oclusal." }
+                ]
+            }
+        ];
+
+        let patientsDatabase = [];
+
+        function initMultiPatientSystem() {
+            try {
+                const stored = localStorage.getItem('ortho_patients_db');
+                if (stored) {
+                    patientsDatabase = JSON.parse(stored);
+                } else {
+                    patientsDatabase = [...defaultPatientsDatabase];
+                    savePatientsToStorage();
+                }
+            } catch (e) {
+                patientsDatabase = [...defaultPatientsDatabase];
+            }
+            renderPatientsGrid();
+            selectActivePatient(activePatientId, 'history');
+        }
+
+        function savePatientsToStorage() {
+            try {
+                localStorage.setItem('ortho_patients_db', JSON.stringify(patientsDatabase));
+            } catch (e) {}
+        }
+
+        function renderPatientsGrid(filter = currentPatientFilter, query = '') {
+            const container = document.getElementById('patientsGridContainer');
+            if (!container) return;
+
+            let filtered = patientsDatabase;
+            if (filter && filter !== 'all') {
+                filtered = filtered.filter(p => p.status === filter);
+            }
+            if (query && query.trim()) {
+                const q = query.trim().toLowerCase();
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(q) || 
+                    p.recordNum.toLowerCase().includes(q) || 
+                    p.diagnosisShort.toLowerCase().includes(q)
+                );
+            }
+
+            const totalCount = patientsDatabase.length;
+            const activeCount = patientsDatabase.filter(p => p.status === 'treatment').length;
+            const planningCount = patientsDatabase.filter(p => p.status === 'planning').length;
+
+            const statTotal = document.getElementById('statTotalPatients');
+            const statActive = document.getElementById('statActivePatients');
+            const statPlanning = document.getElementById('statPlanningPatients');
+            if (statTotal) statTotal.innerText = `${totalCount} Casos`;
+            if (statActive) statActive.innerText = `${activeCount} Activos`;
+            if (statPlanning) statPlanning.innerText = `${planningCount} En Plan`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full p-8 text-center bg-white/5 rounded-3xl border border-white/10">
+                        <i class="ph-bold ph-user-circle text-4xl text-zinc-500 mb-2"></i>
+                        <p class="text-sm font-semibold text-zinc-300">No se encontraron pacientes</p>
+                        <p class="text-xs text-zinc-500 mt-1">Prueba con otro término de búsqueda o crea un nuevo expediente.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
+                <div class="apple-card-surface p-5 rounded-3xl border border-white/10 hover:border-sky-500/30 transition shadow-lg flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${p.avatarGradient || 'from-sky-500 to-indigo-600'} flex items-center justify-center text-white font-bold text-base shadow-md shrink-0">
+                                    ${p.initials}
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-white text-sm hover:text-sky-400 transition cursor-pointer truncate" onclick="selectActivePatient('${p.id}', 'history')">${p.name}</h3>
+                                    <p class="text-xs text-zinc-400">${p.age} &bull; <span class="mono">${p.recordNum}</span></p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${p.badgeClass || 'bg-sky-500/15 border border-sky-500/30 text-sky-400'}">
+                                ${p.statusLabel}
+                            </span>
+                        </div>
+                        <p class="text-xs text-zinc-300 line-clamp-2 leading-relaxed">
+                            ${p.diagnosisShort}
+                        </p>
+                        <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 grid grid-cols-2 gap-2 text-[11px]">
+                            <div>
+                                <span class="text-zinc-500 block">Plan:</span>
+                                <span class="text-zinc-200 font-medium">${p.totalMonths} Meses (${p.currentMonth}/${p.totalMonths})</span>
+                            </div>
+                            <div>
+                                <span class="text-zinc-500 block">Overbite:</span>
+                                <span class="text-amber-300 font-semibold">${p.openBite}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 flex items-center space-x-2">
+                        <button onclick="selectActivePatient('${p.id}', 'history')" class="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center justify-center space-x-1.5 transition">
+                            <i class="ph-bold ph-clipboard-text text-amber-400"></i>
+                            <span>Historia Clínica</span>
+                        </button>
+                        <button onclick="selectActivePatient('${p.id}', 'viewer3d')" class="py-2 px-3 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-xs flex items-center justify-center space-x-1.5 shadow-md transition">
+                            <i class="ph-bold ph-cube text-white"></i>
+                            <span>3D</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPatientsList() {
+            const query = document.getElementById('patientSearchInput') ? document.getElementById('patientSearchInput').value : '';
+            renderPatientsGrid(currentPatientFilter, query);
+        }
+
+        function setPatientFilter(status) {
+            currentPatientFilter = status;
+            ['all', 'treatment', 'planning', 'retention'].forEach(s => {
+                const b = document.getElementById(`filterBtn-${s}`);
+                if (b) {
+                    if (s === status) {
+                        b.className = "px-3 py-1.5 rounded-xl bg-zinc-800 text-white font-medium shadow-sm transition";
+                    } else {
+                        b.className = "px-3 py-1.5 rounded-xl text-zinc-400 hover:text-white transition";
+                    }
+                }
+            });
+            filterPatientsList();
+        }
+
+        function selectActivePatient(patientId, targetView = 'history') {
+            activePatientId = patientId;
+            const patient = patientsDatabase.find(p => p.id === patientId) || patientsDatabase[0];
+            if (!patient) return;
+
+            const chipName = document.getElementById('headerPatientChipName');
+            const chipAvatar = document.getElementById('headerPatientAvatar');
+            if (chipName) chipName.innerText = patient.name.split(' ')[0] + ' ' + (patient.name.split(' ')[1] || '');
+            if (chipAvatar) {
+                chipAvatar.innerText = patient.initials;
+                chipAvatar.className = `w-5 h-5 rounded-full bg-gradient-to-tr ${patient.avatarGradient || 'from-sky-500 to-indigo-500'} flex items-center justify-center text-white text-[10px] font-bold`;
+            }
+
+            const histAvatar = document.getElementById('historyPatientAvatar');
+            const histName = document.getElementById('historyPatientName');
+            const histBadge = document.getElementById('historyStatusBadge');
+            const histMeta = document.getElementById('historyPatientMeta');
+            const histDiagShort = document.getElementById('historyDiagnosisShort');
+
+            if (histAvatar) {
+                histAvatar.innerText = patient.initials;
+                histAvatar.className = `w-16 h-16 rounded-2xl bg-gradient-to-tr ${patient.avatarGradient || 'from-sky-500 to-indigo-600'} flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-sky-500/25 shrink-0`;
+            }
+            if (histName) histName.innerText = patient.name;
+            if (histBadge) {
+                histBadge.innerText = patient.statusLabel;
+                histBadge.className = `px-2.5 py-0.5 rounded-full ${patient.badgeClass || 'bg-sky-500/15 border border-sky-500/30 text-sky-400'} font-semibold text-xs`;
+            }
+            if (histMeta) histMeta.innerHTML = `${patient.age} &bull; ID Exp: ${patient.recordNum} &bull; ${patient.package} &bull; ${patient.doctor}`;
+            if (histDiagShort) histDiagShort.innerText = patient.diagnosisShort;
+
+            const cDiagFull = document.getElementById('historyPatientDiagFull');
+            const cDiagCard = document.getElementById('cardPatientDiag');
+            const cBiotype = document.getElementById('historyBiotype');
+            const cMolar = document.getElementById('historyMolarClass');
+            const cOverbite = document.getElementById('historyOverbite');
+            const cHabits = document.getElementById('historyHabits');
+            const cTads = document.getElementById('historyTads');
+
+            const fullDiagText = patient.diagnosisFull || patient.diagnosisShort;
+            if (cDiagFull) cDiagFull.innerText = fullDiagText;
+            if (cDiagCard) cDiagCard.innerText = fullDiagText;
+            if (cBiotype) cBiotype.innerText = patient.biotype || 'En evaluación.';
+            if (cMolar) cMolar.innerText = patient.molarClass || 'Relación en estudio.';
+            if (cOverbite) cOverbite.innerText = patient.overbite || 'Overbite por registrar.';
+            if (cHabits) cHabits.innerText = patient.habits || 'Ninguno.';
+            if (cTads) cTads.innerText = patient.tads || 'Sin aparatología accesoria.';
+
+            // Tarjeta inferior de datos del paciente
+            const cCardName = document.getElementById('cardPatientName');
+            const cCardMeta = document.getElementById('cardPatientMeta');
+            const cCardAvatar = document.getElementById('cardPatientAvatar');
+            const cCardDoctor = document.getElementById('cardDoctorName');
+            const cCardClinic = document.getElementById('cardClinicName');
+
+            if (cCardName) cCardName.innerText = patient.name;
+            if (cCardMeta) cCardMeta.innerText = `${patient.age} • Exp: ${patient.recordNum}`;
+            if (cCardAvatar) {
+                cCardAvatar.innerText = patient.initials;
+                cCardAvatar.className = `w-10 h-10 rounded-full bg-gradient-to-tr ${patient.avatarGradient || 'from-sky-500 to-indigo-500'} flex items-center justify-center text-white font-bold text-sm shrink-0`;
+            }
+            if (cCardDoctor) cCardDoctor.innerText = patient.doctor;
+            if (cCardClinic) cCardClinic.innerText = patient.clinic;
+
+            const edName = document.getElementById('editPatientName');
+            const edAge = document.getElementById('editPatientAge');
+            const edDoc = document.getElementById('editDoctorName');
+            const edClinic = document.getElementById('editClinicName');
+            const edDiag = document.getElementById('editPatientDiag');
+            if (edName) edName.value = patient.name;
+            if (edAge) edAge.value = patient.age;
+            if (edDoc) edDoc.value = patient.doctor;
+            if (edClinic) edClinic.value = patient.clinic;
+            if (edDiag) edDiag.value = fullDiagText;
+
+            setHistoryTab('ficha');
+
+            if (patient.notes && Array.isArray(patient.notes)) {
+                clinicalNotes = patient.notes;
+                if (typeof renderClinicalNotes === 'function') renderClinicalNotes();
+            }
+
+            if (patient.id === 'patient-8819') {
+                if (typeof loadMarthaGabrielaCase === 'function') loadMarthaGabrielaCase();
+            } else if (patient.id === 'patient-9024') {
+                loadCarlosRamosCase();
+            } else if (patient.id === 'patient-9102') {
+                loadSofiaMoralesCase();
+            }
+
+            showAppView(targetView);
+        }
+
+        function loadCarlosRamosCase() {
+            function setMal(fdi, vals) {
+                if (typeof teethObjects !== 'undefined' && teethObjects[fdi]) Object.assign(teethObjects[fdi].malocclusion, vals);
+            }
+            if (typeof teethObjects !== 'undefined') {
+                Object.values(teethObjects).forEach(t => {
+                    t.malocclusion = { dx: 0, dy: 0, dz: 0, dRotX: 0, dRotY: 0, dRotZ: 0 };
+                });
+            }
+            setMal(11, { dz: 0.85, dy: 0.15, dRotX: 0.35 });
+            setMal(21, { dz: 0.85, dy: 0.15, dRotX: 0.35 });
+            setMal(12, { dz: 0.65, dx: -0.18, dRotY: -0.25 });
+            setMal(22, { dz: 0.65, dx: 0.18, dRotY: 0.25 });
+            setMal(13, { dz: 0.30, dy: 0.20 });
+            setMal(23, { dz: 0.30, dy: 0.20 });
+            setMal(41, { dy: 0.45, dz: -0.20 });
+            setMal(31, { dy: 0.45, dz: -0.20 });
+            setMal(42, { dy: 0.35, dx: 0.15 });
+            setMal(32, { dy: 0.35, dx: -0.15 });
+            if (typeof updateStageVisualization === 'function') updateStageVisualization(0);
+        }
+
+        function loadSofiaMoralesCase() {
+            function setMal(fdi, vals) {
+                if (typeof teethObjects !== 'undefined' && teethObjects[fdi]) Object.assign(teethObjects[fdi].malocclusion, vals);
+            }
+            if (typeof teethObjects !== 'undefined') {
+                Object.values(teethObjects).forEach(t => {
+                    t.malocclusion = { dx: 0, dy: 0, dz: 0, dRotX: 0, dRotY: 0, dRotZ: 0 };
+                });
+            }
+            setMal(16, { dx: -0.55, dy: 0.10 });
+            setMal(15, { dx: -0.45, dy: 0.10 });
+            setMal(46, { dx: 0.45 });
+            setMal(45, { dx: 0.35 });
+            setMal(12, { dRotY: 0.32, dx: 0.10 });
+            setMal(22, { dRotY: -0.28, dx: -0.10 });
+            if (typeof updateStageVisualization === 'function') updateStageVisualization(0);
+        }
+
+        function showAppView(viewName) {
+            currentAppView = viewName;
+            const vPatients = document.getElementById('viewPatientsList');
+            const vHistory = document.getElementById('viewPatientHistory');
+            const v3D = document.getElementById('view3DViewer');
+
+            const tabHistory = document.getElementById('headerTabHistory');
+            const tab3D = document.getElementById('headerTab3D');
+            const switcher = document.getElementById('headerViewSwitcher');
+            const backBtn = document.getElementById('headerBackBtn');
+            const backText = document.getElementById('headerBackText');
+            const patientChip = document.getElementById('headerPatientChip');
+
+            if (viewName === 'patients') {
+                if (vPatients) vPatients.classList.remove('hidden');
+                if (vHistory) vHistory.classList.add('hidden');
+                if (v3D) v3D.classList.add('hidden');
+
+                if (switcher) switcher.classList.add('hidden');
+                if (backText) backText.innerText = "Inicio";
+                if (patientChip) patientChip.classList.add('hidden');
+            } else if (viewName === 'history') {
+                if (vPatients) vPatients.classList.add('hidden');
+                if (vHistory) vHistory.classList.remove('hidden');
+                if (v3D) v3D.classList.add('hidden');
+
+                if (switcher) switcher.classList.remove('hidden');
+                if (tabHistory) {
+                    tabHistory.className = "px-3.5 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition flex items-center space-x-1.5";
+                }
+                if (tab3D) {
+                    tab3D.className = "px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5";
+                }
+                if (backText) backText.innerText = "Pacientes";
+                if (patientChip) patientChip.classList.remove('hidden');
+            } else if (viewName === 'viewer3d') {
+                if (vPatients) vPatients.classList.add('hidden');
+                if (vHistory) vHistory.classList.add('hidden');
+                if (v3D) v3D.classList.remove('hidden');
+
+                if (switcher) switcher.classList.remove('hidden');
+                if (tabHistory) {
+                    tabHistory.className = "px-3.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition flex items-center space-x-1.5";
+                }
+                if (tab3D) {
+                    tab3D.className = "px-3.5 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition flex items-center space-x-1.5";
+                }
+                if (backText) backText.innerText = "Historia";
+                if (patientChip) patientChip.classList.remove('hidden');
+
+                setTimeout(() => {
+                    if (typeof onWindowResize === 'function') onWindowResize();
+                }, 50);
+            }
+        }
+
+        function handleHeaderBack() {
+            if (currentAppView === 'viewer3d') {
+                showAppView('history');
+            } else if (currentAppView === 'history') {
+                showAppView('patients');
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function setHistoryTab(tabName) {
+            const tabs = ['ficha', 'fotos', 'odonto', 'biomecanica', 'evolucion'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`histTab-${t}`);
+                const content = document.getElementById(`histContent-${t}`);
+                if (t === tabName) {
+                    if (btn) {
+                        btn.className = "history-tab-btn active px-4 py-2 rounded-xl flex items-center space-x-2 whitespace-nowrap bg-zinc-800 text-white font-semibold shadow-sm";
+                    }
+                    if (content) content.classList.remove('hidden');
+                } else {
+                    if (btn) {
+                        btn.className = "history-tab-btn px-4 py-2 rounded-xl text-zinc-400 hover:text-white flex items-center space-x-2 whitespace-nowrap transition";
+                    }
+                    if (content) content.classList.add('hidden');
+                }
+            });
+        }
+
+        function toggleToolsDropdown() {
+            const menu = document.getElementById('toolsDropdownMenu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function closeToolsDropdown() {
+            const menu = document.getElementById('toolsDropdownMenu');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const btn = document.getElementById('toolsDropdownBtn');
+            const menu = document.getElementById('toolsDropdownMenu');
+            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Doctor Authentication & Modals
+        function checkDoctorAuth() {
+            const isAuth = localStorage.getItem('ortho_authenticated') === 'true';
+            const modal = document.getElementById('inAppLoginModal');
+            if (!isAuth) {
+                if (modal) modal.classList.remove('hidden');
+                return false;
+            } else {
+                if (modal) modal.classList.add('hidden');
+                return true;
+            }
+        }
+
+        function handleInAppLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('inAppLoginEmail').value.trim();
+            const pass = document.getElementById('inAppLoginPass').value.trim();
+            const err = document.getElementById('inAppLoginError');
+
+            if (email === 'dra.liseth@orthoai.com' && pass === 'Ortho2026!') {
+                localStorage.setItem('ortho_authenticated', 'true');
+                if (err) err.classList.add('hidden');
+                const modal = document.getElementById('inAppLoginModal');
+                if (modal) modal.classList.add('hidden');
+            } else {
+                if (err) {
+                    err.innerText = "Credenciales incorrectas. Usa dra.liseth@orthoai.com / Ortho2026!";
+                    err.classList.remove('hidden');
+                }
+            }
+        }
+
+        function autoFillInAppDoctorCredentials() {
+            const emailInput = document.getElementById('inAppLoginEmail');
+            const passInput = document.getElementById('inAppLoginPass');
+            if (emailInput) emailInput.value = 'dra.liseth@orthoai.com';
+            if (passInput) passInput.value = 'Ortho2026!';
+        }
+
+        function logoutDoctor() {
+            localStorage.removeItem('ortho_authenticated');
+            window.location.href = 'index.html';
+        }
+
+        function openNewPatientModal() {
+            const modal = document.getElementById('newPatientModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeNewPatientModal() {
+            const modal = document.getElementById('newPatientModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleSaveNewPatient(e) {
+            e.preventDefault();
+            const name = document.getElementById('newPatientName').value.trim();
+            const age = document.getElementById('newPatientAge').value.trim();
+            const status = document.getElementById('newPatientStatus').value;
+            const doctor = document.getElementById('newPatientDoctor').value.trim();
+            const duration = document.getElementById('newPatientDuration').value.trim() || '18 Meses';
+            const clinic = document.getElementById('newPatientClinic').value.trim();
+            const diag = document.getElementById('newPatientDiag').value.trim();
+
+            if (!name || !diag) return;
+
+            const parts = name.split(' ');
+            const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+            const id = 'patient-' + Date.now();
+            const randomRec = '#ORD-' + Math.floor(1000 + Math.random() * 9000);
+
+            const statusLabels = {
+                treatment: 'En Tratamiento',
+                planning: 'Planificación 3D',
+                retention: 'En Retención'
+            };
+            const badgeClasses = {
+                treatment: 'bg-sky-500/15 border border-sky-500/30 text-sky-400',
+                planning: 'bg-amber-500/15 border border-amber-500/30 text-amber-400',
+                retention: 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400'
+            };
+
+            const newPatient = {
+                id: id,
+                name: name,
+                initials: initials,
+                avatarGradient: 'from-purple-500 to-indigo-600',
+                age: age,
+                recordNum: randomRec,
+                doctor: doctor,
+                clinic: clinic,
+                package: duration,
+                status: status,
+                statusLabel: statusLabels[status] || 'En Tratamiento',
+                badgeClass: badgeClasses[status] || 'bg-sky-500/15 border border-sky-500/30 text-sky-400',
+                diagnosisShort: diag.length > 80 ? diag.substring(0, 80) + '...' : diag,
+                diagnosisFull: diag,
+                biotype: 'Estudio en proceso.',
+                molarClass: 'Evaluación de modelos 3D.',
+                overbite: 'Por determinar en ClinCheck.',
+                habits: 'Sin hábitos reportados.',
+                tads: 'Pendiente de definir anclaje.',
+                totalMonths: 18,
+                currentMonth: 0,
+                openBite: '0.0 mm',
+                iprTotal: '1.5 mm',
+                notes: [
+                    { date: new Date().toLocaleDateString('es-MX'), author: doctor, text: 'Apertura de nuevo expediente digital: ' + diag }
+                ]
+            };
+
+            patientsDatabase.unshift(newPatient);
+            savePatientsToStorage();
+            renderPatientsGrid();
+            closeNewPatientModal();
+            selectActivePatient(newPatient.id, 'history');
+        }
+
+        // Supabase Cloud Configuration Modal
+        function openSupabaseConfigModal() {
+            const modal = document.getElementById('supabaseConfigModal');
+            if (modal) modal.classList.remove('hidden');
+            const savedUrl = localStorage.getItem('ortho_supabase_url') || '';
+            const savedKey = localStorage.getItem('ortho_supabase_key') || '';
+            if (document.getElementById('supabaseUrlInput')) document.getElementById('supabaseUrlInput').value = savedUrl;
+            if (document.getElementById('supabaseAnonKeyInput')) document.getElementById('supabaseAnonKeyInput').value = savedKey;
+        }
+
+        function closeSupabaseConfigModal() {
+            const modal = document.getElementById('supabaseConfigModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveSupabaseConfig() {
+            const url = document.getElementById('supabaseUrlInput').value.trim();
+            const key = document.getElementById('supabaseAnonKeyInput').value.trim();
+            if (url && key) {
+                localStorage.setItem('ortho_supabase_url', url);
+                localStorage.setItem('ortho_supabase_key', key);
+                const statusBadge = document.getElementById('supabaseStatusBadge');
+                if (statusBadge) {
+                    statusBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold border border-emerald-500/30 flex items-center space-x-1";
+                    statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Conectado a Cloud</span>';
+                }
+                alert("¡Conexión guardada con éxito! Los datos ahora se sincronizan con tu base de datos Supabase.");
+            } else {
+                alert("Por favor ingresa tanto la URL como el Anon Key de tu proyecto Supabase.");
+            }
+            closeSupabaseConfigModal();
+        }
+
+        function copySupabaseSQLSchema() {
+            const schema = `-- OrthoAI Expert Pro v9.0 Schema
+CREATE TABLE IF NOT EXISTS patients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    full_name TEXT NOT NULL,
+    age INT,
+    medical_record_num TEXT UNIQUE,
+    doctor_name TEXT,
+    clinic_name TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS treatment_cases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
+    diagnosis TEXT,
+    active_stage INT DEFAULT 0,
+    notes JSONB DEFAULT '[]'::jsonb,
+    ipr_prescription JSONB DEFAULT '{}'::jsonb
+);
+CREATE TABLE IF NOT EXISTS digital_signatures (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    case_id UUID REFERENCES treatment_cases(id),
+    patient_signature TEXT,
+    doctor_signature TEXT,
+    sha256_cert TEXT NOT NULL
+);`;
+            navigator.clipboard.writeText(schema).then(() => {
+                alert("¡Esquema SQL copiado al portapapeles! Puedes pegarlo en el SQL Editor de tu Dashboard de Supabase.");
+            });
+        }
+
         window.onload = function () {
             const savedTheme = localStorage.getItem('ortho_theme') || 'dark';
             setTheme(savedTheme);
+            checkDoctorAuth();
             initThreeJS();
             buildFDIButtons();
             buildMasterIPRTable();
             buildDentalArches();
             refreshAllToothDecals();
             initPWAInstallation();
-            loadMarthaGabrielaCase();
+            initMultiPatientSystem();
             renderClinicalMediaGallery();
             renderClinicalNotes();
             renderProtocolSequence();
             selectTooth(42, false);
             animate();
+            showAppView('history');
         };
 
         // ============================================================================
@@ -3569,7 +4721,7 @@
                 { month: 18, badge: "Mes 13 - 18", title: "Cierre de Diastema 11-21 y Retención", desc: "Cierre del diastema central superior, logro de Overbite positivo (+1.8 mm) y control radiográfico periapical." }
             ];
 
-            document.getElementById('protocolStepsContainer').innerHTML = steps.map(s => `
+            const html = steps.map(s => `
                 <div onclick="jumpToMonth(${s.month})" class="p-3 rounded-2xl bg-black/50 border border-white/10 hover:border-sky-500/40 cursor-pointer transition">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 mono">${s.badge}</span>
@@ -3579,13 +4731,19 @@
                     <p class="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">${s.desc}</p>
                 </div>
             `).join('');
+
+            const c1 = document.getElementById('protocolStepsContainer');
+            if (c1) c1.innerHTML = html;
+            const c2 = document.getElementById('protocolStepsContainerHistory');
+            if (c2) c2.innerHTML = html;
         }
 
         function jumpToMonth(monthVal) {
             if (isPlaying) togglePlay();
-            document.getElementById('stageSlider').value = monthVal;
+            const slider = document.getElementById('stageSlider');
+            if (slider) slider.value = monthVal;
             updateStageVisualization(monthVal);
-            if (window.innerWidth < 1024) setMobileActiveTab('3d');
+            showAppView('viewer3d');
         }
 
         function openCADWorkflowModal() {
