@@ -1859,14 +1859,26 @@ create table if not exists public.patients (
             });
 
             const allFdiOrder = [...UPPER_RIGHT, ...UPPER_LEFT, ...LOWER_RIGHT, ...LOWER_LEFT];
-            const activeTeethRows = allFdiOrder
-                .map((fdi) => odoMap[fdi])
-                .filter((t) => t && (
-                    t.status !== "aligned" ||
-                    (Number(t.iprMesial || 0) + Number(t.iprDistal || 0)) > 0 ||
-                    t.manually_overridden ||
-                    (t.diagnosis && !t.diagnosis.includes("Alineación y nivelación estándar"))
-                ));
+            const allTeethRows = allFdiOrder.map((fdi) => {
+                const existing = odoMap[fdi] || {};
+                const m = Number(existing.iprMesial || 0);
+                const d = Number(existing.iprDistal || 0);
+                const status = existing.status || ((m + d) > 0 ? "ipr" : "aligned");
+                const quadrantNum = Math.floor(fdi / 10);
+                const archLabel = (quadrantNum === 1 || quadrantNum === 2) ? `Sup. C${quadrantNum}` : `Inf. C${quadrantNum}`;
+                return {
+                    toothFDI: fdi,
+                    archLabel,
+                    name: existing.name || FDI_STANDARD_NAMES[fdi] || `Órgano Dentario ${fdi}`,
+                    status,
+                    iprMesial: m,
+                    iprDistal: d,
+                    iprTotal: m + d,
+                    manually_overridden: Boolean(existing.manually_overridden),
+                    diagnosis: existing.diagnosis || (study.is_uninitialized ? "En valoración clínica inicial" : "Alineación y nivelación estándar en arco"),
+                    biomechanics: existing.biomechanics || (study.is_uninitialized ? "Pendiente de prescripción" : "Control pasivo tridimensional de corona y raíz")
+                };
+            });
 
             // Telemetría 3D .STL
             const hasUpperStl = Boolean(uploadedUpperStlFile || patient.stl_upper_url || mh.stl_upper_url || patient.has_stl);
@@ -2031,15 +2043,16 @@ create table if not exists public.patients (
                         `}
                     </section>
 
-                    <!-- 5. ODONTOGRAMA BIOMECÁNICO 2D Y TABLA DE STRIPPING (IPR MESIAL/DISTAL) -->
+                    <!-- 5. ODONTOGRAMA BIOMECÁNICO 2D Y TABLA COMPLETA DE LOS 32 ÓRGANOS DENTARIOS -->
                     <section class="border border-slate-300 rounded-xl p-2.5 bg-white">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-2 print-section-title">
                             <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950">
-                                4. Odontograma Biomecánico 2D y Prescripción de Stripping (IPR Mesial / Distal)
+                                4. Odontograma Biomecánico 2D y Detalle Completo por Órgano Dentario (32 Dientes • IPR Mesial / Distal)
                             </h2>
                             <div class="flex items-center gap-3 text-[9.5px] font-bold">
                                 <span class="text-indigo-800 mono">IPR Total Sup: ${totalUpperIpr.toFixed(1)} mm</span>
                                 <span class="text-indigo-800 mono">IPR Total Inf: ${totalLowerIpr.toFixed(1)} mm</span>
+                                <span class="text-emerald-800 mono">Total Acumulado: ${(totalUpperIpr + totalLowerIpr).toFixed(1)} mm</span>
                             </div>
                         </div>
 
@@ -2068,47 +2081,59 @@ create table if not exists public.patients (
                             </div>
                         </div>
 
-                        <!-- Tabla Desglosada de Órganos Dentarios con IPR / Hallazgos Activos -->
-                        ${activeTeethRows.length > 0 ? `
-                            <div class="mt-2 overflow-hidden rounded-lg border border-slate-200">
-                                <table class="w-full text-left border-collapse text-[9.5px]">
-                                    <thead>
-                                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 uppercase text-[8.5px]">
-                                            <th class="py-1 px-2 font-bold">OD</th>
-                                            <th class="py-1 px-2 font-bold">Órgano Dentario</th>
-                                            <th class="py-1 px-2 font-bold">Estado</th>
-                                            <th class="py-1 px-2 font-bold text-center">IPR Mesial</th>
-                                            <th class="py-1 px-2 font-bold text-center">IPR Distal</th>
-                                            <th class="py-1 px-2 font-bold text-center">Total OD</th>
-                                            <th class="py-1 px-2 font-bold">Diagnóstico y Mecánica Indicada</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-200">
-                                        ${activeTeethRows.map((t) => {
-                                            const m = Number(t.iprMesial || 0);
-                                            const d = Number(t.iprDistal || 0);
-                                            const tot = m + d;
-                                            const stLabel = t.status === "critical" ? "Crítico / TAD" : t.status === "ipr" ? "Requiere IPR" : t.status === "missing" ? "Ausente / Exod." : "Alineado";
-                                            return `
-                                                <tr class="print-avoid-break">
-                                                    <td class="py-1 px-2 font-extrabold mono text-indigo-900">OD ${t.toothFDI}</td>
-                                                    <td class="py-1 px-2 font-medium text-slate-800">${t.name || FDI_STANDARD_NAMES[t.toothFDI] || `OD ${t.toothFDI}`}</td>
-                                                    <td class="py-1 px-2 font-bold">${stLabel}</td>
-                                                    <td class="py-1 px-2 text-center mono font-bold ${m > 0 ? 'text-amber-700' : 'text-slate-400'}">${m.toFixed(1)} mm</td>
-                                                    <td class="py-1 px-2 text-center mono font-bold ${d > 0 ? 'text-amber-700' : 'text-slate-400'}">${d.toFixed(1)} mm</td>
-                                                    <td class="py-1 px-2 text-center mono font-extrabold ${tot > 0 ? 'text-emerald-700' : 'text-slate-400'}">${tot.toFixed(1)} mm</td>
-                                                    <td class="py-1 px-2 text-slate-700"><strong>${t.diagnosis || ""}:</strong> ${t.biomechanics || ""}</td>
-                                                </tr>
-                                            `;
-                                        }).join("")}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ` : `
-                            <p class="text-[9.5px] text-slate-500 mt-1.5 italic">
-                                Todos los órganos dentarios se encuentran registrados sin desgaste interproximal (IPR) ni alertas críticas activas.
-                            </p>
-                        `}
+                        <!-- Tabla Completa de los 32 Órganos Dentarios con todos sus detalles -->
+                        <div class="mt-2 overflow-hidden rounded-lg border border-slate-200">
+                            <table class="w-full text-left border-collapse text-[8.8px]">
+                                <thead>
+                                    <tr class="bg-slate-900 text-white uppercase text-[8px]">
+                                        <th class="py-1 px-1.5 font-bold">OD</th>
+                                        <th class="py-1 px-1.5 font-bold">Cuad.</th>
+                                        <th class="py-1 px-1.5 font-bold">Órgano Dentario</th>
+                                        <th class="py-1 px-1.5 font-bold">Estado Clínico</th>
+                                        <th class="py-1 px-1.5 font-bold text-center">IPR Mesial</th>
+                                        <th class="py-1 px-1.5 font-bold text-center">IPR Distal</th>
+                                        <th class="py-1 px-1.5 font-bold text-center">Total OD</th>
+                                        <th class="py-1 px-1.5 font-bold">Diagnóstico Clínico</th>
+                                        <th class="py-1 px-1.5 font-bold">Mecánica Biomecánica Indicada</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    ${allTeethRows.map((t) => {
+                                        const m = t.iprMesial;
+                                        const d = t.iprDistal;
+                                        const tot = t.iprTotal;
+                                        let stBadge = `<span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">✓ Alineado</span>`;
+                                        let rowBg = "bg-white";
+                                        if (t.status === "critical") {
+                                            stBadge = `<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300 font-bold">📌 Crítico / TAD</span>`;
+                                            rowBg = "bg-rose-50/35";
+                                        } else if (t.status === "ipr") {
+                                            stBadge = `<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-bold">💎 Requiere IPR</span>`;
+                                            rowBg = "bg-amber-50/35";
+                                        } else if (t.status === "missing") {
+                                            stBadge = `<span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 border border-slate-300 font-bold">✕ Ausente / Exod.</span>`;
+                                            rowBg = "bg-slate-50 text-slate-500";
+                                        }
+                                        return `
+                                            <tr class="${rowBg} print-avoid-break">
+                                                <td class="py-1 px-1.5 font-extrabold mono text-indigo-950 whitespace-nowrap">OD ${t.toothFDI}</td>
+                                                <td class="py-1 px-1.5 mono text-slate-500 whitespace-nowrap">${t.archLabel}</td>
+                                                <td class="py-1 px-1.5 font-semibold text-slate-900 whitespace-nowrap">${t.name}</td>
+                                                <td class="py-1 px-1.5 whitespace-nowrap">
+                                                    ${stBadge}
+                                                    ${t.manually_overridden ? `<span class="ml-0.5 text-[7.5px] font-bold text-indigo-700">(Dr.)</span>` : ""}
+                                                </td>
+                                                <td class="py-1 px-1.5 text-center mono font-bold ${m > 0 ? 'text-amber-800 bg-amber-50/70' : 'text-slate-400'}">${m.toFixed(1)} mm</td>
+                                                <td class="py-1 px-1.5 text-center mono font-bold ${d > 0 ? 'text-amber-800 bg-amber-50/70' : 'text-slate-400'}">${d.toFixed(1)} mm</td>
+                                                <td class="py-1 px-1.5 text-center mono font-extrabold ${tot > 0 ? 'text-emerald-800 bg-emerald-50/70' : 'text-slate-400'}">${tot.toFixed(1)} mm</td>
+                                                <td class="py-1 px-1.5 text-slate-800 font-medium">${t.diagnosis}</td>
+                                                <td class="py-1 px-1.5 text-slate-700">${t.biomechanics}</td>
+                                            </tr>
+                                        `;
+                                    }).join("")}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <!-- 6. PARÁMETROS CEFALOMÉTRICOS, TERAPÉUTICA AUXILIAR, RIESGOS Y RETENCIÓN -->

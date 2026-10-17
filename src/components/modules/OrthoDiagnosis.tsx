@@ -142,8 +142,8 @@ export default function OrthoDiagnosis({ data }: { data: ClinicalStudyData }) {
           </div>
         </div>
 
-        {/* Panel de Detalle Mesial / Distal del Diente Seleccionado */}
-        <div className="mt-5 bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        {/* Panel de Detalle Mesial / Distal del Diente Seleccionado (Interactivo en Pantalla) */}
+        <div className="mt-5 bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 print:hidden">
           <div>
             <div className="flex items-center gap-2.5">
               <span className="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
@@ -176,6 +176,58 @@ export default function OrthoDiagnosis({ data }: { data: ClinicalStudyData }) {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Tabla Completa de los 32 Órganos Dentarios para Exportación PDF */}
+        <div className="hidden print:block mt-4 overflow-hidden rounded-xl border border-slate-300">
+          <table className="w-full text-left border-collapse text-[10px]">
+            <thead>
+              <tr className="bg-slate-900 text-white uppercase text-[9px]">
+                <th className="py-1.5 px-2 font-bold">OD</th>
+                <th className="py-1.5 px-2 font-bold">Órgano Dentario</th>
+                <th className="py-1.5 px-2 font-bold">Estado</th>
+                <th className="py-1.5 px-2 font-bold text-center">IPR Mesial</th>
+                <th className="py-1.5 px-2 font-bold text-center">IPR Distal</th>
+                <th className="py-1.5 px-2 font-bold text-center">Total OD</th>
+                <th className="py-1.5 px-2 font-bold">Diagnóstico Clínico</th>
+                <th className="py-1.5 px-2 font-bold">Mecánica Biomecánica</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {[...UPPER_RIGHT, ...UPPER_LEFT, ...LOWER_RIGHT, ...LOWER_LEFT].map((fdi) => {
+                const t = data.odontogram[fdi] || {
+                  toothFDI: fdi,
+                  name: `Órgano Dentario ${fdi}`,
+                  status: "aligned" as const,
+                  diagnosis: "Alineación y nivelación estándar en arco",
+                  iprMesial: 0,
+                  iprDistal: 0,
+                  biomechanics: "Control pasivo tridimensional de corona y raíz",
+                };
+                const total = t.iprMesial + t.iprDistal;
+                return (
+                  <tr key={fdi} className="break-inside-avoid">
+                    <td className="py-1 px-2 font-extrabold text-indigo-950">OD {fdi}</td>
+                    <td className="py-1 px-2 font-semibold text-slate-900">{t.name}</td>
+                    <td className="py-1 px-2 font-bold">
+                      {t.status === "critical"
+                        ? "Crítico / TAD"
+                        : t.status === "ipr"
+                        ? "Requiere IPR"
+                        : t.status === "missing"
+                        ? "Ausente / Exod."
+                        : "Alineado"}
+                    </td>
+                    <td className="py-1 px-2 text-center font-bold">{t.iprMesial.toFixed(1)} mm</td>
+                    <td className="py-1 px-2 text-center font-bold">{t.iprDistal.toFixed(1)} mm</td>
+                    <td className="py-1 px-2 text-center font-extrabold">{total.toFixed(1)} mm</td>
+                    <td className="py-1 px-2 text-slate-800">{t.diagnosis}</td>
+                    <td className="py-1 px-2 text-slate-700">{t.biomechanics}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
 
