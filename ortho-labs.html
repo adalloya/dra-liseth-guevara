@@ -153,7 +153,7 @@
                         class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
                     >
                         <i class="ph-bold ph-sparkle text-amber-300"></i>
-                        <span>Asistente IA</span>
+                        <span>Sandy IA</span>
                     </button>
                     <button
                         onclick="openNewPatientModal()"
@@ -746,7 +746,7 @@
                             Conecta la cuenta de Google de la Dra. Liseth Guevara Muñoz
                         </h2>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Inicia sesión una sola vez con tu cuenta de Google para traer automáticamente tu calendario a este Hub. Podrás crear, mover o cancelar citas directamente aquí o pidiéndoselo al Asistente IA con Gemini 4 Argon.
+                            Inicia sesión una sola vez con tu cuenta de Google para traer automáticamente tu calendario a este Hub. Podrás crear, mover o cancelar citas directamente aquí o pidiéndoselo a Sandy, tu Asistente Virtual con IA.
                         </p>
                     </div>
                     <button
@@ -760,7 +760,7 @@
                 </div>
             </div>
 
-            <!-- BARRA DE COMANDO CONVERSACIONAL IA (GESTIÓN DEL CALENDARIO MEDIANTE EL ASISTENTE) -->
+            <!-- BARRA DE COMANDO CONVERSACIONAL IA (GESTIÓN DEL CALENDARIO MEDIANTE SANDY) -->
             <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
                 <form onsubmit="handleCalendarHubAiCommand(event)" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div class="flex items-center gap-2.5 flex-1">
@@ -770,7 +770,7 @@
                         <input
                             id="calHubAiCommandInput"
                             type="text"
-                            placeholder="Pídele al Asistente gestionar tu agenda: 'Agendar a Martha el jueves a las 11am para TADs', 'Mover cita de Carlos al viernes 4pm' o 'Cancelar cita'..."
+                            placeholder="Pídele a Sandy gestionar tu agenda: 'Sandy, agenda a Martha el jueves a las 11am para TADs', 'Mover cita de Carlos al viernes 4pm' o 'Cancelar cita'..."
                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                         />
                     </div>
@@ -781,7 +781,7 @@
                             class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
                         >
                             <i class="ph-bold ph-magic-wand text-amber-300"></i>
-                            <span id="btnCalHubAiSubmitText">Ejecutar con IA en Agenda</span>
+                            <span id="btnCalHubAiSubmitText">Pedir a Sandy IA</span>
                         </button>
                         <button
                             type="button"
@@ -872,15 +872,15 @@
 
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between gap-3">
                         <div>
-                            <strong class="text-slate-900 block">💡 Gestión Dual (Hub + Asistente IA)</strong>
-                            <span>Cualquier cambio que hagas aquí o por voz en el Asistente actualiza tu agenda al instante.</span>
+                            <strong class="text-slate-900 block">💡 Gestión Dual (Hub + Sandy IA)</strong>
+                            <span>Cualquier cambio que hagas aquí o por voz con Sandy actualiza tu agenda al instante.</span>
                         </div>
                         <button
                             type="button"
                             onclick="toggleOrthoAssistantDrawer(true)"
                             class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl shrink-0"
                         >
-                            Abrir Chat IA
+                            Hablar con Sandy
                         </button>
                     </div>
                 </div>
@@ -1182,10 +1182,10 @@
                     <button
                         onclick="toggleOrthoAssistantDrawer(true)"
                         class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                        title="Abrir Asistente Clínico Argon & Google Calendar"
+                        title="Abrir a Sandy • Asistente Virtual & Google Calendar"
                     >
                         <i class="ph-bold ph-calendar-check text-emerald-600"></i>
-                        <span>Agenda IA</span>
+                        <span>Sandy IA</span>
                     </button>
                     <button
                         onclick="openStlViewerModal()"
@@ -2190,11 +2190,11 @@ create table if not exists public.patients (
         id="floatingAssistantBtn"
         onclick="toggleOrthoAssistantDrawer(true)"
         class="fixed bottom-5 right-5 z-40 bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2.5 transition transform hover:scale-105 no-print"
-        title="Abrir Asistente Clínico Inteligente & Google Calendar"
+        title="Abrir a Sandy • Asistente Virtual & Google Calendar"
     >
         <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
         <i class="ph-bold ph-calendar-check text-indigo-400 text-base"></i>
-        <span class="text-xs font-bold">Asistente Argon & Calendar</span>
+        <span class="text-xs font-bold">Sandy • Asistente IA</span>
     </button>
 
     <div
@@ -2206,19 +2206,19 @@ create table if not exists public.patients (
             class="w-full max-w-md bg-white h-full shadow-2xl border-l border-slate-200 flex flex-col justify-between overflow-hidden"
             onclick="event.stopPropagation()"
         >
-            <!-- Cabecera del Asistente -->
+            <!-- Cabecera del Asistente (Sandy) -->
             <div class="p-4 bg-slate-900 text-white flex justify-between items-center gap-2">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-lg shadow-sm">
-                        🤖
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-sm font-extrabold shadow-sm">
+                        ✨
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <h3 class="text-xs font-bold tracking-tight">Asistente Clínico & Google Calendar</h3>
+                            <h3 class="text-xs font-bold tracking-tight">Sandy • Asistente Virtual & Google Calendar</h3>
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         </div>
                         <p id="assistantContextSubtitle" class="text-[10px] text-slate-300">
-                            Dra. Liseth Guevara Muñoz • Gemini 4 Argon Activo
+                            Dra. Liseth Guevara Muñoz • Sandy IA Activa
                         </p>
                     </div>
                 </div>
@@ -2297,7 +2297,7 @@ create table if not exists public.patients (
                 </button>
             </div>
 
-            <!-- Historial de Conversación con el Asistente -->
+            <!-- Historial de Conversación con Sandy -->
             <div id="orthoAssistantMessages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-white"></div>
 
             <!-- Barra de Entrada por Voz / Texto Natural -->
@@ -2305,7 +2305,7 @@ create table if not exists public.patients (
                 <input
                     id="orthoAssistantInput"
                     type="text"
-                    placeholder="Ej. Agendar control de Martha el jueves a las 11 am..."
+                    placeholder="Pídele a Sandy: 'Agenda a Martha el jueves a las 11 am'..."
                     class="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 />
                 <button
@@ -3760,7 +3760,7 @@ create table if not exists public.patients (
                             class="no-print w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl py-1.5 px-2.5 text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
                         >
                             <i class="ph-bold ph-calendar-plus"></i>
-                            <span>Agendar Etapa en Google Calendar</span>
+                            <span>Agendar Etapa con Sandy en Calendar</span>
                         </button>
                     </div>
                 </div>
@@ -5168,12 +5168,12 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
         }
 
         // ---------------------------------------------------------------------
-        // 9. ASISTENTE CLÍNICO INTELIGENTE + GOOGLE CALENDAR HUB (CONEXIÓN ÚNICA)
+        // 9. SANDY (ASISTENTE VIRTUAL IA) + GOOGLE CALENDAR HUB (CONEXIÓN ÚNICA)
         // ---------------------------------------------------------------------
         let orthoAssistantHistory = [
             {
                 role: "assistant",
-                text: "Hola, Dra. Liseth 👋. Soy tu Asistente Clínico con Gemini 4 Argon sincronizado de forma permanente con tu Google Calendar.\n\nPuedes gestionar tus citas directamente en el Calendar Hub o pedirme por aquí:\n• \"Agendar a Martha el jueves a las 11am para TADs\"\n• \"Mover la cita de Carlos al viernes a las 4pm\"\n• \"Cancelar la cita de mañana\" o \"Preparar briefing y charola del día\".",
+                text: "¡Hola, Dra. Liseth! 👋 Soy Sandy, tu Asistente Virtual de Ortodoncia sincronizada de forma permanente con tu Google Calendar.\n\nPuedes gestionar tus citas directamente en el Calendar Hub o pedirme por aquí:\n• \"Sandy, agenda a Martha el jueves a las 11am para TADs\"\n• \"Mover la cita de Carlos al viernes a las 4pm\"\n• \"Cancelar la cita de mañana\" o \"Preparar briefing y charola del día\".",
                 appointment: null
             }
         ];
@@ -6099,7 +6099,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 const nameRegex = /(?:agendar?\s+a|cita\s+(?:para|de|con)|paciente|mover\s+(?:a|cita\s+de)|cancelar\s+(?:a|cita\s+de)|para)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,2})/i;
                 const m = promptText.match(nameRegex);
                 if (m && m[1]) {
-                    const stopWords = /^(el|la|los|las|un|una|hoy|manana|mañana|lunes|martes|miercoles|miércoles|jueves|viernes|sabado|sábado|domingo|etapa|mes|control|valoracion|valoración)$/i;
+                    const stopWords = /^(sandy|el|la|los|las|un|una|hoy|manana|mañana|lunes|martes|miercoles|miércoles|jueves|viernes|sabado|sábado|domingo|etapa|mes|control|valoracion|valoración)$/i;
                     const candidateWords = m[1].trim().split(/\s+/).filter((w) => !stopWords.test(w));
                     if (candidateWords.length > 0) {
                         extractedPatientName = candidateWords.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
@@ -6210,12 +6210,12 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 intent: isCancel ? "cancel_appointment" : isMove ? "reschedule_appointment" : isSchedule ? "schedule_appointment" : "clinical_query",
                 targetPatientName: extractedPatientName,
                 reply: isCancel
-                    ? `✓ He cancelado la cita de ${extractedPatientName} en tu Agenda del Hub.`
+                    ? `✓ Soy Sandy: he cancelado la cita de ${extractedPatientName} en tu Agenda del Hub.`
                     : isMove
-                    ? `✓ He reprogramado la cita de ${extractedPatientName} (${stageIdentified}) para el ${dateNice} (${durationMinutes} min en sillón).`
+                    ? `✓ Soy Sandy: he reprogramado la cita de ${extractedPatientName} (${stageIdentified}) para el ${dateNice} (${durationMinutes} min en sillón).`
                     : isSchedule
-                    ? `¡Listo, Dra. Liseth! Identifiqué a **${extractedPatientName}** en **${stageIdentified}**. He agendado su cita de "${procedureTitle}" para el **${dateNice}** (${durationMinutes} min en sillón). Charola lista: ${chairsidePrep}.`
-                    : `📋 Resumen de **${extractedPatientName}**:\n• Etapa actual: ${stageIdentified} — ${procedureTitle}.\n• Diagnóstico: ${matchedPat?.study_data?.summary?.skeletal || "En seguimiento"} (${matchedPat?.study_data?.summary?.vertical || "Control activo"}).\n• Preparación sugerida en sillón: ${chairsidePrep}.`,
+                    ? `¡Listo, Dra. Liseth! Soy Sandy ✨. Identifiqué a **${extractedPatientName}** en **${stageIdentified}**. He agendado su cita de "${procedureTitle}" para el **${dateNice}** (${durationMinutes} min en sillón). Charola lista: ${chairsidePrep}.`
+                    : `📋 Resumen de Sandy para **${extractedPatientName}**:\n• Etapa actual: ${stageIdentified} — ${procedureTitle}.\n• Diagnóstico: ${matchedPat?.study_data?.summary?.skeletal || "En seguimiento"} (${matchedPat?.study_data?.summary?.vertical || "Control activo"}).\n• Preparación sugerida en sillón: ${chairsidePrep}.`,
                 appointment: (isSchedule || isMove) ? {
                     patientName: extractedPatientName,
                     stageIdentified,
@@ -6231,7 +6231,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
         async function sendOrthoAssistantPrompt(promptText, fromCalendarHub = false) {
             const activePat = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             orthoAssistantHistory.push({ role: "user", text: promptText, appointment: null });
-            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Identificando paciente, etapa clínica y sincronizando con el Calendar Hub...", appointment: null });
+            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Sandy está identificando paciente, etapa clínica y sincronizando con el Calendar Hub...", appointment: null });
             renderOrthoAssistantMessages();
 
             const sendBtn = document.getElementById("btnOrthoAssistantSend");
@@ -6262,8 +6262,8 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                     evolutionNotes: (p.evolution_notes || p.medical_history?.evolution_notes || []).slice(0, 3)
                 }));
 
-                const systemInstruction = `Eres el Asistente Clínico Inteligente de Ortodoncia y Coordinador del Google Calendar Hub de la Dra. Liseth Guevara Muñoz (${getConnectedDoctorEmail()}).
-Tu misión es leer con total atención lo que pide o pregunta la doctora:
+                const systemInstruction = `Te llamas Sandy y eres la Asistente Virtual Inteligente de Ortodoncia y Coordinadora del Google Calendar Hub de la Dra. Liseth Guevara Muñoz (${getConnectedDoctorEmail()}).
+Tu misión como Sandy es leer con total atención lo que pide o pregunta la doctora:
 1. IDENTIFICAR AL PACIENTE exacto que menciona la doctora en su mensaje (búscalo en el catálogo de pacientes por nombre o apellido; si la doctora menciona un nombre nuevo que aún no está en el catálogo, usa ese nombre nuevo exactamente; solo usa el paciente activo en pantalla si la doctora dice "este paciente" o no menciona ningún nombre).
 2. IDENTIFICAR LA ETAPA CLÍNICA ('stageIdentified') en la que va el paciente según su 'roadmapStages' / 'evolutionNotes' o según el procedimiento específico que pide la doctora (ej. Etapa 1 Cementado, Etapa 2 Nivelación/IPR, Etapa 3 TADs/Intrusión, Retiro, Valoración Inicial).
 3. CALCULAR LA FECHA Y HORA EXACTA ('startIso' en formato YYYY-MM-DDTHH:mm:00) usando esta tabla oficial de los próximos 14 días:
@@ -6279,7 +6279,7 @@ Citas actuales en el calendario del Hub: ${JSON.stringify(scheduledAppointments)
 Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 {
   "intent": "schedule_appointment" | "reschedule_appointment" | "cancel_appointment" | "daily_briefing" | "clinical_query" | "whatsapp_reminder",
-  "reply": "Respuesta directa, personalizada y clínica para la Dra. Liseth Guevara Muñoz mencionando al paciente identificado, la etapa en la que va, la fecha/hora exacta y el material de sillón",
+  "reply": "Respuesta directa, personalizada y clínica firmada como Sandy para la Dra. Liseth Guevara Muñoz mencionando al paciente identificado, la etapa en la que va, la fecha/hora exacta y el material de sillón",
   "targetPatientName": "Nombre del paciente identificado",
   "appointment": null o {
     "patientName": "Nombre completo del paciente identificado",

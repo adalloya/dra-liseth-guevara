@@ -30,7 +30,7 @@ export default function OrthoAssistantChat({
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      text: "Hola, Dra. Liseth. Soy tu Asistente Clínico de Ortodoncia con Gemini 4 Argon y Google Calendar. Puedo agendar citas calculando el tiempo de sillón ideal (TADs, IPR, cambio de arcos), prepararte el briefing clínico del día o redactar recordatorios de WhatsApp para tus pacientes.",
+      text: "¡Hola, Dra. Liseth! 👋 Soy Sandy, tu Asistente Virtual de Ortodoncia sincronizada con tu Google Calendar. Puedo identificar a tus pacientes, ver en qué etapa van, agendar sus citas calculando el tiempo de sillón ideal (TADs, IPR, cambio de arcos), prepararte el briefing del día o redactar recordatorios de WhatsApp.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -100,7 +100,7 @@ export default function OrthoAssistantChat({
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
           <div>
             <h3 className="text-xs font-bold text-slate-900">
-              🤖 Asistente Clínico Argon & Google Calendar
+              ✨ Sandy • Asistente Virtual & Google Calendar
             </h3>
             <p className="text-[10px] text-slate-500">
               Dra. Liseth Guevara Muñoz • Agenda Inteligente de Sillón
