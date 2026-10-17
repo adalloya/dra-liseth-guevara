@@ -3879,52 +3879,104 @@ create table if not exists public.patients (
          MODAL 1: PORTAL DE PACIENTE EN TABLET / SILLÓN / LINK REMOTO
          (src/components/modules/BudgetAndConsentTablet.tsx)
     ====================================================================== -->
-    <div id="patientSelfServicePortalModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[94vh] overflow-y-auto border border-slate-200 shadow-2xl p-5 sm:p-7 space-y-6 my-auto" onclick="event.stopPropagation()">
-            <!-- Cabecera del Portal con Logo y Título -->
-            <div class="flex justify-between items-start gap-4 border-b border-slate-100 pb-4">
-                <div class="flex items-center gap-3">
-                    <img src="ortho-hub-logo.png" alt="Dra. Liseth Guevara" class="w-12 h-12 rounded-2xl object-contain shadow-xs shrink-0" />
-                    <div>
-                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            Dra. Liseth Guevara Muñoz • Especialista en Ortodoncia
-                        </span>
-                        <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
-                            Portal de Admisión, Selección de Plan y Consentimiento Digital
-                        </h3>
-                        <p class="text-xs text-slate-500">
-                            Expediente para: <strong id="portalPatientDisplayName" class="text-indigo-950">Martha Gabriela Zúñiga</strong>
-                        </p>
+    <div id="patientSelfServicePortalModal" class="hidden fixed inset-0 z-50 bg-[#f8fafc] text-slate-900 overflow-y-auto flex flex-col min-h-screen no-print">
+        
+        <!-- Top Bar Oficial del Portal Clínico (Full-Width, Branded Apple Health Style) -->
+        <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3.5 shadow-2xs shrink-0">
+            <div class="max-w-4xl mx-auto flex justify-between items-center gap-3">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <img src="ortho-hub-logo.png" alt="CRD Ortho" class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-contain shadow-xs shrink-0" />
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+                                Dra. Liseth Guevara Muñoz
+                            </span>
+                            <span class="text-xs text-slate-400 hidden sm:inline">• Ortodoncia y Ortopedia Maxilar</span>
+                        </div>
+                        <h2 class="text-xs sm:text-base font-black text-slate-900 truncate mt-0.5">
+                            Portal de Admisión & Consentimiento Digital
+                        </h2>
                     </div>
                 </div>
-                <button
-                    type="button"
-                    onclick="closePatientSelfServicePortal()"
-                    class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm font-bold transition shrink-0"
-                    title="Cerrar y volver al expediente"
-                >
-                    ✕
-                </button>
+
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <div class="hidden md:flex flex-col text-right">
+                        <span class="text-[9.5px] font-bold uppercase tracking-wider text-slate-400">Paciente</span>
+                        <strong id="portalPatientDisplayName" class="text-xs font-black text-slate-900 truncate max-w-[200px]">Martha Gabriela Zúñiga</strong>
+                    </div>
+                    <button
+                        type="button"
+                        id="portalHeaderExitBtn"
+                        onclick="closePatientSelfServicePortal()"
+                        class="px-3 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
+                        title="Salir del Modo Paciente y volver al expediente"
+                    >
+                        <i class="ph-bold ph-x text-sm"></i>
+                        <span>Salir</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Barra de Progreso de 5 Pasos -->
-            <div class="grid grid-cols-5 gap-1.5 text-center text-[10.5px] font-extrabold uppercase tracking-wider">
-                <div id="portalStepIndicator-1" class="py-2 rounded-xl transition bg-indigo-600 text-white shadow-xs">
-                    1. Selfie
-                </div>
-                <div id="portalStepIndicator-2" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
-                    2. Salud
-                </div>
-                <div id="portalStepIndicator-3" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
-                    3. Plan
-                </div>
-                <div id="portalStepIndicator-4" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
-                    4. Legal
-                </div>
-                <div id="portalStepIndicator-5" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
-                    5. Firma
-                </div>
+            <!-- Línea de Progreso Superior -->
+            <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden max-w-4xl mx-auto">
+                <div id="portalTopProgressBar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: 20%;"></div>
             </div>
+        </header>
+
+        <!-- Stepper Visual Interactivo de 5 Pasos -->
+        <div class="bg-white border-b border-slate-200 px-3 sm:px-4 py-2.5 shrink-0">
+            <div class="max-w-4xl mx-auto grid grid-cols-5 gap-1 sm:gap-2 text-center">
+                <button
+                    type="button"
+                    onclick="setPortalStep(1)"
+                    id="portalStepIndicator-1"
+                    class="py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-indigo-600 text-white shadow-xs"
+                >
+                    <span class="text-sm">📸</span>
+                    <span class="truncate">1. Selfie</span>
+                </button>
+                <button
+                    type="button"
+                    onclick="setPortalStep(2)"
+                    id="portalStepIndicator-2"
+                    class="py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400"
+                >
+                    <span class="text-sm">🩺</span>
+                    <span class="truncate">2. Salud</span>
+                </button>
+                <button
+                    type="button"
+                    onclick="setPortalStep(3)"
+                    id="portalStepIndicator-3"
+                    class="py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400"
+                >
+                    <span class="text-sm">✨</span>
+                    <span class="truncate">3. Plan</span>
+                </button>
+                <button
+                    type="button"
+                    onclick="setPortalStep(4)"
+                    id="portalStepIndicator-4"
+                    class="py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400"
+                >
+                    <span class="text-sm">📋</span>
+                    <span class="truncate">4. Legal</span>
+                </button>
+                <button
+                    type="button"
+                    onclick="setPortalStep(5)"
+                    id="portalStepIndicator-5"
+                    class="py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400"
+                >
+                    <span class="text-sm">✍️</span>
+                    <span class="truncate">5. Firma</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenedor Principal a Pantalla Completa con UX Táctil Espacioso -->
+        <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col justify-start">
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-5 sm:p-8 space-y-6">
 
             <!-- PASO 1: SELFIE DE PERFIL -->
             <div id="portalStepSection-1" class="space-y-4 text-center">
@@ -4331,7 +4383,20 @@ create table if not exists public.patients (
                     </button>
                 </div>
             </div>
-        </div>
+        </main>
+
+        <!-- Footer Clínico Seguro Oficial del Portal -->
+        <footer class="mt-auto py-4 px-6 border-t border-slate-200 bg-white/90 backdrop-blur-xs text-center text-xs text-slate-500 shrink-0">
+            <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                <div class="flex items-center gap-2 text-slate-600 font-medium">
+                    <i class="ph-fill ph-shield-check text-emerald-600 text-base"></i>
+                    <span>Consentimiento Informado Digital • Cifrado de Grado Médico SSL</span>
+                </div>
+                <div class="text-[11px] text-slate-400">
+                    © Dra. Liseth Guevara Muñoz • Registro Sanitario & Protección de Datos LFPDPPP
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- =====================================================================
@@ -4658,23 +4723,30 @@ create table if not exists public.patients (
                 savePatientsLocal();
             }
 
-            // Conectar con Supabase Cloud automáticamente
-            await initSupabaseConnection();
-
             renderPatientsList();
-            openPatientWorkspace(activePatientId, false);
-            showDashboardView();
 
             // Detectar si la URL se abrió en modo Portal del Paciente (?portal=patient&id=...)
+            let isPatientPortalUrl = false;
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get("portal") === "patient" || urlParams.get("mode") === "patient") {
+                    isPatientPortalUrl = true;
                     const targetPatId = urlParams.get("id") || urlParams.get("patient_id") || activePatientId;
-                    setTimeout(() => {
-                        launchPatientSelfServicePortal(targetPatId);
-                    }, 400);
+                    launchPatientSelfServicePortal(targetPatId);
                 }
             } catch (err) {}
+
+            if (!isPatientPortalUrl) {
+                openPatientWorkspace(activePatientId, false);
+                showDashboardView();
+            }
+
+            // Conectar con Supabase Cloud en segundo plano sin demorar la carga de la vista
+            initSupabaseConnection().then(() => {
+                if (!isPatientPortalUrl) {
+                    renderPatientsList();
+                }
+            }).catch(() => {});
 
             // Inicializar visibilidad del botón de instalación PWA
             if (isIosDevice && !checkIsAppStandalone()) {
@@ -12030,7 +12102,35 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
             validatePortalLegalStep();
 
             setPortalStep(1);
-            document.getElementById("patientSelfServicePortalModal")?.classList.remove("hidden");
+            const portalModal = document.getElementById("patientSelfServicePortalModal");
+            if (portalModal) {
+                portalModal.classList.remove("hidden");
+                portalModal.scrollTo({ top: 0, behavior: "instant" });
+            }
+
+            // Ocultar la barra superior global de administración médica para que el portal sea 100% pantalla completa
+            const globalHeader = document.getElementById("globalAppHeader");
+            if (globalHeader) globalHeader.classList.add("hidden");
+
+            // Si se accede directamente vía URL de paciente (?portal=patient), personalizar el botón de salida
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const isDirectPortalUrl = urlParams.get("portal") === "patient" || urlParams.get("mode") === "patient";
+                const exitBtn = document.getElementById("portalHeaderExitBtn");
+                if (exitBtn) {
+                    if (isDirectPortalUrl) {
+                        exitBtn.innerHTML = `<i class="ph-bold ph-arrow-counter-clockwise text-sm"></i><span>Reiniciar</span>`;
+                        exitBtn.onclick = () => {
+                            if (confirm("¿Deseas reiniciar el formulario de registro?")) {
+                                setPortalStep(1);
+                            }
+                        };
+                    } else {
+                        exitBtn.innerHTML = `<i class="ph-bold ph-x text-sm"></i><span>Salir</span>`;
+                        exitBtn.onclick = () => closePatientSelfServicePortal();
+                    }
+                }
+            } catch (e) {}
 
             // Inicializar canvas táctil
             setTimeout(() => {
@@ -12040,6 +12140,9 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
 
         function closePatientSelfServicePortal() {
             document.getElementById("patientSelfServicePortalModal")?.classList.add("hidden");
+            const globalHeader = document.getElementById("globalAppHeader");
+            if (globalHeader) globalHeader.classList.remove("hidden");
+
             const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
             if (patient) {
                 renderBudgetAndConsentModule(patient);
@@ -12049,6 +12152,14 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
         }
 
         function setPortalStep(stepNum) {
+            // Actualizar barra de progreso superior interactiva
+            const progressPercentages = { 1: "20%", 2: "40%", 3: "60%", 4: "80%", 5: "95%", 6: "100%" };
+            const progressBar = document.getElementById("portalTopProgressBar");
+            if (progressBar && progressPercentages[stepNum]) {
+                progressBar.style.width = progressPercentages[stepNum];
+            }
+
+            // Actualizar visibilidad de secciones y estado de los botones del stepper
             for (let i = 1; i <= 6; i++) {
                 const sec = document.getElementById(`portalStepSection-${i}`);
                 if (sec) {
@@ -12058,13 +12169,19 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                 const ind = document.getElementById(`portalStepIndicator-${i}`);
                 if (ind) {
                     if (i === stepNum) {
-                        ind.className = "py-2 rounded-xl transition bg-indigo-600 text-white shadow-xs";
+                        ind.className = "py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-500/30";
                     } else if (i < stepNum) {
-                        ind.className = "py-2 rounded-xl transition bg-emerald-100 text-emerald-800 font-bold";
+                        ind.className = "py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200";
                     } else {
-                        ind.className = "py-2 rounded-xl transition bg-slate-100 text-slate-400";
+                        ind.className = "py-2 px-1 rounded-xl transition text-[10px] sm:text-xs font-extrabold flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400 hover:bg-slate-200";
                     }
                 }
+            }
+
+            // Desplazar al inicio del portal para lectura cómoda en iPads y celulares
+            const portalModal = document.getElementById("patientSelfServicePortalModal");
+            if (portalModal) {
+                portalModal.scrollTo({ top: 0, behavior: "smooth" });
             }
 
             if (stepNum === 5) {
