@@ -26,24 +26,52 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Reglas de Impresión / Exportación PDF Limpia (Módulo 4 PDF) */
+        /* Reglas de Impresión / Exportación PDF Limpia e Integral (Módulo 4 PDF) */
+        @page {
+            size: letter;
+            margin: 9mm 11mm;
+        }
         @media print {
-            body {
+            html, body {
                 background: #ffffff !important;
                 color: #0f172a !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: 0 !important;
+                height: auto !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
+            #viewDashboard,
+            #viewPatientWorkspace > header,
+            #screenInteractiveMain,
             .no-print {
                 display: none !important;
+            }
+            #viewPatientWorkspace {
+                display: block !important;
+                min-height: 0 !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #printFullReportContainer {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .print-only {
                 display: block !important;
             }
-            .print-break-inside-avoid {
+            .print-avoid-break {
                 break-inside: avoid;
+                page-break-inside: avoid;
             }
-            main {
-                max-width: 100% !important;
-                padding: 0 !important;
+            .print-section-title {
+                break-after: avoid;
+                page-break-after: avoid;
             }
         }
     </style>
@@ -196,7 +224,7 @@
                         <span>Visor .STL</span>
                     </button>
                     <button
-                        onclick="window.print()"
+                        onclick="exportPatientPdf()"
                         class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
                     >
                         <i class="ph-bold ph-printer"></i>
@@ -206,23 +234,11 @@
             </div>
         </header>
 
-        <!-- Encabezado Exclusivo para Impresión / PDF Formal -->
-        <div class="hidden print-only max-w-6xl mx-auto px-6 pt-6 pb-4 border-b-2 border-slate-900 mb-6">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-indigo-600">Clínica de Rehabilitación Dental y Ortodoncia</p>
-                    <h1 id="printPatientTitle" class="text-2xl font-extrabold text-slate-900 mt-1">Martha Gabriela Zúñiga Núñez</h1>
-                    <p id="printPatientMeta" class="text-xs text-slate-600 mt-0.5">Dra. Liseth Guevara Muñoz • Especialista en Ortodoncia y Ortopedia Maxilar</p>
-                </div>
-                <div class="text-right text-xs text-slate-500">
-                    <p class="font-bold text-slate-900">Dictamen Clínico & Plan Biomecánico</p>
-                    <p id="printStudyDate">Fecha: 16/10/2026</p>
-                </div>
-            </div>
-        </div>
+        <!-- MÓDULO 4 (PLANTILLA EXCLUSIVA DE IMPRESIÓN / EXPORTACIÓN PDF INTEGRAL) -->
+        <div id="printFullReportContainer" class="hidden print-only"></div>
 
-        <!-- CONTENIDO DINÁMICO POR MÓDULO -->
-        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 flex-1 space-y-6">
+        <!-- CONTENIDO DINÁMICO INTERACTIVO EN PANTALLA -->
+        <main id="screenInteractiveMain" class="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 flex-1 space-y-6 no-print">
 
             <!-- =============================================================
                  MÓDULO 1: DIAGNÓSTICO IA, ODONTOGRAMA 2D (IPR MESIAL/DISTAL) Y PLAN
@@ -1491,17 +1507,21 @@ create table if not exists public.patients (
                             const demoMatch = DEMO_PATIENTS.find(
                                 (d) => d.id === p.id || d.full_name.toLowerCase() === p.full_name.toLowerCase()
                             );
+                            const localMatch = patientsList.find(
+                                (lp) => lp.id === p.id || lp.full_name.toLowerCase() === p.full_name.toLowerCase()
+                            );
                             const latestStudy = (studiesData || []).find((s) => s.patient_id === p.id);
-                            const stlUpperUrl = latestStudy?.stl_upper_url || p.medical_history?.stl_upper_url || "";
-                            const stlLowerUrl = latestStudy?.stl_lower_url || p.medical_history?.stl_lower_url || "";
+                            const stlUpperUrl = latestStudy?.stl_upper_url || p.medical_history?.stl_upper_url || localMatch?.stl_upper_url || "";
+                            const stlLowerUrl = latestStudy?.stl_lower_url || p.medical_history?.stl_lower_url || localMatch?.stl_lower_url || "";
                             const resolvedStudy =
                                 latestStudy?.clinical_data ||
                                 p.medical_history?.study_data ||
+                                localMatch?.study_data ||
                                 (demoMatch ? demoMatch.study_data : createBlankStudyData());
                             const isBlank = Boolean(resolvedStudy?.is_uninitialized);
                             const resolvedComplexity = isBlank
                                 ? "Por determinar"
-                                : (p.medical_history?.complexity || latestStudy?.clinical_data?.complexity || (demoMatch ? demoMatch.complexity : "Por determinar"));
+                                : (p.medical_history?.complexity || latestStudy?.clinical_data?.complexity || localMatch?.complexity || (demoMatch ? demoMatch.complexity : "Por determinar"));
                             return {
                                 id: p.id,
                                 study_id: latestStudy?.id || "",
@@ -1511,16 +1531,17 @@ create table if not exists public.patients (
                                 phone: p.phone || "Sin teléfono",
                                 referring_doctor: p.referring_doctor || "Dra. Liseth Guevara Muñoz",
                                 created_at: new Date(p.created_at).toISOString().split("T")[0],
-                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Valoración ortodóntica inicial — Pendiente de análisis"),
+                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || localMatch?.case_summary || "Valoración ortodóntica inicial — Pendiente de análisis"),
                                 complexity: resolvedComplexity,
                                 has_stl: Boolean(stlUpperUrl || stlLowerUrl || demoMatch),
                                 stl_upper_url: stlUpperUrl,
                                 stl_lower_url: stlLowerUrl,
-                                medical_history: p.medical_history || (demoMatch ? demoMatch.medical_history : {}),
-                                patient_signature: p.patient_signature || "",
-                                doctor_signature: p.doctor_signature || "",
-                                photos: latestStudy?.photos_urls || p.medical_history?.photos || (demoMatch ? demoMatch.photos : {}),
-                                notes: p.medical_history?.notes || (demoMatch ? demoMatch.notes : []),
+                                medical_history: Object.assign({}, demoMatch ? demoMatch.medical_history : {}, localMatch?.medical_history || {}, p.medical_history || {}),
+                                patient_signature: p.patient_signature || localMatch?.patient_signature || "",
+                                doctor_signature: p.doctor_signature || localMatch?.doctor_signature || "",
+                                photos: Object.assign({}, demoMatch ? demoMatch.photos : {}, localMatch?.photos || {}, p.medical_history?.photos || {}, latestStudy?.photos_urls || {}),
+                                notes: p.medical_history?.notes || localMatch?.notes || (demoMatch ? demoMatch.notes : []),
+                                consensus_history: p.medical_history?.consensus_history || localMatch?.consensus_history || [],
                                 study_data: resolvedStudy
                             };
                         });
@@ -1626,6 +1647,7 @@ create table if not exists public.patients (
         }
 
         function showDashboardView() {
+            document.title = "CRD OrthoAI Suite | Dra. Liseth Guevara Muñoz";
             document.getElementById("viewPatientWorkspace").classList.add("hidden");
             document.getElementById("viewDashboard").classList.remove("hidden");
             renderPatientsList();
@@ -1659,10 +1681,12 @@ create table if not exists public.patients (
                     : "Subir .STL Inf";
             }
 
-            // Actualizar encabezados
+            // Actualizar encabezados y título del documento (para nombre del archivo PDF y cabecera de impresión)
+            document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
             document.getElementById("workspaceRecordCode").innerText = `Expediente ${patient.record_code || "#CRD-2026"}`;
             document.getElementById("workspacePatientTitle").innerText = `${patient.full_name} (${patient.age} años)`;
-            document.getElementById("printPatientTitle").innerText = `${patient.full_name} (${patient.age} años)`;
+            const printTitleEl = document.getElementById("printPatientTitle");
+            if (printTitleEl) printTitleEl.innerText = `${patient.full_name} (${patient.age} años)`;
             document.getElementById("sigPatientSublabel").innerText = `${patient.full_name} — Acepto plan y consentimiento`;
 
             // Poblar Módulo 1: Diagnóstico y Odontograma 2D
@@ -1736,6 +1760,9 @@ create table if not exists public.patients (
             renderEvolutionNotes(patient);
             loadSavedSignatures(patient);
 
+            // Pre-renderizar plantilla integral de impresión / PDF
+            renderPrintFullReport(patient);
+
             if (switchView) {
                 document.getElementById("viewDashboard").classList.add("hidden");
                 document.getElementById("viewPatientWorkspace").classList.remove("hidden");
@@ -1744,6 +1771,504 @@ create table if not exists public.patients (
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }
         }
+
+        // ---------------------------------------------------------------------
+        // MÓDULO 4 (EXPORTACIÓN PDF INTEGRAL SIN ESPACIOS EN BLANCO)
+        // ---------------------------------------------------------------------
+        const FDI_STANDARD_NAMES = {
+            18: "3er Molar Sup. Der.", 17: "2do Molar Sup. Der.", 16: "1er Molar Sup. Der.", 15: "2do Premolar Sup. Der.",
+            14: "1er Premolar Sup. Der.", 13: "Canino Sup. Der.", 12: "Incisivo Lateral Sup. Der.", 11: "Incisivo Central Sup. Der.",
+            21: "Incisivo Central Sup. Izq.", 22: "Incisivo Lateral Sup. Izq.", 23: "Canino Sup. Izq.", 24: "1er Premolar Sup. Izq.",
+            25: "2do Premolar Sup. Izq.", 26: "1er Molar Sup. Izq.", 27: "2do Molar Sup. Izq.", 28: "3er Molar Sup. Izq.",
+            48: "3er Molar Inf. Der.", 47: "2do Molar Inf. Der.", 46: "1er Molar Inf. Der.", 45: "2do Premolar Inf. Der.",
+            44: "1er Premolar Inf. Der.", 43: "Canino Inf. Der.", 42: "Incisivo Lateral Inf. Der.", 41: "Incisivo Central Inf. Der.",
+            31: "Incisivo Central Inf. Izq.", 32: "Incisivo Lateral Inf. Izq.", 33: "Canino Inf. Izq.", 34: "1er Premolar Inf. Izq.",
+            35: "2do Premolar Inf. Izq.", 36: "1er Molar Inf. Izq.", 37: "2do Molar Inf. Izq.", 38: "3er Molar Inf. Izq."
+        };
+
+        function renderPrintQuadRow(teethArray, odontogramMap) {
+            return teethArray.map((fdi) => {
+                const t = odontogramMap[fdi];
+                const status = t?.status || "aligned";
+                const totalIPR = Number(((t?.iprMesial || 0) + (t?.iprDistal || 0)).toFixed(1));
+                const badgeSymbol = status === "missing" ? "✕" : totalIPR > 0 ? `.${Math.round(totalIPR * 10)}` : "✓";
+                let style = "bg-emerald-50 border-emerald-300 text-emerald-900";
+                if (status === "critical") style = "bg-rose-50 border-rose-300 text-rose-900";
+                else if (status === "ipr") style = "bg-amber-50 border-amber-300 text-amber-900";
+                else if (status === "missing") style = "bg-slate-100 border-slate-300 text-slate-400";
+
+                return `
+                    <div class="border rounded-lg py-1 px-0.5 text-center ${style}">
+                        <span class="block text-[9px] font-bold mono leading-none">${fdi}</span>
+                        <span class="inline-flex w-4 h-4 mt-0.5 rounded-full border border-current items-center justify-center text-[8px] font-bold mono leading-none">
+                            ${badgeSymbol}
+                        </span>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderPrintFullReport(patient) {
+            const container = document.getElementById("printFullReportContainer");
+            if (!container || !patient) return;
+
+            const study = patient.study_data || createBlankStudyData();
+            const mh = patient.medical_history || {};
+
+            // Tomar valores en vivo de los formularios si fueron editados en pantalla
+            const liveChiefComplaint = document.getElementById("histChiefComplaint")?.value?.trim() || mh.chief_complaint || patient.case_summary || "Valoración ortodóntica integral.";
+            const liveConsentRisks = document.getElementById("histConsentRisks")?.value?.trim() || mh.consent_risks || "Se explican alcances, límites biomecánicos y protocolo de retención.";
+            const liveHabitsPerio = document.getElementById("histHabitsPerio")?.value?.trim() || mh.habits_perio || "En evaluación clínica";
+            const liveAllergies = document.getElementById("histAllergies")?.value?.trim() || mh.allergies || "Ninguna reportada";
+
+            const compValue = patient.complexity || study.complexity || "Por determinar";
+            const durationStr = study.durationMonths > 0 ? `${study.durationMonths} Meses` : "Por definir";
+            const anchorageStr = study.anchorage || "Por definir";
+            const printDate = new Date().toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+            // Fotografías y radiografías disponibles
+            const photosObj = Object.assign({}, mh.photos || {}, patient.photos || {});
+            const allPhotoEntries = [];
+            const missingPhotoLabels = [];
+            MEDIA_SLOTS.forEach((slotLabel) => {
+                if (photosObj[slotLabel]) {
+                    allPhotoEntries.push({ label: slotLabel, url: photosObj[slotLabel] });
+                } else {
+                    missingPhotoLabels.push(slotLabel);
+                }
+            });
+            Object.keys(photosObj).forEach((k) => {
+                if (!MEDIA_SLOTS.includes(k) && photosObj[k]) {
+                    allPhotoEntries.push({ label: k, url: photosObj[k] });
+                }
+            });
+
+            // Calcular IPR total superior e inferior y tabla de órganos dentarios con hallazgos
+            const odoMap = study.odontogram || {};
+            const upperTeeth = [...UPPER_RIGHT, ...UPPER_LEFT];
+            const lowerTeeth = [...LOWER_RIGHT, ...LOWER_LEFT];
+            let totalUpperIpr = 0;
+            let totalLowerIpr = 0;
+            upperTeeth.forEach((fdi) => {
+                const t = odoMap[fdi];
+                if (t) totalUpperIpr += (Number(t.iprMesial || 0) + Number(t.iprDistal || 0));
+            });
+            lowerTeeth.forEach((fdi) => {
+                const t = odoMap[fdi];
+                if (t) totalLowerIpr += (Number(t.iprMesial || 0) + Number(t.iprDistal || 0));
+            });
+
+            const allFdiOrder = [...UPPER_RIGHT, ...UPPER_LEFT, ...LOWER_RIGHT, ...LOWER_LEFT];
+            const activeTeethRows = allFdiOrder
+                .map((fdi) => odoMap[fdi])
+                .filter((t) => t && (
+                    t.status !== "aligned" ||
+                    (Number(t.iprMesial || 0) + Number(t.iprDistal || 0)) > 0 ||
+                    t.manually_overridden ||
+                    (t.diagnosis && !t.diagnosis.includes("Alineación y nivelación estándar"))
+                ));
+
+            // Telemetría 3D .STL
+            const hasUpperStl = Boolean(uploadedUpperStlFile || patient.stl_upper_url || mh.stl_upper_url || patient.has_stl);
+            const hasLowerStl = Boolean(uploadedLowerStlFile || patient.stl_lower_url || mh.stl_lower_url || patient.has_stl);
+            const upperStlInfo = stlUpperTelemetryText || (hasUpperStl ? "Arcada Superior Maxilar (.STL): Vinculado en expediente digital" : "Sin archivo .STL superior cargado");
+            const lowerStlInfo = stlLowerTelemetryText || (hasLowerStl ? "Arcada Inferior Mandibular (.STL): Vinculado en expediente digital" : "Sin archivo .STL inferior cargado");
+
+            // Cefalometría, Tratamientos Auxiliares, Riesgos y Roadmap
+            const cephList = study.cephalometrics || [];
+            const auxTreatments = study.additionalTreatments || [];
+            const risksList = study.risks || [];
+            const roadmapStages = study.roadmap || [];
+            const evolutionNotes = patient.notes || [];
+            const consensusLog = patient.consensus_history || [];
+
+            container.innerHTML = `
+                <div class="space-y-3 text-slate-900 text-[11px] leading-snug">
+                    <!-- 1. ENCABEZADO INSTITUCIONAL Y FICHA DE IDENTIFICACIÓN DEL PACIENTE -->
+                    <div class="border-b-2 border-slate-900 pb-2.5 print-avoid-break">
+                        <div class="flex justify-between items-start gap-4">
+                            <div>
+                                <p class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-700">
+                                    Clínica de Rehabilitación Dental y Ortodoncia • CRD OrthoAI Suite
+                                </p>
+                                <h1 class="text-xl font-extrabold text-slate-900 mt-0.5">
+                                    PACIENTE: ${patient.full_name} (${patient.age} años)
+                                </h1>
+                                <p class="text-[11px] text-slate-600 font-medium">
+                                    Especialista Tratante: <strong>Dra. Liseth Guevara Muñoz</strong> • Ortodoncia y Ortopedia Maxilar
+                                </p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="inline-block bg-slate-900 text-white text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+                                    Expediente Clínico Integral
+                                </span>
+                                <p class="text-[11px] font-bold text-slate-800 mono mt-1">
+                                    Folio: ${patient.record_code || "#CRD-2026"}
+                                </p>
+                                <p class="text-[10px] text-slate-500">
+                                    Fecha de Emisión: ${printDate}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Datos Generales del Paciente -->
+                        <div class="grid grid-cols-6 gap-2 mt-2.5 bg-slate-50 border border-slate-300 rounded-xl p-2 text-[10px]">
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Nombre del Paciente</span>
+                                <strong class="text-slate-900 text-[11px]">${patient.full_name}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Edad / Teléfono</span>
+                                <strong class="text-slate-900">${patient.age} años • ${patient.phone || "S/T"}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Fecha de Estudio</span>
+                                <strong class="text-slate-900">${patient.created_at || printDate}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Complejidad Clínica</span>
+                                <strong class="text-rose-700 uppercase">${compValue}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Duración Estimada</span>
+                                <strong class="text-indigo-900">${durationStr}</strong>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 font-bold uppercase text-[9px]">Anclaje Biomecánico</span>
+                                <strong class="text-slate-900">${anchorageStr}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. FORMULARIO DE DATOS CLÍNICOS, ANTECEDENTES E HISTORIA CLÍNICA -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                        <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2 print-section-title">
+                            1. Formulario de Admisión, Historia Clínica y Antecedentes del Paciente
+                        </h2>
+                        <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Motivo de Consulta y Antecedentes</span>
+                                <p class="text-slate-900 font-medium mt-0.5">${liveChiefComplaint}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Alergias y Condiciones Sistémicas</span>
+                                <p class="text-slate-900 font-medium mt-0.5">${liveAllergies}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Hábitos Funcionales y Estado Periodontal</span>
+                                <p class="text-slate-900 font-medium mt-0.5">${liveHabitsPerio}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Consentimiento de Riesgos Explicados</span>
+                                <p class="text-slate-900 font-medium mt-0.5">${liveConsentRisks}</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. RESUMEN DE DIAGNÓSTICO ORTODÓNTICO Y TELEMETRÍA .STL -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                        <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2 print-section-title">
+                            2. Síntesis de Diagnóstico Ortodóntico y Volumetría Digital 3D (.STL)
+                        </h2>
+                        <div class="grid grid-cols-4 gap-2 text-[10.5px]">
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Patrón Esquelético</span>
+                                <p class="font-bold text-slate-900 mt-0.5">${study.summary?.skeletal || "Pendiente de análisis"}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Problema Vertical</span>
+                                <p class="font-bold text-rose-700 mt-0.5">${study.summary?.vertical || "Pendiente de análisis"}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Fórmula Dental</span>
+                                <p class="font-bold text-slate-900 mt-0.5">${study.summary?.dentalFormula || "En evaluación inicial"}</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                                <span class="block text-[9px] font-bold uppercase text-slate-500">Alerta Radicular / Perio</span>
+                                <p class="font-bold text-amber-800 mt-0.5">${study.summary?.rootAlert || "Sin hallazgos registrados"}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-2 text-[10px] mono">
+                            <div class="bg-indigo-50/60 border border-indigo-200 rounded-lg px-2.5 py-1.5 text-indigo-950">
+                                <strong>STL Maxilar:</strong> ${upperStlInfo}
+                            </div>
+                            <div class="bg-indigo-50/60 border border-indigo-200 rounded-lg px-2.5 py-1.5 text-indigo-950">
+                                <strong>STL Mandibular:</strong> ${lowerStlInfo}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 4. REGISTROS FOTOGRÁFICOS Y RADIOGRÁFICOS DEL PACIENTE -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-2 print-section-title">
+                            <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950">
+                                3. Registros Fotográficos Intraorales / Extraorales y Radiografías IDI (${allPhotoEntries.length} cargados)
+                            </h2>
+                            <span class="text-[9.5px] text-slate-500 font-medium">
+                                Paciente: ${patient.full_name}
+                            </span>
+                        </div>
+                        ${allPhotoEntries.length > 0 ? `
+                            <div class="grid grid-cols-4 gap-2">
+                                ${allPhotoEntries.map((item) => `
+                                    <div class="border border-slate-200 rounded-lg p-1.5 bg-slate-50 print-avoid-break">
+                                        <p class="text-[9.5px] font-bold text-slate-800 truncate mb-1">${item.label}</p>
+                                        <div class="h-28 w-full rounded overflow-hidden bg-slate-900 border border-slate-200 flex items-center justify-center">
+                                            <img src="${item.url}" alt="${item.label}" class="w-full h-full object-cover" />
+                                        </div>
+                                    </div>
+                                `).join("")}
+                            </div>
+                            ${missingPhotoLabels.length > 0 ? `
+                                <p class="text-[9.5px] text-slate-500 mt-1.5">
+                                    <strong>Tomas pendientes de carga:</strong> ${missingPhotoLabels.join(" • ")}
+                                </p>
+                            ` : ""}
+                        ` : `
+                            <p class="text-[10px] text-slate-500 italic py-1">
+                                Sin fotografías o radiografías adjuntas al expediente al momento de exportar este reporte.
+                            </p>
+                        `}
+                    </section>
+
+                    <!-- 5. ODONTOGRAMA BIOMECÁNICO 2D Y TABLA DE STRIPPING (IPR MESIAL/DISTAL) -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-2 print-section-title">
+                            <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950">
+                                4. Odontograma Biomecánico 2D y Prescripción de Stripping (IPR Mesial / Distal)
+                            </h2>
+                            <div class="flex items-center gap-3 text-[9.5px] font-bold">
+                                <span class="text-indigo-800 mono">IPR Total Sup: ${totalUpperIpr.toFixed(1)} mm</span>
+                                <span class="text-indigo-800 mono">IPR Total Inf: ${totalLowerIpr.toFixed(1)} mm</span>
+                            </div>
+                        </div>
+
+                        <!-- Mapa Visual Compacto de los 32 Dientes -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 space-y-2 print-avoid-break">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase mb-1">Cuadrante 1 (Maxilar Der. 18-11)</p>
+                                    <div class="grid grid-cols-8 gap-1">${renderPrintQuadRow(UPPER_RIGHT, odoMap)}</div>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase mb-1 text-right">Cuadrante 2 (Maxilar Izq. 21-28)</p>
+                                    <div class="grid grid-cols-8 gap-1">${renderPrintQuadRow(UPPER_LEFT, odoMap)}</div>
+                                </div>
+                            </div>
+                            <div class="border-t border-dashed border-slate-300"></div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase mb-1">Cuadrante 4 (Mandíbula Der. 48-41)</p>
+                                    <div class="grid grid-cols-8 gap-1">${renderPrintQuadRow(LOWER_RIGHT, odoMap)}</div>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase mb-1 text-right">Cuadrante 3 (Mandíbula Izq. 31-38)</p>
+                                    <div class="grid grid-cols-8 gap-1">${renderPrintQuadRow(LOWER_LEFT, odoMap)}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla Desglosada de Órganos Dentarios con IPR / Hallazgos Activos -->
+                        ${activeTeethRows.length > 0 ? `
+                            <div class="mt-2 overflow-hidden rounded-lg border border-slate-200">
+                                <table class="w-full text-left border-collapse text-[9.5px]">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 uppercase text-[8.5px]">
+                                            <th class="py-1 px-2 font-bold">OD</th>
+                                            <th class="py-1 px-2 font-bold">Órgano Dentario</th>
+                                            <th class="py-1 px-2 font-bold">Estado</th>
+                                            <th class="py-1 px-2 font-bold text-center">IPR Mesial</th>
+                                            <th class="py-1 px-2 font-bold text-center">IPR Distal</th>
+                                            <th class="py-1 px-2 font-bold text-center">Total OD</th>
+                                            <th class="py-1 px-2 font-bold">Diagnóstico y Mecánica Indicada</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        ${activeTeethRows.map((t) => {
+                                            const m = Number(t.iprMesial || 0);
+                                            const d = Number(t.iprDistal || 0);
+                                            const tot = m + d;
+                                            const stLabel = t.status === "critical" ? "Crítico / TAD" : t.status === "ipr" ? "Requiere IPR" : t.status === "missing" ? "Ausente / Exod." : "Alineado";
+                                            return `
+                                                <tr class="print-avoid-break">
+                                                    <td class="py-1 px-2 font-extrabold mono text-indigo-900">OD ${t.toothFDI}</td>
+                                                    <td class="py-1 px-2 font-medium text-slate-800">${t.name || FDI_STANDARD_NAMES[t.toothFDI] || `OD ${t.toothFDI}`}</td>
+                                                    <td class="py-1 px-2 font-bold">${stLabel}</td>
+                                                    <td class="py-1 px-2 text-center mono font-bold ${m > 0 ? 'text-amber-700' : 'text-slate-400'}">${m.toFixed(1)} mm</td>
+                                                    <td class="py-1 px-2 text-center mono font-bold ${d > 0 ? 'text-amber-700' : 'text-slate-400'}">${d.toFixed(1)} mm</td>
+                                                    <td class="py-1 px-2 text-center mono font-extrabold ${tot > 0 ? 'text-emerald-700' : 'text-slate-400'}">${tot.toFixed(1)} mm</td>
+                                                    <td class="py-1 px-2 text-slate-700"><strong>${t.diagnosis || ""}:</strong> ${t.biomechanics || ""}</td>
+                                                </tr>
+                                            `;
+                                        }).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ` : `
+                            <p class="text-[9.5px] text-slate-500 mt-1.5 italic">
+                                Todos los órganos dentarios se encuentran registrados sin desgaste interproximal (IPR) ni alertas críticas activas.
+                            </p>
+                        `}
+                    </section>
+
+                    <!-- 6. PARÁMETROS CEFALOMÉTRICOS, TERAPÉUTICA AUXILIAR, RIESGOS Y RETENCIÓN -->
+                    <div class="grid grid-cols-2 gap-2.5 print-avoid-break">
+                        <section class="border border-slate-300 rounded-xl p-2.5 bg-white">
+                            <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-1.5">
+                                5. Parámetros Cefalométricos & Terapéutica Auxiliar
+                            </h2>
+                            ${cephList.length > 0 ? `
+                                <div class="space-y-1.5 mb-2">
+                                    ${cephList.map((c) => `
+                                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[9.5px]">
+                                            <div class="flex justify-between font-bold text-slate-900">
+                                                <span>${c.parameter}</span>
+                                                <span class="text-rose-700 mono">${c.finding} <span class="text-slate-400 font-normal">(Norma: ${c.norm})</span></span>
+                                            </div>
+                                            <p class="text-slate-600 mt-0.5">${c.implication}</p>
+                                        </div>
+                                    `).join("")}
+                                </div>
+                            ` : `<p class="text-[9.5px] text-slate-500 italic mb-2">Sin mediciones cefalométricas registradas.</p>`}
+                            <p class="text-[9.5px] font-bold uppercase text-slate-700 mb-1">Terapéutica Auxiliar Obligatoria:</p>
+                            <ul class="list-disc pl-4 space-y-0.5 text-[9.5px] text-slate-800">
+                                ${auxTreatments.length > 0
+                                    ? auxTreatments.map((item) => `<li>${item}</li>`).join("")
+                                    : `<li>Pendiente de definir terapéutica auxiliar.</li>`}
+                            </ul>
+                        </section>
+
+                        <section class="border border-slate-300 rounded-xl p-2.5 bg-white flex flex-col justify-between">
+                            <div>
+                                <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-rose-900 border-b border-slate-200 pb-1 mb-1.5">
+                                    6. Control de Riesgos Clínicos & Retención
+                                </h2>
+                                ${risksList.length > 0 ? `
+                                    <div class="space-y-1.5">
+                                        ${risksList.map((r) => `
+                                            <div class="bg-rose-50/70 border border-rose-200 rounded-lg p-1.5 text-[9.5px]">
+                                                <div class="flex justify-between items-center font-bold text-rose-950">
+                                                    <span>${r.title}</span>
+                                                    <span class="bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded text-[8.5px] uppercase">Riesgo ${r.level}</span>
+                                                </div>
+                                                <p class="text-rose-950/90 mt-0.5">${r.mitigation}</p>
+                                            </div>
+                                        `).join("")}
+                                    </div>
+                                ` : `<p class="text-[9.5px] text-slate-500 italic">Sin alertas de riesgo biomecánico registradas.</p>`}
+                            </div>
+                            <div class="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-[9.5px] text-emerald-950">
+                                <strong class="block uppercase text-[8.5px] text-emerald-800 tracking-wider">Protocolo de Retención Final:</strong>
+                                <span>${study.retentionProtocol || "Pendiente de definir."}</span>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- 7. SECUENCIA BIOMECÁNICA MES A MES (HOJA DE RUTA EN SILLÓN) -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                        <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2 print-section-title">
+                            7. Secuencia Biomecánica Mes a Mes (${durationStr}) — Hoja de Ruta en Sillón
+                        </h2>
+                        ${roadmapStages.length > 0 ? `
+                            <table class="w-full text-left border-collapse text-[9.5px]">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 uppercase text-[8.5px]">
+                                        <th class="py-1 px-2 font-bold w-24">Etapa / Meses</th>
+                                        <th class="py-1 px-2 font-bold w-32">Arco / Mecánica</th>
+                                        <th class="py-1 px-2 font-bold w-40">Objetivo de Fase</th>
+                                        <th class="py-1 px-2 font-bold">Acción Clínica en Sillón</th>
+                                        <th class="py-1 px-2 font-bold">Movimiento Esperado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    ${roadmapStages.map((s) => `
+                                        <tr class="print-avoid-break">
+                                            <td class="py-1.5 px-2 font-extrabold mono text-indigo-700">${s.months}</td>
+                                            <td class="py-1.5 px-2 font-semibold mono text-slate-800">${s.archwire}</td>
+                                            <td class="py-1.5 px-2 font-bold text-slate-900">${s.title}</td>
+                                            <td class="py-1.5 px-2 text-slate-700">${s.chairsideAction}</td>
+                                            <td class="py-1.5 px-2 text-slate-700">${s.expectedMovement}</td>
+                                        </tr>
+                                    `).join("")}
+                                </tbody>
+                            </table>
+                        ` : `
+                            <p class="text-[9.5px] text-slate-500 italic">
+                                Secuencia biomecánica pendiente de generación.
+                            </p>
+                        `}
+                    </section>
+
+                    <!-- 8. BITÁCORA DE EVOLUCIÓN CLÍNICA Y CONSENSO ESPECIALISTA-IA -->
+                    ${(evolutionNotes.length > 0 || consensusLog.length > 0) ? `
+                        <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                            <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2">
+                                8. Bitácora de Evolución Clínica y Revisiones del Especialista
+                            </h2>
+                            <div class="grid grid-cols-1 gap-1.5 text-[9.5px]">
+                                ${evolutionNotes.map((n) => `
+                                    <div class="bg-slate-50 border border-slate-200 rounded px-2 py-1 flex justify-between gap-2">
+                                        <span><strong>${n.author}:</strong> ${n.text}</span>
+                                        <span class="mono text-slate-400 shrink-0">${n.date}</span>
+                                    </div>
+                                `).join("")}
+                                ${consensusLog.map((m) => `
+                                    <div class="bg-indigo-50/50 border border-indigo-100 rounded px-2 py-1">
+                                        <strong>${m.role === "doctor" ? "Dra. Liseth Guevara (Ajuste Clínico)" : "Consenso Biomecánico"}:</strong> ${m.text}
+                                    </div>
+                                `).join("")}
+                            </div>
+                        </section>
+                    ` : ""}
+
+                    <!-- 9. VALIDACIÓN LEGAL Y FIRMAS DIGITALES -->
+                    <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                        <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2">
+                            Conformidad de Plan de Tratamiento y Consentimiento Informado
+                        </h2>
+                        <div class="grid grid-cols-2 gap-4 pt-1">
+                            <div class="border border-slate-200 rounded-lg p-2 bg-slate-50 text-center">
+                                <div class="h-16 flex items-center justify-center bg-white border border-dashed border-slate-300 rounded mb-1.5 overflow-hidden">
+                                    ${patient.patient_signature
+                                        ? `<img src="${patient.patient_signature}" alt="Firma del paciente" class="max-h-14 w-auto object-contain" />`
+                                        : `<span class="text-[9px] text-slate-400 italic">Espacio para firma autógrafa o digital del paciente / tutor</span>`
+                                    }
+                                </div>
+                                <p class="text-[10px] font-bold text-slate-900">${patient.full_name}</p>
+                                <p class="text-[9px] text-slate-500">Firma de Conformidad del Paciente / Tutor Legal</p>
+                            </div>
+                            <div class="border border-slate-200 rounded-lg p-2 bg-slate-50 text-center">
+                                <div class="h-16 flex items-center justify-center bg-white border border-dashed border-slate-300 rounded mb-1.5 overflow-hidden">
+                                    ${patient.doctor_signature
+                                        ? `<img src="${patient.doctor_signature}" alt="Firma de la especialista" class="max-h-14 w-auto object-contain" />`
+                                        : `<span class="text-[9px] text-slate-400 italic">Firma de la Especialista en Ortodoncia</span>`
+                                    }
+                                </div>
+                                <p class="text-[10px] font-bold text-slate-900">Dra. Liseth Guevara Muñoz</p>
+                                <p class="text-[9px] text-slate-500">Especialista en Ortodoncia y Ortopedia Maxilar</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            `;
+        }
+
+        function exportPatientPdf() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (patient) {
+                document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                renderPrintFullReport(patient);
+            }
+            window.print();
+        }
+
+        window.addEventListener("beforeprint", () => {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (patient) {
+                document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                renderPrintFullReport(patient);
+            }
+        });
 
         function toggleManualDiagnosisForm(forceOpen) {
             const panel = document.getElementById("manualDiagnosisFormPanel");
@@ -2152,14 +2677,29 @@ create table if not exists public.patients (
             const file = event.target.files?.[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const dataUrl = e.target?.result;
                 const patient = patientsList.find((p) => p.id === activePatientId);
                 if (patient && typeof dataUrl === "string") {
                     if (!patient.photos) patient.photos = {};
                     patient.photos[slotLabel] = dataUrl;
+                    if (!patient.medical_history) patient.medical_history = {};
+                    if (!patient.medical_history.photos) patient.medical_history.photos = {};
+                    patient.medical_history.photos[slotLabel] = dataUrl;
                     savePatientsLocal();
                     renderMediaSlots(patient);
+                    renderPrintFullReport(patient);
+
+                    if (supabaseClient && String(patient.id).length > 20) {
+                        try {
+                            await supabaseClient
+                                .from("patients")
+                                .update({ medical_history: patient.medical_history })
+                                .eq("id", patient.id);
+                        } catch (err) {
+                            console.warn("Foto guardada en sesión local:", err);
+                        }
+                    }
                 }
             };
             reader.readAsDataURL(file);
@@ -2297,13 +2837,14 @@ create table if not exists public.patients (
             const patient = patientsList.find((p) => p.id === activePatientId);
             if (!patient) return;
 
-            patient.medical_history = {
+            patient.medical_history = Object.assign({}, patient.medical_history || {}, {
                 chief_complaint: document.getElementById("histChiefComplaint").value.trim(),
                 consent_risks: document.getElementById("histConsentRisks").value.trim(),
                 habits_perio: document.getElementById("histHabitsPerio").value.trim(),
                 allergies: document.getElementById("histAllergies").value.trim()
-            };
+            });
             savePatientsLocal();
+            renderPrintFullReport(patient);
 
             if (supabaseClient && patient.id.length > 20) {
                 await supabaseClient
