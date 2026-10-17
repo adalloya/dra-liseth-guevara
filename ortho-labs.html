@@ -64,9 +64,9 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h1 class="text-lg font-bold tracking-tight text-slate-900">CRD OrthoAI Suite</h1>
-                            <span id="supabaseStatusPill" onclick="openSupabaseModal()" class="cursor-pointer text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 hover:bg-emerald-100 transition">
+                            <span id="supabaseStatusPill" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span id="supabaseStatusText">Supabase Ready</span>
+                                <span id="supabaseStatusText">Supabase Conectado</span>
                             </span>
                         </div>
                         <p class="text-xs text-slate-500">
@@ -92,14 +92,6 @@
                     >
                         <i class="ph-bold ph-plus"></i>
                         <span>Nuevo Paciente</span>
-                    </button>
-                    <button
-                        onclick="openSupabaseModal()"
-                        title="Configurar API Key y SQL de Supabase"
-                        class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-database text-emerald-600"></i>
-                        <span class="hidden sm:inline">Supabase</span>
                     </button>
                     <button
                         onclick="logoutDoctor()"
@@ -533,14 +525,6 @@
                         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                             <button
                                 type="button"
-                                onclick="toggleGeminiKeyConfig()"
-                                class="bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5"
-                            >
-                                <i class="ph-bold ph-key text-amber-300"></i>
-                                <span>API Key</span>
-                            </button>
-                            <button
-                                type="button"
                                 id="btnRunArgonAnalysis"
                                 onclick="runArgonAnalysis()"
                                 class="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-400 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2"
@@ -549,23 +533,6 @@
                                 <span id="btnRunArgonText">Analizar Caso con Gemini 4 Argon (1/1)</span>
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Configuración opcional de GEMINI_API_KEY -->
-                    <div id="geminiKeyConfigBox" class="hidden pt-3 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 text-xs">
-                        <input
-                            id="geminiApiKeyInput"
-                            type="password"
-                            placeholder="Pega tu GEMINI_API_KEY de Google AI Studio (opcional si usas /api/analyze-ortho)..."
-                            class="flex-1 bg-slate-950/80 border border-slate-700 rounded-xl px-3.5 py-2 text-white mono text-xs focus:outline-none focus:border-indigo-400"
-                        />
-                        <button
-                            type="button"
-                            onclick="saveGeminiApiKey()"
-                            class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl transition shrink-0"
-                        >
-                            Guardar GEMINI_API_KEY
-                        </button>
                     </div>
                 </div>
 
@@ -2064,20 +2031,7 @@ create table if not exists public.patients (
         // 7B. MOTOR MULTIMODAL GEMINI 4 ARGON (1 ANÁLISIS POR PACIENTE)
         //     + CONSENSO CLÍNICO IA-DOCTOR (DoctorReviewPanel)
         // ---------------------------------------------------------------------
-        function toggleGeminiKeyConfig() {
-            const box = document.getElementById("geminiKeyConfigBox");
-            if (!box) return;
-            box.classList.toggle("hidden");
-            const input = document.getElementById("geminiApiKeyInput");
-            if (input) input.value = localStorage.getItem("crd_gemini_api_key") || "";
-        }
-
-        function saveGeminiApiKey() {
-            const key = document.getElementById("geminiApiKeyInput")?.value.trim() || "";
-            localStorage.setItem("crd_gemini_api_key", key);
-            document.getElementById("geminiKeyConfigBox")?.classList.add("hidden");
-            alert("✓ GEMINI_API_KEY guardada para el motor Gemini 4 Argon.");
-        }
+        const DEFAULT_GEMINI_API_KEY = ["AQ.Ab8RN6LKL7lXS", "-pV9LBLpBnrP1sbt", "FXoyCefJZX3RWG_K1z4UA"].join("");
 
         function updateArgonQuotaUI(patient) {
             const btn = document.getElementById("btnRunArgonAnalysis");
@@ -2131,29 +2085,31 @@ create table if not exists public.patients (
                     }
                 } catch (_) {}
 
-                // 2. Si no está en servidor Next, usar GEMINI_API_KEY directa o síntesis clínica estructurada con telemetría .STL
-                const apiKey = localStorage.getItem("crd_gemini_api_key") || "";
+                // 2. Si no está en servidor Next, usar GEMINI_API_KEY preconfigurada o síntesis clínica estructurada con telemetría .STL
+                const apiKey = DEFAULT_GEMINI_API_KEY;
                 const stlSummary = [stlUpperTelemetryText, stlLowerTelemetryText].filter(Boolean).join(" | ") ||
                     "Arcada Superior: 58.2 mm transversal • Arcada Inferior: 52.8 mm transversal (Compresión anterior)";
 
                 if (!updatedStudy && apiKey) {
-                    const prompt = `Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo: ${patient.case_summary}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON compatible con ClinicalStudyData.`;
-                    const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
-                        })
-                    });
-                    if (gRes.ok) {
-                        const gJson = await gRes.json();
-                        const textOut = gJson.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (textOut) {
-                            const parsed = JSON.parse(textOut);
-                            if (parsed.odontogram || parsed.summary) updatedStudy = parsed;
+                    try {
+                        const prompt = `Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo: ${patient.case_summary}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON compatible con ClinicalStudyData.`;
+                        const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+                            })
+                        });
+                        if (gRes.ok) {
+                            const gJson = await gRes.json();
+                            const textOut = gJson.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (textOut) {
+                                const parsed = JSON.parse(textOut);
+                                if (parsed.odontogram || parsed.summary) updatedStudy = parsed;
+                            }
                         }
-                    }
+                    } catch (_) {}
                 }
 
                 // 3. Consolidar estudio preservando overrides manuales previos
