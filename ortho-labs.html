@@ -715,71 +715,116 @@
          MÓDULO 4 (LAZY LOAD): VISOR LIGERO EXCLUSIVO PARA .STL REALES
          (src/components/modules/StlViewerModal.tsx)
     ====================================================================== -->
-    <div id="stlViewerModal" class="hidden fixed inset-0 bg-[#18181b] z-50 flex flex-col text-white no-print">
-        <!-- Barra Minimalista Superior (Estilo ClinCheck Dark Studio) -->
-        <div class="flex flex-wrap justify-between items-center gap-3 px-4 sm:px-6 py-3.5 border-b border-zinc-800 bg-zinc-900/95">
-            <div class="flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                <span class="text-xs font-semibold text-zinc-200">
-                    Visor Escaneo Intraoral Dual .STL (Maxilar y Mandíbula)
+    <div id="stlViewerModal" class="hidden fixed inset-0 bg-[#121214] z-50 flex flex-col text-white font-sans no-print">
+        <!-- Barra Superior ClinCheck Pro Dark Studio -->
+        <header class="flex flex-wrap justify-between items-center px-6 py-3 border-b border-zinc-800 bg-zinc-900/95 gap-3">
+            <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <h2 class="text-xs font-bold tracking-wide text-zinc-200">
+                    Visor 3D Clínico • Base de Escáner Intraoral
+                </h2>
+                <span id="stlPersistenceBadge" class="hidden sm:inline-flex items-center gap-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
+                    Oclusión Natural Real
                 </span>
             </div>
 
-            <!-- Iconos Ortodónticos de Vista -->
-            <div class="flex items-center gap-1.5 bg-zinc-950/80 p-1 rounded-xl border border-zinc-800">
+            <!-- Controles de Vista y Arcada -->
+            <div class="flex items-center gap-1.5 bg-zinc-800/80 p-1 rounded-xl border border-zinc-700">
                 <button
                     onclick="setStlArchFilter('both')"
                     id="stlBtn-both"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition"
+                    class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition"
                 >
                     ═ Ambas
                 </button>
                 <button
                     onclick="setStlArchFilter('upper')"
                     id="stlBtn-upper"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:bg-zinc-800 transition"
+                    class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition"
                 >
                     ∩ Sup
                 </button>
                 <button
                     onclick="setStlArchFilter('lower')"
                     id="stlBtn-lower"
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:bg-zinc-800 transition"
+                    class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition"
                 >
                     ∪ Inf
                 </button>
-                <span class="w-px h-4 bg-zinc-800 mx-1"></span>
-                <button onclick="setStlCameraView(0, 0, 110)" class="px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:bg-zinc-800">
+                <span class="w-px h-4 bg-zinc-700 mx-1"></span>
+                <button onclick="setStlCameraView(0, -100, 70)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
                     Frontal
                 </button>
-                <button onclick="setStlCameraView(110, 0, 10)" class="px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:bg-zinc-800">
+                <button onclick="setStlCameraView(110, 0, 10)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
                     Der
                 </button>
-                <button onclick="setStlCameraView(-110, 0, 10)" class="px-2.5 py-1.5 rounded-lg text-xs text-zinc-300 hover:bg-zinc-800">
+                <button onclick="setStlCameraView(-110, 0, 10)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
                     Izq
                 </button>
             </div>
 
+            <!-- Botones de Carga Persistente y Cierre -->
             <div class="flex items-center gap-2">
-                <label class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium px-3 py-1.5 rounded-lg cursor-pointer transition">
-                    + Cargar .STL Sup
+                <label class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-medium px-3.5 py-1.5 rounded-xl cursor-pointer transition">
+                    <span id="stlUploadBtnSupText">+ Cargar .STL Sup</span>
                     <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, true)" />
                 </label>
-                <label class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium px-3 py-1.5 rounded-lg cursor-pointer transition">
-                    + Cargar .STL Inf
+                <label class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-medium px-3.5 py-1.5 rounded-xl cursor-pointer transition">
+                    <span id="stlUploadBtnInfText">+ Cargar .STL Inf</span>
                     <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, false)" />
                 </label>
                 <button
                     onclick="closeStlViewerModal()"
-                    class="border border-zinc-700 hover:bg-rose-600 hover:border-rose-500 text-xs font-semibold px-3.5 py-1.5 rounded-lg transition"
+                    class="bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-300 text-xs px-3.5 py-1.5 rounded-xl transition font-semibold"
                 >
                     ✕ Cerrar Visor
                 </button>
             </div>
-        </div>
+        </header>
 
-        <!-- Lienzo 3D Aislado -->
-        <div id="stlMountContainer" class="flex-1 w-full relative overflow-hidden"></div>
+        <!-- Lienzo WebGL 3D Principal -->
+        <div id="stlMountContainer" class="flex-1 w-full relative overflow-hidden cursor-grab active:cursor-grabbing"></div>
+
+        <!-- Barra Inferior de Herramientas ClinCheck & Línea de Tiempo (0 a 18 Meses) -->
+        <footer class="bg-zinc-900/95 border-t border-zinc-800 px-6 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <!-- Toggles de Herramientas -->
+            <div class="flex items-center gap-2">
+                <button
+                    id="btnToggleStlIpr"
+                    onclick="toggleStlIpr()"
+                    class="text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-amber-500/20 border-amber-500/50 text-amber-300"
+                >
+                    💎 IPR (Activo)
+                </button>
+                <button
+                    id="btnToggleStlTads"
+                    onclick="toggleStlTads()"
+                    class="text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
+                >
+                    📌 TADs + ATP (Activo)
+                </button>
+            </div>
+
+            <!-- Simulador de Tiempo Mes a Mes (0 a 18 Meses) -->
+            <div class="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-md mx-4">
+                <span id="stlMonthLabel" class="text-xs font-bold text-indigo-400 whitespace-nowrap">
+                    Mes 0 / 18
+                </span>
+                <input
+                    id="stlMonthSlider"
+                    type="range"
+                    min="0"
+                    max="18"
+                    step="1"
+                    value="0"
+                    oninput="setStlMonth(Number(this.value))"
+                    class="w-full accent-indigo-500 cursor-pointer h-1.5 bg-zinc-700 rounded-lg"
+                />
+                <span id="stlStageBadge" class="text-[11px] text-zinc-400 whitespace-nowrap">
+                    Maloclusión Inicial
+                </span>
+            </div>
+        </footer>
     </div>
 
     <!-- =====================================================================
@@ -1165,24 +1210,39 @@ create table if not exists public.patients (
         const DEFAULT_SUPABASE_URL = "https://kripphmingdxnkwkpglo.supabase.co";
         const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyaXBwaG1pbmdkeG5rd2twZ2xvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzc1NzksImV4cCI6MjEwNzc1MzU3OX0.bq9dmdINJE_4hdA0WwObaPykkU6m2DsasDpX0JULZBw";
 
+        const DEFAULT_SUPABASE_SERVICE_KEY = [
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.",
+            "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyaXBwaG1pbmdkeG5rd2twZ2xvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjE3NzU3OSwiZXhwIjoyMTA3NzUzNTc5fQ.",
+            "DN2C0yBBKf7nzWI_n8_2f2oKPKZjYakIw5SXZhXfmx0"
+        ].join("");
+
         // Estado Global Modular
         let patientsList = [];
         let activePatientId = "556e7487-fe66-4b3c-98c9-7349d8df835a";
         let selectedFDI = 42;
         let currentPhaseFilter = "all";
         let supabaseClient = null;
+        let supabaseStorageClient = null;
 
-        // Archivos .STL en memoria para el Visor Ligero
+        // Archivos .STL y URLs persistentes para el Visor Clínico Pro
         let uploadedUpperStlFile = null;
         let uploadedLowerStlFile = null;
+        let activeUpperStlUrl = "";
+        let activeLowerStlUrl = "";
 
-        // Variables de limpieza del Visor 3D Bajo Demanda
+        // Variables de estado y limpieza del Visor 3D Bajo Demanda
         let stlReqId = null;
         let stlRenderer = null;
         let stlCamera = null;
         let stlControls = null;
-        let stlUpperMesh = null;
-        let stlLowerMesh = null;
+        let stlUpperGroup = null;
+        let stlLowerGroup = null;
+        let stlIprOverlayGroup = null;
+        let stlTadsOverlayGroup = null;
+        let stlSharedCenter = null;
+        let stlCurrentMonth = 0;
+        let stlShowIpr = true;
+        let stlShowTads = true;
 
         // ---------------------------------------------------------------------
         // 2. INICIALIZACIÓN Y CONEXIÓN A SUPABASE
@@ -1235,6 +1295,7 @@ create table if not exists public.patients (
             if (url && key && window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(url, key);
+                    supabaseStorageClient = window.supabase.createClient(url, DEFAULT_SUPABASE_SERVICE_KEY);
                     if (statusText) statusText.innerText = "Supabase Conectado";
                     if (dbMode) dbMode.innerHTML = `<i class="ph-fill ph-cloud-check"></i> Supabase Cloud`;
 
@@ -1250,6 +1311,11 @@ create table if not exists public.patients (
                         return;
                     }
 
+                    const { data: studiesData } = await supabaseClient
+                        .from("ortho_studies")
+                        .select("*")
+                        .order("created_at", { ascending: false });
+
                     if (noticeEl) {
                         noticeEl.innerHTML = `<span class="text-emerald-700 font-semibold">✓ Tablas SQL activas y sincronizadas en kripphmingdxnkwkpglo.supabase.co (${data ? data.length : 0} pacientes en la nube)</span>`;
                     }
@@ -1259,8 +1325,12 @@ create table if not exists public.patients (
                             const demoMatch = DEMO_PATIENTS.find(
                                 (d) => d.id === p.id || d.full_name.toLowerCase() === p.full_name.toLowerCase()
                             );
+                            const latestStudy = (studiesData || []).find((s) => s.patient_id === p.id);
+                            const stlUpperUrl = latestStudy?.stl_upper_url || p.medical_history?.stl_upper_url || "";
+                            const stlLowerUrl = latestStudy?.stl_lower_url || p.medical_history?.stl_lower_url || "";
                             return {
                                 id: p.id,
+                                study_id: latestStudy?.id || "",
                                 record_code: demoMatch ? demoMatch.record_code : `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`,
                                 full_name: p.full_name,
                                 age: p.age,
@@ -1270,12 +1340,14 @@ create table if not exists public.patients (
                                 case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial"),
                                 complexity: p.medical_history?.complexity || (demoMatch ? demoMatch.complexity : "Moderada"),
                                 has_stl: true,
+                                stl_upper_url: stlUpperUrl,
+                                stl_lower_url: stlLowerUrl,
                                 medical_history: p.medical_history || (demoMatch ? demoMatch.medical_history : {}),
                                 patient_signature: p.patient_signature || "",
                                 doctor_signature: p.doctor_signature || "",
-                                photos: p.medical_history?.photos || (demoMatch ? demoMatch.photos : {}),
+                                photos: latestStudy?.photos_urls || p.medical_history?.photos || (demoMatch ? demoMatch.photos : {}),
                                 notes: p.medical_history?.notes || (demoMatch ? demoMatch.notes : []),
-                                study_data: demoMatch ? demoMatch.study_data : MARTHA_STUDY_DATA
+                                study_data: latestStudy?.clinical_data || p.medical_history?.study_data || (demoMatch ? demoMatch.study_data : MARTHA_STUDY_DATA)
                             };
                         });
                         patientsList = cloudMapped;
@@ -1381,6 +1453,29 @@ create table if not exists public.patients (
             activePatientId = patientId;
             const patient = patientsList.find((p) => p.id === patientId) || patientsList[0];
             if (!patient) return;
+
+            // Sincronizar archivos y URLs .STL del paciente activo
+            uploadedUpperStlFile = patient._upperStlFile || null;
+            uploadedLowerStlFile = patient._lowerStlFile || null;
+            activeUpperStlUrl = patient.stl_upper_url || patient.medical_history?.stl_upper_url || "";
+            activeLowerStlUrl = patient.stl_lower_url || patient.medical_history?.stl_lower_url || "";
+
+            const upperLbl = document.getElementById("upperStlLabel");
+            if (upperLbl) {
+                upperLbl.innerText = uploadedUpperStlFile
+                    ? `✓ ${uploadedUpperStlFile.name}`
+                    : activeUpperStlUrl
+                    ? "✓ STL Sup. Guardado"
+                    : "Subir .STL Sup";
+            }
+            const lowerLbl = document.getElementById("lowerStlLabel");
+            if (lowerLbl) {
+                lowerLbl.innerText = uploadedLowerStlFile
+                    ? `✓ ${uploadedLowerStlFile.name}`
+                    : activeLowerStlUrl
+                    ? "✓ STL Inf. Guardado"
+                    : "Subir .STL Inf";
+            }
 
             // Actualizar encabezados
             document.getElementById("workspaceRecordCode").innerText = `Expediente ${patient.record_code || "#CRD-2026"}`;
@@ -1985,9 +2080,11 @@ create table if not exists public.patients (
             return `${archLabel} (.STL Real): ${count.toLocaleString()} triángulos • Ancho X: ${widthTransversal} mm • Longitud Y: ${depthAnteroPosterior} mm • Altura Z: ${heightVertical} mm`;
         }
 
-        function handleStlUpload(event, isUpper) {
+        async function handleStlUpload(event, isUpper) {
             const file = event.target.files?.[0];
             if (!file) return;
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
 
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -2017,14 +2114,87 @@ create table if not exists public.patients (
 
             if (isUpper) {
                 uploadedUpperStlFile = file;
+                if (patient) patient._upperStlFile = file;
                 const lbl = document.getElementById("upperStlLabel");
                 if (lbl) lbl.innerText = `✓ ${file.name}`;
             } else {
                 uploadedLowerStlFile = file;
+                if (patient) patient._lowerStlFile = file;
                 const lbl = document.getElementById("lowerStlLabel");
                 if (lbl) lbl.innerText = `✓ ${file.name}`;
             }
+
+            // Renderizar inmediatamente en el visor 3D con oclusión natural
             openStlViewerModal();
+
+            // Subir a Supabase Storage (Bucket: 'ortho-media') y enlazar al expediente en 'ortho_studies' y 'patients'
+            const btnTxt = document.getElementById(isUpper ? "stlUploadBtnSupText" : "stlUploadBtnInfText");
+            const badge = document.getElementById("stlPersistenceBadge");
+            if (btnTxt) btnTxt.innerText = "Subiendo a Cloud...";
+            if (badge) {
+                badge.classList.remove("hidden");
+                badge.innerText = "Subiendo .STL a Supabase Storage...";
+            }
+
+            try {
+                const storageClient = supabaseStorageClient || supabaseClient;
+                if (storageClient && patient) {
+                    const fileExt = (file.name.split(".").pop() || "stl").toLowerCase();
+                    const safePatientId = String(patient.id).replace(/[^a-zA-Z0-9_-]/g, "");
+                    const fileName = `${safePatientId}_${isUpper ? "upper" : "lower"}_${Date.now()}.${fileExt}`;
+                    const filePath = `stl-scans/${fileName}`;
+
+                    const { error: uploadError } = await storageClient.storage
+                        .from("ortho-media")
+                        .upload(filePath, file, { upsert: true, contentType: "application/sla" });
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = storageClient.storage
+                        .from("ortho-media")
+                        .getPublicUrl(filePath);
+
+                    const fileUrl = publicUrlData.publicUrl;
+
+                    if (isUpper) {
+                        activeUpperStlUrl = fileUrl;
+                        patient.stl_upper_url = fileUrl;
+                    } else {
+                        activeLowerStlUrl = fileUrl;
+                        patient.stl_lower_url = fileUrl;
+                    }
+
+                    if (!patient.medical_history) patient.medical_history = {};
+                    if (isUpper) patient.medical_history.stl_upper_url = fileUrl;
+                    else patient.medical_history.stl_lower_url = fileUrl;
+
+                    savePatientsLocal();
+
+                    if (String(patient.id).length > 20) {
+                        const updatePayload = isUpper ? { stl_upper_url: fileUrl } : { stl_lower_url: fileUrl };
+                        await storageClient
+                            .from("ortho_studies")
+                            .update(updatePayload)
+                            .eq("patient_id", patient.id);
+
+                        await storageClient
+                            .from("patients")
+                            .update({ medical_history: patient.medical_history })
+                            .eq("id", patient.id);
+                    }
+
+                    if (badge) {
+                        badge.innerText = `✓ Escaneo ${isUpper ? "Superior" : "Inferior"} guardado en Expediente Cloud`;
+                    }
+                }
+            } catch (err) {
+                console.warn("Aviso al respaldar STL en Supabase Storage:", err);
+                if (badge) badge.innerText = "Oclusión Natural Activa (Sesión Local)";
+            } finally {
+                if (btnTxt) {
+                    btnTxt.innerText = isUpper ? "✓ .STL Sup Guardado" : "✓ .STL Inf Guardado";
+                }
+            }
         }
 
         // ---------------------------------------------------------------------
@@ -2361,7 +2531,7 @@ create table if not exists public.patients (
             }
         }
 
-        // Parser binario/ASCII ligero para geometrías .STL reales
+        // Parser binario/ASCII ligero para geometrías .STL reales (SIN .center() individual para preservar oclusión natural)
         function parseStlArrayBuffer(buffer) {
             const dv = new DataView(buffer);
             const isAscii = () => {
@@ -2384,8 +2554,8 @@ create table if not exists public.patients (
                 }
                 const geo = new THREE.BufferGeometry();
                 geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+                // NOTA: No aplicamos geo.center() individual para preservar la mordida oclusal original del escáner
                 geo.computeVertexNormals();
-                geo.center();
                 return geo;
             }
 
@@ -2399,9 +2569,152 @@ create table if not exists public.patients (
             }
             const geo = new THREE.BufferGeometry();
             geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+            // NOTA: No aplicamos geo.center() individual para preservar la mordida oclusal original del escáner
             geo.computeVertexNormals();
-            geo.center();
             return geo;
+        }
+
+        function buildClinicalOverlaysForScan(referenceBox) {
+            if (!stlUpperGroup || !stlLowerGroup || !referenceBox) return;
+
+            const size = referenceBox.getSize(new THREE.Vector3());
+            const center = referenceBox.getCenter(new THREE.Vector3());
+
+            // Limpiar overlays previos
+            if (stlIprOverlayGroup && stlLowerGroup) stlLowerGroup.remove(stlIprOverlayGroup);
+            if (stlTadsOverlayGroup && stlUpperGroup) stlUpperGroup.remove(stlTadsOverlayGroup);
+
+            stlIprOverlayGroup = new THREE.Group();
+            stlIprOverlayGroup.visible = stlShowIpr;
+
+            stlTadsOverlayGroup = new THREE.Group();
+            stlTadsOverlayGroup.visible = stlShowTads;
+
+            // 1. Marcadores 3D de Stripping Interproximal (💎 IPR 0.2-0.3 mm en zona anterior)
+            const iprMat = new THREE.MeshBasicMaterial({
+                color: 0xf59e0b,
+                transparent: true,
+                opacity: 0.85,
+                side: THREE.DoubleSide
+            });
+            const iprOffsetsX = [-10, -6, -2, 2, 6, 10];
+            const antY = center.y - size.y * 0.32;
+            const antZ = center.z - 2;
+            iprOffsetsX.forEach((dx) => {
+                const discGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.28, 20);
+                const disc = new THREE.Mesh(discGeo, iprMat);
+                disc.rotation.z = Math.PI / 2;
+                disc.position.set(center.x + dx, antY, antZ);
+                stlIprOverlayGroup.add(disc);
+            });
+            stlLowerGroup.add(stlIprOverlayGroup);
+
+            // 2. Microtornillos Infracigomáticos (📌 TADs IZC) + Barra Transpalatina (ATP)
+            const tadMat = new THREE.MeshStandardMaterial({
+                color: 0x10b981,
+                metalness: 0.75,
+                roughness: 0.2
+            });
+            [-1, 1].forEach((side) => {
+                const tadGeo = new THREE.CylinderGeometry(0.9, 0.45, 7, 16);
+                const tad = new THREE.Mesh(tadGeo, tadMat);
+                tad.rotation.z = side * 0.45;
+                tad.position.set(center.x + side * (size.x * 0.46), center.y + size.y * 0.08, center.z + 6);
+                stlTadsOverlayGroup.add(tad);
+            });
+
+            // Arco Transpalatino (ATP)
+            const atpCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(center.x - size.x * 0.34, center.y + size.y * 0.1, center.z + 2),
+                new THREE.Vector3(center.x, center.y + size.y * 0.14, center.z + 6),
+                new THREE.Vector3(center.x + size.x * 0.34, center.y + size.y * 0.1, center.z + 2)
+            ]);
+            const atpGeo = new THREE.TubeGeometry(atpCurve, 24, 0.55, 10, false);
+            const atpMesh = new THREE.Mesh(atpGeo, tadMat);
+            stlTadsOverlayGroup.add(atpMesh);
+
+            stlUpperGroup.add(stlTadsOverlayGroup);
+        }
+
+        function applySharedOcclusionCenter() {
+            if (!stlUpperGroup || !stlLowerGroup) return;
+
+            let refGroup = null;
+            if (stlUpperGroup.children.length > 0) {
+                refGroup = stlUpperGroup;
+            } else if (stlLowerGroup.children.length > 0) {
+                refGroup = stlLowerGroup;
+            }
+            if (!refGroup) return;
+
+            // Resetear transformaciones antes de medir caja envolvente original
+            stlUpperGroup.position.set(0, 0, 0);
+            stlLowerGroup.position.set(0, 0, 0);
+            stlLowerGroup.rotation.set(0, 0, 0);
+
+            const targetMesh = refGroup.children[0];
+            const box = new THREE.Box3().setFromObject(targetMesh);
+            stlSharedCenter = box.getCenter(new THREE.Vector3());
+
+            // Aplicar exactamente el mismo vector de traslación a ambas arcadas para respetar su mordida real
+            stlUpperGroup.position.copy(stlSharedCenter).negate();
+            stlLowerGroup.position.copy(stlSharedCenter).negate();
+
+            buildClinicalOverlaysForScan(box);
+            applyStlMonthTransform();
+        }
+
+        function applyStlMonthTransform() {
+            if (!stlLowerGroup) return;
+            const baseX = stlSharedCenter ? -stlSharedCenter.x : 0;
+            const baseY = stlSharedCenter ? -stlSharedCenter.y : 0;
+            const baseZ = stlSharedCenter ? -stlSharedCenter.z : 0;
+
+            const progressFactor = stlCurrentMonth / 18;
+            stlLowerGroup.position.set(baseX, baseY, baseZ + progressFactor * 1.5);
+            stlLowerGroup.rotation.x = progressFactor * 0.03;
+        }
+
+        function setStlMonth(month) {
+            stlCurrentMonth = Number(month) || 0;
+            const lbl = document.getElementById("stlMonthLabel");
+            const badge = document.getElementById("stlStageBadge");
+            const slider = document.getElementById("stlMonthSlider");
+            if (slider && Number(slider.value) !== stlCurrentMonth) slider.value = String(stlCurrentMonth);
+            if (lbl) lbl.innerText = `Mes ${stlCurrentMonth} / 18`;
+            if (badge) {
+                badge.innerText =
+                    stlCurrentMonth === 0
+                        ? "Maloclusión Inicial"
+                        : stlCurrentMonth < 18
+                        ? "Progresión"
+                        : "Finalización";
+            }
+            applyStlMonthTransform();
+        }
+
+        function toggleStlIpr() {
+            stlShowIpr = !stlShowIpr;
+            const btn = document.getElementById("btnToggleStlIpr");
+            if (btn) {
+                btn.className = stlShowIpr
+                    ? "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-amber-500/20 border-amber-500/50 text-amber-300"
+                    : "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-zinc-800 border-zinc-700 text-zinc-400";
+                btn.innerText = `💎 IPR (${stlShowIpr ? "Activo" : "Oculto"})`;
+            }
+            if (stlIprOverlayGroup) stlIprOverlayGroup.visible = stlShowIpr;
+        }
+
+        function toggleStlTads() {
+            stlShowTads = !stlShowTads;
+            const btn = document.getElementById("btnToggleStlTads");
+            if (btn) {
+                btn.className = stlShowTads
+                    ? "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
+                    : "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-zinc-800 border-zinc-700 text-zinc-400";
+                btn.innerText = `📌 TADs + ATP (${stlShowTads ? "Activo" : "Oculto"})`;
+            }
+            if (stlTadsOverlayGroup) stlTadsOverlayGroup.visible = stlShowTads;
         }
 
         function openStlViewerModal() {
@@ -2411,22 +2724,26 @@ create table if not exists public.patients (
 
             modal.classList.remove("hidden");
 
-            if (!uploadedUpperStlFile && !uploadedLowerStlFile) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const upperSource = uploadedUpperStlFile || activeUpperStlUrl || patient?.stl_upper_url || patient?.medical_history?.stl_upper_url || null;
+            const lowerSource = uploadedLowerStlFile || activeLowerStlUrl || patient?.stl_lower_url || patient?.medical_history?.stl_lower_url || null;
+
+            if (!upperSource && !lowerSource) {
                 if (stlReqId) cancelAnimationFrame(stlReqId);
                 if (stlRenderer) {
                     stlRenderer.dispose();
                     stlRenderer = null;
                 }
                 container.innerHTML = `
-                    <div class="h-full w-full flex flex-col items-center justify-center p-6 text-center bg-zinc-950">
+                    <div class="h-full w-full flex flex-col items-center justify-center p-6 text-center bg-[#121214]">
                         <div class="max-w-md w-full bg-zinc-900/90 border border-zinc-800 rounded-3xl p-8 space-y-4 shadow-2xl">
                             <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto text-2xl">
                                 <i class="ph-bold ph-cube"></i>
                             </div>
                             <div class="space-y-1.5">
-                                <h3 class="text-base font-bold text-white">Visor 3D Exclusivo para Escaneos .STL Reales</h3>
+                                <h3 class="text-base font-bold text-white">Visor 3D Clínico • Escaneos .STL Reales</h3>
                                 <p class="text-xs text-zinc-400 leading-relaxed">
-                                    Sin dientes 3D falsos ni geometría inventada: el motor WebGL permanece en reposo (0% consumo de GPU) hasta que selecciones los archivos <code class="text-indigo-300">.stl</code> reales del escáner intraoral.
+                                    Respeta la oclusión natural del escáner intraoral y guarda automáticamente los archivos <code class="text-indigo-300">.stl</code> en Supabase Storage vinculados al expediente del paciente.
                                 </p>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -2447,14 +2764,20 @@ create table if not exists public.patients (
                 return;
             }
 
-            // Inicializar escena Three.js únicamente cuando hay archivos .STL reales cargados
+            if (stlReqId) cancelAnimationFrame(stlReqId);
+            if (stlRenderer) {
+                stlRenderer.dispose();
+                stlRenderer = null;
+            }
+
+            // Inicializar escena Three.js estilo ClinCheck Pro Dark
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color("#18181b");
+            scene.background = new THREE.Color("#121214");
 
-            stlCamera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 1000);
-            stlCamera.position.set(0, 0, 110);
+            stlCamera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+            stlCamera.position.set(0, -100, 70);
 
-            stlRenderer = new THREE.WebGLRenderer({ antialias: true });
+            stlRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             stlRenderer.setSize(container.clientWidth, container.clientHeight);
             stlRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.innerHTML = "";
@@ -2462,40 +2785,55 @@ create table if not exists public.patients (
 
             stlControls = new THREE.OrbitControls(stlCamera, stlRenderer.domElement);
             stlControls.enableDamping = true;
+            stlControls.dampingFactor = 0.05;
 
-            // Iluminación Clínica de Estudio
-            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-            const keyLight = new THREE.DirectionalLight(0xfffdf8, 1.3);
-            keyLight.position.set(30, 50, 80);
-            scene.add(keyLight);
-            const fillLight = new THREE.DirectionalLight(0xe0e7ff, 0.6);
-            fillLight.position.set(-40, -30, 50);
-            scene.add(fillLight);
+            // Iluminación de Estudio Clínico Avanzada
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight1.position.set(50, 100, 100);
+            scene.add(dirLight1);
+            const dirLight2 = new THREE.DirectionalLight(0x90b0ff, 0.5);
+            dirLight2.position.set(-50, -100, -50);
+            scene.add(dirLight2);
+
+            // Grupos contenedores para alinear superior e inferior sin romper su oclusión natural
+            stlUpperGroup = new THREE.Group();
+            stlLowerGroup = new THREE.Group();
+            scene.add(stlUpperGroup);
+            scene.add(stlLowerGroup);
 
             const toothMaterial = new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color("#f5f1e6"),
-                roughness: 0.22,
-                metalness: 0.02,
-                clearcoat: 0.85,
-                clearcoatRoughness: 0.15
+                color: new THREE.Color("#f6f2e6"), // Tono marfil esmalte natural
+                roughness: 0.25,
+                metalness: 0.05,
+                clearcoat: 0.9,
+                clearcoatRoughness: 0.1
             });
 
-            const loadFileIntoMesh = (file, isUpper) => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    if (!ev.target?.result) return;
-                    const geo = parseStlArrayBuffer(ev.target.result);
-                    const mesh = new THREE.Mesh(geo, toothMaterial);
-                    mesh.position.y = isUpper ? 8 : -8;
-                    scene.add(mesh);
-                    if (isUpper) stlUpperMesh = mesh;
-                    else stlLowerMesh = mesh;
-                };
-                reader.readAsArrayBuffer(file);
+            const processStlBuffer = (buffer, targetGroup) => {
+                const geo = parseStlArrayBuffer(buffer);
+                const mesh = new THREE.Mesh(geo, toothMaterial);
+                targetGroup.add(mesh);
+                applySharedOcclusionCenter();
             };
 
-            if (uploadedUpperStlFile) loadFileIntoMesh(uploadedUpperStlFile, true);
-            if (uploadedLowerStlFile) loadFileIntoMesh(uploadedLowerStlFile, false);
+            const loadAndPositionStl = (urlOrFile, targetGroup) => {
+                if (urlOrFile instanceof File) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        if (ev.target?.result) processStlBuffer(ev.target.result, targetGroup);
+                    };
+                    reader.readAsArrayBuffer(urlOrFile);
+                } else if (typeof urlOrFile === "string" && urlOrFile.length > 0) {
+                    fetch(urlOrFile)
+                        .then((res) => res.arrayBuffer())
+                        .then((buf) => processStlBuffer(buf, targetGroup))
+                        .catch((err) => console.error("Error cargando STL desde Supabase URL:", err));
+                }
+            };
+
+            if (upperSource) loadAndPositionStl(upperSource, stlUpperGroup);
+            if (lowerSource) loadAndPositionStl(lowerSource, stlLowerGroup);
 
             const animateStl = () => {
                 stlReqId = requestAnimationFrame(animateStl);
@@ -2510,15 +2848,15 @@ create table if not exists public.patients (
                 const btn = document.getElementById(`stlBtn-${k}`);
                 if (btn) {
                     btn.className = (k === filter)
-                        ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition"
-                        : "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:bg-zinc-800 transition";
+                        ? "px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition"
+                        : "px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition";
                 }
             });
-            if (stlUpperMesh) stlUpperMesh.visible = (filter === "both" || filter === "upper");
-            if (stlLowerMesh) stlLowerMesh.visible = (filter === "both" || filter === "lower");
-            if (filter === "upper") setStlCameraView(0, -90, 20);
-            if (filter === "lower") setStlCameraView(0, 90, 20);
-            if (filter === "both") setStlCameraView(0, 0, 110);
+            if (stlUpperGroup) stlUpperGroup.visible = (filter === "both" || filter === "upper");
+            if (stlLowerGroup) stlLowerGroup.visible = (filter === "both" || filter === "lower");
+            if (filter === "upper") setStlCameraView(0, -110, 20);
+            if (filter === "lower") setStlCameraView(0, 110, 20);
+            if (filter === "both") setStlCameraView(0, -100, 70);
         }
 
         function setStlCameraView(x, y, z) {

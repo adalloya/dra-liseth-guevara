@@ -316,8 +316,9 @@ export default function PatientWorkspacePage() {
 
       {isStlViewerOpen && (
         <StlViewerModal
-          upperFile={upperStl}
-          lowerFile={lowerStl}
+          patientId="556e7487-fe66-4b3c-98c9-7349d8df835a"
+          initialUpperUrl={upperStl ? URL.createObjectURL(upperStl) : undefined}
+          initialLowerUrl={lowerStl ? URL.createObjectURL(lowerStl) : undefined}
           onClose={() => setIsStlViewerOpen(false)}
         />
       )}
