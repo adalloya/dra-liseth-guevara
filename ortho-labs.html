@@ -775,27 +775,6 @@
                 <!-- Cuadrícula Milimétrica Opcional ClinCheck -->
                 <div id="millimeterGridOverlay" class="clincheck-grid-overlay absolute inset-0 hidden pointer-events-none z-10"></div>
 
-                <!-- Calibrador de Medición Overjet / Overbite estilo ClinCheck -->
-                <div id="overjetCaliperOverlay" class="hidden absolute top-28 left-1/2 -translate-x-1/2 pointer-events-none z-20 flex items-center justify-center">
-                    <div class="apple-glass border border-sky-400/40 p-3 rounded-2xl shadow-2xl flex flex-col items-center space-y-1.5 animate-fade-in text-center max-w-xs pointer-events-auto">
-                        <div class="flex items-center space-x-2 text-xs font-bold text-sky-400">
-                            <i class="ph-bold ph-crosshair text-sm"></i>
-                            <span>Calibrador Ortodóntico Activo</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 w-full pt-1 text-center">
-                            <div class="p-1.5 rounded-xl bg-black/40 border border-white/10">
-                                <div class="text-[10px] text-zinc-400">Overjet Sagital</div>
-                                <div id="caliperOJVal" class="text-xs font-mono font-bold text-sky-300">3.8 mm</div>
-                            </div>
-                            <div class="p-1.5 rounded-xl bg-black/40 border border-white/10">
-                                <div class="text-[10px] text-zinc-400">Overbite Vertical</div>
-                                <div id="caliperOBVal" class="text-xs font-mono font-bold text-amber-300">-4.5 mm</div>
-                            </div>
-                        </div>
-                        <div class="text-[9px] text-zinc-400">Caninos &amp; Incisivos Centrales (11, 21, 31, 41)</div>
-                    </div>
-                </div>
-
                 <!-- Controles Verticales Izquierdos (+, -, ↻, ✥, ⌂) -->
                 <div class="clincheck-left-controls absolute top-1/2 left-3 -translate-y-1/2 z-20 pointer-events-auto" role="group" aria-label="Controles Rápidos 3D">
                     <button onclick="zoomCameraStep('in')" class="clincheck-side-btn" title="Acercar (Zoom In)">
@@ -837,147 +816,42 @@
                         </button>
                     </div>
 
-                    <!-- Suite Completa de 18 Controles Oficiales Invisalign ClinCheck (WccViewControls) -->
-                    <div class="clincheck-top-toolbar flex items-center space-x-1 overflow-x-auto no-scrollbar max-w-[96vw] px-2.5 py-1.5" role="toolbar" aria-label="Suite Completa de Controles ClinCheck">
-                        
-                        <!-- SECCIÓN 1: VISTAS Y ARCADAS -->
-                        <div class="flex items-center space-x-0.5 shrink-0" role="group" aria-label="Vistas y Arcadas">
-                            <!-- 1. Números Dentales (WccViewControls-number) -->
-                            <button id="ccBtn-numbers" onclick="toggleNumberingSystem()" class="clincheck-icon-btn active" data-tooltip="Números (#U / #FDI / Off)" title="Alternar Números Dentales">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.60678 21.7024C5.7017 20.7249 2.6455 17.3496 2.09639 13.4079C1.2613 7.41327 5.96056 2 11.9996 2C16.9089 2 21.2287 5.74379 21.9028 10.5827C22.874 17.5544 16.4053 23.4043 9.60678 21.7024ZM12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM10.948 16V11.224H9.268V9.58C10.456 9.532 11.32 8.872 11.56 7.708H13.348V16H10.948Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 2. Oclusal Superior (WccViewControls-upper) -->
-                            <button id="ccBtn-coronalTop" onclick="setCameraView('upper')" class="clincheck-icon-btn" data-tooltip="Oclusal Sup." title="Vista Oclusal Superior">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 8H22V11H2V8ZM8 13H16V16H8V13Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 3. Aislar Maxilar (WccViewControls-maxil) -->
-                            <button id="ccBtn-upper" onclick="setArchVisibility('upper')" class="clincheck-icon-btn" data-tooltip="Maxilar" title="Aislar Arcada Superior">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M19 22V12.0051C19 8.13714 15.866 5.00153 12 5.00153C8.13401 5.00153 5 8.13714 5 12.0051V22H2V12.0051C2 6.47944 6.47715 2 12 2C17.5228 2 22 6.47944 22 12.0051V22H19Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 4. Lateral Derecha (WccViewControls-right) -->
-                            <button id="ccBtn-right" onclick="setCameraView('right')" class="clincheck-icon-btn" data-tooltip="Lateral Der." title="Vista Lateral Derecha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M19 6H22V11H2V8H19V6ZM2 13H22V16H2V13Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 5. Anterior Frontal (WccViewControls-anter) -->
-                            <button id="ccBtn-front" onclick="setCameraView('front')" class="clincheck-icon-btn active" data-tooltip="Frontal" title="Vista Anterior Frontal">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 8H22V11H2V8ZM2 13H22V16H2V13Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 6. Lateral Izquierda (WccViewControls-left) -->
-                            <button id="ccBtn-left" onclick="setCameraView('left')" class="clincheck-icon-btn" data-tooltip="Lateral Izq." title="Vista Lateral Izquierda">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 6H5V8H22V11H2V6ZM2 13H22V16H2V13Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 7. Aislar Mandíbula (WccViewControls-mand) -->
-                            <button id="ccBtn-lower" onclick="setArchVisibility('lower')" class="clincheck-icon-btn" data-tooltip="Mandíbula" title="Aislar Arcada Inferior">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M19 2V11.9949C19 15.8652 15.8653 19.0016 12 19.0016C8.13469 19.0016 5 15.8652 5 11.9949V2H2V11.9949C2 17.5205 6.47715 22 12 22C17.5228 22 22 17.5205 22 11.9949V2H19Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 8. Oclusal Inferior (WccViewControls-lower) -->
-                            <button id="ccBtn-overjetBottom" onclick="setCameraView('lower')" class="clincheck-icon-btn" data-tooltip="Oclusal Inf." title="Vista Oclusal Inferior">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2 13H22V16H2V13ZM8 8H16V11H8V8Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- DIVISOR SUTIL 1 -->
-                        <div class="h-4 w-[1px] bg-white/15 dark:bg-white/10 shrink-0 mx-0.5"></div>
-
-                        <!-- SECCIÓN 2: MEDICIÓN Y OCLUSIÓN -->
-                        <div class="flex items-center space-x-0.5 shrink-0" role="group" aria-label="Medición y Diagnóstico">
-                            <!-- 9. Cuadrícula Milimétrica (WccViewControls-grid) -->
-                            <button id="ccBtn-grid" onclick="toggleMillimeterGrid()" class="clincheck-icon-btn" data-tooltip="Cuadrícula" title="Cuadrícula Milimétrica">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill="currentColor" d="M3,3 L21,3 L21,21 L3,21 L3,3 Z M6,6 L6,10.5 L10.5,10.5 L10.5,6 L6,6 Z M6,13.5 L6,18 L10.5,18 L10.5,13.5 L6,13.5 Z M18,13.5 L13.5,13.5 L13.5,18 L18,18 L18,13.5 Z M18,10.5 L18,6 L13.5,6 L13.5,10.5 L18,10.5 Z"/>
-                                </svg>
-                            </button>
-                            <!-- 10. Calibrador Overjet / Overbite (WccViewControls-over) -->
-                            <button id="ccBtn-overjet" onclick="toggleOverjetCaliper()" class="clincheck-icon-btn" data-tooltip="Overjet / Overbite" title="Medición de Sobremordida">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12,5 C10.0933,5 8.29278,5.92245 7,7.53247 L7,16.4675 C8.29278,18.0775 10.0933,19 12,19 C13.9067,19 15.7072,18.0775 17,16.4675 L17,7.53247 C15.7072,5.92245 13.9067,5 12,5 Z M20,6.57074 L20,17.4293 C18.2122,20.1974 15.2951,22 12,22 C8.70489,22 5.78775,20.1974 4,17.4293 L4,6.57074 C5.78775,3.80257 8.70489,2 12,2 C15.2951,2 18.2122,3.80257 20,6.57074 Z M11,11 L11,9 L13,9 L13,11 L15,11 L15,13 L13,13 L13,15 L11,15 L11,13 L9,13 L9,11 L11,11 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 11. Mapa de Contactos Oclusales (WccViewControls-occlus) -->
-                            <button id="ccBtn-occlus" onclick="toggleOcclusalHeatmap()" class="clincheck-icon-btn" data-tooltip="Contactos Oclusales" title="Mapa de Contactos Oclusales">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7,16.12 L13.3636,15 L13.3636,18.6364 L17,17.9474 L17,7.53247 C15.7072,5.92245 13.9067,5 12,5 C10.0933,5 8.29278,5.92245 7,7.53247 L7,16.12 Z M4,16.648 L4,6.57074 C5.78775,3.80257 8.70489,2 12,2 C15.2951,2 18.2122,3.80257 20,6.57074 Z M20,17.3789 L22,17 L22,20 L10.6364,22 L10.6364,18.3636 L2,20 L2,17 L4,16.648 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- DIVISOR SUTIL 2 -->
-                        <div class="h-4 w-[1px] bg-white/15 dark:bg-white/10 shrink-0 mx-0.5"></div>
-
-                        <!-- SECCIÓN 3: BIOMECÁNICA Y CAPAS CLÍNICAS -->
-                        <div class="flex items-center space-x-0.5 shrink-0" role="group" aria-label="Biomecánica y Capas">
-                            <!-- 12. Ataches Ortodónticos (WccViewControls-attach) -->
-                            <button id="ccBtn-attach" onclick="toggleLayerBtn('attachments')" class="clincheck-icon-btn active" data-tooltip="Ataches (On/Off)" title="Ataches Ortodónticos">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12,5 C10.0933,5 8.29278,5.92245 7,7.53247 L7,16.4675 C8.29278,18.0775 10.0933,19 12,19 C13.9067,19 15.7072,18.0775 17,16.4675 L17,7.53247 C15.7072,5.92245 13.9067,5 12,5 Z M20,6.57074 L20,17.4293 C18.2122,20.1974 15.2951,22 12,22 C8.70489,22 5.78775,20.1974 4,17.4293 L4,6.57074 C5.78775,3.80257 8.70489,2 12,2 C15.2951,2 18.2122,3.80257 20,6.57074 Z M10,9 L10,15 L14,15 L14,9 L10,9 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 13. Stripping IPR (WccViewControls-ipr) -->
-                            <button id="ccBtn-ipr" onclick="toggleLayerBtn('ipr')" class="clincheck-icon-btn active" data-tooltip="Stripping IPR" title="Prescripción de Stripping (IPR)">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M17.7574,12 L12,6.24264 L6.24264,12 L12,17.7574 L17.7574,12 Z M12,22 L2,12 L12,2 L22,12 L12,22 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 14. Pónticos Virtuales (WccViewControls-pontic) -->
-                            <button id="ccBtn-pontic" onclick="togglePonticsLayer()" class="clincheck-icon-btn" data-tooltip="Pónticos (14, 24, 34, 44)" title="Pónticos Virtuales de Extracción">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M20,18 L22,18 L22,21 L2,21 L2,18 L4,18 L4,6.44124 C5.78775,3.7515 8.70489,2 12,2 C15.2951,2 18.2122,3.7515 20,6.44124 L20,18 Z M12,5 C10.086,5 8.28823,5.88853 7,7.42965 L7,18 L17,18 L17,7.42965 C15.7118,5.88853 13.914,5 12,5 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 15. Raíces Rx & Enanismo (WccViewControls-roots) -->
-                            <button id="ccBtn-roots" onclick="toggleLayerBtn('roots')" class="clincheck-icon-btn active" data-tooltip="Raíces Rx (1:1.1)" title="Raíces Transparentes & Alerta Enanismo">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill="currentColor" d="M20 6.57C18.212 3.804 15.295 2 12 2S5.788 3.803 4 6.57v8.748L7 22l5-4.879L17 22l3-6.682V6.571zM7 7.533C8.293 5.922 10.093 5 12 5s3.707.922 5 2.532v7.15l-.984 2.213L12 12.879l-4.016 4.016L7 14.682v-7.15z"/>
-                                </svg>
-                            </button>
-                            <!-- 16. Superposición Fantasma (WccViewControls-super) -->
-                            <button id="ccBtn-super" onclick="toggleLayerBtn('ghost')" class="clincheck-icon-btn" data-tooltip="Superposición Fantasma" title="Superposición Inicial vs Actual">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12,5 C10.0933,5 8.29278,5.92245 7,7.53247 L7,16.4675 C8.29278,18.0775 10.0933,19 12,19 C12,17 12,7 12,5 Z M20,6.57074 L20,17.4293 C18.2122,20.1974 15.2951,22 12,22 C8.70489,22 5.78775,20.1974 4,17.4293 L4,6.57074 C5.78775,3.80257 8.70489,2 12,2 C15.2951,2 18.2122,3.80257 20,6.57074 Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- DIVISOR SUTIL 3 -->
-                        <div class="h-4 w-[1px] bg-white/15 dark:bg-white/10 shrink-0 mx-0.5"></div>
-
-                        <!-- SECCIÓN 4: ENFOQUE DENTAL Y SUITE -->
-                        <div class="flex items-center space-x-0.5 shrink-0" role="group" aria-label="Enfoque y Registros">
-                            <!-- 17. Modo Restaurativo / Enfoque Dental (WccViewControls-restorative) -->
-                            <button id="ccBtn-tooth" onclick="toggleToothFocusMode()" class="clincheck-icon-btn" data-tooltip="Enfoque Dental" title="Modo Restaurativo y Enfoque Dental">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M9.4022 2.86439C7.84747 2.4113 6.16918 2.82853 5.00761 3.95691L4.15239 4.7877C3.04488 5.86357 2.56629 7.43214 2.88456 8.94303L3.62576 12.4617L6.44533 11.2926L5.82014 8.32465C5.71405 7.82102 5.87358 7.29816 6.24275 6.93954L7.09797 6.10875C7.48516 5.73262 8.04459 5.59355 8.56283 5.74458L10.7525 6.3827C11.5747 6.62233 12.4483 6.62233 13.2706 6.3827L15.4602 5.74458C15.9784 5.59355 16.5379 5.73262 16.925 6.10875L17.7571 6.91705C18.1326 7.28179 18.2908 7.81586 18.1745 8.32623L17.43 11.5932L20.2471 12.7334L21.0995 8.99274C21.4484 7.46164 20.9739 5.85941 19.8475 4.76522L19.0154 3.95691C17.8538 2.82853 16.1756 2.4113 14.6208 2.86439L12.4312 3.50251C12.1571 3.58239 11.8659 3.58239 11.5918 3.50251L9.4022 2.86439Z" fill="currentColor"/>
-                                    <path d="M19.5719 15.6966L16.7548 14.5563L16.2078 16.9569C16.1515 17.204 16.0422 17.4358 15.8873 17.6364L15.3987 18.2693C15.3761 18.2986 15.3411 18.3158 15.304 18.3158C15.2611 18.3158 15.2214 18.2928 15.2001 18.2555L13.8586 15.9098C13.0416 14.4811 10.9815 14.4812 10.1644 15.9098L8.87367 18.1668C8.82096 18.2589 8.72293 18.3158 8.61676 18.3158C8.52506 18.3158 8.43854 18.2733 8.3825 18.2007L7.95852 17.6515C7.80133 17.4479 7.69215 17.2115 7.63913 16.9598L7.0745 14.2794L4.25493 15.4484L4.70356 17.5782C4.84969 18.2719 5.15063 18.9237 5.58389 19.4849L6.00788 20.034C6.63197 20.8424 7.59552 21.3158 8.61676 21.3158C9.79912 21.3158 10.8909 20.6825 11.4779 19.6561L12.0115 18.723L12.5959 19.7449C13.1515 20.7163 14.1849 21.3158 15.304 21.3158C16.2706 21.3158 17.1826 20.8677 17.7733 20.1026L18.2619 19.4698C18.6827 18.9248 18.9799 18.2948 19.1329 17.6234L19.5719 15.6966Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                            <!-- 18. Suite Completa / Multi-Vista (WccViewControls-comp) -->
-                            <button id="ccBtn-comp" onclick="openDoctorSiteRecordsModal()" class="clincheck-icon-btn" data-tooltip="Suite Clínico / Registros" title="Suite de Registros Clínicos 3 Columnas">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path fill="currentColor" d="M2 5H7V11H2V5Z"/>
-                                    <path fill="currentColor" d="M2 13H11V19H2V13Z"/>
-                                    <path fill="currentColor" d="M22 13H13V19H22V13Z"/>
-                                    <path fill="currentColor" d="M9 5H15V11H9V5Z"/>
-                                    <path fill="currentColor" d="M22 5H17V11H22V5Z"/>
-                                </svg>
-                            </button>
-                        </div>
-
+                    <!-- ClinCheck Dark Studio Top 10-Icon Toolbar -->
+                    <div class="clincheck-top-toolbar" role="toolbar" aria-label="Herramientas ClinCheck Studio">
+                        <button id="ccBtn-numbers" onclick="toggleNumberingSystem()" class="clincheck-icon-btn active" data-tooltip="Alternar Números (#U / #FDI / Off)" title="Alternar Números Dentales">
+                            <span id="ccNumbersLabel" class="text-[11px] font-black font-mono">#U</span>
+                        </button>
+                        <button id="ccBtn-coronalTop" onclick="setCameraView('upper')" class="clincheck-icon-btn" data-tooltip="Oclusal Sup." title="Vista Oclusal Superior">
+                            <i class="ph-bold ph-arrow-up text-sm"></i>
+                        </button>
+                        <button id="ccBtn-upper" onclick="setArchVisibility('upper')" class="clincheck-icon-btn" data-tooltip="Maxilar" title="Aislar Arcada Superior">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M4 14 C 4 5.5, 16 5.5, 16 14"/>
+                            </svg>
+                        </button>
+                        <button id="ccBtn-right" onclick="setCameraView('right')" class="clincheck-icon-btn" data-tooltip="Lat. Der." title="Vista Lateral Derecha">
+                            <i class="ph-bold ph-arrow-right text-sm"></i>
+                        </button>
+                        <button id="ccBtn-front" onclick="setCameraView('front')" class="clincheck-icon-btn active" data-tooltip="Frontal" title="Vista Frontal">
+                            <i class="ph-bold ph-eye text-sm"></i>
+                        </button>
+                        <button id="ccBtn-left" onclick="setCameraView('left')" class="clincheck-icon-btn" data-tooltip="Lat. Izq." title="Vista Lateral Izquierda">
+                            <i class="ph-bold ph-arrow-left text-sm"></i>
+                        </button>
+                        <button id="ccBtn-lower" onclick="setArchVisibility('lower')" class="clincheck-icon-btn" data-tooltip="Mandíbula" title="Aislar Arcada Inferior">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M4 6 C 4 14.5, 16 14.5, 16 6"/>
+                            </svg>
+                        </button>
+                        <button id="ccBtn-overjetBottom" onclick="setCameraView('lower')" class="clincheck-icon-btn" data-tooltip="Oclusal Inf." title="Vista Oclusal Inferior">
+                            <i class="ph-bold ph-arrow-down text-sm"></i>
+                        </button>
+                        <button id="ccBtn-grid" onclick="toggleMillimeterGrid()" class="clincheck-icon-btn" data-tooltip="Cuadrícula" title="Cuadrícula Milimétrica">
+                            <i class="ph-bold ph-grid-four text-sm"></i>
+                        </button>
+                        <button id="ccBtn-tooth" onclick="toggleToothFocusMode()" class="clincheck-icon-btn" data-tooltip="Enfocar Diente" title="Modo Enfoque Dental">
+                            <i class="ph-fill ph-tooth text-sm"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -1772,10 +1646,7 @@
             tads: true,
             attachments: true,
             tongue: false,
-            ghost: false,
-            occlusalContacts: false,
-            overjetCaliper: false,
-            pontics: false
+            ghost: false
         };
 
         let currentLightboxIndex = 0;
@@ -2423,43 +2294,6 @@
             showToast(isGridVisible ? 'Cuadrícula Milimétrica: Activada' : 'Cuadrícula Milimétrica: Desactivada');
         }
 
-        function toggleOverjetCaliper() {
-            layerState.overjetCaliper = !layerState.overjetCaliper;
-            const overlay = document.getElementById('overjetCaliperOverlay');
-            const btn = document.getElementById('ccBtn-overjet');
-            if (overlay) overlay.classList.toggle('hidden', !layerState.overjetCaliper);
-            if (btn) btn.classList.toggle('active', layerState.overjetCaliper);
-            showToast(layerState.overjetCaliper ? 'Calibrador Overjet / Overbite: Activado' : 'Calibrador Overjet / Overbite: Desactivado');
-        }
-
-        function toggleOcclusalHeatmap() {
-            layerState.occlusalContacts = !layerState.occlusalContacts;
-            const btn = document.getElementById('ccBtn-occlus');
-            if (btn) btn.classList.toggle('active', layerState.occlusalContacts);
-
-            Object.values(teethObjects).forEach(t => {
-                const isMolarOrPremolar = [15, 16, 17, 25, 26, 27, 35, 36, 37, 45, 46, 47].includes(t.fdi);
-                if (layerState.occlusalContacts) {
-                    if (isMolarOrPremolar) {
-                        t.crownMesh.material.color.setHex(0xf43f5e);
-                    } else {
-                        t.crownMesh.material.color.setHex(0x10b981);
-                    }
-                } else {
-                    t.crownMesh.material.color.setHex(0xfafaf9);
-                }
-            });
-
-            showToast(layerState.occlusalContacts ? 'Mapa de Contactos Oclusales: Activado' : 'Mapa de Contactos Oclusales: Desactivado');
-        }
-
-        function togglePonticsLayer() {
-            layerState.pontics = !layerState.pontics;
-            const btn = document.getElementById('ccBtn-pontic');
-            if (btn) btn.classList.toggle('active', layerState.pontics);
-            showToast(layerState.pontics ? 'Pónticos Virtuales (14, 24, 34, 44): Mostrando' : 'Pónticos Virtuales: Ocultos');
-        }
-
         function zoomCameraStep(direction) {
             if (!camera || !controls) return;
             const factor = direction === 'in' ? 0.82 : 1.22;
@@ -2745,11 +2579,6 @@
             document.getElementById('popMetricOB').innerText = `${currentOB > 0 ? '+' : ''}${currentOB} mm`;
             document.getElementById('popMetricOJ').innerText = `${currentOJ} mm`;
             document.getElementById('popMetricIMPA').innerText = `${currentIMPA}°`;
-
-            const calOJ = document.getElementById('caliperOJVal');
-            const calOB = document.getElementById('caliperOBVal');
-            if (calOJ) calOJ.innerText = `${currentOJ} mm`;
-            if (calOB) calOB.innerText = `${currentOB > 0 ? '+' : ''}${currentOB} mm`;
 
             let shortPhase = "Maloclusión Inicial";
             let fullDesc = "Mordida abierta anterior severa (-4.5 mm), diastema central 11-21 (0.6 mm), ausencia de 14, 24, 34, 44 y apiñamiento anteroinferior con raíces cortas.";
@@ -3915,22 +3744,6 @@
                     btn.className = "h-8 px-2.5 rounded-lg text-zinc-400 hover:text-white text-[11px] font-medium whitespace-nowrap flex items-center space-x-1.5 transition active:scale-95";
                 }
             }
-
-            // Sincronizar también con la barra ClinCheck superior oficial
-            const ccMap = {
-                'attachments': 'ccBtn-attach',
-                'ipr': 'ccBtn-ipr',
-                'roots': 'ccBtn-roots',
-                'ghost': 'ccBtn-super'
-            };
-            const ccBtnId = ccMap[layerKey];
-            if (ccBtnId) {
-                const ccBtn = document.getElementById(ccBtnId);
-                if (ccBtn) {
-                    ccBtn.classList.toggle('active', layerState[layerKey]);
-                }
-            }
-
             updateStageVisualization(currentStage);
         }
 
