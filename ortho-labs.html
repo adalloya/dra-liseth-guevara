@@ -1250,9 +1250,15 @@
                             </span>
                             <span id="workspaceRecordCode" class="text-xs text-slate-500 mono truncate">Expediente #IDI-2026-0912</span>
                         </div>
-                        <h1 id="workspacePatientTitle" class="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-0.5 truncate">
-                            Martha Gabriela Zúñiga Núñez (40 años)
-                        </h1>
+                        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <h1 id="workspacePatientTitle" class="text-base sm:text-lg font-bold tracking-tight text-slate-900 truncate">
+                                Martha Gabriela Zúñiga Núñez (40 años)
+                            </h1>
+                            <span id="workspaceTimelineQuickBadge" class="hidden sm:inline-flex items-center gap-1 text-[10.5px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
+                                <i class="ph-bold ph-map-pin"></i>
+                                <span id="workspaceTimelineQuickBadgeText">Cita en curso</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -1277,7 +1283,7 @@
                         onclick="setWorkspaceTab('historia')"
                         class="text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900"
                     >
-                        3. Historia y Firmas
+                        3. Historia y Timeline de Citas
                     </button>
                 </div>
 
@@ -1863,10 +1869,134 @@
             </div>
 
             <!-- =============================================================
-                 MÓDULO 3: HISTORIA CLÍNICA, EVOLUCIÓN Y FIRMAS DIGITALES
-                 (src/components/modules/ClinicalHistory.tsx + SignaturePad.tsx)
+                 MÓDULO 3: HISTORIA CLÍNICA, TIMELINE DE CITAS Y FIRMAS DIGITALES
+                 (src/components/modules/ClinicalHistory.tsx + PatientTimeline.tsx)
             ============================================================== -->
             <div id="module-historia" class="hidden space-y-6">
+
+                <!-- 1. TIMELINE VISUAL DE CITAS Y PROGRESIÓN BIOMECÁNICA (ESTILO APPLE) -->
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-50 text-indigo-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase border border-indigo-200 tracking-wider flex items-center gap-1">
+                                    <i class="ph-bold ph-calendar-check"></i>
+                                    Línea de Vida Clínica
+                                </span>
+                                <span id="timelinePatientActiveBadge" class="text-xs text-slate-500 font-semibold truncate max-w-xs">
+                                    Martha Gabriela Zúñiga
+                                </span>
+                            </div>
+                            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 mt-1">
+                                Timeline de Citas y Secuencia en Sillón
+                            </h2>
+                            <p class="text-xs text-slate-500 max-w-2xl">
+                                Monitorea en qué cita va tu paciente, las etapas concluidas, las fechas de las próximas consultas y gestiona cambios o reprogramaciones con un solo clic.
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button
+                                type="button"
+                                onclick="openTimelineAddAppointmentModal()"
+                                class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-xs transition flex items-center justify-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-plus-circle text-sm"></i>
+                                <span>+ Nueva Cita / Control</span>
+                            </button>
+                            <button
+                                type="button"
+                                onclick="syncPatientTimelineWithCalendar()"
+                                title="Sincronizar fechas con Google Calendar y Agenda del Hub"
+                                class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold border border-slate-200 flex items-center gap-1 shrink-0"
+                            >
+                                <i class="ph-bold ph-arrows-clockwise text-indigo-600 text-sm"></i>
+                                <span class="hidden md:inline text-[11px]">Sincronizar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Métricas de Progreso (KPI Cards) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-100/90 flex flex-col justify-between">
+                            <div class="flex justify-between items-center text-[10.5px] font-bold text-indigo-700 uppercase tracking-wider mb-1">
+                                <span>Cita Actual / En Curso</span>
+                                <i class="ph-fill ph-map-pin"></i>
+                            </div>
+                            <p id="timelineKpiCurrentStage" class="text-sm font-extrabold text-slate-900 truncate">
+                                Cita #4: Intrusión Molar
+                            </p>
+                            <p id="timelineKpiCurrentSubtitle" class="text-[11px] font-medium text-indigo-600 mt-0.5 truncate">
+                                En sillón: Mañana 11:00 AM
+                            </p>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-100/90 flex flex-col justify-between">
+                            <div class="flex justify-between items-center text-[10.5px] font-bold text-emerald-700 uppercase tracking-wider mb-1">
+                                <span>Avance del Tratamiento</span>
+                                <i class="ph-fill ph-check-circle"></i>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span id="timelineKpiProgressPercent" class="text-lg font-extrabold text-slate-900">67%</span>
+                                <span id="timelineKpiProgressCount" class="text-[11px] font-semibold text-slate-500">4 de 6 citas</span>
+                            </div>
+                            <div class="w-full bg-emerald-200/50 rounded-full h-1.5 mt-1 overflow-hidden">
+                                <div id="timelineKpiProgressBar" class="bg-emerald-600 h-1.5 rounded-full transition-all duration-500" style="width: 67%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-100/90 flex flex-col justify-between">
+                            <div class="flex justify-between items-center text-[10.5px] font-bold text-amber-800 uppercase tracking-wider mb-1">
+                                <span>Citas Restantes</span>
+                                <i class="ph-fill ph-hourglass-high"></i>
+                            </div>
+                            <p id="timelineKpiRemainingCount" class="text-sm font-extrabold text-slate-900">
+                                2 citas por realizar
+                            </p>
+                            <p id="timelineKpiEstimatedCompletion" class="text-[11px] font-medium text-amber-700 mt-0.5 truncate">
+                                Asentamiento y Retiro
+                            </p>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 flex flex-col justify-between">
+                            <div class="flex justify-between items-center text-[10.5px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+                                <span>Próxima Fecha</span>
+                                <i class="ph-fill ph-calendar"></i>
+                            </div>
+                            <p id="timelineKpiNextDate" class="text-sm font-extrabold text-slate-900 truncate">
+                                Jueves, 24 Oct
+                            </p>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span id="timelineKpiNextCountdown" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">
+                                    Mañana
+                                </span>
+                                <span id="timelineKpiNextTime" class="text-[11px] text-slate-500 truncate">11:00 AM (45 min)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- El Riel Interactivo del Timeline (Desktop Scroll Horizontal + Mobile Friendly Cards) -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center px-1">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-git-commit text-indigo-600"></i>
+                                Secuencia de Citas Paso a Paso
+                            </span>
+                            <div class="text-[11px] text-slate-400 hidden sm:flex items-center gap-3">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Realizada</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span> Cita Actual</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-400"></span> Programada</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-300"></span> Por agendar</span>
+                            </div>
+                        </div>
+
+                        <!-- Contenedor del Riel Dinámico -->
+                        <div id="patientTimelineTrack" class="overflow-x-auto pb-4 pt-2 -mx-1 px-1 custom-scrollbar">
+                            <!-- Inyectado por renderPatientTimeline(patient) -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
                         <div>
@@ -1973,6 +2103,131 @@
             </div>
 
         </main>
+    </div>
+
+    <!-- =====================================================================
+         MODAL ESPECIALIZADO: REPROGRAMAR / EDITAR CITA DEL TIMELINE
+    ====================================================================== -->
+    <div id="timelineRescheduleModal" onclick="closeTimelineRescheduleModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 text-lg shadow-2xs">
+                        <i class="ph-bold ph-calendar-pencil"></i>
+                    </span>
+                    <div>
+                        <span id="timelineModalPatientBadge" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                            Gestión de Cita
+                        </span>
+                        <h3 id="timelineModalTitle" class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">
+                            Reprogramar Cita en Sillón
+                        </h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closeTimelineRescheduleModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <form onsubmit="saveTimelineReschedule(event)" class="space-y-3.5">
+                <input type="hidden" id="timelineModalApptId" value="" />
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Procedimiento / Etapa de Tratamiento</label>
+                    <input
+                        id="timelineModalProcedure"
+                        type="text"
+                        required
+                        placeholder="Ej. Mes 7: Intrusión Molar con TADs IZC + Cadena"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Fecha de la Cita</label>
+                        <input
+                            id="timelineModalDate"
+                            type="date"
+                            required
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Hora en Sillón</label>
+                        <input
+                            id="timelineModalTime"
+                            type="time"
+                            required
+                            value="11:00"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Duración Estimada</label>
+                        <select
+                            id="timelineModalDuration"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                        >
+                            <option value="20">20 min (Control rápido / Elásticos)</option>
+                            <option value="30" selected>30 min (Control estándar / Secuencia)</option>
+                            <option value="45">45 min (TADs / Arcos rectangulares)</option>
+                            <option value="60">60 min (Cementado / Retiro completo)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Estado de la Cita</label>
+                        <select
+                            id="timelineModalStatus"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                        >
+                            <option value="current">📍 Cita Actual / Próxima Inmediata</option>
+                            <option value="scheduled">🗓️ Cita Futura Programada</option>
+                            <option value="completed">✓ Cita Realizada (Completada)</option>
+                            <option value="pending">⏳ Pendiente por Agendar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Charola de Sillón e Instrumental</label>
+                    <input
+                        id="timelineModalChairside"
+                        type="text"
+                        placeholder="Ej. Pinza Weingart, 2 microtornillos IZC, cadena elástica 150g"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Notas Clínicas / Indicaciones</label>
+                    <textarea
+                        id="timelineModalNotes"
+                        rows="2"
+                        placeholder="Observaciones de evolución o acuerdos con el paciente..."
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    ></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="closeTimelineRescheduleModal()"
+                        class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-check"></i>
+                        <span>Guardar Cambios</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- =====================================================================
@@ -3453,6 +3708,7 @@ create table if not exists public.patients (
             document.getElementById("histHabitsPerio").value = mh.habits_perio || "En evaluación clínica";
             document.getElementById("histAllergies").value = mh.allergies || "Ninguna";
 
+            renderPatientTimeline(patient);
             renderEvolutionNotes(patient);
             loadSavedSignatures(patient);
 
@@ -4097,6 +4353,10 @@ create table if not exists public.patients (
                     if (mod) mod.classList.add("hidden");
                 }
             });
+            if (tabName === "historia") {
+                const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+                renderPatientTimeline(patient);
+            }
         }
 
         // ---------------------------------------------------------------------
@@ -4642,6 +4902,764 @@ create table if not exists public.patients (
             input.value = "";
             savePatientsLocal();
             renderEvolutionNotes(patient);
+        }
+
+        // ---------------------------------------------------------------------
+        // 6B. TIMELINE VISUAL DE CITAS Y PROGRESIÓN CLÍNICA (ESTILO APPLE)
+        // ---------------------------------------------------------------------
+        function getPatientTimeline(patient) {
+            if (!patient) return [];
+            if (Array.isArray(patient.timeline_appointments) && patient.timeline_appointments.length > 0) {
+                return patient.timeline_appointments;
+            }
+
+            // Si es Martha Gabriela Zúñiga
+            if (patient.full_name?.includes("Martha")) {
+                const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                tomorrow.setHours(11, 0, 0, 0);
+
+                const defaultTimeline = [
+                    {
+                        id: "martha-timeline-1",
+                        stageNumber: 1,
+                        stageMonths: "MES 0",
+                        title: "Saneamiento y Exodoncias de 3eros Molares",
+                        archwire: "Pre-Ortodoncia",
+                        chairsideAction: "Detartraje inferior y exodoncia de 18, 28, 38 y 48.",
+                        startIso: "2026-09-18T10:00:00.000Z",
+                        durationMinutes: 45,
+                        status: "completed",
+                        completedDate: "18/09/2026",
+                        notes: "Exodoncias realizadas con éxito. Cicatrización favorable sin complicaciones."
+                    },
+                    {
+                        id: "martha-timeline-2",
+                        stageNumber: 2,
+                        stageMonths: "MES 1 - 3",
+                        title: "Cementado Damon + Espuelas Linguales + IPR Inicial",
+                        archwire: ".014\" CuNiTi Termoactivado",
+                        chairsideAction: "Adhesión de tongue spurs y stripping 0.2 mm de 32 a 42.",
+                        startIso: "2026-10-02T11:00:00.000Z",
+                        durationMinutes: 45,
+                        status: "completed",
+                        completedDate: "02/10/2026",
+                        notes: "Espuelas linguales fijadas para reeducar hábito de lengua. Brackets Damon Q2 instalados."
+                    },
+                    {
+                        id: "martha-timeline-3",
+                        stageNumber: 3,
+                        stageMonths: "MES 4 - 6",
+                        title: "Desrotación Completa + Instalación de Barra ATP",
+                        archwire: ".016\" x .022\" CuNiTi",
+                        chairsideAction: "Completar IPR en 33-43. Barra ATP pasiva a 3 mm del paladar.",
+                        startIso: "2026-10-15T16:00:00.000Z",
+                        durationMinutes: 30,
+                        status: "completed",
+                        completedDate: "15/10/2026",
+                        notes: "Desrotación lograda en 42 y 32. Espacio anterior liberado adecuadamente."
+                    },
+                    {
+                        id: "appt-tomorrow-martha",
+                        stageNumber: 4,
+                        stageMonths: "MES 7 - 11",
+                        title: "Intrusión Molar Activa con 2 TADs IZC + Cadena Elástica",
+                        archwire: ".019\" x .025\" SS con postes",
+                        chairsideAction: "Colocar 2 Microtornillos IZC. Cadena elástica 150g hacia molares 16-17 y 26-27.",
+                        startIso: tomorrow.toISOString(),
+                        durationMinutes: 45,
+                        status: "current",
+                        completedDate: null,
+                        notes: "Etapa clave para el cierre vertical de la mordida abierta por autorrotación mandibular."
+                    },
+                    {
+                        id: "martha-timeline-5",
+                        stageNumber: 5,
+                        stageMonths: "MES 12 - 14",
+                        title: "Control de Cierre de Mordida y Nivelación Canina",
+                        archwire: ".019\" x .025\" SS + Elásticos Intermaxilares",
+                        chairsideAction: "Revisar paralelismo radicular y contacto oclusal posterior.",
+                        startIso: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                        durationMinutes: 30,
+                        status: "scheduled",
+                        completedDate: null,
+                        notes: "Chequeo de overbite alcanzado."
+                    },
+                    {
+                        id: "martha-timeline-6",
+                        stageNumber: 6,
+                        stageMonths: "MES 15 - 18",
+                        title: "Asentamiento Oclusal Final, Retiro y Retención Fija",
+                        archwire: ".019\"x.025\" TMA / Braided",
+                        chairsideAction: "Retiro de brackets y adhesión de retenedor fijo 33-43 + Essix con bloque molar.",
+                        startIso: "",
+                        durationMinutes: 60,
+                        status: "pending",
+                        completedDate: null,
+                        notes: "Entrega de protocolo de retención dual."
+                    }
+                ];
+                patient.timeline_appointments = defaultTimeline;
+                return defaultTimeline;
+            }
+
+            // Si es Fátima Escamilla
+            if (patient.full_name?.includes("Fátima")) {
+                const today = new Date();
+                today.setHours(10, 30, 0, 0);
+
+                const defaultTimeline = [
+                    {
+                        id: "fatima-timeline-1",
+                        stageNumber: 1,
+                        stageMonths: "ETAPA 1 - 2",
+                        title: "Escaneo Digital 3D, Colocación de Ataches y Entrega Alineadores",
+                        archwire: "Alineadores 1 y 2",
+                        chairsideAction: "Colocación de ataches estéticos en resina y entrega de instructivo.",
+                        startIso: "2026-10-10T12:00:00.000Z",
+                        durationMinutes: 45,
+                        status: "completed",
+                        completedDate: "10/10/2026",
+                        notes: "Excelente cooperación de la paciente con el uso diario."
+                    },
+                    {
+                        id: "appt-today-fatima",
+                        stageNumber: 2,
+                        stageMonths: "ETAPA 3 - 5",
+                        title: "Control de Alineadores: Entrega Etapa 3 + Revisión de Ataches",
+                        archwire: "Alineadores 3 a 5",
+                        chairsideAction: "Alineadores Etapa 3-5 + Chequeo de inserción y ajuste de ataches.",
+                        startIso: today.toISOString(),
+                        durationMinutes: 30,
+                        status: "current",
+                        completedDate: null,
+                        notes: "Verificación de tracking dental y ajuste de alineadores."
+                    },
+                    {
+                        id: "fatima-timeline-3",
+                        stageNumber: 3,
+                        stageMonths: "ETAPA 6 - 9",
+                        title: "Stripping (IPR) Ligero Anteroinferior y Entrega Etapa 6",
+                        archwire: "Alineadores 6 a 9",
+                        chairsideAction: "IPR de 0.2 mm en incisivos inferiores y chequeo de rotaciones.",
+                        startIso: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString(),
+                        durationMinutes: 30,
+                        status: "scheduled",
+                        completedDate: null,
+                        notes: "Ganancia de espacio para desrotación final."
+                    },
+                    {
+                        id: "fatima-timeline-4",
+                        stageNumber: 4,
+                        stageMonths: "ETAPA 10 - 12",
+                        title: "Refinamiento Estético Final y Retenedores Essix",
+                        archwire: "Alineadores Finales + Retención",
+                        chairsideAction: "Retiro de ataches, pulido dental y entrega de guardas Essix.",
+                        startIso: "",
+                        durationMinutes: 45,
+                        status: "pending",
+                        completedDate: null,
+                        notes: "Fase de retención y estabilidad estética."
+                    }
+                ];
+                patient.timeline_appointments = defaultTimeline;
+                return defaultTimeline;
+            }
+
+            // Para cualquier otro paciente: derivar de roadmap
+            const roadmap = patient.study_data?.roadmap || [];
+            if (roadmap.length > 0) {
+                patient.timeline_appointments = roadmap.map((s, idx) => {
+                    const isFirst = idx === 0;
+                    const isSecond = idx === 1;
+                    return {
+                        id: `timeline-${patient.id}-${idx + 1}`,
+                        stageNumber: idx + 1,
+                        stageMonths: s.months || `ETAPA ${idx + 1}`,
+                        title: s.title || `Etapa ${idx + 1}`,
+                        archwire: s.archwire || "Secuencia estándar",
+                        chairsideAction: s.chairsideAction || "Control de sillón",
+                        startIso: isFirst ? new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() : (isSecond ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : ""),
+                        durationMinutes: 30,
+                        status: isFirst ? "completed" : (isSecond ? "current" : "pending"),
+                        completedDate: isFirst ? new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toLocaleDateString("es-MX") : null,
+                        notes: s.expectedMovement || ""
+                    };
+                });
+                return patient.timeline_appointments;
+            }
+
+            // Plantilla estándar por defecto
+            patient.timeline_appointments = [
+                {
+                    id: `timeline-${patient.id}-1`,
+                    stageNumber: 1,
+                    stageMonths: "FASE 0",
+                    title: "Estudio Diagnóstico 3D, Fotos y Rx",
+                    archwire: "Diagnóstico",
+                    chairsideAction: "Toma de impresiones/escaneo .STL y valoración.",
+                    startIso: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    durationMinutes: 45,
+                    status: "completed",
+                    completedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString("es-MX"),
+                    notes: "Estudio inicial registrado en el expediente."
+                },
+                {
+                    id: `timeline-${patient.id}-2`,
+                    stageNumber: 2,
+                    stageMonths: "FASE 1",
+                    title: "Cementado de Brackets / Inicio de Tratamiento",
+                    archwire: ".014\" CuNiTi",
+                    chairsideAction: "Colocación de aparatología fija e indicaciones.",
+                    startIso: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    durationMinutes: 60,
+                    status: "current",
+                    completedDate: null,
+                    notes: "Cita inicial de colocación."
+                },
+                {
+                    id: `timeline-${patient.id}-3`,
+                    stageNumber: 3,
+                    stageMonths: "FASE 2",
+                    title: "Control de Alineación y Cambio de Arco",
+                    archwire: ".016\"x.022\" CuNiTi",
+                    chairsideAction: "Revisión de desrotación y nivelación.",
+                    startIso: "",
+                    durationMinutes: 30,
+                    status: "pending",
+                    completedDate: null,
+                    notes: "Secuencia de arcos térmicos."
+                },
+                {
+                    id: `timeline-${patient.id}-4`,
+                    stageNumber: 4,
+                    stageMonths: "FASE 3",
+                    title: "Finalización, Retiro y Retenedores",
+                    archwire: "Retención",
+                    chairsideAction: "Retiro y entrega de retenedor.",
+                    startIso: "",
+                    durationMinutes: 45,
+                    status: "pending",
+                    completedDate: null,
+                    notes: "Estabilidad a largo plazo."
+                }
+            ];
+            return patient.timeline_appointments;
+        }
+
+        function renderPatientTimeline(patient) {
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+
+            // Actualizar etiqueta del paciente en cabecera del timeline
+            const patBadge = document.getElementById("timelinePatientActiveBadge");
+            if (patBadge) patBadge.innerText = `${patient.full_name} (${patient.record_code || '#CRD-2026'})`;
+
+            // Métricas del timeline
+            const totalCount = timeline.length;
+            const completedCount = timeline.filter(a => a.status === "completed").length;
+            const currentAppt = timeline.find(a => a.status === "current") || timeline.find(a => a.status !== "completed");
+            const remainingCount = Math.max(0, totalCount - completedCount);
+            const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+            // Próxima cita programada
+            const upcomingAppt = timeline.find(a => a.status === "current" && a.startIso) ||
+                                 timeline.find(a => a.status === "scheduled" && a.startIso) ||
+                                 timeline.find(a => a.startIso && a.status !== "completed");
+
+            // Actualizar KPIs de cabecera
+            const kpiCurrentStage = document.getElementById("timelineKpiCurrentStage");
+            if (kpiCurrentStage) {
+                kpiCurrentStage.innerText = currentAppt ? `Cita #${currentAppt.stageNumber || 1}: ${currentAppt.title}` : "Tratamiento Concluido";
+            }
+
+            const kpiCurrentSub = document.getElementById("timelineKpiCurrentSubtitle");
+            if (kpiCurrentSub) {
+                if (currentAppt && currentAppt.startIso) {
+                    const dt = new Date(currentAppt.startIso);
+                    const isToday = dt.toDateString() === new Date().toDateString();
+                    const isTomorrow = new Date(Date.now() + 86400000).toDateString() === dt.toDateString();
+                    const rel = isToday ? "Hoy" : (isTomorrow ? "Mañana" : dt.toLocaleDateString("es-MX", { weekday: "short", day: "numeric", month: "short" }));
+                    const timeStr = dt.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+                    kpiCurrentSub.innerText = `En sillón: ${rel} a las ${timeStr} (${currentAppt.durationMinutes || 30} min)`;
+                } else if (currentAppt) {
+                    kpiCurrentSub.innerText = "⏳ Fecha pendiente por definir";
+                } else {
+                    kpiCurrentSub.innerText = "✓ Todas las etapas completadas";
+                }
+            }
+
+            const kpiPercent = document.getElementById("timelineKpiProgressPercent");
+            if (kpiPercent) kpiPercent.innerText = `${progressPercent}%`;
+            const kpiCount = document.getElementById("timelineKpiProgressCount");
+            if (kpiCount) kpiCount.innerText = `${completedCount} de ${totalCount} citas`;
+            const kpiBar = document.getElementById("timelineKpiProgressBar");
+            if (kpiBar) kpiBar.style.width = `${progressPercent}%`;
+
+            const kpiRemCount = document.getElementById("timelineKpiRemainingCount");
+            if (kpiRemCount) kpiRemCount.innerText = remainingCount === 0 ? "¡Fase activa completa!" : `${remainingCount} ${remainingCount === 1 ? "cita restante" : "citas restantes"}`;
+            const kpiRemEst = document.getElementById("timelineKpiEstimatedCompletion");
+            if (kpiRemEst) {
+                const nextPending = timeline.find(a => a.status === "scheduled" || a.status === "pending");
+                kpiRemEst.innerText = nextPending ? `Próximo hito: ${nextPending.title}` : "Retención y Estabilidad";
+            }
+
+            const kpiNextDate = document.getElementById("timelineKpiNextDate");
+            const kpiNextCountdown = document.getElementById("timelineKpiNextCountdown");
+            const kpiNextTime = document.getElementById("timelineKpiNextTime");
+            if (kpiNextDate && upcomingAppt && upcomingAppt.startIso) {
+                const dt = new Date(upcomingAppt.startIso);
+                const isToday = dt.toDateString() === new Date().toDateString();
+                const isTomorrow = new Date(Date.now() + 86400000).toDateString() === dt.toDateString();
+                kpiNextDate.innerText = dt.toLocaleDateString("es-MX", { weekday: "short", day: "numeric", month: "short" });
+                if (kpiNextCountdown) {
+                    kpiNextCountdown.innerText = isToday ? "Hoy" : (isTomorrow ? "Mañana" : "Programada");
+                    kpiNextCountdown.className = isToday ? "text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800" : (isTomorrow ? "text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800" : "text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700");
+                }
+                if (kpiNextTime) {
+                    kpiNextTime.innerText = `${dt.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })} • ${upcomingAppt.durationMinutes || 30} min`;
+                }
+            } else if (kpiNextDate) {
+                kpiNextDate.innerText = "Sin fecha fija";
+                if (kpiNextCountdown) kpiNextCountdown.innerText = "Por agendar";
+                if (kpiNextTime) kpiNextTime.innerText = "Asignar fecha en el timeline";
+            }
+
+            // Badge rápido del header del workspace
+            const headerBadge = document.getElementById("workspaceTimelineQuickBadgeText");
+            if (headerBadge && currentAppt) {
+                headerBadge.innerText = `Cita #${currentAppt.stageNumber || 1} en curso (${progressPercent}%)`;
+            }
+
+            // Renderizar tarjetas del riel dinámico
+            const trackEl = document.getElementById("patientTimelineTrack");
+            if (!trackEl) return;
+
+            trackEl.innerHTML = `
+                <div class="flex items-stretch gap-4 min-w-full pb-2">
+                    ${timeline.map((appt, idx) => {
+                        const isCompleted = appt.status === "completed";
+                        const isCurrent = appt.status === "current";
+                        const isScheduled = appt.status === "scheduled";
+                        const isPending = appt.status === "pending" || (!appt.startIso && !isCompleted);
+
+                        // Formateo de fechas relativas
+                        let dateBadgeText = "⏳ Fecha por definir";
+                        let dateBadgeClass = "bg-slate-100 text-slate-600 border-slate-200";
+                        if (isCompleted) {
+                            dateBadgeText = `✓ Realizada ${appt.completedDate || (appt.startIso ? new Date(appt.startIso).toLocaleDateString("es-MX") : "")}`;
+                            dateBadgeClass = "bg-emerald-50 text-emerald-800 border-emerald-200 font-bold";
+                        } else if (appt.startIso) {
+                            const dt = new Date(appt.startIso);
+                            const isToday = dt.toDateString() === new Date().toDateString();
+                            const isTomorrow = new Date(Date.now() + 86400000).toDateString() === dt.toDateString();
+                            const rel = isToday ? "Hoy" : (isTomorrow ? "Mañana" : dt.toLocaleDateString("es-MX", { day: "numeric", month: "short" }));
+                            const time = dt.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+                            dateBadgeText = isCurrent ? `📍 ${rel} a las ${time}` : `🗓️ ${rel} a las ${time}`;
+                            dateBadgeClass = isCurrent ? "bg-indigo-600 text-white font-extrabold shadow-2xs" : "bg-blue-50 text-blue-800 border-blue-200 font-bold";
+                        }
+
+                        // Estilo visual del contenedor
+                        const cardClass = isCurrent
+                            ? "border-2 border-indigo-500 bg-white shadow-md ring-4 ring-indigo-500/10"
+                            : isCompleted
+                            ? "border border-emerald-200/90 bg-emerald-50/20 shadow-2xs"
+                            : isScheduled
+                            ? "border border-slate-200 bg-white hover:border-slate-300 shadow-2xs"
+                            : "border border-dashed border-slate-300 bg-slate-50/70 opacity-90";
+
+                        // Nodo circular
+                        const nodeCircle = isCompleted
+                            ? `<span class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0"><i class="ph-bold ph-check"></i></span>`
+                            : isCurrent
+                            ? `<span class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-md ring-4 ring-indigo-200 animate-pulse shrink-0"><i class="ph-fill ph-map-pin"></i></span>`
+                            : isScheduled
+                            ? `<span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 border border-blue-300 flex items-center justify-center text-xs font-bold shrink-0">${appt.stageNumber || idx + 1}</span>`
+                            : `<span class="w-7 h-7 rounded-full bg-slate-100 text-slate-400 border border-dashed border-slate-300 flex items-center justify-center text-xs font-bold shrink-0">${appt.stageNumber || idx + 1}</span>`;
+
+                        return `
+                            <div class="w-[300px] sm:w-[325px] flex-shrink-0 flex flex-col justify-between rounded-2xl p-4 transition ${cardClass} snap-start">
+                                <div>
+                                    <!-- Header Cita & Status -->
+                                    <div class="flex items-center justify-between gap-2 mb-2.5">
+                                        <div class="flex items-center gap-2">
+                                            ${nodeCircle}
+                                            <div>
+                                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                                                    Cita #${appt.stageNumber || idx + 1} ${appt.stageMonths ? `• ${appt.stageMonths}` : ''}
+                                                </span>
+                                                <h4 class="text-xs font-extrabold text-slate-900 leading-tight">
+                                                    ${appt.title}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Badge de Fecha Programada / Estado -->
+                                    <div class="mb-3">
+                                        <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg border ${dateBadgeClass}">
+                                            ${dateBadgeText}
+                                        </span>
+                                    </div>
+
+                                    <!-- Detalles Clínicos -->
+                                    <div class="space-y-1.5 text-[11px] text-slate-600 mb-3">
+                                        ${appt.archwire ? `
+                                            <div class="flex items-start gap-1.5 bg-slate-100/70 px-2.5 py-1.5 rounded-lg border border-slate-200/60">
+                                                <strong class="text-slate-800 shrink-0">Arco:</strong>
+                                                <span class="truncate">${appt.archwire}</span>
+                                            </div>
+                                        ` : ''}
+
+                                        ${appt.chairsideAction ? `
+                                            <div class="flex items-start gap-1.5 bg-slate-100/70 px-2.5 py-1.5 rounded-lg border border-slate-200/60">
+                                                <strong class="text-slate-800 shrink-0">Sillón:</strong>
+                                                <span class="line-clamp-2">${appt.chairsideAction}</span>
+                                            </div>
+                                        ` : ''}
+
+                                        ${appt.notes ? `
+                                            <p class="text-[10.5px] text-slate-500 italic px-1 pt-1">
+                                                "${appt.notes}"
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <!-- Botones de Gestión Directa (1 Clic) -->
+                                <div class="pt-2 border-t border-slate-100/80 space-y-1.5">
+                                    <div class="grid grid-cols-2 gap-1.5">
+                                        <button
+                                            type="button"
+                                            onclick="openTimelineRescheduleModal('${appt.id}')"
+                                            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1"
+                                            title="Reprogramar fecha, hora y duración"
+                                        >
+                                            <i class="ph-bold ph-calendar-pencil text-indigo-600"></i>
+                                            <span>${appt.startIso ? 'Reprogramar' : 'Asignar Fecha'}</span>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onclick="toggleTimelineAppointmentStatus('${appt.id}')"
+                                            class="w-full ${isCompleted ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200'} text-[11px] font-bold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1"
+                                            title="${isCompleted ? 'Desmarcar cita' : 'Marcar cita como completada en sillón'}"
+                                        >
+                                            <i class="ph-bold ${isCompleted ? 'ph-arrow-counter-clockwise' : 'ph-check-circle'}"></i>
+                                            <span>${isCompleted ? 'Revertir' : 'Realizada ✓'}</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            onclick="sendTimelineWhatsAppReminder('${appt.id}')"
+                                            class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10.5px] font-bold py-1.5 px-2 rounded-xl transition flex items-center justify-center gap-1 shadow-2xs"
+                                            title="Enviar recordatorio de cita por WhatsApp"
+                                        >
+                                            <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                                            <span>WhatsApp</span>
+                                        </button>
+
+                                        ${appt.startIso ? `
+                                            <button
+                                                type="button"
+                                                onclick="openTimelineGoogleCalendar('${appt.id}')"
+                                                class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-[11px] font-bold border border-slate-200"
+                                                title="Abrir o crear evento en Google Calendar"
+                                            >
+                                                <i class="ph-bold ph-calendar-blank text-indigo-600 text-sm"></i>
+                                            </button>
+                                        ` : ''}
+
+                                        <button
+                                            type="button"
+                                            onclick="deleteTimelineAppointment('${appt.id}')"
+                                            class="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition text-[11px] border border-slate-200"
+                                            title="Eliminar cita del timeline"
+                                        >
+                                            <i class="ph-bold ph-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            `;
+        }
+
+        function openTimelineRescheduleModal(apptId) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+            const appt = timeline.find((a) => a.id === apptId) || timeline[0];
+            if (!appt) return;
+
+            const editIdEl = document.getElementById("timelineModalApptId");
+            const patBadge = document.getElementById("timelineModalPatientBadge");
+            const titleEl = document.getElementById("timelineModalTitle");
+            const procEl = document.getElementById("timelineModalProcedure");
+            const dateEl = document.getElementById("timelineModalDate");
+            const timeEl = document.getElementById("timelineModalTime");
+            const durEl = document.getElementById("timelineModalDuration");
+            const statEl = document.getElementById("timelineModalStatus");
+            const chairEl = document.getElementById("timelineModalChairside");
+            const notesEl = document.getElementById("timelineModalNotes");
+
+            if (editIdEl) editIdEl.value = appt.id;
+            if (patBadge) patBadge.innerText = patient.full_name;
+            if (titleEl) titleEl.innerText = `Cita #${appt.stageNumber || 1}: ${appt.title}`;
+            if (procEl) procEl.value = appt.title || "";
+            
+            const dt = appt.startIso ? new Date(appt.startIso) : new Date();
+            if (dateEl) dateEl.value = dt.toISOString().slice(0, 10);
+            if (timeEl) timeEl.value = `${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`;
+            if (durEl) durEl.value = String(appt.durationMinutes || 30);
+            if (statEl) statEl.value = appt.status || "current";
+            if (chairEl) chairEl.value = appt.chairsideAction || "";
+            if (notesEl) notesEl.value = appt.notes || "";
+
+            document.getElementById("timelineRescheduleModal")?.classList.remove("hidden");
+        }
+
+        function closeTimelineRescheduleModal() {
+            document.getElementById("timelineRescheduleModal")?.classList.add("hidden");
+        }
+
+        function saveTimelineReschedule(event) {
+            event.preventDefault();
+            const patient = patientsList.find((p) => p.id === activePatientId);
+            if (!patient) return;
+
+            const editId = document.getElementById("timelineModalApptId")?.value;
+            const timeline = getPatientTimeline(patient);
+            const apptIndex = timeline.findIndex((a) => a.id === editId);
+            if (apptIndex < 0) return;
+
+            const procVal = document.getElementById("timelineModalProcedure")?.value?.trim() || timeline[apptIndex].title;
+            const dateVal = document.getElementById("timelineModalDate")?.value || new Date().toISOString().slice(0, 10);
+            const timeVal = document.getElementById("timelineModalTime")?.value || "11:00";
+            const durVal = Number(document.getElementById("timelineModalDuration")?.value) || 30;
+            const statVal = document.getElementById("timelineModalStatus")?.value || "current";
+            const chairVal = document.getElementById("timelineModalChairside")?.value?.trim() || "";
+            const notesVal = document.getElementById("timelineModalNotes")?.value?.trim() || "";
+
+            const startIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+
+            // Si se marca como current, ajustar las otras
+            if (statVal === "current") {
+                timeline.forEach((a, i) => {
+                    if (i !== apptIndex && a.status === "current") {
+                        a.status = "scheduled";
+                    }
+                });
+            }
+
+            timeline[apptIndex] = {
+                ...timeline[apptIndex],
+                title: procVal,
+                startIso: statVal === "pending" ? "" : startIso,
+                durationMinutes: durVal,
+                status: statVal,
+                completedDate: statVal === "completed" ? (timeline[apptIndex].completedDate || new Date(dateVal).toLocaleDateString("es-MX")) : null,
+                chairsideAction: chairVal,
+                notes: notesVal
+            };
+
+            patient.timeline_appointments = timeline;
+
+            // Sincronizar con scheduledAppointments
+            syncTimelineToScheduledAppointments(patient, timeline[apptIndex]);
+
+            saveAppointmentsLocal();
+            savePatientsLocal();
+            closeTimelineRescheduleModal();
+            renderPatientTimeline(patient);
+            renderDashboardHome();
+            renderCalendarHub();
+        }
+
+        function toggleTimelineAppointmentStatus(apptId) {
+            const patient = patientsList.find((p) => p.id === activePatientId);
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+            const apptIndex = timeline.findIndex((a) => a.id === apptId);
+            if (apptIndex < 0) return;
+
+            const appt = timeline[apptIndex];
+            if (appt.status === "completed") {
+                appt.status = "current";
+                appt.completedDate = null;
+            } else {
+                appt.status = "completed";
+                appt.completedDate = new Date().toLocaleDateString("es-MX");
+
+                // Pasar la siguiente cita a current si existe
+                const nextAppt = timeline[apptIndex + 1];
+                if (nextAppt && nextAppt.status !== "completed") {
+                    nextAppt.status = "current";
+                    if (!nextAppt.startIso) {
+                        const nextMonth = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000);
+                        nextMonth.setHours(11, 0, 0, 0);
+                        nextAppt.startIso = nextMonth.toISOString();
+                    }
+                }
+
+                // Agregar nota de evolución automática
+                if (!patient.notes) patient.notes = [];
+                patient.notes.unshift({
+                    date: new Date().toLocaleDateString("es-MX"),
+                    author: "Dra. Liseth Guevara",
+                    text: `Cita #${appt.stageNumber || apptIndex + 1} completada: ${appt.title}. Charola: ${appt.chairsideAction || 'Control regular'}.`
+                });
+            }
+
+            syncTimelineToScheduledAppointments(patient, appt);
+
+            saveAppointmentsLocal();
+            savePatientsLocal();
+            renderPatientTimeline(patient);
+            renderEvolutionNotes(patient);
+            renderDashboardHome();
+            renderCalendarHub();
+        }
+
+        function syncTimelineToScheduledAppointments(patient, timelineAppt) {
+            if (!timelineAppt) return;
+            const apptIndex = scheduledAppointments.findIndex((a) => a.id === timelineAppt.id || (a.patientName === patient.full_name && a.procedureTitle === timelineAppt.title));
+
+            if (timelineAppt.status === "current" || timelineAppt.status === "scheduled") {
+                if (timelineAppt.startIso) {
+                    const payload = {
+                        id: timelineAppt.id,
+                        patientName: patient.full_name,
+                        patientPhone: patient.phone || "",
+                        procedureTitle: timelineAppt.title,
+                        startIso: timelineAppt.startIso,
+                        durationMinutes: timelineAppt.durationMinutes || 30,
+                        chairsidePrep: timelineAppt.chairsideAction || "Instrumental de sillón",
+                        patientReminderNote: `Hola ${patient.full_name}, confirmamos tu cita de ortodoncia (${timelineAppt.title}) con la Dra. Liseth Guevara.`
+                    };
+                    payload.googleCalendarEventUrl = buildGoogleCalendarTemplateUrl(payload);
+
+                    if (apptIndex >= 0) {
+                        scheduledAppointments[apptIndex] = payload;
+                    } else {
+                        scheduledAppointments.unshift(payload);
+                    }
+                }
+            } else if (timelineAppt.status === "completed" || timelineAppt.status === "pending") {
+                if (apptIndex >= 0) {
+                    scheduledAppointments.splice(apptIndex, 1);
+                }
+            }
+        }
+
+        function openTimelineAddAppointmentModal() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+
+            const nextNum = timeline.length + 1;
+            const newAppt = {
+                id: `appt-custom-${Date.now()}`,
+                stageNumber: nextNum,
+                stageMonths: `CITA ${nextNum}`,
+                title: `Control Ortodóntico Etapa ${nextNum}`,
+                archwire: "Secuencia según evolución",
+                chairsideAction: "Revisión clínica, ajuste de arcos y control fotográfico",
+                startIso: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                durationMinutes: 30,
+                status: "scheduled",
+                completedDate: null,
+                notes: ""
+            };
+
+            timeline.push(newAppt);
+            patient.timeline_appointments = timeline;
+            savePatientsLocal();
+            renderPatientTimeline(patient);
+            openTimelineRescheduleModal(newAppt.id);
+        }
+
+        function deleteTimelineAppointment(apptId) {
+            const patient = patientsList.find((p) => p.id === activePatientId);
+            if (!patient) return;
+            if (!confirm("¿Deseas eliminar esta cita del timeline del paciente?")) return;
+
+            patient.timeline_appointments = getPatientTimeline(patient).filter((a) => a.id !== apptId);
+            scheduledAppointments = scheduledAppointments.filter((a) => a.id !== apptId);
+
+            saveAppointmentsLocal();
+            savePatientsLocal();
+            renderPatientTimeline(patient);
+            renderDashboardHome();
+            renderCalendarHub();
+        }
+
+        function sendTimelineWhatsAppReminder(apptId) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+            const appt = timeline.find((a) => a.id === apptId);
+            if (!appt) return;
+
+            const url = buildWhatsAppReminderUrl({
+                patientName: patient.full_name,
+                patientPhone: patient.phone,
+                procedureTitle: appt.title,
+                startIso: appt.startIso,
+                chairsidePrep: appt.chairsideAction
+            });
+            window.open(url, "_blank");
+        }
+
+        function openTimelineGoogleCalendar(apptId) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+            const appt = timeline.find((a) => a.id === apptId);
+            if (!appt || !appt.startIso) {
+                alert("Esta cita aún no tiene fecha asignada. Asigna una fecha primero para abrirla en Google Calendar.");
+                return;
+            }
+
+            const url = buildGoogleCalendarTemplateUrl({
+                patientName: patient.full_name,
+                procedureTitle: appt.title,
+                startIso: appt.startIso,
+                durationMinutes: appt.durationMinutes || 30,
+                chairsidePrep: appt.chairsideAction
+            });
+            window.open(url, "_blank");
+        }
+
+        function syncPatientTimelineWithCalendar() {
+            const patient = patientsList.find((p) => p.id === activePatientId);
+            if (!patient) return;
+            const timeline = getPatientTimeline(patient);
+
+            // Buscar si hay citas agendadas en scheduledAppointments para este paciente
+            const matchedAppts = scheduledAppointments.filter((a) =>
+                (a.patientName || "").toLowerCase().includes((patient.full_name || "").toLowerCase()) ||
+                (patient.full_name || "").toLowerCase().includes((a.patientName || "").toLowerCase())
+            );
+
+            let syncCount = 0;
+            matchedAppts.forEach((mAppt) => {
+                const matchInTimeline = timeline.find((t) => t.id === mAppt.id || t.title.toLowerCase().includes(mAppt.procedureTitle.toLowerCase()) || mAppt.procedureTitle.toLowerCase().includes(t.title.toLowerCase()));
+                if (matchInTimeline) {
+                    matchInTimeline.startIso = mAppt.startIso;
+                    matchInTimeline.durationMinutes = mAppt.durationMinutes || 30;
+                    matchInTimeline.chairsideAction = mAppt.chairsidePrep || matchInTimeline.chairsideAction;
+                    syncCount++;
+                }
+            });
+
+            patient.timeline_appointments = timeline;
+            savePatientsLocal();
+            renderPatientTimeline(patient);
+            alert(`✓ Sincronización exitosa: ${timeline.length} citas en el timeline actualizadas con el Calendario y Dashboard.`);
         }
 
         // ---------------------------------------------------------------------
