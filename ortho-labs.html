@@ -1393,6 +1393,13 @@
                     >
                         4. Comparador Before/After (Fotos y 3D)
                     </button>
+                    <button
+                        id="tabBtn-presupuesto"
+                        onclick="setWorkspaceTab('presupuesto')"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900"
+                    >
+                        5. Cierre de Presupuesto & Firma Tablet
+                    </button>
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
@@ -2430,6 +2437,204 @@
                                 <i class="ph-bold ph-arrows-clockwise text-emerald-600"></i>
                                 <span>Auto-Agendar 18 Citas en Google Calendar</span>
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =============================================================
+                 MÓDULO 5: CIERRE DE PRESUPUESTO & FIRMA DE CONSENTIMIENTO DIGITAL EN TABLET
+                 (src/components/modules/BudgetAndConsentTablet.tsx)
+            ============================================================== -->
+            <div id="module-presupuesto" class="hidden space-y-6">
+                <!-- Cabecera y Acciones Rápidas del Cierre en Sillón -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-md shrink-0">
+                            <i class="ph-bold ph-device-tablet-speaker"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                    5. Cierre en Sillón • Tablet & Consentimiento Digital
+                                </span>
+                                <span id="budgetModuleStatusBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                    ⏳ Pendiente de Firma
+                                </span>
+                            </div>
+                            <h2 class="text-lg font-extrabold text-slate-900 mt-0.5">
+                                Comparador de Presupuestos & Firma Táctil Inmediata
+                            </h2>
+                            <p class="text-xs text-slate-500">
+                                Presenta las opciones al paciente en sillón (Brackets vs Autoligado vs Alineadores), desglosa mensualidades y captura la firma del consentimiento legal.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            onclick="launchPatientSelfServicePortal()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"
+                        >
+                            <i class="ph-bold ph-device-tablet"></i>
+                            <span>📱 Presentar en Sillón (Modo Tablet)</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="copyActivePatientPortalUrl()"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                            title="Copiar URL para que el paciente lo conteste y firme en su celular"
+                        >
+                            <i class="ph-bold ph-link"></i>
+                            <span>Copiar Enlace Paciente</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="shareActivePatientPortalWhatsApp()"
+                            class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-xs"
+                        >
+                            <i class="ph-bold ph-whatsapp-logo"></i>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="openOrthoPricingConfigModal()"
+                            class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-2xs"
+                        >
+                            <i class="ph-bold ph-gear"></i>
+                            <span>Configurar Precios</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Comparativa de las 3 Opciones (Con Efecto Señuelo / 3rd Choice Recomendado) -->
+                <div id="orthoPricingPlansCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Inyectado dinámicamente por renderBudgetAndConsentModule -->
+                </div>
+
+                <!-- Banner Informativo del Disclaimer Clínico Obligatorio -->
+                <div class="bg-amber-50/90 border border-amber-200 rounded-3xl p-5 text-amber-950 flex items-start gap-3.5 shadow-2xs">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl shrink-0">
+                        <i class="ph-bold ph-warning"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900">
+                            Aviso Clínico Obligatorio sobre la Elección de Tratamiento:
+                        </h4>
+                        <p class="text-xs leading-relaxed text-amber-800">
+                            La selección realizada por el paciente refleja su preferencia estética y conveniencia de cuotas. La <strong>Dra. Liseth Guevara Muñoz</strong> evaluará de forma concluyente los estudios radiográficos, tomográficos y cefalométricos del paciente para determinar y autorizar formalmente si este procedimiento es el biomecánicamente idóneo, seguro y predecible para resolver su caso.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Panel de Validación Legal, Firma Digital y Aprobación de la Doctora -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                                Validación Legal, Firma del Paciente y Autorización Médica
+                            </h3>
+                            <p class="text-xs text-slate-500">
+                                Conformidad del plan biomecánico y contrato bajo la NOM-004-SSA3-2012 y LFPDPPP.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="exportPatientPdf()"
+                            class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3.5 py-1.5 rounded-xl transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-file-pdf"></i>
+                            <span>Descargar Contrato en PDF</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Tarjeta de Firma y Selfie del Paciente -->
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <div id="budgetPatientAvatarContainer" class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                                        <i class="ph-bold ph-user"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-extrabold text-slate-900 block" id="budgetPatientCardName">Paciente</span>
+                                        <span class="text-[10px] text-slate-500 block" id="budgetPatientCardSub">Aceptación y Firma Digital</span>
+                                    </div>
+                                </div>
+                                <span id="budgetPatientSigStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">
+                                    Pendiente
+                                </span>
+                            </div>
+
+                            <div class="h-28 bg-white rounded-xl border border-dashed border-slate-300 flex items-center justify-center overflow-hidden p-2 relative group">
+                                <img id="budgetPatientSigImg" src="" alt="Firma del paciente" class="hidden max-h-full max-w-full object-contain" />
+                                <span id="budgetPatientSigPlaceholder" class="text-xs text-slate-400 italic text-center px-4">
+                                    Sin firma digital registrada aún.<br/>Usa el botón "Presentar en Sillón" o firma abajo.
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-xs text-slate-600 pt-1">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block uppercase font-bold">Plan Elegido:</span>
+                                    <strong id="budgetPatientChosenPlanText" class="text-indigo-900">Por definir</strong>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-400 block uppercase font-bold">Fecha / Hora:</span>
+                                    <span id="budgetPatientSignedDateText" class="mono text-slate-700">Sin fecha</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Autorización Médica por Dra. Liseth Guevara -->
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
+                                        <i class="ph-bold ph-stethoscope"></i>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-extrabold text-slate-900 block">Dra. Liseth Guevara Muñoz</span>
+                                        <span class="text-[10px] text-slate-500 block">Especialista en Ortodoncia y Ortopedia Maxilar</span>
+                                    </div>
+                                </div>
+                                <span id="budgetDoctorAuthStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                    Requiere Autorización
+                                </span>
+                            </div>
+
+                            <div class="h-28 bg-white rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center overflow-hidden p-3 text-center relative">
+                                <div id="budgetDoctorApprovedView" class="hidden space-y-1">
+                                    <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg mx-auto">
+                                        <i class="ph-bold ph-check"></i>
+                                    </span>
+                                    <span class="text-xs font-black text-emerald-800 block">PLAN AUTORIZADO CLÍNICAMENTE</span>
+                                    <span id="budgetDoctorAuthDateText" class="text-[10px] text-slate-500 mono block"></span>
+                                </div>
+                                <div id="budgetDoctorPendingAction" class="space-y-2">
+                                    <p class="text-xs text-slate-500">
+                                        Una vez revisados los estudios radiográficos, autoriza el plan elegido:
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onclick="authorizeActivePatientBudget()"
+                                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition"
+                                    >
+                                        ✍️ Autorizar Clínicamente este Plan
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center text-xs text-slate-600 pt-1">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block uppercase font-bold">Criterio Clínico:</span>
+                                    <span class="text-slate-800">Biomecánica Viable y Segura</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-400 block uppercase font-bold">Cédula Profesional:</span>
+                                    <span class="mono text-slate-700">Especialista</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3480,6 +3685,515 @@ create table if not exists public.patients (
     </div>
 
     <!-- =====================================================================
+         MODAL 1: PORTAL DE PACIENTE EN TABLET / SILLÓN / LINK REMOTO
+         (src/components/modules/BudgetAndConsentTablet.tsx)
+    ====================================================================== -->
+    <div id="patientSelfServicePortalModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-print">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[94vh] overflow-y-auto border border-slate-200 shadow-2xl p-5 sm:p-7 space-y-6 my-auto" onclick="event.stopPropagation()">
+            <!-- Cabecera del Portal con Logo y Título -->
+            <div class="flex justify-between items-start gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <img src="ortho-hub-logo.png" alt="Dra. Liseth Guevara" class="w-12 h-12 rounded-2xl object-contain shadow-xs shrink-0" />
+                    <div>
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            Dra. Liseth Guevara Muñoz • Especialista en Ortodoncia
+                        </span>
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                            Portal de Admisión, Selección de Plan y Consentimiento Digital
+                        </h3>
+                        <p class="text-xs text-slate-500">
+                            Expediente para: <strong id="portalPatientDisplayName" class="text-indigo-950">Martha Gabriela Zúñiga</strong>
+                        </p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onclick="closePatientSelfServicePortal()"
+                    class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center text-sm font-bold transition shrink-0"
+                    title="Cerrar y volver al expediente"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <!-- Barra de Progreso de 5 Pasos -->
+            <div class="grid grid-cols-5 gap-1.5 text-center text-[10.5px] font-extrabold uppercase tracking-wider">
+                <div id="portalStepIndicator-1" class="py-2 rounded-xl transition bg-indigo-600 text-white shadow-xs">
+                    1. Selfie
+                </div>
+                <div id="portalStepIndicator-2" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
+                    2. Salud
+                </div>
+                <div id="portalStepIndicator-3" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
+                    3. Plan
+                </div>
+                <div id="portalStepIndicator-4" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
+                    4. Legal
+                </div>
+                <div id="portalStepIndicator-5" class="py-2 rounded-xl transition bg-slate-100 text-slate-400">
+                    5. Firma
+                </div>
+            </div>
+
+            <!-- PASO 1: SELFIE DE PERFIL -->
+            <div id="portalStepSection-1" class="space-y-4 text-center">
+                <div class="max-w-md mx-auto space-y-1">
+                    <h4 class="text-base font-extrabold text-slate-900">
+                        📸 Paso 1: Tómate tu Selfie para tu Perfil Clínico
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        Esta fotografía servirá para identificar tu expediente clínico y registrar el inicio de tu tratamiento de ortodoncia.
+                    </p>
+                </div>
+
+                <div class="relative w-40 h-40 mx-auto rounded-full border-4 border-indigo-200 overflow-hidden bg-slate-100 flex items-center justify-center shadow-inner">
+                    <img id="portalSelfiePreviewImg" src="" alt="Selfie" class="hidden w-full h-full object-cover" />
+                    <div id="portalSelfiePlaceholder" class="text-center p-3 text-slate-400">
+                        <i class="ph-bold ph-camera text-4xl block mb-1 text-indigo-400"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-wider block">Tu Foto Aquí</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2">
+                        <i class="ph-bold ph-camera"></i>
+                        <span>Tomar Selfie con la Cámara</span>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            capture="user"
+                            onchange="handlePatientPortalSelfieChange(event)"
+                            class="hidden"
+                        />
+                    </label>
+                    <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-200">
+                        <i class="ph-bold ph-upload"></i>
+                        <span>Subir desde Galería</span>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onchange="handlePatientPortalSelfieChange(event)"
+                            class="hidden"
+                        />
+                    </label>
+                </div>
+
+                <div class="pt-4 flex justify-end border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="setPortalStep(2)"
+                        class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2"
+                    >
+                        <span>Siguiente: Cuestionario de Salud</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 2: CUESTIONARIO DE SALUD Y ANTECEDENTES MÉDICOS -->
+            <div id="portalStepSection-2" class="hidden space-y-4">
+                <div class="space-y-1">
+                    <h4 class="text-base font-extrabold text-slate-900">
+                        🩺 Paso 2: Antecedentes Médicos y Padecimientos
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        Información médica confidencial indispensable para salvaguardar tu salud durante el tratamiento ortodóntico.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="sm:col-span-2">
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Cuál es tu motivo principal de consulta? (¿Qué te gustaría corregir en tu sonrisa?)
+                        </label>
+                        <textarea
+                            id="portalHealthChiefComplaint"
+                            rows="2"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Ej. Mordida abierta, alinear dientes chuecos, cerrar espacios..."
+                        ></textarea>
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Alergias conocidas? (Penicilina, anestésicos, látex, metales/níquel)
+                        </label>
+                        <input
+                            id="portalHealthAllergies"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Ninguna conocida o especificar..."
+                        />
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Enfermedades crónicas? (Diabetes, hipertensión, cardiopatías, asma)
+                        </label>
+                        <input
+                            id="portalHealthConditions"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Ninguna o especificar..."
+                        />
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Medicamentos habituales que tomes actualmente?
+                        </label>
+                        <input
+                            id="portalHealthMedications"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Ninguno o listar medicamentos..."
+                        />
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Cirugías previas o problemas de coagulación/sangrado?
+                        </label>
+                        <input
+                            id="portalHealthSurgeries"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Sin antecedentes quirúrgicos o detallar..."
+                        />
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Hábitos? (Apretar dientes/bruxismo, morder uñas u objetos, respirar por la boca)
+                        </label>
+                        <input
+                            id="portalHealthHabits"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Ej. Proyección lingual al tragar, bruxismo nocturno..."
+                        />
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-800 block mb-1">
+                            ¿Salud de encías? (¿Sangran al cepillarte o sientes movilidad dental?)
+                        </label>
+                        <input
+                            id="portalHealthGums"
+                            type="text"
+                            class="w-full p-2.5 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            placeholder="Sanas sin sangrado / Sangrado ocasional..."
+                        />
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="setPortalStep(1)"
+                        class="text-xs text-slate-500 font-bold px-4 py-2 hover:text-slate-800"
+                    >
+                        ← Regresar
+                    </button>
+                    <button
+                        type="button"
+                        onclick="setPortalStep(3)"
+                        class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2"
+                    >
+                        <span>Siguiente: Elección de Tratamiento</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 3: SELECCIÓN DE PLAN (3 CHOICES CON DECOY EFFECT) -->
+            <div id="portalStepSection-3" class="hidden space-y-4">
+                <div class="space-y-1">
+                    <h4 class="text-base font-extrabold text-slate-900">
+                        ✨ Paso 3: Elige la alternativa de tratamiento de tu preferencia
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        Compara las opciones disponibles y selecciona la modalidad que mejor se adapte a tu estilo de vida y presupuesto.
+                    </p>
+                </div>
+
+                <div id="portalPricingPlansContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <!-- Inyectado por renderPortalPricingCards() -->
+                </div>
+
+                <!-- Disclaimer Clínico Obligatorio en el Paso 3 -->
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-2.5">
+                    <span class="text-lg shrink-0">⚠️</span>
+                    <p class="leading-relaxed">
+                        <strong>Aviso Clínico Importante:</strong> Tu selección representa tu preferencia inicial. La <strong>Dra. Liseth Guevara Muñoz</strong> evaluará de forma integral tus radiografías, tomografías y análisis cefalométrico para determinar y autorizar formalmente si esta opción es biomecánicamente óptima y segura para resolver tu caso.
+                    </p>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="setPortalStep(2)"
+                        class="text-xs text-slate-500 font-bold px-4 py-2 hover:text-slate-800"
+                    >
+                        ← Regresar
+                    </button>
+                    <button
+                        type="button"
+                        onclick="setPortalStep(4)"
+                        class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2"
+                    >
+                        <span>Siguiente: Términos Legales & Consentimiento</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 4: MARCO LEGAL, AVISO DE PRIVACIDAD LFPDPPP Y CONSENTIMIENTO INFORMADO -->
+            <div id="portalStepSection-4" class="hidden space-y-4">
+                <div class="space-y-1">
+                    <h4 class="text-base font-extrabold text-slate-900">
+                        📋 Paso 4: Consentimiento Informado & Aviso de Privacidad
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        Revisa detenidamente los términos legales y médicos antes de otorgar tu firma digital de conformidad.
+                    </p>
+                </div>
+
+                <div class="h-48 overflow-y-auto p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-700 space-y-3 leading-relaxed">
+                    <div class="border-b border-slate-200 pb-2">
+                        <strong class="text-indigo-950 uppercase tracking-wider block text-[11px] mb-1">
+                            1. Aviso de Privacidad y Tratamiento de Datos Personales Sensibles (LFPDPPP)
+                        </h4>
+                        <p>
+                            En estricto apego a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (México) y a la NOM-004-SSA3-2012 del Expediente Clínico, sus datos personales, historial médico, fotografías clínicas intraorales y extraorales, modelos digitales tridimensionales y radiografías serán tratados bajo absoluto secreto médico y confidencialidad profesional por la Dra. Liseth Guevara Muñoz y su equipo clínico para fines exclusivos de diagnóstico, planificación ortodóntica y seguimiento de su salud oral.
+                        </p>
+                    </div>
+
+                    <div class="border-b border-slate-200 pb-2">
+                        <strong class="text-indigo-950 uppercase tracking-wider block text-[11px] mb-1">
+                            2. Consentimiento Informado para Tratamiento de Ortodoncia y Ortopedia Maxilar
+                        </h4>
+                        <p>
+                            Se me han explicado de forma clara los objetivos del tratamiento, la aparatología a emplear y los riesgos inherentes comunes a todo movimiento dental biológico, tales como leve reabsorción radicular apical fisiológica, molestia o sensibilidad transitoria en los primeros días tras cada activación, riesgo de desmineralización o manchas blancas en el esmalte si se descuida la técnica de cepillado, y la obligatoriedad estricta de cooperar con el uso de aditamentos (elásticos intermaxilares, espuelas o alineadores) así como la fase indispensable de <strong>retención fija o removible</strong> al término del tratamiento para garantizar la estabilidad a largo plazo.
+                        </p>
+                    </div>
+
+                    <div>
+                        <strong class="text-indigo-950 uppercase tracking-wider block text-[11px] mb-1">
+                            3. Compromiso Financiero y Asistencia a Consultas
+                        </h4>
+                        <p>
+                            El paciente o su tutor legal se compromete a cubrir puntualmente el enganche inicial convenido y las cuotas mensuales acordadas, así como asistir a las citas programadas cada 4 a 6 semanas para evitar retrasos o complicaciones en el plan biomecánico.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Casillas de Aceptación Obligatoria -->
+                <div class="space-y-2.5 text-xs bg-indigo-50/50 p-3.5 rounded-2xl border border-indigo-100">
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            id="portalChkPrivacy"
+                            onchange="validatePortalLegalStep()"
+                            class="rounded accent-indigo-600 w-4 h-4 mt-0.5 shrink-0"
+                        />
+                        <span class="text-slate-800 leading-tight">
+                            He leído, comprendido y <strong>acepto íntegramente el Aviso de Privacidad</strong> y autorizo el tratamiento confidencial de mis datos clínicos y biométricos.
+                        </span>
+                    </label>
+                    <label class="flex items-start gap-2.5 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            id="portalChkConsent"
+                            onchange="validatePortalLegalStep()"
+                            class="rounded accent-indigo-600 w-4 h-4 mt-0.5 shrink-0"
+                        />
+                        <span class="text-slate-800 leading-tight">
+                            Acepto los términos, recomendaciones, deberes y riesgos descritos en el <strong>Consentimiento Informado de Ortodoncia</strong> y solicito iniciar mi tratamiento.
+                        </span>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="setPortalStep(3)"
+                        class="text-xs text-slate-500 font-bold px-4 py-2 hover:text-slate-800"
+                    >
+                        ← Regresar
+                    </button>
+                    <button
+                        type="button"
+                        id="portalBtnToSignature"
+                        disabled
+                        onclick="setPortalStep(5)"
+                        class="bg-slate-300 text-slate-500 font-bold text-xs px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed"
+                    >
+                        <span>Siguiente: Firma Digital Táctil</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 5: CAPTURA INMEDIATA DE FIRMA DIGITAL TÁCTIL EN CANVAS -->
+            <div id="portalStepSection-5" class="hidden space-y-4">
+                <div class="space-y-1">
+                    <h4 class="text-base font-extrabold text-slate-900">
+                        ✍️ Paso 5: Estampa tu Firma Digital de Conformidad
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                        Firma directamente sobre la pantalla con tu dedo, lápiz táctil o ratón dentro del recuadro inferior.
+                    </p>
+                </div>
+
+                <div class="border-2 border-dashed border-indigo-300 rounded-2xl bg-slate-50 p-2 overflow-hidden relative">
+                    <canvas
+                        id="portalSignatureCanvas"
+                        width="680"
+                        height="200"
+                        class="w-full h-48 bg-white rounded-xl shadow-inner cursor-crosshair touch-none"
+                    ></canvas>
+                    <button
+                        type="button"
+                        onclick="clearPortalSignatureCanvas()"
+                        class="absolute top-4 right-4 text-[10.5px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded-lg border border-slate-300 shadow-2xs"
+                    >
+                        Borrar Trazo
+                    </button>
+                </div>
+
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex justify-between items-center">
+                    <div>
+                        <span>Plan seleccionado: <strong id="portalConfirmPlanTitle" class="text-indigo-900 font-bold">Alineadores Invisibles</strong></span>
+                    </div>
+                    <div>
+                        <span>Mensualidad: <strong id="portalConfirmPlanFee" class="text-indigo-950 font-bold">$2,100 /mes</strong></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onclick="setPortalStep(4)"
+                        class="text-xs text-slate-500 font-bold px-4 py-2 hover:text-slate-800"
+                    >
+                        ← Regresar
+                    </button>
+                    <button
+                        type="button"
+                        onclick="submitPortalDigitalConsent()"
+                        id="portalBtnSubmitConsent"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-7 py-3 rounded-xl shadow-lg transition flex items-center gap-2"
+                    >
+                        <i class="ph-bold ph-check-circle text-lg"></i>
+                        <span>✓ Aceptar y Firmar Orden de Tratamiento</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 6: CONFIRMACIÓN Y COMPROBANTE DE ÉXITO -->
+            <div id="portalStepSection-6" class="hidden space-y-5 text-center py-4">
+                <div class="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-sm">
+                    <i class="ph-bold ph-check"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-xl font-black text-slate-900">
+                        ¡Consentimiento y Orden Firmados con Éxito!
+                    </h3>
+                    <p class="text-xs text-slate-600 max-w-md mx-auto">
+                        Tu selección ha quedado registrada en tu expediente clínico oficial con firma digital encriptada bajo la normativa de salud.
+                    </p>
+                </div>
+
+                <div class="max-w-md mx-auto p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-xs space-y-2">
+                    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                        <span class="text-slate-500">Paciente:</span>
+                        <strong id="portalSummaryPatientName" class="text-slate-900"></strong>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                        <span class="text-slate-500">Plan Elegido:</span>
+                        <strong id="portalSummaryPlanTitle" class="text-indigo-900"></strong>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                        <span class="text-slate-500">Mensualidad Convenida:</span>
+                        <strong id="portalSummaryMonthlyFee" class="text-slate-900"></strong>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-200/80 pb-1.5">
+                        <span class="text-slate-500">Enganche Inicial:</span>
+                        <strong id="portalSummaryDownPayment" class="text-slate-900"></strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Fecha y Hora de Firma:</span>
+                        <strong id="portalSummaryTimestamp" class="mono text-slate-700"></strong>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-3 pt-2">
+                    <button
+                        type="button"
+                        onclick="closePatientSelfServicePortal()"
+                        class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition"
+                    >
+                        Cerrar y Volver al Expediente
+                    </button>
+                    <button
+                        type="button"
+                        onclick="exportPatientPdf()"
+                        class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-printer"></i>
+                        <span>Imprimir Contrato</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 2: CONFIGURACIÓN DE PRECIOS Y OPCIONES DE TRATAMIENTO
+         (Para la Dra. Liseth Guevara)
+    ====================================================================== -->
+    <div id="orthoPricingConfigModal" onclick="closeOrthoPricingConfigModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto no-print">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 border border-slate-200 shadow-2xl space-y-5 my-6" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-xl shadow-2xs">
+                        <i class="ph-bold ph-currency-dollar"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                            Configuración de Tarifas
+                        </span>
+                        <h3 class="text-base font-extrabold text-slate-900 mt-0.5">
+                            Precios de Tratamiento & Opción Recomendada (3 Choices)
+                        </h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closeOrthoPricingConfigModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-500">
+                Personaliza las 3 alternativas que se presentan al paciente en sillón. Asegúrate de destacar la opción estrella (3rd choice) para incentivar la elección de alineadores o autoligado.
+            </p>
+
+            <div id="pricingConfigModalCardsList" class="space-y-4">
+                <!-- Inyectado por renderPricingConfigModal() -->
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                    type="button"
+                    onclick="closeOrthoPricingConfigModal()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="button"
+                    onclick="saveOrthoPricingConfigFromModal()"
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition"
+                >
+                    Guardar Precios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
          LÓGICA MODULAR DE LA APLICACIÓN (CONTRATO ESTRICTO TYPESCRIPT/JS)
     ====================================================================== -->
     <script>
@@ -3706,6 +4420,17 @@ create table if not exists public.patients (
             renderPatientsList();
             openPatientWorkspace(activePatientId, false);
             showDashboardView();
+
+            // Detectar si la URL se abrió en modo Portal del Paciente (?portal=patient&id=...)
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get("portal") === "patient" || urlParams.get("mode") === "patient") {
+                    const targetPatId = urlParams.get("id") || urlParams.get("patient_id") || activePatientId;
+                    setTimeout(() => {
+                        launchPatientSelfServicePortal(targetPatId);
+                    }, 400);
+                }
+            } catch (err) {}
         });
 
         function savePatientsLocal() {
@@ -4200,6 +4925,7 @@ create table if not exists public.patients (
             document.getElementById("histAllergies").value = mh.allergies || "Ninguna";
 
             renderPatientTimeline(patient);
+            renderBudgetAndConsentModule(patient);
             renderEvolutionNotes(patient);
             loadSavedSignatures(patient);
 
@@ -4691,7 +5417,40 @@ create table if not exists public.patients (
                         </section>
                     ` : ""}
 
-                    <!-- 9. VALIDACIÓN LEGAL Y FIRMAS DIGITALES -->
+                    <!-- 9. ELECCIÓN DE PRESUPUESTO Y ESQUEMA FINANCIERO -->
+                    ${patient.selected_budget ? `
+                        <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
+                            <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2 flex justify-between items-center">
+                                <span>Modalidad de Tratamiento y Presupuesto Convenido</span>
+                                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                    ✓ ${patient.selected_budget.planTitle || "Alineadores Invisibles"}
+                                </span>
+                            </h2>
+                            <div class="grid grid-cols-4 gap-2 text-center text-[9.5px]">
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5">
+                                    <span class="text-slate-500 block text-[8px] uppercase">Plan Seleccionado</span>
+                                    <strong class="text-indigo-950">${patient.selected_budget.planTitle}</strong>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5">
+                                    <span class="text-slate-500 block text-[8px] uppercase">Enganche Inicial</span>
+                                    <strong class="font-mono text-slate-900">$${Number(patient.selected_budget.downPayment || 0).toLocaleString("es-MX")} MXN</strong>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5">
+                                    <span class="text-slate-500 block text-[8px] uppercase">Mensualidad (${patient.selected_budget.durationMonths || 18} meses)</span>
+                                    <strong class="font-mono text-indigo-700">$${Number(patient.selected_budget.monthlyFee || 0).toLocaleString("es-MX")}/mes</strong>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5">
+                                    <span class="text-slate-500 block text-[8px] uppercase">Inversión Total</span>
+                                    <strong class="font-mono text-emerald-800">$${Number(patient.selected_budget.totalAmount || 0).toLocaleString("es-MX")} MXN</strong>
+                                </div>
+                            </div>
+                            <p class="text-[8.5px] text-slate-500 italic mt-1.5">
+                                * Nota Clínica: La Dra. Liseth Guevara Muñoz valida la idoneidad biomecánica del procedimiento conforme a los estudios cefalométricos del paciente.
+                            </p>
+                        </section>
+                    ` : ""}
+
+                    <!-- 10. VALIDACIÓN LEGAL Y FIRMAS DIGITALES -->
                     <section class="border border-slate-300 rounded-xl p-2.5 bg-white print-avoid-break">
                         <h2 class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-950 border-b border-slate-200 pb-1 mb-2">
                             Conformidad de Plan de Tratamiento y Consentimiento Informado
@@ -4832,7 +5591,7 @@ create table if not exists public.patients (
         }
 
         function setWorkspaceTab(tabName) {
-            const tabs = ["diagnostico", "multimedia", "historia", "comparador"];
+            const tabs = ["diagnostico", "multimedia", "historia", "comparador", "presupuesto"];
             tabs.forEach((t) => {
                 const btn = document.getElementById(`tabBtn-${t}`);
                 const mod = document.getElementById(`module-${t}`);
@@ -4849,6 +5608,8 @@ create table if not exists public.patients (
                 renderPatientTimeline(patient);
             } else if (tabName === "comparador") {
                 renderEvolutionComparator(patient);
+            } else if (tabName === "presupuesto") {
+                renderBudgetAndConsentModule(patient);
             }
         }
 
@@ -10430,6 +11191,877 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                     : "https://business.facebook.com/latest/composer";
             }
             document.getElementById("metaPublishModal")?.classList.remove("hidden");
+        }
+
+        // =====================================================================
+        // MÓDULO 5: CIERRE DE PRESUPUESTO & FIRMA DE CONSENTIMIENTO DIGITAL EN TABLET
+        // (src/components/modules/BudgetAndConsentTablet.tsx)
+        // =====================================================================
+        const DEFAULT_ORTHO_PRICING_PLANS = [
+            {
+                id: "metal",
+                badge: "Económico & Resistente",
+                title: "Brackets Metálicos Convencionales",
+                subtitle: "Mini Master / MBT Prescripción .022",
+                downPayment: 3500,
+                monthlyFee: 1200,
+                durationMonths: 18,
+                totalAmount: 25100,
+                isRecommended: false,
+                features: [
+                    "Excelente control biomecánico para rotaciones y nivelación",
+                    "Alta resistencia y durabilidad de aparatología",
+                    "Secuencia de arcos termoactivados NiTi → Acero",
+                    "Control de higiene y profilaxis en cada cita mensual"
+                ]
+            },
+            {
+                id: "self_ligating",
+                badge: "Menor Fricción & Tiempo",
+                title: "Brackets Autoligado Pasivo",
+                subtitle: "Damon Q2 / Cerámicos Estéticos .022",
+                downPayment: 6500,
+                monthlyFee: 1650,
+                durationMonths: 18,
+                totalAmount: 36200,
+                isRecommended: false,
+                features: [
+                    "Fuerzas biológicas ligeras con menor dolor inicial",
+                    "Sin ligas elásticas que acumulen restos de comida y placa",
+                    "Citas de ajuste más espaciadas (cada 6 a 8 semanas)",
+                    "Expansión transversal armónica y menor necesidad de extracciones"
+                ]
+            },
+            {
+                id: "aligners",
+                badge: "🌟 MÁS ELEGIDO • RECOMENDADO",
+                title: "Alineadores Invisibles Premium",
+                subtitle: "Invisalign / Spark / ClearSmile Ortho",
+                downPayment: 12000,
+                monthlyFee: 2100,
+                durationMonths: 18,
+                totalAmount: 49800,
+                isRecommended: true, // Efecto señuelo / 3rd choice estrella
+                features: [
+                    "100% Removible e imperceptible a la vista en todo momento",
+                    "Higiene bucal óptima: come sin restricciones y cepíllate con hilo",
+                    "Planificación digital 3D y simulación de resultados desde el inicio",
+                    "Sin urgencias por brackets despegados o alambres punzantes",
+                    "Ideal para pacientes con alta exigencia estética y profesional"
+                ]
+            }
+        ];
+
+        let orthoCurrentPricingPlans = null;
+        let portalSelectedPlanId = "aligners";
+        let portalUploadedSelfieUrl = "";
+        let portalActivePatientId = null;
+        let portalSignaturePadInited = false;
+        let portalSignatureHasStrokes = false;
+
+        function getOrthoPricingPlans() {
+            if (orthoCurrentPricingPlans) return orthoCurrentPricingPlans;
+            const saved = localStorage.getItem("crd_ortho_pricing_plans_v1");
+            if (saved) {
+                try {
+                    orthoCurrentPricingPlans = JSON.parse(saved);
+                    return orthoCurrentPricingPlans;
+                } catch (e) {}
+            }
+            orthoCurrentPricingPlans = JSON.parse(JSON.stringify(DEFAULT_ORTHO_PRICING_PLANS));
+            return orthoCurrentPricingPlans;
+        }
+
+        function saveOrthoPricingPlans(plans) {
+            orthoCurrentPricingPlans = plans;
+            try {
+                localStorage.setItem("crd_ortho_pricing_plans_v1", JSON.stringify(plans));
+            } catch (e) {}
+        }
+
+        function renderBudgetAndConsentModule(patient) {
+            if (!patient) patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const plans = getOrthoPricingPlans();
+            const b = patient.selected_budget || {};
+            const isSigned = Boolean(patient.patient_signature || b.status === "signed" || b.signedAt);
+            const chosenPlanId = b.planId || "aligners";
+
+            // 1. Estado general del módulo
+            const badgeEl = document.getElementById("budgetModuleStatusBadge");
+            if (badgeEl) {
+                if (isSigned) {
+                    badgeEl.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                    badgeEl.innerHTML = `<span class="flex items-center gap-1"><i class="ph-bold ph-check"></i> Consentimiento Firmado</span>`;
+                } else {
+                    badgeEl.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800";
+                    badgeEl.innerHTML = `<span class="flex items-center gap-1"><i class="ph-bold ph-clock"></i> ⏳ Pendiente de Firma</span>`;
+                }
+            }
+
+            // 2. Renderizar tarjetas de las 3 opciones con efecto señuelo
+            const container = document.getElementById("orthoPricingPlansCardsContainer");
+            if (container) {
+                container.innerHTML = plans.map((p) => {
+                    const isSelected = p.id === chosenPlanId;
+                    const isRecommended = p.isRecommended;
+
+                    return `
+                        <div
+                            onclick="selectDoctorSideBudgetPlan('${p.id}')"
+                            class="relative rounded-3xl p-6 cursor-pointer transition flex flex-col justify-between ${
+                                isSelected
+                                    ? isRecommended
+                                        ? "bg-slate-900 text-white border-2 border-indigo-400 shadow-xl ring-4 ring-indigo-500/20"
+                                        : "bg-white text-slate-900 border-2 border-indigo-600 shadow-lg ring-4 ring-indigo-500/10"
+                                    : isRecommended
+                                    ? "bg-slate-900/95 text-white border border-slate-700 shadow-md hover:border-indigo-400"
+                                    : "bg-white text-slate-900 border border-slate-200 shadow-2xs hover:border-indigo-200"
+                            }"
+                        >
+                            ${isRecommended ? `
+                                <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-slate-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md whitespace-nowrap flex items-center gap-1">
+                                    <i class="ph-bold ph-star-fill text-slate-950"></i>
+                                    <span>${p.badge}</span>
+                                </div>
+                            ` : ""}
+
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                        isRecommended
+                                            ? "bg-indigo-500/30 text-indigo-200 border border-indigo-400/30"
+                                            : "bg-slate-100 text-slate-600"
+                                    }">
+                                        ${p.badge}
+                                    </span>
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                        isSelected
+                                            ? "bg-emerald-500 text-white shadow-xs"
+                                            : "border border-slate-300 text-transparent"
+                                    }">
+                                        ✓
+                                    </div>
+                                </div>
+
+                                <h3 class="font-extrabold text-base sm:text-lg mt-3 text-inherit">${p.title}</h3>
+                                <p class="text-xs mt-0.5 ${isRecommended ? "text-slate-300" : "text-slate-500"}">${p.subtitle}</p>
+
+                                <div class="mt-4 p-4 rounded-2xl border ${
+                                    isRecommended
+                                        ? "bg-white/5 border-white/10"
+                                        : "bg-slate-50 border-slate-100"
+                                }">
+                                    <div class="flex items-baseline justify-between">
+                                        <span class="text-xs opacity-75">Mensualidad:</span>
+                                        <span class="text-2xl font-black font-mono">
+                                            $${Number(p.monthlyFee).toLocaleString("es-MX")}
+                                            <span class="text-xs font-normal"> /mes</span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs mt-2 pt-2 border-t border-slate-200/20">
+                                        <span class="opacity-75">Enganche inicial:</span>
+                                        <span class="font-bold font-mono">$${Number(p.downPayment).toLocaleString("es-MX")} MXN</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs mt-1">
+                                        <span class="opacity-75">Plazo estimado:</span>
+                                        <span class="font-semibold">${p.durationMonths} meses</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs mt-1">
+                                        <span class="opacity-75">Inversión total:</span>
+                                        <span class="font-bold font-mono ${isRecommended ? "text-amber-300" : "text-indigo-600"}">
+                                            $${Number(p.totalAmount).toLocaleString("es-MX")} MXN
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <ul class="mt-4 space-y-2 text-xs">
+                                    ${p.features.map(f => `
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-500 font-bold shrink-0">✓</span>
+                                            <span class="${isRecommended ? "text-slate-200" : "text-slate-600"}">${f}</span>
+                                        </li>
+                                    `).join("")}
+                                </ul>
+                            </div>
+
+                            <div class="mt-5 pt-3 border-t border-slate-200/20">
+                                <button
+                                    type="button"
+                                    class="w-full py-2.5 rounded-xl font-bold text-xs transition ${
+                                        isSelected
+                                            ? isRecommended
+                                                ? "bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md"
+                                                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs"
+                                            : isRecommended
+                                            ? "bg-white/10 hover:bg-white/20 text-white"
+                                            : "bg-slate-100 hover:bg-slate-200 text-slate-800"
+                                    }"
+                                >
+                                    ${isSelected ? "✓ Plan Asignado al Paciente" : "Asignar este Plan"}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            // 3. Tarjeta del paciente (Nombre, avatar, firma, plan, fecha)
+            const nameEl = document.getElementById("budgetPatientCardName");
+            if (nameEl) nameEl.innerText = `${patient.full_name} (${patient.age} años)`;
+
+            const avatarContainer = document.getElementById("budgetPatientAvatarContainer");
+            if (avatarContainer) {
+                const selfie = patient.patient_selfie || patient.avatar_url;
+                if (selfie) {
+                    avatarContainer.innerHTML = `<img src="${selfie}" alt="${patient.full_name}" class="w-full h-full object-cover rounded-full" />`;
+                } else {
+                    avatarContainer.innerHTML = `<i class="ph-bold ph-user text-slate-600"></i>`;
+                }
+            }
+
+            const pStatusBadge = document.getElementById("budgetPatientSigStatusBadge");
+            if (pStatusBadge) {
+                if (isSigned) {
+                    pStatusBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                    pStatusBadge.innerText = "✓ Firmado Digitalmente";
+                } else {
+                    pStatusBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
+                    pStatusBadge.innerText = "⏳ Pendiente";
+                }
+            }
+
+            const sigImg = document.getElementById("budgetPatientSigImg");
+            const sigPlaceholder = document.getElementById("budgetPatientSigPlaceholder");
+            const sigUrl = patient.patient_signature || b.patientSignature;
+            if (sigUrl && sigImg && sigPlaceholder) {
+                sigImg.src = sigUrl;
+                sigImg.classList.remove("hidden");
+                sigPlaceholder.classList.add("hidden");
+            } else if (sigImg && sigPlaceholder) {
+                sigImg.src = "";
+                sigImg.classList.add("hidden");
+                sigPlaceholder.classList.remove("hidden");
+            }
+
+            const chosenPlanObj = plans.find(p => p.id === chosenPlanId) || plans[2];
+            const chosenPlanText = document.getElementById("budgetPatientChosenPlanText");
+            if (chosenPlanText) chosenPlanText.innerText = `${chosenPlanObj.title} ($${chosenPlanObj.monthlyFee.toLocaleString("es-MX")}/mes)`;
+
+            const signedDateText = document.getElementById("budgetPatientSignedDateText");
+            if (signedDateText) {
+                signedDateText.innerText = b.signedAt
+                    ? new Date(b.signedAt).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                    : (patient.signed_at ? new Date(patient.signed_at).toLocaleDateString("es-MX") : "Sin firma registrada");
+            }
+
+            // 4. Tarjeta de autorización de la Dra. Liseth Guevara
+            const doctorAuthBadge = document.getElementById("budgetDoctorAuthStatusBadge");
+            const doctorApprovedView = document.getElementById("budgetDoctorApprovedView");
+            const doctorPendingAction = document.getElementById("budgetDoctorPendingAction");
+            const doctorAuthDateText = document.getElementById("budgetDoctorAuthDateText");
+
+            const isDoctorApproved = Boolean(b.doctorAuthorized || patient.doctor_signature);
+            if (isDoctorApproved) {
+                if (doctorAuthBadge) {
+                    doctorAuthBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                    doctorAuthBadge.innerText = "✓ Autorizado Clínicamente";
+                }
+                if (doctorApprovedView) doctorApprovedView.classList.remove("hidden");
+                if (doctorPendingAction) doctorPendingAction.classList.add("hidden");
+                if (doctorAuthDateText) {
+                    const dt = b.doctorAuthorizedAt || patient.signed_at || new Date().toISOString();
+                    doctorAuthDateText.innerText = `Autorizado el ${new Date(dt).toLocaleDateString("es-MX", { day: "2-digit", month: "long", year: "numeric" })}`;
+                }
+            } else {
+                if (doctorAuthBadge) {
+                    doctorAuthBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
+                    doctorAuthBadge.innerText = "Requiere Autorización";
+                }
+                if (doctorApprovedView) doctorApprovedView.classList.add("hidden");
+                if (doctorPendingAction) doctorPendingAction.classList.remove("hidden");
+            }
+        }
+
+        function selectDoctorSideBudgetPlan(planId) {
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const plans = getOrthoPricingPlans();
+            const planObj = plans.find(p => p.id === planId) || plans[2];
+
+            if (!patient.selected_budget) {
+                patient.selected_budget = {};
+            }
+            patient.selected_budget.planId = planObj.id;
+            patient.selected_budget.planTitle = planObj.title;
+            patient.selected_budget.downPayment = planObj.downPayment;
+            patient.selected_budget.monthlyFee = planObj.monthlyFee;
+            patient.selected_budget.durationMonths = planObj.durationMonths;
+            patient.selected_budget.totalAmount = planObj.totalAmount;
+
+            savePatientsLocal();
+            renderBudgetAndConsentModule(patient);
+        }
+
+        function authorizeActivePatientBudget() {
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            if (!patient.selected_budget) {
+                const plans = getOrthoPricingPlans();
+                const defaultPlan = plans[2];
+                patient.selected_budget = {
+                    planId: defaultPlan.id,
+                    planTitle: defaultPlan.title,
+                    downPayment: defaultPlan.downPayment,
+                    monthlyFee: defaultPlan.monthlyFee,
+                    durationMonths: defaultPlan.durationMonths,
+                    totalAmount: defaultPlan.totalAmount,
+                };
+            }
+
+            patient.selected_budget.doctorAuthorized = true;
+            patient.selected_budget.doctorAuthorizedAt = new Date().toISOString();
+            patient.doctor_signature = "Dra. Liseth Guevara Muñoz • Céd. Esp. Ortodoncia";
+
+            // Registrar en bitácora
+            if (!patient.notes) patient.notes = [];
+            patient.notes.unshift({
+                date: new Date().toLocaleDateString("es-MX"),
+                author: "Dra. Liseth Guevara",
+                text: `✓ Plan de tratamiento (${patient.selected_budget.planTitle}) autorizado formalmente tras valoración biomecánica.`
+            });
+
+            savePatientsLocal();
+            renderBudgetAndConsentModule(patient);
+            renderPrintFullReport(patient);
+
+            if (supabaseClient && String(patient.id).length > 20) {
+                supabaseClient
+                    .from("patients")
+                    .update({
+                        doctor_signature: patient.doctor_signature,
+                        medical_history: patient.medical_history
+                    })
+                    .eq("id", patient.id)
+                    .then(() => {})
+                    .catch(err => console.warn("Supabase update doc signature:", err));
+            }
+
+            alert("✓ Plan de tratamiento autorizado formalmente por la Dra. Liseth Guevara Muñoz.");
+        }
+
+        function copyActivePatientPortalUrl() {
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const url = `${window.location.origin}${window.location.pathname}?portal=patient&id=${encodeURIComponent(patient.id)}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert(`✓ Enlace del portal copiado al portapapeles:\n\n${url}\n\nPuedes enviarlo al paciente para que llene su cuestionario, se tome su selfie y firme su consentimiento desde su teléfono o tablet.`);
+            }).catch(() => {
+                prompt("Copia el siguiente enlace para el paciente:", url);
+            });
+        }
+
+        function shareActivePatientPortalWhatsApp() {
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const url = `${window.location.origin}${window.location.pathname}?portal=patient&id=${encodeURIComponent(patient.id)}`;
+            const cleanPhone = (patient.phone || "").replace(/\D/g, "");
+            const msg = `Hola ${patient.full_name}, la Dra. Liseth Guevara te comparte tu enlace exclusivo para revisar tus opciones de tratamiento de ortodoncia, completar tu historia médica, aviso de privacidad y firmar digitalmente tu consentimiento informado:\n\n${url}`;
+            const targetUrl = cleanPhone.length >= 10
+                ? `https://wa.me/52${cleanPhone.slice(-10)}?text=${encodeURIComponent(msg)}`
+                : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            window.open(targetUrl, "_blank");
+        }
+
+        // ---------------------------------------------------------------------
+        // PORTAL DE PACIENTE INTERACTIVO (TABLET / SILLÓN / LINK EXTERNO)
+        // ---------------------------------------------------------------------
+        function launchPatientSelfServicePortal(patientId) {
+            portalActivePatientId = patientId || activePatientId;
+            const patient = patientsList.find(p => p.id === portalActivePatientId) || patientsList[0];
+            if (!patient) return;
+
+            document.getElementById("portalPatientDisplayName").innerText = `${patient.full_name} (${patient.age} años)`;
+
+            // Precargar datos si existen
+            const mh = patient.medical_history || {};
+            const q = mh.health_questionnaire || {};
+            document.getElementById("portalHealthChiefComplaint").value = q.chiefComplaint || mh.chief_complaint || patient.case_summary || "";
+            document.getElementById("portalHealthAllergies").value = q.allergies || mh.allergies || "";
+            document.getElementById("portalHealthConditions").value = q.medicalConditions || "";
+            document.getElementById("portalHealthMedications").value = q.currentMedications || "";
+            document.getElementById("portalHealthSurgeries").value = q.surgeriesOrAnesthesia || "";
+            document.getElementById("portalHealthHabits").value = q.habits || mh.habits_perio || "";
+            document.getElementById("portalHealthGums").value = q.gumHealth || "";
+
+            // Selfie existente
+            portalUploadedSelfieUrl = patient.patient_selfie || patient.avatar_url || "";
+            const selfieImg = document.getElementById("portalSelfiePreviewImg");
+            const selfiePh = document.getElementById("portalSelfiePlaceholder");
+            if (portalUploadedSelfieUrl && selfieImg && selfiePh) {
+                selfieImg.src = portalUploadedSelfieUrl;
+                selfieImg.classList.remove("hidden");
+                selfiePh.classList.add("hidden");
+            } else if (selfieImg && selfiePh) {
+                selfieImg.src = "";
+                selfieImg.classList.add("hidden");
+                selfiePh.classList.remove("hidden");
+            }
+
+            // Plan seleccionado
+            portalSelectedPlanId = patient.selected_budget?.planId || "aligners";
+            renderPortalPricingCards();
+
+            // Checkboxes legales
+            const chkPriv = document.getElementById("portalChkPrivacy");
+            const chkCons = document.getElementById("portalChkConsent");
+            if (chkPriv) chkPriv.checked = Boolean(patient.selected_budget?.privacyAccepted);
+            if (chkCons) chkCons.checked = Boolean(patient.selected_budget?.consentAccepted);
+            validatePortalLegalStep();
+
+            setPortalStep(1);
+            document.getElementById("patientSelfServicePortalModal")?.classList.remove("hidden");
+
+            // Inicializar canvas táctil
+            setTimeout(() => {
+                initPortalSignatureCanvas();
+            }, 300);
+        }
+
+        function closePatientSelfServicePortal() {
+            document.getElementById("patientSelfServicePortalModal")?.classList.add("hidden");
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (patient) {
+                renderBudgetAndConsentModule(patient);
+                renderPatientsList();
+                renderPrintFullReport(patient);
+            }
+        }
+
+        function setPortalStep(stepNum) {
+            for (let i = 1; i <= 6; i++) {
+                const sec = document.getElementById(`portalStepSection-${i}`);
+                if (sec) {
+                    if (i === stepNum) sec.classList.remove("hidden");
+                    else sec.classList.add("hidden");
+                }
+                const ind = document.getElementById(`portalStepIndicator-${i}`);
+                if (ind) {
+                    if (i === stepNum) {
+                        ind.className = "py-2 rounded-xl transition bg-indigo-600 text-white shadow-xs";
+                    } else if (i < stepNum) {
+                        ind.className = "py-2 rounded-xl transition bg-emerald-100 text-emerald-800 font-bold";
+                    } else {
+                        ind.className = "py-2 rounded-xl transition bg-slate-100 text-slate-400";
+                    }
+                }
+            }
+
+            if (stepNum === 5) {
+                setTimeout(() => {
+                    initPortalSignatureCanvas();
+                }, 100);
+            }
+        }
+
+        function handlePatientPortalSelfieChange(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                portalUploadedSelfieUrl = e.target?.result;
+                const img = document.getElementById("portalSelfiePreviewImg");
+                const ph = document.getElementById("portalSelfiePlaceholder");
+                if (img) {
+                    img.src = portalUploadedSelfieUrl;
+                    img.classList.remove("hidden");
+                }
+                if (ph) ph.classList.add("hidden");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderPortalPricingCards() {
+            const container = document.getElementById("portalPricingPlansContainer");
+            if (!container) return;
+
+            const plans = getOrthoPricingPlans();
+            container.innerHTML = plans.map(p => {
+                const isSelected = p.id === portalSelectedPlanId;
+                const isRecommended = p.isRecommended;
+
+                return `
+                    <div
+                        onclick="selectPortalPlan('${p.id}')"
+                        class="p-4 rounded-2xl cursor-pointer border transition text-left relative flex flex-col justify-between ${
+                            isSelected
+                                ? isRecommended
+                                    ? "border-amber-400 bg-slate-900 text-white shadow-lg ring-3 ring-amber-400/30"
+                                    : "border-indigo-600 bg-indigo-50/70 text-slate-900 shadow-sm ring-2 ring-indigo-500/20"
+                                : isRecommended
+                                ? "border-slate-700 bg-slate-900 text-white hover:border-amber-400 shadow-xs"
+                                : "border-slate-200 bg-white hover:border-indigo-300 text-slate-900 shadow-2xs"
+                        }"
+                    >
+                        <div>
+                            <div class="flex justify-between items-start gap-1">
+                                <span class="text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                    isRecommended
+                                        ? "bg-amber-400 text-slate-950 font-black shadow-2xs"
+                                        : "bg-slate-100 text-slate-600"
+                                }">
+                                    ${p.badge}
+                                </span>
+                                <div class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    isSelected
+                                        ? "bg-emerald-500 text-white shadow-xs"
+                                        : "border border-slate-300 text-transparent"
+                                }">
+                                    ✓
+                                </div>
+                            </div>
+
+                            <h5 class="font-extrabold text-xs sm:text-sm text-inherit mt-2.5">${p.title}</h5>
+                            <p class="text-[10px] mt-0.5 ${isRecommended ? "text-slate-300" : "text-slate-500"}">${p.subtitle}</p>
+
+                            <div class="mt-3 p-2.5 rounded-xl border ${
+                                isRecommended ? "bg-white/5 border-white/10" : "bg-white border-slate-100 shadow-2xs"
+                            }">
+                                <div class="text-lg font-black font-mono">
+                                    $${Number(p.monthlyFee).toLocaleString("es-MX")}
+                                    <span class="text-[10px] font-normal"> /mes</span>
+                                </div>
+                                <div class="text-[10px] opacity-80 mt-0.5">Enganche: $${Number(p.downPayment).toLocaleString("es-MX")} MXN</div>
+                                <div class="text-[10px] opacity-80">Plazo: ${p.durationMonths} meses</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/20">
+                            <span class="text-[10.5px] font-bold block text-center ${isSelected ? "text-emerald-500" : "opacity-75"}">
+                                ${isSelected ? "✓ Seleccionado" : "Tocar para elegir"}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            const planObj = plans.find(p => p.id === portalSelectedPlanId) || plans[2];
+            const planTitleEl = document.getElementById("portalConfirmPlanTitle");
+            const planFeeEl = document.getElementById("portalConfirmPlanFee");
+            if (planTitleEl) planTitleEl.innerText = planObj.title;
+            if (planFeeEl) planFeeEl.innerText = `$${Number(planObj.monthlyFee).toLocaleString("es-MX")} /mes`;
+        }
+
+        function selectPortalPlan(planId) {
+            portalSelectedPlanId = planId;
+            renderPortalPricingCards();
+        }
+
+        function validatePortalLegalStep() {
+            const priv = document.getElementById("portalChkPrivacy")?.checked;
+            const cons = document.getElementById("portalChkConsent")?.checked;
+            const btn = document.getElementById("portalBtnToSignature");
+            if (!btn) return;
+
+            if (priv && cons) {
+                btn.disabled = false;
+                btn.className = "bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm";
+            } else {
+                btn.disabled = true;
+                btn.className = "bg-slate-300 text-slate-500 font-bold text-xs px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed";
+            }
+        }
+
+        function initPortalSignatureCanvas() {
+            const canvas = document.getElementById("portalSignatureCanvas");
+            if (!canvas) return;
+
+            // Ajustar resolución según tamaño en pantalla para nitidez en iPad retina
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                canvas.width = rect.width * (window.devicePixelRatio || 1);
+                canvas.height = rect.height * (window.devicePixelRatio || 1);
+            }
+            const ctx = canvas.getContext("2d");
+            ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = "#1e1b4b";
+
+            if (portalSignaturePadInited) return;
+            portalSignaturePadInited = true;
+
+            let drawing = false;
+
+            const getPos = (e) => {
+                const r = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - r.left,
+                    y: clientY - r.top
+                };
+            };
+
+            const start = (e) => {
+                e.preventDefault();
+                drawing = true;
+                portalSignatureHasStrokes = true;
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+            };
+
+            const move = (e) => {
+                if (!drawing) return;
+                e.preventDefault();
+                const p = getPos(e);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+            };
+
+            const stop = (e) => {
+                if (!drawing) return;
+                drawing = false;
+            };
+
+            canvas.addEventListener("mousedown", start);
+            canvas.addEventListener("mousemove", move);
+            canvas.addEventListener("mouseup", stop);
+            canvas.addEventListener("mouseleave", stop);
+
+            canvas.addEventListener("touchstart", start, { passive: false });
+            canvas.addEventListener("touchmove", move, { passive: false });
+            canvas.addEventListener("touchend", stop);
+        }
+
+        function clearPortalSignatureCanvas() {
+            const canvas = document.getElementById("portalSignatureCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            portalSignatureHasStrokes = false;
+        }
+
+        async function submitPortalDigitalConsent() {
+            const canvas = document.getElementById("portalSignatureCanvas");
+            if (!canvas || !portalSignatureHasStrokes) {
+                alert("Por favor estampa tu firma digital en el recuadro para otorgar tu conformidad legal.");
+                return;
+            }
+
+            const signatureData = canvas.toDataURL("image/png");
+            const patient = patientsList.find(p => p.id === (portalActivePatientId || activePatientId)) || patientsList[0];
+            if (!patient) return;
+
+            const plans = getOrthoPricingPlans();
+            const planObj = plans.find(p => p.id === portalSelectedPlanId) || plans[2];
+            const signedTimestamp = new Date().toISOString();
+
+            // 1. Cuestionario médico completado
+            const healthQuestionnaire = {
+                chiefComplaint: document.getElementById("portalHealthChiefComplaint")?.value?.trim() || "",
+                allergies: document.getElementById("portalHealthAllergies")?.value?.trim() || "",
+                medicalConditions: document.getElementById("portalHealthConditions")?.value?.trim() || "",
+                currentMedications: document.getElementById("portalHealthMedications")?.value?.trim() || "",
+                surgeriesOrAnesthesia: document.getElementById("portalHealthSurgeries")?.value?.trim() || "",
+                habits: document.getElementById("portalHealthHabits")?.value?.trim() || "",
+                gumHealth: document.getElementById("portalHealthGums")?.value?.trim() || ""
+            };
+
+            // 2. Objeto de presupuesto y consentimiento digital
+            const budgetData = {
+                planId: planObj.id,
+                planTitle: planObj.title,
+                downPayment: planObj.downPayment,
+                monthlyFee: planObj.monthlyFee,
+                durationMonths: planObj.durationMonths,
+                totalAmount: planObj.totalAmount,
+                signedAt: signedTimestamp,
+                patientSelfie: portalUploadedSelfieUrl || patient.patient_selfie || null,
+                privacyAccepted: true,
+                consentAccepted: true,
+                status: "signed",
+                doctorAuthorized: false,
+                doctorAuthorizedAt: null,
+                clinicalDisclaimer: "La Dra. Liseth Guevara Muñoz determinará y autorizará formalmente si el procedimiento es el biomecánicamente adecuado tras valorar estudios radiográficos y tomográficos."
+            };
+
+            // 3. Actualizar paciente
+            patient.patient_signature = signatureData;
+            patient.signed_at = signedTimestamp;
+            if (portalUploadedSelfieUrl) {
+                patient.patient_selfie = portalUploadedSelfieUrl;
+                patient.avatar_url = portalUploadedSelfieUrl;
+            }
+            patient.selected_budget = budgetData;
+
+            if (!patient.medical_history) patient.medical_history = {};
+            patient.medical_history.chief_complaint = healthQuestionnaire.chiefComplaint || patient.medical_history.chief_complaint;
+            patient.medical_history.allergies = healthQuestionnaire.allergies || patient.medical_history.allergies;
+            patient.medical_history.habits_perio = `${healthQuestionnaire.habits || "Ninguno"} • Encías: ${healthQuestionnaire.gumHealth || "Sanas"}`;
+            patient.medical_history.health_questionnaire = healthQuestionnaire;
+            patient.medical_history.selected_budget = budgetData;
+
+            // Bitácora clínica
+            if (!patient.notes) patient.notes = [];
+            patient.notes.unshift({
+                date: new Date().toLocaleDateString("es-MX"),
+                author: "Portal del Paciente (Firma Digital)",
+                text: `Consentimiento y orden de tratamiento firmados digitalmente. Opción elegida: ${planObj.title} ($${planObj.monthlyFee}/mes). Selfie de perfil archivada.`
+            });
+
+            savePatientsLocal();
+
+            // Enviar a Supabase si está disponible
+            if (supabaseClient && String(patient.id).length > 20) {
+                supabaseClient
+                    .from("patients")
+                    .update({
+                        patient_signature: signatureData,
+                        signed_at: signedTimestamp,
+                        avatar_url: portalUploadedSelfieUrl || patient.avatar_url || null,
+                        medical_history: patient.medical_history
+                    })
+                    .eq("id", patient.id)
+                    .then(() => {})
+                    .catch(e => console.warn("Sync Supabase consent error:", e));
+            }
+
+            // 4. Mostrar Paso 6 de Resumen
+            document.getElementById("portalSummaryPatientName").innerText = patient.full_name;
+            document.getElementById("portalSummaryPlanTitle").innerText = planObj.title;
+            document.getElementById("portalSummaryMonthlyFee").innerText = `$${Number(planObj.monthlyFee).toLocaleString("es-MX")} /mes`;
+            document.getElementById("portalSummaryDownPayment").innerText = `$${Number(planObj.downPayment).toLocaleString("es-MX")} MXN`;
+            document.getElementById("portalSummaryTimestamp").innerText = new Date(signedTimestamp).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+            setPortalStep(6);
+        }
+
+        // ---------------------------------------------------------------------
+        // MODAL DE CONFIGURACIÓN DE PRECIOS PARA LA DOCTORA
+        // ---------------------------------------------------------------------
+        function openOrthoPricingConfigModal() {
+            renderPricingConfigModal();
+            document.getElementById("orthoPricingConfigModal")?.classList.remove("hidden");
+        }
+
+        function closeOrthoPricingConfigModal() {
+            document.getElementById("orthoPricingConfigModal")?.classList.add("hidden");
+        }
+
+        function renderPricingConfigModal() {
+            const container = document.getElementById("pricingConfigModalCardsList");
+            if (!container) return;
+
+            const plans = getOrthoPricingPlans();
+            container.innerHTML = plans.map((p, idx) => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <span class="text-xs font-bold text-indigo-950 uppercase tracking-wider">
+                            Plan ${idx + 1}: ${p.title}
+                        </span>
+                        <label class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="pricingModalRecommendedPlan"
+                                value="${p.id}"
+                                ${p.isRecommended ? "checked" : ""}
+                                class="accent-amber-500 w-4 h-4"
+                            />
+                            <span>Marcar como Opción Recomendada (3rd choice)</span>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Enganche ($ MXN):</label>
+                            <input
+                                type="number"
+                                id="cfgPriceDown-${idx}"
+                                value="${p.downPayment}"
+                                oninput="calcPricingTotalFromInputs(${idx})"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 font-mono font-bold"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Mensualidad ($ MXN):</label>
+                            <input
+                                type="number"
+                                id="cfgPriceMonthly-${idx}"
+                                value="${p.monthlyFee}"
+                                oninput="calcPricingTotalFromInputs(${idx})"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 font-mono font-bold"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Plazo (Meses):</label>
+                            <input
+                                type="number"
+                                id="cfgPriceMonths-${idx}"
+                                value="${p.durationMonths}"
+                                oninput="calcPricingTotalFromInputs(${idx})"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 font-mono"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Total ($ MXN):</label>
+                            <input
+                                type="number"
+                                id="cfgPriceTotal-${idx}"
+                                disabled
+                                value="${p.totalAmount}"
+                                class="w-full bg-slate-100 border border-slate-200 rounded-xl px-2.5 py-1.5 font-mono font-black text-indigo-700"
+                            />
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function calcPricingTotalFromInputs(idx) {
+            const down = Number(document.getElementById(`cfgPriceDown-${idx}`)?.value) || 0;
+            const monthly = Number(document.getElementById(`cfgPriceMonthly-${idx}`)?.value) || 0;
+            const months = Number(document.getElementById(`cfgPriceMonths-${idx}`)?.value) || 0;
+            const total = down + monthly * months;
+            const totalInput = document.getElementById(`cfgPriceTotal-${idx}`);
+            if (totalInput) totalInput.value = total;
+        }
+
+        function saveOrthoPricingConfigFromModal() {
+            const plans = getOrthoPricingPlans();
+            const checkedRadio = document.querySelector("input[name='pricingModalRecommendedPlan']:checked");
+            const recommendedId = checkedRadio ? checkedRadio.value : "aligners";
+
+            plans.forEach((p, idx) => {
+                const down = Number(document.getElementById(`cfgPriceDown-${idx}`)?.value) || p.downPayment;
+                const monthly = Number(document.getElementById(`cfgPriceMonthly-${idx}`)?.value) || p.monthlyFee;
+                const months = Number(document.getElementById(`cfgPriceMonths-${idx}`)?.value) || p.durationMonths;
+                p.downPayment = down;
+                p.monthlyFee = monthly;
+                p.durationMonths = months;
+                p.totalAmount = down + monthly * months;
+                p.isRecommended = p.id === recommendedId;
+                if (p.isRecommended) {
+                    p.badge = "🌟 MÁS ELEGIDO • RECOMENDADO";
+                } else if (p.id === "metal") {
+                    p.badge = "Económico & Resistente";
+                } else {
+                    p.badge = "Menor Fricción & Tiempo";
+                }
+            });
+
+            saveOrthoPricingPlans(plans);
+            closeOrthoPricingConfigModal();
+
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (patient) renderBudgetAndConsentModule(patient);
+
+            alert("✓ Precios y planes de tratamiento actualizados correctamente.");
         }
 
         function closeMetaPublishModal() {
