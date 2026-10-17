@@ -4272,20 +4272,28 @@ create table if not exists public.patients (
                         const prompt = `Eres un ortodoncista experto utilizando Gemini 4 Argon. Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo de consulta: ${patient.case_summary || "Valoración ortodóntica"}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "durationMonths": number, "complexity": "Baja" | "Moderada" | "Alta", "anchorage": string, "summary": { "skeletal": string, "vertical": string, "dentalFormula": string, "rootAlert": string }, "cephalometrics": [{ "parameter": string, "finding": string, "norm": string, "implication": string }], "additionalTreatments": [string], "risks": [{ "title": string, "level": string, "mitigation": string }], "odontogram": { "32": { "toothFDI": 32, "name": string, "status": "ipr"|"critical"|"missing"|"aligned", "diagnosis": string, "iprMesial": number, "iprDistal": number, "biomechanics": string } }, "roadmap": [{ "phase": "fase1"|"fase2"|"fase3", "months": string, "archwire": string, "title": string, "chairsideAction": string, "expectedMovement": string }], "retentionProtocol": string }.`;
                         parts.push({ text: prompt });
 
-                        const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                contents: [{ parts }],
-                                generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
-                            })
-                        });
-                        if (gRes.ok) {
-                            const gJson = await gRes.json();
-                            const textOut = gJson.candidates?.[0]?.content?.parts?.[0]?.text;
-                            if (textOut) {
-                                const parsed = JSON.parse(textOut);
-                                if (parsed.odontogram || parsed.summary) updatedStudy = parsed;
+                        for (const modelName of ["gemini-3.8-flash", "gemini-flash-latest"]) {
+                            const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    contents: [{ parts }],
+                                    generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+                                })
+                            });
+                            if (gRes.ok) {
+                                const gJson = await gRes.json();
+                                const partsArr = gJson.candidates?.[0]?.content?.parts || [];
+                                const textPart = partsArr.find((p) => !p.thought && p.text) || partsArr[partsArr.length - 1];
+                                const textOut = textPart?.text;
+                                if (textOut) {
+                                    const cleanJson = textOut.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                                    const parsed = JSON.parse(cleanJson);
+                                    if (parsed.odontogram || parsed.summary) {
+                                        updatedStudy = parsed;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     } catch (_) {}
@@ -5948,14 +5956,20 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                             <p class="whitespace-pre-line leading-relaxed text-[11.5px]">${m.text}</p>
                             ${appt ? `
                                 <div class="bg-white border border-indigo-200 rounded-xl p-2.5 text-slate-900 space-y-1.5 shadow-xs">
-                                    <div class="flex justify-between items-center">
+                                    <div class="flex flex-wrap justify-between items-center gap-1">
                                         <span class="text-[9.5px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            ✓ Sincronizado en Agenda Hub • ${appt.durationMinutes || 30} min en sillón
+                                            ✓ Agendado en Hub • ${appt.durationMinutes || 30} min en sillón
                                         </span>
+                                        ${appt.stageIdentified ? `
+                                            <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                🦷 ${appt.stageIdentified}
+                                            </span>
+                                        ` : ""}
                                     </div>
                                     <p class="font-bold text-xs text-indigo-950">${appt.procedureTitle}</p>
-                                    <p class="text-[10.5px] text-slate-600"><strong>Paciente:</strong> ${appt.patientName}</p>
-                                    <p class="text-[10.5px] text-slate-600"><strong>Charola de Sillón:</strong> ${appt.chairsidePrep || "Instrumental de control"}</p>
+                                    <p class="text-[10.5px] text-slate-700"><strong>👤 Paciente:</strong> ${appt.patientName}</p>
+                                    <p class="text-[10.5px] text-slate-700"><strong>🗓️ Fecha y Hora:</strong> ${appt.startIso ? new Date(appt.startIso).toLocaleString("es-MX", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "Confirmada"}</p>
+                                    <p class="text-[10.5px] text-slate-600"><strong>🧰 Charola de Sillón:</strong> ${appt.chairsidePrep || "Instrumental de control"}</p>
                                     <div class="flex flex-wrap gap-1.5 pt-1">
                                         <a
                                             href="${gcalUrl}"
@@ -6003,15 +6017,15 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
 
         function runQuickAssistantPrompt(type) {
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
-            const patName = patient ? patient.full_name : "la paciente";
+            const patName = patient ? patient.full_name : "el paciente activo";
             if (type === "briefing") {
-                sendOrthoAssistantPrompt("Dame el briefing clínico del día: resume mis pacientes en seguimiento, qué etapa les toca hoy, qué material o arcos debo preparar en la charola del sillón y si hay alertas radiculares.");
+                sendOrthoAssistantPrompt("Dame el briefing clínico del día: resume mis pacientes en seguimiento, en qué etapa van, qué material o arcos debo preparar en la charola del sillón y si hay alertas radiculares.");
             } else if (type === "schedule_next") {
-                sendOrthoAssistantPrompt(`Agendar el próximo control biomecánico de ${patName} el próximo jueves a las 11:00 am de acuerdo con su hoja de ruta mes a mes y dime cuánto tiempo de sillón reservar.`);
+                sendOrthoAssistantPrompt(`Identifica en qué etapa va ${patName} y agenda su próximo control biomecánico el próximo jueves a las 11:00 am calculando el tiempo de sillón ideal.`);
             } else if (type === "whatsapp") {
                 sendOrthoAssistantPrompt(`Redacta un mensaje de WhatsApp cálido y profesional de parte de la Dra. Liseth Guevara para ${patName} recordándole su próxima cita y las indicaciones de cuidado de su aparatología.`);
             } else if (type === "clinical_check") {
-                sendOrthoAssistantPrompt(`Analiza el expediente de ${patName}: resume su stripping (IPR) pendiente, su anclaje requerido y las precauciones biomecánicas clave para su próxima cita.`);
+                sendOrthoAssistantPrompt(`Analiza el expediente de ${patName}: resume su etapa actual, su stripping (IPR) pendiente, su anclaje requerido y las precauciones biomecánicas clave para su próxima cita.`);
             }
         }
 
@@ -6024,64 +6038,218 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             sendOrthoAssistantPrompt(text);
         }
 
+        // Parser inteligente en lenguaje natural como respaldo local si no hay red
+        function buildSmartLocalAssistantFallback(promptText, activePatient) {
+            const norm = (str) => String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            const cleanPrompt = norm(promptText);
+
+            // 1. Identificar al paciente mencionado en el texto de la doctora (o extraer nombre nuevo)
+            let matchedPat = patientsList.find((p) => {
+                const words = norm(p.full_name).split(/\s+/).filter((w) => w.length >= 3);
+                return words.some((w) => cleanPrompt.includes(w));
+            });
+
+            let extractedPatientName = matchedPat ? matchedPat.full_name : "";
+            if (!extractedPatientName) {
+                const nameRegex = /(?:agendar?\s+a|cita\s+(?:para|de|con)|paciente|mover\s+(?:a|cita\s+de)|cancelar\s+(?:a|cita\s+de)|para)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,2})/i;
+                const m = promptText.match(nameRegex);
+                if (m && m[1]) {
+                    const stopWords = /^(el|la|los|las|un|una|hoy|manana|mañana|lunes|martes|miercoles|miércoles|jueves|viernes|sabado|sábado|domingo|etapa|mes|control|valoracion|valoración)$/i;
+                    const candidateWords = m[1].trim().split(/\s+/).filter((w) => !stopWords.test(w));
+                    if (candidateWords.length > 0) {
+                        extractedPatientName = candidateWords.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+                    }
+                }
+            }
+            if (!extractedPatientName) {
+                extractedPatientName = activePatient?.full_name || "Paciente en Consulta";
+                matchedPat = activePatient || null;
+            }
+
+            // 2. Identificar día y hora solicitados en el prompt
+            const targetDate = new Date();
+            const dayMap = { domingo: 0, lunes: 1, martes: 2, miercoles: 3, jueves: 4, viernes: 5, sabado: 6 };
+            let dayFound = false;
+            if (cleanPrompt.includes("pasado manana")) {
+                targetDate.setDate(targetDate.getDate() + 2);
+                dayFound = true;
+            } else if (cleanPrompt.includes("manana")) {
+                targetDate.setDate(targetDate.getDate() + 1);
+                dayFound = true;
+            } else if (cleanPrompt.includes("hoy")) {
+                dayFound = true;
+            } else {
+                for (const [dayName, dayIdx] of Object.entries(dayMap)) {
+                    if (cleanPrompt.includes(dayName)) {
+                        const curr = targetDate.getDay();
+                        let diff = (dayIdx - curr + 7) % 7;
+                        if (diff === 0) diff = 7;
+                        targetDate.setDate(targetDate.getDate() + diff);
+                        dayFound = true;
+                        break;
+                    }
+                }
+            }
+            if (!dayFound) {
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            let hour = 11;
+            let minute = 0;
+            const timeMatch = promptText.match(/(?:a\s+las?|las?|hora)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm|de\s+la\s+tarde|de\s+la\s+manana|de\s+la\s+mañana)?/i) ||
+                              promptText.match(/\b(\d{1,2}):(\d{2})\s*(am|pm)?\b/i);
+            if (timeMatch) {
+                let h = parseInt(timeMatch[1], 10);
+                const min = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+                const mer = norm(timeMatch[3] || "");
+                if ((mer === "pm" || mer.includes("tarde")) && h < 12) h += 12;
+                else if (mer === "am" && h === 12) h = 0;
+                else if (!mer && h >= 1 && h <= 7) h += 12; // horario clínico vespertino 1pm-7pm
+                if (h >= 7 && h <= 21) {
+                    hour = h;
+                    minute = min;
+                }
+            }
+            targetDate.setHours(hour, minute, 0, 0);
+
+            // 3. Identificar la etapa clínica del paciente o el pedido específico de la doctora
+            const roadmap = matchedPat?.study_data?.roadmap || [];
+            let chosenStage = roadmap[1] || roadmap[0] || null;
+            const stageNumMatch = cleanPrompt.match(/etapa\s*(\d+)/);
+            if (stageNumMatch && roadmap.length > 0) {
+                const idx = Math.max(0, Math.min(roadmap.length - 1, parseInt(stageNumMatch[1], 10) - 1));
+                chosenStage = roadmap[idx];
+            } else if (roadmap.length > 0) {
+                const byKeyword = roadmap.find((s) =>
+                    (cleanPrompt.includes("tad") && norm(s.title + " " + s.chairsideAction).includes("tad")) ||
+                    (cleanPrompt.includes("ipr") || cleanPrompt.includes("stripping")) && norm(s.title + " " + s.chairsideAction).includes("ipr") ||
+                    (cleanPrompt.includes("retiro") || cleanPrompt.includes("retenedor")) && norm(s.title).includes("retiro")
+                );
+                if (byKeyword) chosenStage = byKeyword;
+            }
+
+            let stageIdentified = chosenStage ? `${chosenStage.months} (${chosenStage.phase?.toUpperCase() || "ETAPA ACTIVA"})` : "Etapa de Control Clínico";
+            let procedureTitle = chosenStage ? `${chosenStage.months}: ${chosenStage.title}` : "Control Biomecánico Ortodóntico";
+            let chairsidePrep = chosenStage?.chairsideAction || `Arco ${chosenStage?.archwire || ".016 CuNiTi"}, espejo intraoral y pinza Mathieu`;
+            let durationMinutes = 30;
+
+            if (/tad|microtornillo|cementado|colocacion|brackets|retiro|estudio|escaner|scanner/i.test(cleanPrompt)) {
+                durationMinutes = 45;
+                if (cleanPrompt.includes("tad") || cleanPrompt.includes("microtornillo")) {
+                    procedureTitle = "Colocación / Activación de Microtornillos (TADs)";
+                    chairsidePrep = "2 Microtornillos IZC/Vía + Anestesia tópica/infiltrativa + Cadena elástica + Desarmador";
+                    stageIdentified = "Fase Biomecánica de Anclaje Esquelético (TADs)";
+                } else if (cleanPrompt.includes("retiro") || cleanPrompt.includes("retenedor")) {
+                    procedureTitle = "Retiro de Aparatología y Cementado de Retenedores";
+                    chairsidePrep = "Pinza quitabrackets + Fresas de carburo multilaminadas + Retenedor fijo + Guarda termoformada";
+                    stageIdentified = "Fase 3: Finalización y Retención";
+                } else if (cleanPrompt.includes("brackets") || cleanPrompt.includes("cementado")) {
+                    procedureTitle = "Cementado Directo de Aparatología y Arco Inicial";
+                    chairsidePrep = "Juego de brackets + Ácido grabador + Adhesivo ortodóncico + Arco .014 CuNiTi";
+                    stageIdentified = "Fase 1: Inicio de Tratamiento";
+                }
+            } else if (/ipr|stripping/i.test(cleanPrompt)) {
+                durationMinutes = 30;
+                procedureTitle = "Stripping Selectivo (IPR) y Secuencia de Arco";
+                chairsidePrep = "Tiras diamantadas de IPR + Calibrador de espesores + Flúor tópico + Arco CuNiTi";
+                stageIdentified = "Fase de Nivelación y Espacio (IPR)";
+            }
+
+            const isCancel = /cancelar|cancela|eliminar|elimina|borrar/i.test(cleanPrompt);
+            const isMove = /mover|mueve|cambiar|cambia|reprogramar|reprograma|pasar/i.test(cleanPrompt);
+            const isSchedule = /agendar|agenda|cita|control|pon|poner|programa|lunes|martes|miercoles|jueves|viernes|sabado|manana|hoy|etapa|mes/i.test(cleanPrompt);
+
+            const dateNice = targetDate.toLocaleString("es-MX", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+
+            return {
+                intent: isCancel ? "cancel_appointment" : isMove ? "reschedule_appointment" : isSchedule ? "schedule_appointment" : "clinical_query",
+                targetPatientName: extractedPatientName,
+                reply: isCancel
+                    ? `✓ He cancelado la cita de ${extractedPatientName} en tu Agenda del Hub.`
+                    : isMove
+                    ? `✓ He reprogramado la cita de ${extractedPatientName} (${stageIdentified}) para el ${dateNice} (${durationMinutes} min en sillón).`
+                    : isSchedule
+                    ? `¡Listo, Dra. Liseth! Identifiqué a **${extractedPatientName}** en **${stageIdentified}**. He agendado su cita de "${procedureTitle}" para el **${dateNice}** (${durationMinutes} min en sillón). Charola lista: ${chairsidePrep}.`
+                    : `📋 Resumen de **${extractedPatientName}**:\n• Etapa actual: ${stageIdentified} — ${procedureTitle}.\n• Diagnóstico: ${matchedPat?.study_data?.summary?.skeletal || "En seguimiento"} (${matchedPat?.study_data?.summary?.vertical || "Control activo"}).\n• Preparación sugerida en sillón: ${chairsidePrep}.`,
+                appointment: (isSchedule || isMove) ? {
+                    patientName: extractedPatientName,
+                    stageIdentified,
+                    procedureTitle,
+                    startIso: targetDate.toISOString(),
+                    durationMinutes,
+                    chairsidePrep,
+                    patientReminderNote: `Hola ${extractedPatientName}, te confirmamos tu cita de ortodoncia (${procedureTitle}) con la Dra. Liseth Guevara Muñoz el ${dateNice}.`
+                } : null
+            };
+        }
+
         async function sendOrthoAssistantPrompt(promptText, fromCalendarHub = false) {
-            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const activePat = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             orthoAssistantHistory.push({ role: "user", text: promptText, appointment: null });
-            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Consultando expediente y sincronizando con Google Calendar Hub...", appointment: null });
+            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Identificando paciente, etapa clínica y sincronizando con el Calendar Hub...", appointment: null });
             renderOrthoAssistantMessages();
 
             const sendBtn = document.getElementById("btnOrthoAssistantSend");
             if (sendBtn) sendBtn.disabled = true;
 
             try {
-                const patientsSummary = patientsList.map((p) => ({
+                // Construir calendario de referencia de los próximos 14 días para que el LLM calcule fechas exactas
+                const upcomingDaysRef = [];
+                for (let i = 0; i < 14; i++) {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const isoDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                    const label = d.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+                    upcomingDaysRef.push(`${i === 0 ? "HOY" : i === 1 ? "MAÑANA" : ""} (${label}) = ${isoDate}`);
+                }
+
+                // Pasar TODOS los pacientes con su roadmap completo y notas de evolución
+                const fullPatientsCatalog = patientsList.map((p) => ({
+                    id: p.id,
                     name: p.full_name,
                     age: p.age,
                     phone: p.phone,
                     complexity: p.complexity,
-                    anchorage: p.study_data?.anchorage,
-                    skeletal: p.study_data?.summary?.skeletal,
-                    vertical: p.study_data?.summary?.vertical,
-                    rootAlert: p.study_data?.summary?.rootAlert,
-                    nextStage: p.study_data?.roadmap?.[1] || p.study_data?.roadmap?.[0] || null
+                    chiefComplaint: p.case_summary || p.medical_history?.chief_complaint || "",
+                    anchorage: p.study_data?.anchorage || "",
+                    summary: p.study_data?.summary || {},
+                    roadmapStages: p.study_data?.roadmap || [],
+                    evolutionNotes: (p.evolution_notes || p.medical_history?.evolution_notes || []).slice(0, 3)
                 }));
 
                 const systemInstruction = `Eres el Asistente Clínico Inteligente de Ortodoncia y Coordinador del Google Calendar Hub de la Dra. Liseth Guevara Muñoz (${getConnectedDoctorEmail()}).
-Fecha actual: ${new Date().toISOString()}.
-Citas actuales en el calendario del Hub: ${JSON.stringify(scheduledAppointments)}.
-Pacientes en clínica: ${JSON.stringify(patientsSummary)}.
-Paciente activo en pantalla: ${JSON.stringify({
-                    name: patient?.full_name,
-                    age: patient?.age,
-                    phone: patient?.phone,
-                    complexity: patient?.complexity,
-                    study: patient?.study_data?.summary,
-                    anchorage: patient?.study_data?.anchorage,
-                    roadmap: patient?.study_data?.roadmap,
-                    retention: patient?.study_data?.retentionProtocol
-                })}.
+Tu misión es leer con total atención lo que pide o pregunta la doctora:
+1. IDENTIFICAR AL PACIENTE exacto que menciona la doctora en su mensaje (búscalo en el catálogo de pacientes por nombre o apellido; si la doctora menciona un nombre nuevo que aún no está en el catálogo, usa ese nombre nuevo exactamente; solo usa el paciente activo en pantalla si la doctora dice "este paciente" o no menciona ningún nombre).
+2. IDENTIFICAR LA ETAPA CLÍNICA ('stageIdentified') en la que va el paciente según su 'roadmapStages' / 'evolutionNotes' o según el procedimiento específico que pide la doctora (ej. Etapa 1 Cementado, Etapa 2 Nivelación/IPR, Etapa 3 TADs/Intrusión, Retiro, Valoración Inicial).
+3. CALCULAR LA FECHA Y HORA EXACTA ('startIso' en formato YYYY-MM-DDTHH:mm:00) usando esta tabla oficial de los próximos 14 días:
+${upcomingDaysRef.join(" | ")}
+4. AGENDAR, MOVER O CANCELAR la cita en el calendario según la instrucción de la doctora.
+
+Catálogo completo de pacientes en la clínica y sus etapas (Roadmap):
+${JSON.stringify(fullPatientsCatalog)}
+
+Paciente actualmente abierto en pantalla (solo usar si no se nombra a otro en la solicitud): ${activePat ? activePat.full_name : "Ninguno"}
+Citas actuales en el calendario del Hub: ${JSON.stringify(scheduledAppointments)}
 
 Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 {
   "intent": "schedule_appointment" | "reschedule_appointment" | "cancel_appointment" | "daily_briefing" | "clinical_query" | "whatsapp_reminder",
-  "reply": "Respuesta profesional, estructurada y concisa para la Dra. Liseth Guevara Muñoz confirmando el cambio en su agenda o respondiendo su duda",
-  "targetPatientName": "Nombre del paciente cuya cita se mueve o cancela (si aplica)",
+  "reply": "Respuesta directa, personalizada y clínica para la Dra. Liseth Guevara Muñoz mencionando al paciente identificado, la etapa en la que va, la fecha/hora exacta y el material de sillón",
+  "targetPatientName": "Nombre del paciente identificado",
   "appointment": null o {
-    "patientName": "Nombre completo del paciente",
-    "procedureTitle": "Título clínico de la cita (ej. Mes 7: Intrusión con TADs / Control .016x.022 CuNiTi)",
+    "patientName": "Nombre completo del paciente identificado",
+    "stageIdentified": "Etapa identificada (ej. Etapa 2 • Mes 4-6: Nivelación y Stripping)",
+    "procedureTitle": "Título clínico del procedimiento o etapa a realizar en sillón",
     "startIso": "YYYY-MM-DDTHH:mm:00",
     "durationMinutes": 30,
-    "chairsidePrep": "Materiales e instrumental exacto a preparar en charola de sillón",
-    "patientReminderNote": "Mensaje breve de recordatorio por WhatsApp para el paciente"
+    "chairsidePrep": "Materiales, arcos e instrumental exacto a preparar en la charola de sillón para esa etapa",
+    "patientReminderNote": "Mensaje personalizado de confirmación por WhatsApp para ese paciente"
   }
-}
-Reglas:
-- Si la doctora pide agendar una cita nueva ('schedule_appointment') o mover/reprogramar una cita ('reschedule_appointment'), SIEMPRE incluye el objeto 'appointment' con la nueva fecha ISO válida, duración clínica adecuada (45 min para TADs/Cementado/Retiro, 30 min para IPR/ATP, 20 min para control de arcos) y el material de sillón.
-- Si pide cancelar/eliminar una cita ('cancel_appointment'), coloca 'targetPatientName' con el nombre del paciente a cancelar.`;
+}`;
 
                 let parsed = null;
 
-                const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+                const modelsToTry = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.7-flash"];
                 for (const modelName of modelsToTry) {
                     const resp = await fetch(
                         `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(DEFAULT_GEMINI_API_KEY)}`,
@@ -6089,50 +6257,29 @@ Reglas:
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                contents: [{ role: "user", parts: [{ text: `${systemInstruction}\n\nSolicitud de la Dra. Liseth: "${promptText}"` }] }],
+                                contents: [{ role: "user", parts: [{ text: `${systemInstruction}\n\nSolicitud exacta de la Dra. Liseth: "${promptText}"` }] }],
                                 generationConfig: {
                                     responseMimeType: "application/json",
-                                    temperature: 0.2
+                                    temperature: 0.15
                                 }
                             })
                         }
                     );
                     if (resp.ok) {
                         const json = await resp.json();
-                        const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+                        const partsArr = json?.candidates?.[0]?.content?.parts || [];
+                        const textPart = partsArr.find((p) => !p.thought && p.text) || partsArr[partsArr.length - 1];
+                        const rawText = textPart?.text;
                         if (rawText) {
-                            parsed = JSON.parse(rawText);
+                            const cleanJson = rawText.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                            parsed = JSON.parse(cleanJson);
                             break;
                         }
                     }
                 }
 
-                // Fallback inteligente local si el endpoint externo no responde
                 if (!parsed) {
-                    const nextThu = new Date(Date.now() + 3 * 86400000);
-                    nextThu.setHours(11, 0, 0, 0);
-                    const isCancel = /cancelar|cancela|eliminar|elimina|borrar/i.test(promptText);
-                    const isMove = /mover|mueve|cambiar|cambia|reprogramar|reprograma|pasar/i.test(promptText);
-                    const isSchedule = /agendar|agenda|cita|control|jueves|lunes|martes|miercoles|viernes|sabado|etapa|mes/i.test(promptText);
-                    parsed = {
-                        intent: isCancel ? "cancel_appointment" : isMove ? "reschedule_appointment" : isSchedule ? "schedule_appointment" : "daily_briefing",
-                        targetPatientName: patient?.full_name || "Martha",
-                        reply: isCancel
-                            ? `✓ He cancelado y liberado el espacio en sillón de la cita solicitada en tu Agenda del Hub.`
-                            : isMove
-                            ? `✓ He reprogramado la cita en tu Agenda del Hub para el nuevo horario solicitado.`
-                            : isSchedule
-                            ? `¡Listo, Dra. Liseth! He agendado la cita de control para ${patient?.full_name || "el paciente"} en tu Calendar Hub calculando el tiempo de sillón necesario y los materiales de charola.`
-                            : `📋 Briefing Clínico del Consultorio:\n• ${patient?.full_name} (${patient?.age} años): ${patient?.study_data?.summary?.skeletal || "En valoración"} — ${patient?.study_data?.summary?.vertical || ""}.\n• Anclaje: ${patient?.study_data?.anchorage || "Por definir"}.\n• Alerta Radicular: ${patient?.study_data?.summary?.rootAlert || "Monitoreo estándar"}.`,
-                        appointment: (isSchedule || isMove) ? {
-                            patientName: patient?.full_name || "Martha Gabriela Zúñiga Núñez",
-                            procedureTitle: patient?.study_data?.roadmap?.[1]?.title || "Control Biomecánico Ortodóntico",
-                            startIso: nextThu.toISOString(),
-                            durationMinutes: String(promptText).toLowerCase().includes("tad") ? 45 : 30,
-                            chairsidePrep: patient?.study_data?.roadmap?.[1]?.chairsideAction || "Espejo, pinza Mathieu, tiras de IPR y arco térmico CuNiTi",
-                            patientReminderNote: `Hola ${patient?.full_name || ""}, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara Muñoz el ${nextThu.toLocaleDateString("es-MX")} a las 11:00 am.`
-                        } : null
-                    };
+                    parsed = buildSmartLocalAssistantFallback(promptText, activePat);
                 }
 
                 let finalAppt = null;
@@ -6149,10 +6296,12 @@ Reglas:
                 } else if (parsed.intent === "reschedule_appointment" && parsed.appointment) {
                     const target = (parsed.targetPatientName || parsed.appointment.patientName || "").toLowerCase();
                     const existingIdx = scheduledAppointments.findIndex((a) => (a.patientName || "").toLowerCase().includes(target));
+                    const matchedPat = patientsList.find((p) => p.full_name.toLowerCase().includes((parsed.appointment.patientName || target).toLowerCase()));
                     const updatedAppt = {
                         id: existingIdx >= 0 ? scheduledAppointments[existingIdx].id : `appt-${Date.now()}`,
-                        patientName: parsed.appointment.patientName || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientName : patient?.full_name || "Paciente"),
-                        patientPhone: patient?.phone || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientPhone : ""),
+                        patientName: parsed.appointment.patientName || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientName : matchedPat?.full_name || "Paciente"),
+                        patientPhone: matchedPat?.phone || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientPhone : ""),
+                        stageIdentified: parsed.appointment.stageIdentified || "",
                         procedureTitle: parsed.appointment.procedureTitle || (existingIdx >= 0 ? scheduledAppointments[existingIdx].procedureTitle : "Control Ortodóntico"),
                         startIso: parsed.appointment.startIso || new Date(Date.now() + 86400000).toISOString(),
                         durationMinutes: Number(parsed.appointment.durationMinutes) || 30,
@@ -6171,10 +6320,15 @@ Reglas:
                     renderUpcomingAppointments();
                     renderCalendarHub();
                 } else if (parsed.appointment) {
+                    const matchedPat = patientsList.find((p) =>
+                        p.full_name.toLowerCase().includes((parsed.appointment.patientName || "").toLowerCase()) ||
+                        (parsed.appointment.patientName || "").toLowerCase().includes(p.full_name.toLowerCase())
+                    );
                     finalAppt = {
                         id: `appt-${Date.now()}`,
-                        patientName: parsed.appointment.patientName || patient?.full_name || "Paciente",
-                        patientPhone: patient?.phone || "",
+                        patientName: parsed.appointment.patientName || matchedPat?.full_name || "Paciente",
+                        patientPhone: matchedPat?.phone || "",
+                        stageIdentified: parsed.appointment.stageIdentified || "",
                         procedureTitle: parsed.appointment.procedureTitle || "Control Ortodóntico",
                         startIso: parsed.appointment.startIso || new Date(Date.now() + 86400000).toISOString(),
                         durationMinutes: Number(parsed.appointment.durationMinutes) || 30,
@@ -6209,10 +6363,11 @@ Reglas:
                 }
             } catch (err) {
                 console.warn("Error en Asistente IA:", err);
+                const fallback = buildSmartLocalAssistantFallback(promptText, activePat);
                 orthoAssistantHistory[orthoAssistantHistory.length - 1] = {
                     role: "assistant",
-                    text: "He registrado tu solicitud en la agenda del Hub.",
-                    appointment: null
+                    text: fallback.reply,
+                    appointment: fallback.appointment
                 };
                 renderOrthoAssistantMessages();
             } finally {
@@ -6595,7 +6750,7 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
 }`;
 
                 let parsed = null;
-                const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+                const modelsToTry = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.7-flash"];
                 for (const modelName of modelsToTry) {
                     const resp = await fetch(
                         `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(DEFAULT_GEMINI_API_KEY)}`,
@@ -6613,9 +6768,12 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                     );
                     if (resp.ok) {
                         const json = await resp.json();
-                        const raw = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+                        const partsArr = json?.candidates?.[0]?.content?.parts || [];
+                        const textPart = partsArr.find((p) => !p.thought && p.text) || partsArr[partsArr.length - 1];
+                        const raw = textPart?.text;
                         if (raw) {
-                            parsed = JSON.parse(raw);
+                            const cleanJson = raw.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                            parsed = JSON.parse(cleanJson);
                             break;
                         }
                     }

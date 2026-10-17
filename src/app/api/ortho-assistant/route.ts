@@ -65,7 +65,7 @@ ${JSON.stringify(activePatientContext || null)}
     let modelResultText = "";
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.8-flash",
         contents: [{ role: "user", parts: [{ text: `${systemInstruction}\n\nInstrucción de la Dra. Liseth: "${prompt}"` }] }],
         config: {
           responseMimeType: "application/json",
@@ -76,7 +76,7 @@ ${JSON.stringify(activePatientContext || null)}
       modelResultText = response.text || "";
     } catch {
       const fallbackResp = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-flash-latest",
         contents: [{ role: "user", parts: [{ text: `${systemInstruction}\n\nInstrucción de la Dra. Liseth: "${prompt}"` }] }],
         config: {
           responseMimeType: "application/json",
