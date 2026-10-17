@@ -136,6 +136,17 @@
 
                 <div class="flex items-center gap-2 shrink-0">
                     <button
+                        id="btnPwaInstall"
+                        type="button"
+                        onclick="triggerPwaInstall()"
+                        class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs shrink-0"
+                        title="Instalar aplicación en tu pantalla de inicio"
+                    >
+                        <i class="ph-bold ph-download-simple text-sm"></i>
+                        <span class="hidden sm:inline">Instalar App</span>
+                        <span class="sm:hidden">Instalar</span>
+                    </button>
+                    <button
                         onclick="logoutDoctor()"
                         title="Cerrar sesión y volver al sitio público"
                         class="text-slate-400 hover:text-rose-600 p-2.5 rounded-xl hover:bg-slate-100 transition"
@@ -1403,6 +1414,16 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
+                    <button
+                        id="btnPwaInstallWorkspace"
+                        type="button"
+                        onclick="triggerPwaInstall()"
+                        class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs shrink-0"
+                        title="Instalar aplicación en tu pantalla de inicio"
+                    >
+                        <i class="ph-bold ph-download-simple text-sm"></i>
+                        <span>Instalar App</span>
+                    </button>
                     <button
                         onclick="openOrthoPreferencesModal()"
                         class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
@@ -4194,6 +4215,59 @@ create table if not exists public.patients (
     </div>
 
     <!-- =====================================================================
+         MODAL 3: INSTALACIÓN PWA EN IPHONE / IPAD (IOS SAFARI BOTTOM SHEET)
+    ====================================================================== -->
+    <div id="pwaIosModal" onclick="closePwaIosModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl space-y-4 animate-in slide-in-from-bottom-5" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                    <img src="ortho-hub-logo.png" alt="CRD Ortho" class="w-12 h-12 rounded-2xl object-contain shadow-xs shrink-0" />
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                            PWA Nativa • Pantalla Completa
+                        </span>
+                        <h3 class="font-extrabold text-base text-slate-900 mt-0.5">Instalar en tu iPhone o iPad</h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closePwaIosModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Apple requiere 2 toques manuales en Safari para instalar el acceso directo en tu pantalla de inicio y ocultar la barra del navegador:
+            </p>
+
+            <div class="space-y-2.5 pt-1">
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
+                    <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-2xs">1</span>
+                    <div class="text-xs text-slate-700 leading-relaxed">
+                        Toca el botón <strong>Compartir</strong> en la barra inferior de Safari <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-white border border-slate-300 text-indigo-600 text-sm align-middle mx-1"><i class="ph-bold ph-share-network"></i></span> (icono cuadrado con flecha hacia arriba).
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
+                    <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-2xs">2</span>
+                    <div class="text-xs text-slate-700 leading-relaxed">
+                        Desliza hacia abajo en el menú de opciones y pulsa <strong>"Agregar a pantalla de inicio"</strong> <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-white border border-slate-300 text-slate-900 text-sm align-middle mx-1"><i class="ph-bold ph-plus-square"></i></span>.
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
+                    <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-2xs">3</span>
+                    <div class="text-xs text-slate-700 leading-relaxed">
+                        Toca <strong>"Agregar"</strong> en la esquina superior derecha. ¡La app se abrirá a pantalla completa como una app nativa!
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" onclick="closePwaIosModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition shadow-xs">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
          LÓGICA MODULAR DE LA APLICACIÓN (CONTRATO ESTRICTO TYPESCRIPT/JS)
     ====================================================================== -->
     <script>
@@ -4431,7 +4505,87 @@ create table if not exists public.patients (
                     }, 400);
                 }
             } catch (err) {}
+
+            // Inicializar visibilidad del botón de instalación PWA
+            if (isIosDevice && !checkIsAppStandalone()) {
+                showPwaInstallButtons(true);
+            } else if (deferredPwaPrompt && !checkIsAppStandalone()) {
+                showPwaInstallButtons(true);
+            }
         });
+
+        // =====================================================================
+        // MOTOR DE INSTALACIÓN PWA INTELIGENTE (ANDROID & IOS SAFARI STANDALONE)
+        // =====================================================================
+        let deferredPwaPrompt = null;
+        const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        function checkIsAppStandalone() {
+            return Boolean(
+                window.matchMedia("(display-mode: standalone)").matches ||
+                window.navigator.standalone === true ||
+                document.referrer.includes("android-app://")
+            );
+        }
+
+        function showPwaInstallButtons(visible) {
+            const isInstalled = checkIsAppStandalone();
+            const shouldShow = visible && !isInstalled;
+
+            const b1 = document.getElementById("btnPwaInstall");
+            const b2 = document.getElementById("btnPwaInstallWorkspace");
+            if (b1) {
+                if (shouldShow) b1.classList.remove("hidden");
+                else b1.classList.add("hidden");
+            }
+            if (b2) {
+                if (shouldShow) b2.classList.remove("hidden");
+                else b2.classList.add("hidden");
+            }
+        }
+
+        // 1. Escuchar evento nativo en Android / Chrome / Edge
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            showPwaInstallButtons(true);
+        });
+
+        // 2. Registro del Service Worker
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").then((reg) => {
+                    console.log("✓ PWA Service Worker registrado con éxito:", reg.scope);
+                }).catch((err) => {
+                    console.warn("Aviso Service Worker:", err);
+                });
+            });
+        }
+
+        // 3. Disparador de instalación
+        function triggerPwaInstall() {
+            if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                deferredPwaPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === "accepted") {
+                        showPwaInstallButtons(false);
+                    }
+                    deferredPwaPrompt = null;
+                });
+            } else if (isIosDevice) {
+                openPwaIosModal();
+            } else {
+                openPwaIosModal();
+            }
+        }
+
+        function openPwaIosModal() {
+            document.getElementById("pwaIosModal")?.classList.remove("hidden");
+        }
+
+        function closePwaIosModal() {
+            document.getElementById("pwaIosModal")?.classList.add("hidden");
+        }
 
         function savePatientsLocal() {
             try {

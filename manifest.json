@@ -1,0 +1,31 @@
+{
+  "name": "CRD OrthoAI Hub | Dra. Liseth Guevara Muñoz",
+  "short_name": "CRD Ortho",
+  "description": "Expediente Clínico Ortodóncico 3D, IA Gemini 4 Argon, Agenda y Marketing Hub",
+  "start_url": "./ortho-labs.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#4f46e5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "ortho-hub-apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ortho-hub-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "ortho-hub-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
