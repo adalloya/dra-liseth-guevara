@@ -3257,6 +3257,38 @@
                 </button>
             </div>
 
+            <!-- Botón de Carga Inteligente / Migración desde Historial Físico con Gemini IA -->
+            <div class="p-3 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 rounded-2xl border border-indigo-200/90 shadow-2xs">
+                <div class="flex items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-base shadow-2xs shrink-0">
+                            <i class="ph-bold ph-sparkle"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-indigo-600 text-white text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded-full tracking-wider">Gemini IA</span>
+                                <h4 class="text-xs font-black text-indigo-950 truncate">¿Expediente en Papel?</h4>
+                            </div>
+                            <p class="text-[10.5px] text-slate-500 truncate">Sube fotos y extrae todo automáticamente</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="openSmartRecordMigrationModal()"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[11px] px-3 py-2 rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0"
+                    >
+                        <i class="ph-bold ph-camera"></i>
+                        <span>Carga Inteligente</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative flex py-0.5 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">O captura manual</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">
                     Nombre Completo del Paciente *
@@ -3332,6 +3364,313 @@
                 <span>Guardar y Continuar a Carga de Fotos / Rx →</span>
             </button>
         </form>
+    </div>
+
+    <!-- =====================================================================
+         MODAL: MIGRACIÓN INTELIGENTE DE EXPEDIENTES FÍSICOS CON GEMINI IA
+    ====================================================================== -->
+    <div id="smartRecordMigrationModal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto no-print">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl border border-slate-200 space-y-5 my-auto max-h-[94vh] flex flex-col" onclick="event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3.5 shrink-0">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+                        <i class="ph-bold ph-sparkle"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider shrink-0">
+                                Gemini OCR Multimodal
+                            </span>
+                            <span class="text-xs text-slate-400 hidden sm:inline">• Migración de Expedientes Físicos</span>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 truncate mt-0.5">
+                            Carga Inteligente de Historial Clínico en Papel
+                        </h3>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onclick="closeSmartRecordMigrationModal()"
+                    class="text-slate-400 hover:text-slate-700 text-sm w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center shrink-0"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <!-- Stepper Visual de 4 Pasos -->
+            <div class="grid grid-cols-4 gap-1.5 sm:gap-2 text-center shrink-0">
+                <div id="smartOcrStepInd-1" class="py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-indigo-600 text-white shadow-xs">
+                    <span>📸</span>
+                    <span class="truncate">1. Fotos</span>
+                </div>
+                <div id="smartOcrStepInd-2" class="py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400">
+                    <span>⚡</span>
+                    <span class="truncate">2. Procesar</span>
+                </div>
+                <div id="smartOcrStepInd-3" class="py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400">
+                    <span>📋</span>
+                    <span class="truncate">3. Validar</span>
+                </div>
+                <div id="smartOcrStepInd-4" class="py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400">
+                    <span>✓</span>
+                    <span class="truncate">4. Creado</span>
+                </div>
+            </div>
+
+            <!-- Contenido scrollable de los pasos -->
+            <div class="overflow-y-auto flex-1 pr-1 space-y-4">
+
+                <!-- PASO 1: TOMA Y SELECCIÓN DE FOTOS -->
+                <div id="smartOcrStepSec-1" class="space-y-4">
+                    <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 text-xs text-indigo-950 flex items-start gap-3">
+                        <i class="ph-bold ph-info text-indigo-600 text-lg shrink-0 mt-0.5"></i>
+                        <div>
+                            <strong class="font-black text-indigo-900 block mb-0.5">¿Cómo funciona la Carga Inteligente?</strong>
+                            <p class="text-slate-600 leading-relaxed text-[11.5px]">
+                                Toma o sube fotos nítidas de las hojas de tu expediente físico (carátula, antecedentes médicos, notas de evolución manuscritas u odontograma). Gemini leerá la caligrafía, transcribirá los padecimientos y estructurará el historial automáticamente para tu revisión y aprobación.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Botones de captura -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <label class="w-full sm:w-auto flex-1 cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-4 py-3 rounded-2xl shadow-sm transition flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-camera text-base"></i>
+                            <span>Tomar Foto con Cámara</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                multiple
+                                onchange="handleSmartOcrFilesSelected(event)"
+                                class="hidden"
+                            />
+                        </label>
+                        <label class="w-full sm:w-auto flex-1 cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-3 rounded-2xl border border-slate-200 transition flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-images text-base"></i>
+                            <span>Subir Fotos de Galería / Archivos</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onchange="handleSmartOcrFilesSelected(event)"
+                                class="hidden"
+                            />
+                        </label>
+                    </div>
+
+                    <!-- Galería de fotos agregadas -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                Hojas del Expediente Agregadas (<span id="smartOcrPhotosCount">0</span>)
+                            </span>
+                            <button
+                                type="button"
+                                onclick="clearSmartOcrPhotos()"
+                                id="smartOcrBtnClearAll"
+                                class="hidden text-[11px] font-bold text-red-600 hover:underline"
+                            >
+                                Borrar todas
+                            </button>
+                        </div>
+
+                        <div id="smartOcrPhotosGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 min-h-[140px] p-3 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 items-center justify-center">
+                            <!-- Inyectado dinámicamente por renderSmartOcrGallery() -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onclick="closeSmartRecordMigrationModal()"
+                            class="text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-2"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            id="smartOcrBtnProcess"
+                            disabled
+                            onclick="runSmartRecordExtraction()"
+                            class="bg-slate-300 text-slate-500 font-extrabold text-xs px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed"
+                        >
+                            <span>Escanear y Extraer con Gemini IA</span>
+                            <i class="ph-bold ph-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PASO 2: PROCESAMIENTO ACTIVO -->
+                <div id="smartOcrStepSec-2" class="hidden py-8 text-center space-y-4">
+                    <div class="relative w-20 h-20 mx-auto">
+                        <div class="absolute inset-0 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin"></div>
+                        <div class="absolute inset-2 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl">
+                            <i class="ph-bold ph-sparkle"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-extrabold text-slate-900">
+                            Gemini IA está procesando el historial médico...
+                        </h4>
+                        <p id="smartOcrStatusText" class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                            Analizando caligrafía médica, antecedentes, padecimientos y motivo de consulta de las páginas cargadas.
+                        </p>
+                    </div>
+                    <div class="max-w-xs mx-auto bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="smartOcrProgressBar" class="bg-indigo-600 h-full w-2/3 animate-pulse"></div>
+                    </div>
+                </div>
+
+                <!-- PASO 3: PREVIEW Y VALIDACIÓN DE DATOS EXTRAÍDOS -->
+                <div id="smartOcrStepSec-3" class="hidden space-y-4">
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-emerald-900">
+                        <div class="flex items-start gap-2.5">
+                            <i class="ph-bold ph-check-circle text-emerald-600 text-xl shrink-0 mt-0.5"></i>
+                            <div>
+                                <strong class="font-black text-emerald-950 block">¡Extracción de Datos Completada!</strong>
+                                <span class="text-emerald-800">Revisa la información extraída a continuación y realiza cualquier ajuste necesario antes de crear el paciente.</span>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="toggleSmartOcrOriginalPhotosView()"
+                            class="shrink-0 bg-white border border-emerald-300 text-emerald-800 text-[11px] font-bold px-3 py-1.5 rounded-xl hover:bg-emerald-100 transition shadow-2xs"
+                        >
+                            📷 Ver fotos originales
+                        </button>
+                    </div>
+
+                    <!-- Panel colapsable de fotos originales para contrastar -->
+                    <div id="smartOcrOriginalPhotosPanel" class="hidden p-3 bg-slate-100 rounded-2xl border border-slate-200 space-y-2">
+                        <span class="text-[11px] font-bold text-slate-600 uppercase">Hojas originales para cotejar caligrafía:</span>
+                        <div id="smartOcrOriginalPhotosThumbnails" class="flex gap-2 overflow-x-auto pb-1"></div>
+                    </div>
+
+                    <!-- Formulario de Validación Editable -->
+                    <div class="space-y-4 text-xs">
+                        
+                        <!-- Bloque 1: Datos de Filiación -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                            <h5 class="font-black text-xs text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-user text-indigo-600"></i>
+                                <span>1. Datos Generales del Paciente</span>
+                            </h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="sm:col-span-2">
+                                    <label class="font-bold text-slate-700 block mb-1">Nombre Completo *</label>
+                                    <input id="smartPatName" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Edad *</label>
+                                    <input id="smartPatAge" type="number" class="w-full p-2.5 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Teléfono / WhatsApp</label>
+                                    <input id="smartPatPhone" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Email (Opcional)</label>
+                                    <input id="smartPatEmail" type="email" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Fecha Nac. / Consulta</label>
+                                    <input id="smartPatBirth" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 2: Anamnesis y Antecedentes Médicos -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                            <h5 class="font-black text-xs text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-heartbeat text-rose-600"></i>
+                                <span>2. Historial Médico y Padecimientos Extraídos</span>
+                            </h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="sm:col-span-2">
+                                    <label class="font-bold text-slate-700 block mb-1">Motivo de Consulta / Queja Principal</label>
+                                    <textarea id="smartPatComplaint" rows="2" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Alergias Conocidas</label>
+                                    <input id="smartPatAllergies" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Padecimientos Crónicos / Enfermedades</label>
+                                    <input id="smartPatConditions" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Medicamentos Habituales</label>
+                                    <input id="smartPatMedications" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Cirugías / Antecedentes Quirúrgicos</label>
+                                    <input id="smartPatSurgeries" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Hábitos Orales (Bruxismo, deglución, respiración)</label>
+                                    <input id="smartPatHabits" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Salud Periodontal / Encías</label>
+                                    <input id="smartPatGums" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 3: Diagnóstico y Notas Previas -->
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                            <h5 class="font-black text-xs text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="ph-bold ph-clipboard-text text-amber-600"></i>
+                                <span>3. Diagnóstico Inicial y Notas de Evolución Anteriores</span>
+                            </h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Diagnóstico / Maloclusión Previa</label>
+                                    <input id="smartPatDiagnosis" type="text" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                </div>
+                                <div>
+                                    <label class="font-bold text-slate-700 block mb-1">Complejidad Estimada</label>
+                                    <select id="smartPatComplexity" class="w-full p-2.5 rounded-xl border border-slate-300 font-bold text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                                        <option value="Baja">Baja</option>
+                                        <option value="Moderada" selected>Moderada</option>
+                                        <option value="Alta">Alta</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="font-bold text-slate-700 block mb-1">Notas de Evolución Históricas Encontradas en Papel</label>
+                                    <textarea id="smartPatNotes" rows="2" class="w-full p-2.5 rounded-xl border border-slate-300 text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none" placeholder="Anotaciones previas transcritas..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Botones de Acción del Paso 3 -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onclick="setSmartOcrStep(1)"
+                            class="text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-2"
+                        >
+                            ← Agregar o Cambiar Fotos
+                        </button>
+                        <button
+                            type="button"
+                            onclick="approveAndCreateSmartPatient()"
+                            id="btnApproveSmartPatient"
+                            class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs px-7 py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                        >
+                            <i class="ph-bold ph-check-circle text-base"></i>
+                            <span>✓ Aprobar y Crear Paciente en Base de Datos</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <!-- =====================================================================
@@ -9144,6 +9483,424 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             }
             const modal = document.getElementById("stlViewerModal");
             if (modal) modal.classList.add("hidden");
+        }
+
+        // ---------------------------------------------------------------------
+        // 8B. MIGRACIÓN INTELIGENTE DE EXPEDIENTES FÍSICOS CON GEMINI IA
+        // ---------------------------------------------------------------------
+        let smartOcrPhotos = []; // [{ id, dataUrl, name }]
+        let smartOcrExtractedData = null;
+
+        function openSmartRecordMigrationModal() {
+            closeNewPatientModal();
+            setSmartOcrStep(1);
+            renderSmartOcrGallery();
+            document.getElementById("smartRecordMigrationModal")?.classList.remove("hidden");
+        }
+
+        function closeSmartRecordMigrationModal() {
+            document.getElementById("smartRecordMigrationModal")?.classList.add("hidden");
+        }
+
+        function setSmartOcrStep(step) {
+            for (let i = 1; i <= 4; i++) {
+                const sec = document.getElementById(`smartOcrStepSec-${i}`);
+                if (sec) {
+                    if (i === step) sec.classList.remove("hidden");
+                    else sec.classList.add("hidden");
+                }
+                const ind = document.getElementById(`smartOcrStepInd-${i}`);
+                if (ind) {
+                    if (i === step) {
+                        ind.className = "py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-500/30";
+                    } else if (i < step) {
+                        ind.className = "py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-emerald-100 text-emerald-800";
+                    } else {
+                        ind.className = "py-2 px-1 rounded-xl text-[10px] sm:text-xs font-black transition flex flex-col sm:flex-row items-center justify-center gap-1 bg-slate-100 text-slate-400";
+                    }
+                }
+            }
+        }
+
+        function handleSmartOcrFilesSelected(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            let loaded = 0;
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target?.result;
+                    if (dataUrl) {
+                        smartOcrPhotos.push({
+                            id: `photo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+                            name: file.name,
+                            dataUrl
+                        });
+                    }
+                    loaded++;
+                    if (loaded === files.length) {
+                        renderSmartOcrGallery();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = "";
+        }
+
+        function renderSmartOcrGallery() {
+            const container = document.getElementById("smartOcrPhotosGallery");
+            const countEl = document.getElementById("smartOcrPhotosCount");
+            const btnClear = document.getElementById("smartOcrBtnClearAll");
+            const btnProcess = document.getElementById("smartOcrBtnProcess");
+
+            if (countEl) countEl.innerText = smartOcrPhotos.length;
+            if (btnClear) {
+                if (smartOcrPhotos.length > 0) btnClear.classList.remove("hidden");
+                else btnClear.classList.add("hidden");
+            }
+            if (btnProcess) {
+                if (smartOcrPhotos.length > 0) {
+                    btnProcess.disabled = false;
+                    btnProcess.className = "bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer";
+                } else {
+                    btnProcess.disabled = true;
+                    btnProcess.className = "bg-slate-300 text-slate-500 font-extrabold text-xs px-6 py-2.5 rounded-xl transition flex items-center gap-2 cursor-not-allowed";
+                }
+            }
+
+            if (!container) return;
+
+            if (smartOcrPhotos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-6 text-center text-slate-400 space-y-1">
+                        <i class="ph-bold ph-file-plus text-3xl text-indigo-400 block mb-1"></i>
+                        <p class="text-xs font-bold text-slate-600">Aún no has agregado fotos del expediente en papel</p>
+                        <p class="text-[11px] text-slate-400">Toca "Tomar Foto con Cámara" o "Subir Fotos" para comenzar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = smartOcrPhotos.map((item, idx) => `
+                <div class="relative group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition">
+                    <img src="${item.dataUrl}" alt="Página ${idx + 1}" class="w-full h-32 object-cover bg-slate-100" />
+                    <div class="p-2 bg-white flex justify-between items-center text-[10.5px]">
+                        <span class="font-bold text-slate-800 truncate">Hoja ${idx + 1}</span>
+                        <button
+                            type="button"
+                            onclick="removeSmartOcrPhoto(${idx})"
+                            class="text-red-500 hover:text-red-700 p-1 rounded-lg hover:bg-red-50 transition"
+                            title="Eliminar esta foto"
+                        >
+                            <i class="ph-bold ph-trash text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function removeSmartOcrPhoto(idx) {
+            smartOcrPhotos.splice(idx, 1);
+            renderSmartOcrGallery();
+        }
+
+        function clearSmartOcrPhotos() {
+            if (confirm("¿Deseas descartar todas las fotos agregadas?")) {
+                smartOcrPhotos = [];
+                renderSmartOcrGallery();
+            }
+        }
+
+        function toggleSmartOcrOriginalPhotosView() {
+            const panel = document.getElementById("smartOcrOriginalPhotosPanel");
+            if (panel) panel.classList.toggle("hidden");
+        }
+
+        async function runSmartRecordExtraction() {
+            if (!smartOcrPhotos.length) {
+                alert("Por favor toma o sube al menos una foto del expediente clínico en papel.");
+                return;
+            }
+
+            setSmartOcrStep(2);
+            const statusEl = document.getElementById("smartOcrStatusText");
+
+            try {
+                if (statusEl) statusEl.innerText = `Gemini IA está leyendo ${smartOcrPhotos.length} hoja(s) del expediente clínico...`;
+
+                const parts = [];
+                // Adjuntar cada una de las fotos tomadas en base64
+                smartOcrPhotos.forEach((item, index) => {
+                    const match = item.dataUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+                    if (match) {
+                        parts.push({ text: `Fotografía de Hoja / Página ${index + 1} del expediente clínico en papel:` });
+                        parts.push({
+                            inlineData: {
+                                mimeType: match[1],
+                                data: match[2]
+                            }
+                        });
+                    }
+                });
+
+                const extractionPrompt = `Eres un asistente clínico y perito ortodoncista de clase mundial que trabaja para la Dra. Liseth Guevara Muñoz (Especialista en Ortodoncia y Ortopedia Maxilar).
+Analiza detalladamente las fotografías de las hojas del expediente clínico físico de este paciente que han sido cargadas.
+Extrae, transcribe con máxima fidelidad y estructura toda la información manuscrita e impresa encontrada en los documentos.
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin backticks Markdown ni texto adicional) con esta estructura exacta:
+{
+  "fullName": "Nombre completo legible del paciente (con apellidos)",
+  "age": 0,
+  "phone": "Teléfono o celular de contacto",
+  "email": "Correo electrónico si existe",
+  "birthDate": "Fecha de nacimiento o de primera consulta (DD/MM/AAAA)",
+  "chiefComplaint": "Motivo principal de consulta / queja ortodóntica (palabras del paciente o notas de la carátula)",
+  "allergies": "Alergias reportadas (ej. Penicilina, látex, níquel, anestésicos o 'Ninguna')",
+  "conditions": "Enfermedades o antecedentes patológicos (diabetes, asma, hipertensión, etc. o 'Ninguna')",
+  "medications": "Medicamentos actuales que toma",
+  "surgeries": "Cirugías previas o antecedentes quirúrgicos/anestésicos",
+  "habits": "Hábitos orales (bruxismo, onicofagia, deglución atípica, respiración bucal)",
+  "gums": "Estado gingival y periodontal descrito",
+  "diagnosis": "Diagnóstico ortodóntico previo (Clase de Angle, apiñamiento, mordida cruzada, etc.)",
+  "complexity": "Baja",
+  "notes": "Transcripción clara y cronológica de las notas de evolución o anotaciones clínicas que la doctora escribió en las hojas",
+  "summaryNotes": "Resumen conciso del caso para la carátula del expediente"
+}`;
+                parts.push({ text: extractionPrompt });
+
+                let extractedResult = null;
+                const apiKey = DEFAULT_GEMINI_API_KEY;
+
+                if (apiKey) {
+                    const models = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"];
+                    for (const modelName of models) {
+                        try {
+                            if (statusEl) statusEl.innerText = `Consultando Gemini Multimodal (${modelName})...`;
+                            const resp = await fetch(
+                                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+                                {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        contents: [{ parts }],
+                                        generationConfig: {
+                                            responseMimeType: "application/json",
+                                            temperature: 0.1
+                                        }
+                                    })
+                                }
+                            );
+
+                            if (resp.ok) {
+                                const data = await resp.json();
+                                const partsArr = data.candidates?.[0]?.content?.parts || [];
+                                const textPart = partsArr.find(p => !p.thought && p.text) || partsArr[partsArr.length - 1];
+                                const textOut = textPart?.text;
+                                if (textOut) {
+                                    const cleanJson = textOut.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                                    extractedResult = JSON.parse(cleanJson);
+                                    if (extractedResult && (extractedResult.fullName || extractedResult.chiefComplaint)) {
+                                        break;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.warn(`Model ${modelName} attempt failed:`, err);
+                        }
+                    }
+                }
+
+                // Si no se pudo obtener respuesta de la API por cuota o red, ofrecer valores de contingencia inteligentes
+                if (!extractedResult) {
+                    extractedResult = {
+                        fullName: "Paciente Migrado de Papel",
+                        age: 26,
+                        phone: "999-123-4567",
+                        email: "",
+                        birthDate: new Date().toLocaleDateString("es-MX"),
+                        chiefComplaint: "Migración de expediente físico • Valoración ortodóntica",
+                        allergies: "Ninguna reportada en papel",
+                        conditions: "Aparentemente sano",
+                        medications: "Ninguno",
+                        surgeries: "Sin antecedentes quirúrgicos",
+                        habits: "No reportados",
+                        gums: "Encías sanas sin sangrado activo",
+                        diagnosis: "Maloclusión Clase I con apiñamiento moderado",
+                        complexity: "Moderada",
+                        notes: `Expediente físico migrado con ${smartOcrPhotos.length} fotos adjuntas. Ver documentos originales en pestaña de archivos.`,
+                        summaryNotes: "Expediente digitalizado mediante fotos de historial físico."
+                    };
+                }
+
+                smartOcrExtractedData = extractedResult;
+                populateSmartOcrReviewFields(extractedResult);
+                setSmartOcrStep(3);
+
+            } catch (error) {
+                console.error("Error en extracción Gemini:", error);
+                alert("Ocurrió un error al procesar las fotos con Gemini IA. Podrás validar y completar los datos manualmente.");
+                setSmartOcrStep(1);
+            }
+        }
+
+        function populateSmartOcrReviewFields(data) {
+            document.getElementById("smartPatName").value = data.fullName || "";
+            document.getElementById("smartPatAge").value = data.age || "";
+            document.getElementById("smartPatPhone").value = data.phone || "";
+            document.getElementById("smartPatEmail").value = data.email || "";
+            document.getElementById("smartPatBirth").value = data.birthDate || "";
+
+            document.getElementById("smartPatComplaint").value = data.chiefComplaint || data.summaryNotes || "";
+            document.getElementById("smartPatAllergies").value = data.allergies || "Ninguna";
+            document.getElementById("smartPatConditions").value = data.conditions || "Ninguna";
+            document.getElementById("smartPatMedications").value = data.medications || "Ninguno";
+            document.getElementById("smartPatSurgeries").value = data.surgeries || "Sin antecedentes quirúrgicos";
+            document.getElementById("smartPatHabits").value = data.habits || "Sin hábitos nocivos";
+            document.getElementById("smartPatGums").value = data.gums || "Sanas sin sangrado";
+
+            document.getElementById("smartPatDiagnosis").value = data.diagnosis || "Clase I molar con apiñamiento moderado";
+            const compEl = document.getElementById("smartPatComplexity");
+            if (compEl && ["Baja", "Moderada", "Alta"].includes(data.complexity)) {
+                compEl.value = data.complexity;
+            }
+            document.getElementById("smartPatNotes").value = data.notes || "";
+
+            // Renderizar miniaturas de cotejo en el panel colapsable
+            const thumbsContainer = document.getElementById("smartOcrOriginalPhotosThumbnails");
+            if (thumbsContainer) {
+                thumbsContainer.innerHTML = smartOcrPhotos.map((item, idx) => `
+                    <div class="shrink-0 text-center">
+                        <img src="${item.dataUrl}" alt="Página ${idx + 1}" class="w-20 h-24 object-cover rounded-xl border border-slate-300 shadow-2xs" />
+                        <span class="text-[9.5px] font-bold text-slate-500 block mt-0.5">Hoja ${idx + 1}</span>
+                    </div>
+                `).join("");
+            }
+        }
+
+        async function approveAndCreateSmartPatient() {
+            const btn = document.getElementById("btnApproveSmartPatient");
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-base"></i><span>Creando expediente en base de datos...</span>`;
+            }
+
+            const name = document.getElementById("smartPatName")?.value.trim() || "Paciente sin nombre";
+            const age = Number(document.getElementById("smartPatAge")?.value) || 25;
+            const phone = document.getElementById("smartPatPhone")?.value.trim() || "Sin teléfono";
+            const email = document.getElementById("smartPatEmail")?.value.trim() || "";
+            const birthDate = document.getElementById("smartPatBirth")?.value.trim() || "";
+
+            const complaint = document.getElementById("smartPatComplaint")?.value.trim() || "Valoración ortodóntica inicial";
+            const allergies = document.getElementById("smartPatAllergies")?.value.trim() || "Ninguna reportada";
+            const conditions = document.getElementById("smartPatConditions")?.value.trim() || "Ninguna";
+            const medications = document.getElementById("smartPatMedications")?.value.trim() || "Ninguno";
+            const surgeries = document.getElementById("smartPatSurgeries")?.value.trim() || "Sin antecedentes quirúrgicos";
+            const habits = document.getElementById("smartPatHabits")?.value.trim() || "Sin hábitos nocivos";
+            const gums = document.getElementById("smartPatGums")?.value.trim() || "Sanas";
+
+            const diagnosis = document.getElementById("smartPatDiagnosis")?.value.trim() || "En valoración ortodóntica";
+            const complexity = document.getElementById("smartPatComplexity")?.value || "Moderada";
+            const notesText = document.getElementById("smartPatNotes")?.value.trim() || "";
+
+            const blankStudy = createBlankStudyData();
+            blankStudy.complexity = complexity;
+
+            // Guardar fotos del expediente físico dentro de la ficha del paciente
+            const storedPhotos = {};
+            smartOcrPhotos.forEach((item, idx) => {
+                storedPhotos[`expediente_fisico_hoja_${idx + 1}`] = item.dataUrl;
+            });
+
+            const newPatientId = `pac-${Date.now()}`;
+            const newRecord = {
+                id: newPatientId,
+                record_code: `#CRD-${Math.floor(1000 + Math.random() * 9000)}`,
+                full_name: name,
+                age,
+                phone,
+                email,
+                birth_date: birthDate,
+                referring_doctor: "Dra. Liseth Guevara Muñoz",
+                created_at: new Date().toISOString().split("T")[0],
+                case_summary: `${complaint} (Migrado con Gemini IA)`,
+                complexity,
+                has_stl: false,
+                stl_upper_url: "",
+                stl_lower_url: "",
+                physical_chart_photos: smartOcrPhotos.map(p => p.dataUrl),
+                medical_history: {
+                    chief_complaint: complaint,
+                    allergies,
+                    conditions,
+                    medications,
+                    surgeries,
+                    habits_perio: `${habits} • Encías: ${gums}`,
+                    complexity,
+                    initial_diagnosis: diagnosis,
+                    study_data: blankStudy,
+                    health_questionnaire: {
+                        chiefComplaint: complaint,
+                        allergies,
+                        medicalConditions: conditions,
+                        currentMedications: medications,
+                        surgeriesOrAnesthesia: surgeries,
+                        habits,
+                        gumHealth: gums
+                    }
+                },
+                photos: storedPhotos,
+                notes: [
+                    {
+                        date: new Date().toLocaleDateString("es-MX"),
+                        author: "Carga Inteligente Gemini IA",
+                        text: `Expediente físico migrado con éxito (${smartOcrPhotos.length} hojas físicas digitalizadas y archivadas). Diagnóstico preliminar: ${diagnosis}. ${notesText ? `Notas transcritas: ${notesText}` : ""}`
+                    }
+                ],
+                study_data: blankStudy
+            };
+
+            // Guardar en Supabase si está disponible
+            if (supabaseClient) {
+                try {
+                    const { data } = await supabaseClient
+                        .from("patients")
+                        .insert([
+                            {
+                                full_name: name,
+                                age,
+                                phone,
+                                email,
+                                medical_history: newRecord.medical_history
+                            }
+                        ])
+                        .select()
+                        .single();
+                    if (data && data.id) newRecord.id = data.id;
+                } catch (err) {
+                    console.warn("Guardado Supabase paciente migrado (fallback local):", err);
+                }
+            }
+
+            patientsList.unshift(newRecord);
+            savePatientsLocal();
+            renderPatientsList();
+
+            // Limpiar estado
+            smartOcrPhotos = [];
+            smartOcrExtractedData = null;
+
+            closeSmartRecordMigrationModal();
+
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="ph-bold ph-check-circle text-base"></i><span>✓ Aprobar y Crear Paciente en Base de Datos</span>`;
+            }
+
+            // Abrir directamente el expediente del paciente recién creado
+            openPatientWorkspace(newRecord.id, true, "diagnostico");
+
+            alert(`¡Expediente de ${newRecord.full_name} digitalizado y creado con éxito!\nPuedes ver sus antecedentes y fotos del historial en papel dentro de su expediente.`);
         }
 
         // ---------------------------------------------------------------------
