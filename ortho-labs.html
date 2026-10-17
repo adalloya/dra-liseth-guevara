@@ -332,6 +332,7 @@
                             <input
                                 id="mktTreatmentGoal"
                                 type="text"
+                                oninput="updateMktAssembledPromptPreview()"
                                 value="Alineadores Invisibles & Diseño de Sonrisa 3D"
                                 class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                                 required
@@ -346,6 +347,7 @@
                                 <input
                                     id="mktTargetAudience"
                                     type="text"
+                                    oninput="updateMktAssembledPromptPreview()"
                                     value="Adultos profesionales y jóvenes en Mérida"
                                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                                 />
@@ -357,6 +359,7 @@
                                 <input
                                     id="mktTargetAges"
                                     type="text"
+                                    oninput="updateMktAssembledPromptPreview()"
                                     value="25 a 45 años (Mujeres y Hombres)"
                                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                                 />
@@ -370,6 +373,7 @@
                             <textarea
                                 id="mktCustomNotes"
                                 rows="2"
+                                oninput="updateMktAssembledPromptPreview()"
                                 class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                             >Valoración especializada incluye Escaneo Intraoral 3D digital y planes a meses sin intereses.</textarea>
                         </div>
@@ -381,7 +385,7 @@
                                 </label>
                                 <select
                                     id="mktVisualTheme"
-                                    onchange="renderMarketingCanvasAd()"
+                                    onchange="updateMktAssembledPromptPreview(); renderMarketingCanvasAd()"
                                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900"
                                 >
                                     <option value="indigo">Cupertino Indigo (Moderno)</option>
@@ -392,19 +396,47 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                                    Escena Fotográfica Base
+                                    Dirección de Arte Fotográfica IA
                                 </label>
                                 <select
                                     id="mktSceneSelect"
                                     onchange="handleMktSceneChange()"
                                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900"
                                 >
-                                    <option value="smile_woman">Sonrisa Estética Adulto Joven</option>
-                                    <option value="aligner_clear">Alineador Transparente / Estética</option>
-                                    <option value="clinic_kids">Ortodoncia Infantil / Adolescente</option>
-                                    <option value="digital_3d">Tecnología Dental & Escaneo 3D</option>
+                                    <option value="ai_dynamic" selected>🤖 Generación IA Dinámica según Formulario</option>
+                                    <option value="smile_woman">✨ Retrato: Sonrisa Estética Adulto Joven</option>
+                                    <option value="aligner_clear">🦷 Close-Up: Alineador Transparente / Estética</option>
+                                    <option value="clinic_kids">👨‍👩‍👧 Familiar: Ortodoncia Infantil / Adolescente</option>
+                                    <option value="digital_3d">🖥️ High-Tech: Escáner Dental 3D & Clínica</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- Prompt Visual Armado Dinámicamente para Gemini IA -->
+                        <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200/80">
+                            <div class="flex items-center justify-between mb-1">
+                                <label for="mktImagePromptPreview" class="text-[10px] font-extrabold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="ph-fill ph-magic-wand text-indigo-600"></i>
+                                    Prompt Visual Armado para Gemini IA (Editable)
+                                </label>
+                                <button
+                                    type="button"
+                                    onclick="mktState.userEditedPrompt = false; updateMktAssembledPromptPreview();"
+                                    class="text-[10px] font-bold text-indigo-600 hover:underline"
+                                >
+                                    Restaurar del formulario
+                                </button>
+                            </div>
+                            <textarea
+                                id="mktImagePromptPreview"
+                                rows="3"
+                                oninput="mktState.userEditedPrompt = true"
+                                class="w-full bg-white/90 border border-indigo-200 rounded-lg p-2.5 text-[11px] text-slate-700 leading-snug focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                                placeholder="El formulario arma automáticamente aquí el prompt fotográfico que se envía a Gemini IA para generar la imagen..."
+                            ></textarea>
+                            <p class="text-[10px] text-indigo-700/80 mt-1">
+                                💡 Al hacer clic en <strong>Generar Anuncio</strong>, Gemini IA optimiza este prompt y genera una imagen fotorealista única de 1080×1080 px.
+                            </p>
                         </div>
 
                         <!-- Subida de Logotipo e Imagen Propia -->
@@ -440,7 +472,7 @@
                         class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2"
                     >
                         <i class="ph-bold ph-sparkle text-amber-300 text-sm"></i>
-                        <span id="btnGenerateMktAdText">✨ Generar Anuncio 1080×1080 + Copy con IA</span>
+                        <span id="btnGenerateMktAdText">✨ Generar Imagen IA 1080×1080 + Copy con Gemini</span>
                     </button>
                 </form>
 
@@ -449,8 +481,8 @@
                     <div class="space-y-4">
                         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
                             <div>
-                                <h2 class="text-sm font-bold text-slate-900">2. Arte Publicitario Generado (1080×1080 px) & Copy Persuasivo</h2>
-                                <p class="text-xs text-slate-500">Listo para Instagram Feed, Facebook Ads y Meta Business Suite</p>
+                                <h2 class="text-sm font-bold text-slate-900">2. Arte Publicitario Generado por IA (1080×1080 px) & Copy Persuasivo</h2>
+                                <p class="text-xs text-slate-500">Imagen creada dinámicamente según tu prompt + diseño de alta conversión</p>
                             </div>
                             <button
                                 type="button"
@@ -467,9 +499,22 @@
                             <div class="md:col-span-7">
                                 <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-slate-900 aspect-square">
                                     <canvas id="mktAdCanvas" width="1080" height="1080" class="w-full h-full object-contain block"></canvas>
-                                    <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/15">
-                                        1080 × 1080 px • Meta Ads Approved
+                                    <span id="mktCanvasAiSourceBadge" class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/15 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                        1080 × 1080 px • Meta Ads Ready
                                     </span>
+                                    <!-- Overlay de Carga de Generación de Imagen IA -->
+                                    <div id="mktCanvasLoadingOverlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-10">
+                                        <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center mb-3 animate-pulse">
+                                            <i class="ph-fill ph-sparkle text-amber-300 text-2xl"></i>
+                                        </div>
+                                        <p id="mktCanvasLoadingTitle" class="text-xs font-bold text-white mb-1">
+                                            Generando imagen 1080×1080 con IA...
+                                        </p>
+                                        <p id="mktCanvasLoadingSub" class="text-[11px] text-indigo-200 max-w-xs leading-relaxed">
+                                            Gemini está armando el prompt fotográfico y renderizando la escena clínica para tu campaña.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -6393,8 +6438,43 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             targetingTip: "Mérida, Yucatán (+8 km) • Edades 25–45 años • Presupuesto sugerido: $150–$200 MXN/día • Objetivo: Mensajes a WhatsApp / Instagram Direct.",
             bgImageObj: null,
             logoImageObj: null,
-            customPhotoDataUrl: ""
+            customPhotoDataUrl: "",
+            userEditedPrompt: false,
+            lastImagePromptEn: ""
         };
+
+        function buildMktPromptFromForm(feedbackText = "") {
+            const goal = document.getElementById("mktTreatmentGoal")?.value || "Alineadores Invisibles & Diseño de Sonrisa 3D";
+            const audience = document.getElementById("mktTargetAudience")?.value || "Adultos profesionales en Mérida";
+            const ages = document.getElementById("mktTargetAges")?.value || "25 a 45 años";
+            const notes = document.getElementById("mktCustomNotes")?.value || "Escaneo Intraoral 3D digital";
+            const theme = document.getElementById("mktVisualTheme")?.value || "indigo";
+            const scene = document.getElementById("mktSceneSelect")?.value || "ai_dynamic";
+
+            const styleMap = {
+                indigo: "iluminación de estudio moderna estilo Apple Cupertino, tonos limpios azul índigo y blanco clínico",
+                dark: "estética de lujo en estudio oscuro, iluminación dramática cálida y dorada de alta gama",
+                emerald: "ambiente clínico luminoso verde esmeralda y blanco, transmitiendo salud, frescura y confianza",
+                rose: "iluminación cálida familiar y acogedora, luz natural suave de mañana"
+            };
+            const sceneMap = {
+                ai_dynamic: `Escena fotográfica editorial personalizada para ${goal}`,
+                smile_woman: "Retrato editorial de cerca de paciente con sonrisa estética natural y radiante",
+                aligner_clear: "Primer plano estético mostrando alineador dental transparente cristalino y sonrisa perfecta",
+                clinic_kids: "Escena cálida de ortodoncia infantil/adolescente con mamá e hijo sonriendo en clínica dental moderna",
+                digital_3d: "Clínica de ortodoncia de alta tecnología con visualización de escaneo intraoral 3D dental"
+            };
+
+            return `${sceneMap[scene] || sceneMap.ai_dynamic}. Perfil del paciente en la foto: ${audience} (${ages}). Enfoque clínico: ${goal} (${notes}). Atmósfera visual: ${styleMap[theme] || styleMap.indigo}. Fotografía publicitaria hiperrealista 85mm f/1.8, sin texto superpuesto.${feedbackText ? ` Ajuste solicitado: ${feedbackText}.` : ""}`;
+        }
+
+        function updateMktAssembledPromptPreview(feedbackText = "") {
+            const previewEl = document.getElementById("mktImagePromptPreview");
+            if (!previewEl) return;
+            if (!mktState.userEditedPrompt || feedbackText) {
+                previewEl.value = buildMktPromptFromForm(feedbackText);
+            }
+        }
 
         function openMarketingHubView() {
             document.title = "Marketing Hub & Campaign Manager | Dra. Liseth Guevara";
@@ -6407,12 +6487,18 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             if (copyEl && !copyEl.value) {
                 copyEl.value = mktState.copy;
             }
-            loadMktSceneImage(document.getElementById("mktSceneSelect")?.value || "smile_woman");
+            updateMktAssembledPromptPreview();
+            if (!mktState.bgImageObj) {
+                loadMktSceneImage(document.getElementById("mktSceneSelect")?.value || "smile_woman");
+            } else {
+                renderMarketingCanvasAd();
+            }
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function loadMktSceneImage(sceneKey) {
-            const url = mktState.customPhotoDataUrl || MKT_SCENE_IMAGES[sceneKey] || MKT_SCENE_IMAGES.smile_woman;
+            const fallbackKey = sceneKey === "ai_dynamic" ? "smile_woman" : sceneKey;
+            const url = mktState.customPhotoDataUrl || MKT_SCENE_IMAGES[fallbackKey] || MKT_SCENE_IMAGES.smile_woman;
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => {
@@ -6428,8 +6514,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 
         function handleMktSceneChange() {
             mktState.customPhotoDataUrl = "";
-            const sceneKey = document.getElementById("mktSceneSelect")?.value || "smile_woman";
-            loadMktSceneImage(sceneKey);
+            mktState.userEditedPrompt = false;
+            updateMktAssembledPromptPreview();
+            const sceneKey = document.getElementById("mktSceneSelect")?.value || "ai_dynamic";
+            if (sceneKey !== "ai_dynamic") {
+                loadMktSceneImage(sceneKey);
+            }
         }
 
         function handleMktAssetUpload(event, type) {
@@ -6446,6 +6536,10 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                     } else {
                         mktState.customPhotoDataUrl = dataUrl;
                         mktState.bgImageObj = img;
+                        const badgeEl = document.getElementById("mktCanvasAiSourceBadge");
+                        if (badgeEl) {
+                            badgeEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Foto Propia de Clínica • 1080 × 1080 px`;
+                        }
                     }
                     renderMarketingCanvasAd();
                 };
@@ -6462,29 +6556,32 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             const themeEl = document.getElementById("mktVisualTheme");
             const sceneEl = document.getElementById("mktSceneSelect");
 
+            mktState.userEditedPrompt = false;
+            mktState.customPhotoDataUrl = "";
+
             if (preset === "aligners") {
                 if (goalEl) goalEl.value = "Alineadores Invisibles & Estética Dental 3D";
                 if (audEl) audEl.value = "Mujeres y hombres profesionistas en Mérida";
                 if (ageEl) ageEl.value = "26 a 45 años";
                 if (notesEl) notesEl.value = "Incluye Escaneo Intraoral 3D digital en tu valoración y planes a meses sin intereses.";
                 if (themeEl) themeEl.value = "indigo";
-                if (sceneEl) sceneEl.value = "smile_woman";
+                if (sceneEl) sceneEl.value = "ai_dynamic";
             } else if (preset === "kids") {
                 if (goalEl) goalEl.value = "Ortodoncia Interceptiva Infantil y Adolescente";
                 if (audEl) audEl.value = "Mamás y papás con hijos de 8 a 15 años en Mérida";
                 if (ageEl) ageEl.value = "Padres de 30 a 48 años (Hijos 8–15 años)";
                 if (notesEl) notesEl.value = "Guía el crecimiento maxilar a tiempo y evita extracciones o cirugías futuras. Valoración especializada.";
                 if (themeEl) themeEl.value = "emerald";
-                if (sceneEl) sceneEl.value = "clinic_kids";
+                if (sceneEl) sceneEl.value = "ai_dynamic";
             } else if (preset === "complex") {
                 if (goalEl) goalEl.value = "Corrección de Mordida Abierta y Retratamientos sin Cirugía";
                 if (audEl) audEl.value = "Pacientes que ya usaron brackets o buscan evitar cirugía";
                 if (ageEl) ageEl.value = "22 a 48 años";
                 if (notesEl) notesEl.value = "Biomecánica avanzada con Microtornillos (TADs) y Diagnóstico 3D por la Especialista Dra. Liseth Guevara.";
                 if (themeEl) themeEl.value = "dark";
-                if (sceneEl) sceneEl.value = "digital_3d";
+                if (sceneEl) sceneEl.value = "ai_dynamic";
             }
-            handleMktSceneChange();
+            updateMktAssembledPromptPreview();
             handleGenerateMarketingAd();
         }
 
@@ -6509,9 +6606,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                 const notesEl = document.getElementById("mktCustomNotes");
 
                 if (goalEl) goalEl.value = "Ortodoncia Digital 3D: Estética Invisible & Casos de Alta Precisión";
-                if (audEl) audEl.value = `Segmento dual detectado en tus ${total} pacientes: Adultos buscando estética (${adultsCount}) y Familias con jóvenes/niños (${kidsCount})`;
+                if (audEl) audEl.value = `Adultos jóvenes profesionales (${adultsCount}) y Familias en Mérida (${kidsCount})`;
                 if (ageEl) ageEl.value = `25 a 45 años (Rango clínico actual: ${minAge} a ${maxAge} años)`;
                 if (notesEl) notesEl.value = "Escaneo Intraoral 3D (.STL) + Diagnóstico por Especialista Dra. Liseth Guevara Muñoz. Soluciones sin extracciones innecesarias.";
+
+                mktState.userEditedPrompt = false;
+                updateMktAssembledPromptPreview();
 
                 const banner = document.getElementById("mktPatientInsightsBanner");
                 const head = document.getElementById("mktInsightHeadline");
@@ -6519,7 +6619,7 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                 if (banner && head && det) {
                     banner.classList.remove("hidden");
                     head.innerText = `Análisis de ${total} Expedientes Reales (${adultsCount} adultos y ${kidsCount} pacientes pediátricos/jóvenes • ${highCompCount} de alta complejidad)`;
-                    det.innerText = `Patrón dominante en tu consulta: Pacientes de ${minAge} a ${maxAge} años que requieren corrección estética con stripping (IPR) controlado y biomecánica con escaneo 3D. Hemos prellenado la campaña para atraer exactamente este perfil de alto valor en Mérida.`;
+                    det.innerText = `Patrón dominante en tu consulta: Pacientes de ${minAge} a ${maxAge} años que requieren corrección estética con stripping (IPR) controlado y biomecánica con escaneo 3D. Hemos armado el prompt visual y prellenado la campaña para atraer exactamente este perfil en Mérida.`;
                 }
 
                 await handleGenerateMarketingAd();
@@ -6699,20 +6799,102 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             await handleGenerateMarketingAd(null, fb);
         }
 
+        async function generateAiMarketingImageFromPrompt(imagePromptEn) {
+            // 1. Intentar primero generación nativa de imagen vía Gemini Image API (si la cuenta tiene cuota habilitada)
+            const geminiImgModels = ["gemini-3.1-flash-image", "gemini-2.5-flash-image"];
+            for (const imgModel of geminiImgModels) {
+                try {
+                    const resp = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${imgModel}:generateContent?key=${encodeURIComponent(DEFAULT_GEMINI_API_KEY)}`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{
+                                    role: "user",
+                                    parts: [{ text: `Generate a photorealistic 1:1 square commercial orthodontic photography image (no text, no words, no watermarks): ${imagePromptEn}` }]
+                                }],
+                                generationConfig: {
+                                    responseModalities: ["TEXT", "IMAGE"]
+                                }
+                            })
+                        }
+                    );
+                    if (resp.ok) {
+                        const json = await resp.json();
+                        const parts = json?.candidates?.[0]?.content?.parts || [];
+                        const imgPart = parts.find((p) => p.inlineData && p.inlineData.data);
+                        if (imgPart) {
+                            const mime = imgPart.inlineData.mimeType || "image/png";
+                            const dataUrl = `data:${mime};base64,${imgPart.inlineData.data}`;
+                            const loadedImg = await new Promise((resolve) => {
+                                const im = new Image();
+                                im.onload = () => resolve(im);
+                                im.onerror = () => resolve(null);
+                                im.src = dataUrl;
+                            });
+                            if (loadedImg) {
+                                return { img: loadedImg, source: "Gemini Native Image IA" };
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // Continuar al motor de difusión IA en vivo
+                }
+            }
+
+            // 2. Motor de difusión fotográfica IA en vivo a partir del prompt exacto armado por Gemini (1080x1080, CORS-friendly)
+            const cleanPrompt = String(imagePromptEn || "High-end editorial portrait of a happy Hispanic patient with a radiant healthy orthodontic smile in a modern dental clinic in Merida, 85mm lens, photorealistic, no text")
+                .replace(/[\r\n]+/g, " ")
+                .slice(0, 420);
+            const randomSeed = Math.floor(10000 + Math.random() * 899999);
+            const aiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?width=1080&height=1080&nologo=true&seed=${randomSeed}`;
+
+            const diffusedImg = await new Promise((resolve) => {
+                const im = new Image();
+                im.crossOrigin = "anonymous";
+                const timer = setTimeout(() => resolve(null), 16000);
+                im.onload = () => {
+                    clearTimeout(timer);
+                    resolve(im);
+                };
+                im.onerror = () => {
+                    clearTimeout(timer);
+                    resolve(null);
+                };
+                im.src = aiUrl;
+            });
+
+            if (diffusedImg) {
+                return { img: diffusedImg, source: "Imagen Generada por IA (Prompt Gemini)" };
+            }
+            return null;
+        }
+
         async function handleGenerateMarketingAd(event, feedbackText = "") {
             if (event) event.preventDefault();
 
             const btn = document.getElementById("btnGenerateMktAd");
             const btnTxt = document.getElementById("btnGenerateMktAdText");
             const fbBtn = document.getElementById("btnRegenerateFeedback");
+            const overlay = document.getElementById("mktCanvasLoadingOverlay");
+            const overlayTitle = document.getElementById("mktCanvasLoadingTitle");
+            const overlaySub = document.getElementById("mktCanvasLoadingSub");
+
             if (btn) btn.disabled = true;
             if (fbBtn) fbBtn.disabled = true;
-            if (btnTxt) btnTxt.innerText = feedbackText ? "Aplicando tu feedback con Gemini IA..." : "Generando creatividad 1080×1080 y copy con IA...";
+            if (btnTxt) btnTxt.innerText = feedbackText ? "Aplicando feedback y generando nueva imagen IA..." : "Armando prompt y generando imagen 1080×1080 con IA...";
+            if (overlay) overlay.classList.remove("hidden");
+            if (overlayTitle) overlayTitle.innerText = feedbackText ? "Regenerando imagen y copy según tu feedback..." : "Armando prompt en Gemini IA y generando imagen...";
 
             const goal = document.getElementById("mktTreatmentGoal")?.value || "Alineadores Invisibles";
             const audience = document.getElementById("mktTargetAudience")?.value || "Adultos en Mérida";
             const ages = document.getElementById("mktTargetAges")?.value || "25 a 45 años";
             const notes = document.getElementById("mktCustomNotes")?.value || "Escaneo 3D sin costo";
+
+            // Actualizar vista previa del prompt armado con el formulario y el feedback
+            updateMktAssembledPromptPreview(feedbackText);
+            const manualOrAssembledPrompt = document.getElementById("mktImagePromptPreview")?.value || buildMktPromptFromForm(feedbackText);
 
             // Ajustar tema visual automáticamente si el feedback pide un color
             const fbLower = feedbackText.toLowerCase();
@@ -6730,18 +6912,21 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             }
 
             try {
-                const prompt = `Eres un Director Creativo experto en Marketing Médico y Meta Ads para Ortodoncia (estilo Apple).
-Diseña un anuncio de altísima conversión para la Dra. Liseth Guevara Muñoz (Especialista en Ortodoncia y Ortopedia Maxilar en Mérida, Yucatán).
+                const prompt = `Eres un Director Creativo experto en Marketing Médico, Fotografía Dental Editorial y Meta Ads para Ortodoncia (estilo Apple).
+Diseña un anuncio de altísima conversión y el PROMPT FOTOGRÁFICO EXACTO para generar la imagen por IA para la Dra. Liseth Guevara Muñoz (Especialista en Ortodoncia y Ortopedia Maxilar en Mérida, Yucatán).
 
-Datos de la campaña:
+Datos del formulario de campaña:
 - Tratamiento / Objetivo: ${goal}
-- Público Meta: ${audience}
-- Rango de Edad: ${ages}
+- Público Meta (quién debe aparecer o identificarse en la imagen): ${audience}
+- Rango de Edad del sujeto en la foto: ${ages}
 - Gancho / Beneficio: ${notes}
-${feedbackText ? `- RETROALIMENTACIÓN OBLIGATORIA DE LA DOCTORA PARA MEJORAR LA VERSIÓN ANTERIOR: "${feedbackText}"` : ""}
+- Prompt base armado por el formulario: ${manualOrAssembledPrompt}
+${feedbackText ? `- RETROALIMENTACIÓN OBLIGATORIA DE LA DOCTORA PARA MODIFICAR LA IMAGEN Y EL COPY: "${feedbackText}"` : ""}
 
 Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
 {
+  "imagePromptEn": "Detailed photorealistic commercial photography prompt in English (max 55 words) describing the exact person/patient matching the target age (${ages}) and audience (${audience}), smiling naturally or in a modern orthodontic clinic in Merida related to (${goal})${feedbackText ? `, strictly applying this visual change: (${feedbackText})` : ""}. Studio lighting, 85mm lens, ultra-detailed skin and teeth texture, no text, no watermarks",
+  "imagePromptEs": "Descripción en español del prompt fotográfico optimizado por Gemini para mostrar a la doctora en la caja de prompt",
   "headline": "Titular visual impactante para la imagen (MÁXIMO 7 palabras, sin signos de admiración excesivos)",
   "subheadline": "Subtítulo corto de respaldo para la imagen (MÁXIMO 10 palabras)",
   "ctaBadge": "Texto corto para la etiqueta superior del botón (MÁXIMO 5 palabras, ej. ESCANEO 3D DIGITAL INCLUIDO)",
@@ -6761,7 +6946,7 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                                 generationConfig: {
                                     responseMimeType: "application/json",
-                                    temperature: 0.4
+                                    temperature: 0.45
                                 }
                             })
                         }
@@ -6781,6 +6966,8 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
 
                 if (!parsed) {
                     parsed = {
+                        imagePromptEn: `Commercial editorial dental portrait of a happy Hispanic patient (${ages}, ${audience}) with a radiant orthodontic smile in a modern luxury dental clinic, representing ${goal}. ${feedbackText ? feedbackText : "Soft studio lighting, 85mm f/1.8 lens, photorealistic, no text"}`,
+                        imagePromptEs: manualOrAssembledPrompt,
                         headline: feedbackText
                             ? "Sonrisa Perfecta con Escaneo 3D y Meses Sin Intereses"
                             : goal.slice(0, 46),
@@ -6796,11 +6983,32 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                 mktState.ctaBadge = parsed.ctaBadge || mktState.ctaBadge;
                 mktState.copy = parsed.copy || mktState.copy;
                 mktState.targetingTip = parsed.targetingTip || mktState.targetingTip;
+                mktState.lastImagePromptEn = parsed.imagePromptEn || "";
+
+                const promptPreviewEl = document.getElementById("mktImagePromptPreview");
+                if (promptPreviewEl && parsed.imagePromptEs) {
+                    promptPreviewEl.value = `${parsed.imagePromptEs}\n[Prompt EN enviado al motor visual IA]: ${parsed.imagePromptEn}`;
+                }
 
                 const copyEl = document.getElementById("mktGeneratedCopyText");
                 if (copyEl) copyEl.value = mktState.copy;
                 const tipEl = document.getElementById("mktAiTargetingText");
                 if (tipEl) tipEl.innerText = mktState.targetingTip;
+
+                // Generar la nueva imagen fotográfica 1080x1080 con IA a menos que la doctora haya subido una foto propia
+                if (!mktState.customPhotoDataUrl) {
+                    if (overlayTitle) overlayTitle.innerText = "Renderizando fotografía 1080×1080 con IA...";
+                    if (overlaySub) overlaySub.innerText = parsed.imagePromptEs || parsed.imagePromptEn;
+
+                    const aiImgResult = await generateAiMarketingImageFromPrompt(parsed.imagePromptEn);
+                    if (aiImgResult && aiImgResult.img) {
+                        mktState.bgImageObj = aiImgResult.img;
+                        const badgeEl = document.getElementById("mktCanvasAiSourceBadge");
+                        if (badgeEl) {
+                            badgeEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 🤖 ${aiImgResult.source} • 1080×1080 px`;
+                        }
+                    }
+                }
 
                 if (feedbackText) {
                     const fbInput = document.getElementById("mktFeedbackInput");
@@ -6812,9 +7020,10 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                 console.warn("Aviso al generar anuncio con IA:", err);
                 renderMarketingCanvasAd();
             } finally {
+                if (overlay) overlay.classList.add("hidden");
                 if (btn) btn.disabled = false;
                 if (fbBtn) fbBtn.disabled = false;
-                if (btnTxt) btnTxt.innerText = "✨ Generar Anuncio 1080×1080 + Copy con IA";
+                if (btnTxt) btnTxt.innerText = "✨ Generar Imagen IA 1080×1080 + Copy con Gemini";
             }
         }
 

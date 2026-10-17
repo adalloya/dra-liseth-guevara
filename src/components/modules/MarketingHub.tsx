@@ -85,13 +85,18 @@ export default function MarketingHub({ onBack }: { onBack?: () => void }) {
     if (e) e.preventDefault();
     setIsGenerating(true);
     try {
-      const stockUrl =
+      const assembledPromptEn = `Commercial editorial orthodontic photography of a happy Hispanic patient (${targetAudience}) with a radiant healthy smile in a modern luxury dental clinic in Merida, representing ${treatmentGoal}. ${customNotes}. ${feedback ? `Adjustment: ${feedback}.` : ""} 85mm lens, studio lighting, photorealistic, no text`;
+      const randomSeed = Math.floor(10000 + Math.random() * 899999);
+      const aiGeneratedUrl =
         customPhotoUrl ||
-        "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&q=80&w=1080";
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(
+          assembledPromptEn.slice(0, 400)
+        )}?width=1080&height=1080&nologo=true&seed=${randomSeed}`;
+
       const copyText = `🦷 ¿Te gustaría transformar tu sonrisa con planeación digital 3D milimétrica?\n\nEn el consultorio de la Dra. Liseth Guevara Muñoz combinamos especialista en Ortodoncia y Ortopedia Maxilar con escaneo 3D para lograr resultados predecibles y estéticos.\n\n✨ Beneficio de campaña: ${customNotes}\n🎯 Ideal para: ${targetAudience}\n\n📍 Mérida, Yucatán | 👩‍⚕️ Dra. Liseth Guevara Muñoz\n📲 Envíanos mensaje directo o haz clic en "Más información" para agendar tu cita.`;
 
       setGeneratedAd({
-        imageUrl: stockUrl,
+        imageUrl: aiGeneratedUrl,
         headline: treatmentGoal.slice(0, 48),
         subheadline: "Dra. Liseth Guevara Muñoz • Ortodoncia y Ortopedia Maxilar",
         ctaBadge: "Agenda tu Valoración 3D Hoy",
