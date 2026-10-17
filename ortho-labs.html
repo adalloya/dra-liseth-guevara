@@ -4365,23 +4365,27 @@ create table if not exists public.patients (
                     </div>
                 </div>
 
-                <div class="flex justify-center gap-3 pt-2">
-                    <button
-                        type="button"
-                        onclick="closePatientSelfServicePortal()"
-                        class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition"
-                    >
-                        Cerrar y Volver al Expediente
-                    </button>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-3">
                     <button
                         type="button"
                         onclick="exportPatientPdf()"
-                        class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                        class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-7 py-3 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
                     >
-                        <i class="ph-bold ph-printer"></i>
-                        <span>Imprimir Contrato</span>
+                        <i class="ph-bold ph-download-simple text-base"></i>
+                        <span>Descargar Contrato (PDF)</span>
+                    </button>
+                    <button
+                        type="button"
+                        id="portalSummaryCloseBtn"
+                        onclick="closePatientSelfServicePortal()"
+                        class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-1.5"
+                    >
+                        <span>Cerrar y Volver al Expediente</span>
                     </button>
                 </div>
+                <p class="text-[11px] text-slate-400 text-center pt-1">
+                    💡 Guarda tu copia oficial en tu dispositivo; también queda archivada permanentemente en tu expediente médico digital.
+                </p>
             </div>
         </main>
 
@@ -5956,18 +5960,32 @@ create table if not exists public.patients (
         }
 
         function exportPatientPdf() {
-            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const patId = portalActivePatientId || activePatientId;
+            const patient = patientsList.find((p) => p.id === patId) || patientsList[0];
             if (patient) {
-                document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                const cleanName = (patient.full_name || "Paciente").trim().replace(/\s+/g, '_');
+                const isPortal = !document.getElementById("patientSelfServicePortalModal")?.classList.contains("hidden");
+                if (isPortal) {
+                    document.title = `Contrato_Consentimiento_Ortodoncia_${cleanName}`;
+                } else {
+                    document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                }
                 renderPrintFullReport(patient);
             }
             window.print();
         }
 
         window.addEventListener("beforeprint", () => {
-            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const patId = portalActivePatientId || activePatientId;
+            const patient = patientsList.find((p) => p.id === patId) || patientsList[0];
             if (patient) {
-                document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                const cleanName = (patient.full_name || "Paciente").trim().replace(/\s+/g, '_');
+                const isPortal = !document.getElementById("patientSelfServicePortalModal")?.classList.contains("hidden");
+                if (isPortal) {
+                    document.title = `Contrato_Consentimiento_Ortodoncia_${cleanName}`;
+                } else {
+                    document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                }
                 renderPrintFullReport(patient);
             }
         });
@@ -12464,6 +12482,25 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
             document.getElementById("portalSummaryDownPayment").innerText = `$${Number(planObj.downPayment).toLocaleString("es-MX")} MXN`;
             document.getElementById("portalSummaryTimestamp").innerText = new Date(signedTimestamp).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
+            // Adaptar texto y acción del botón secundario si el paciente está en su propio dispositivo
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const isDirectPortalUrl = urlParams.get("portal") === "patient" || urlParams.get("mode") === "patient";
+                const closeBtn = document.getElementById("portalSummaryCloseBtn");
+                if (closeBtn) {
+                    if (isDirectPortalUrl) {
+                        closeBtn.innerHTML = `<span>✓ Finalizar Registro</span>`;
+                        closeBtn.onclick = () => {
+                            alert("¡Registro y consentimiento completados con éxito! Dra. Liseth Guevara y su equipo se comunicarán contigo para confirmar tu cita de colocación.");
+                        };
+                    } else {
+                        closeBtn.innerHTML = `<span>Cerrar y Volver al Expediente</span>`;
+                        closeBtn.onclick = () => closePatientSelfServicePortal();
+                    }
+                }
+            } catch (e) {}
+
+            renderPrintFullReport(patient);
             setPortalStep(6);
         }
 
