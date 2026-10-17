@@ -180,6 +180,8 @@
             white-space: nowrap;
             z-index: 5;
             transition: opacity 0.2s;
+        }
+
         /* Barra Superior de 10 Iconos Ortodónticos estilo ClinCheck Pro */
         .clincheck-top-toolbar {
             display: inline-flex;
@@ -636,7 +638,8 @@
         html.light #dualSTLModal .apple-glass,
         html.light #liveCameraModal .apple-glass,
         html.light #digitalSignaturesModal .apple-glass,
-        html.light #supabaseConfigModal .apple-glass {
+        html.light #supabaseConfigModal .apple-glass,
+        html.light #doctorSiteRecordsModal .apple-glass {
             background: #ffffff !important;
             border-color: rgba(0, 0, 0, 0.1) !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
@@ -644,28 +647,33 @@
         html.light #dualSTLModal .text-white,
         html.light #liveCameraModal .text-white,
         html.light #digitalSignaturesModal .text-white,
-        html.light #supabaseConfigModal .text-white {
+        html.light #supabaseConfigModal .text-white,
+        html.light #doctorSiteRecordsModal .text-white {
             color: #1d1d1f !important;
         }
         html.light #dualSTLModal .text-zinc-200,
         html.light #liveCameraModal .text-zinc-200,
         html.light #digitalSignaturesModal .text-zinc-200,
         html.light #supabaseConfigModal .text-zinc-200,
+        html.light #doctorSiteRecordsModal .text-zinc-200,
         html.light #dualSTLModal .text-zinc-300,
         html.light #liveCameraModal .text-zinc-300,
         html.light #digitalSignaturesModal .text-zinc-300,
-        html.light #supabaseConfigModal .text-zinc-300 {
+        html.light #supabaseConfigModal .text-zinc-300,
+        html.light #doctorSiteRecordsModal .text-zinc-300 {
             color: #3a3a3c !important;
         }
         html.light #dualSTLModal .text-zinc-400,
         html.light #liveCameraModal .text-zinc-400,
         html.light #digitalSignaturesModal .text-zinc-400,
-        html.light #supabaseConfigModal .text-zinc-400 {
+        html.light #supabaseConfigModal .text-zinc-400,
+        html.light #doctorSiteRecordsModal .text-zinc-400 {
             color: #86868b !important;
         }
         html.light #dualSTLModal input,
         html.light #liveCameraModal select,
-        html.light #supabaseConfigModal input {
+        html.light #supabaseConfigModal input,
+        html.light #doctorSiteRecordsModal input {
             background-color: #f2f2f7 !important;
             border-color: rgba(0, 0, 0, 0.1) !important;
             color: #1d1d1f !important;
@@ -712,32 +720,32 @@
                 <span id="themeToggleText" class="hidden sm:inline">Fondo Blanco</span>
             </button>
             <!-- Motor Dual STL -->
-            <button onclick="openDualSTLModal()" class="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-medium text-purple-300 flex items-center space-x-1.5 transition" title="Cargar Modelos Dual .STL (Maxilar y Mandíbula)">
+            <button onclick="openDualSTLModal()" class="hidden md:inline-flex px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-medium text-purple-300 items-center space-x-1.5 transition" title="Cargar Modelos Dual .STL (Maxilar y Mandíbula)">
                 <i class="ph-bold ph-layers text-sm"></i>
                 <span class="hidden xl:inline">Dual .STL</span>
             </button>
             <!-- Captura de Cámara en Vivo -->
-            <button onclick="openLiveCameraModal(2)" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-medium text-rose-300 flex items-center space-x-1.5 transition" title="Captura de Cámara en Vivo (Webcam / Móvil)">
+            <button onclick="openLiveCameraModal(2)" class="hidden md:inline-flex px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-medium text-rose-300 items-center space-x-1.5 transition" title="Captura de Cámara en Vivo (Webcam / Móvil)">
                 <i class="ph-bold ph-camera text-sm"></i>
                 <span class="hidden xl:inline">Cámara</span>
             </button>
             <!-- Firmas Digitales Biométricas -->
-            <button onclick="openDigitalSignaturesModal()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-xs font-medium text-amber-300 flex items-center space-x-1.5 transition" title="Firmas Digitales Biométricas">
+            <button onclick="openDigitalSignaturesModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-xs font-medium text-amber-300 items-center space-x-1.5 transition" title="Firmas Digitales Biométricas">
                 <i class="ph-bold ph-signature text-sm"></i>
                 <span class="hidden xl:inline">Firmas</span>
             </button>
             <!-- Conexión Supabase Cloud -->
-            <button onclick="openSupabaseConfigModal()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-medium text-emerald-300 flex items-center space-x-1.5 transition" title="Conexión Supabase Cloud">
+            <button onclick="openSupabaseConfigModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-medium text-emerald-300 items-center space-x-1.5 transition" title="Conexión Supabase Cloud">
                 <i class="ph-bold ph-database text-sm"></i>
                 <span class="hidden xl:inline">Cloud</span>
             </button>
             <input type="file" id="stlFileInput" accept=".stl" class="hidden" onchange="handleSTLUpload(event)">
-            <button onclick="document.getElementById('stlFileInput').click()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white flex items-center space-x-1.5 transition" title="Importar Escaneo Intraoral .STL">
+            <button onclick="document.getElementById('stlFileInput').click()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white items-center space-x-1.5 transition" title="Importar Escaneo Intraoral .STL">
                 <i class="ph-bold ph-cube text-sky-400 text-sm"></i>
                 <span class="hidden md:inline">Importar .STL</span>
             </button>
 
-            <button onclick="openCADWorkflowModal()" class="px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-medium text-indigo-300 flex items-center space-x-1.5 transition" title="Ver Flujo Digital Formlabs CAD/CAM">
+            <button onclick="openCADWorkflowModal()" class="hidden lg:inline-flex px-2.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-medium text-indigo-300 items-center space-x-1.5 transition" title="Ver Flujo Digital Formlabs CAD/CAM">
                 <i class="ph-bold ph-git-diff text-sm"></i>
                 <span class="hidden md:inline">Flujo Formlabs</span>
             </button>
@@ -1725,7 +1733,7 @@
 
             // Actualizar botones de Odontograma
             buildFDIButtons();
-            selectTooth(selectedFDI);
+            selectTooth(selectedFDI, false);
         }
 
 
