@@ -28,6 +28,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Supabase JS Client v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Identity Services (OAuth 2.0 1-Click Login & Calendar Sync) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Three.js (Solo se instancia bajo demanda cuando se abre el Visor .STL) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -122,16 +124,23 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                    <div class="relative flex-1 sm:w-64">
+                    <div class="relative flex-1 sm:w-56">
                         <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                         <input
                             type="text"
                             id="patientSearchInput"
                             oninput="renderPatientsList()"
-                            placeholder="Buscar paciente por nombre..."
+                            placeholder="Buscar paciente..."
                             class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition"
                         />
                     </div>
+                    <button
+                        onclick="openCalendarHubView()"
+                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-calendar-check text-emerald-600"></i>
+                        <span>Agenda & Google Calendar</span>
+                    </button>
                     <button
                         onclick="openMarketingHubView()"
                         class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
@@ -143,8 +152,8 @@
                         onclick="toggleOrthoAssistantDrawer(true)"
                         class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
                     >
-                        <i class="ph-bold ph-calendar-check text-emerald-400"></i>
-                        <span>Asistente IA & Agenda</span>
+                        <i class="ph-bold ph-sparkle text-amber-300"></i>
+                        <span>Asistente IA</span>
                     </button>
                     <button
                         onclick="openNewPatientModal()"
@@ -603,6 +612,471 @@
                 </a>
             </div>
         </div>
+    </div>
+
+    <!-- =====================================================================
+         VISTA 1C: AGENDA CLÍNICA & GOOGLE CALENDAR HUB (CONEXIÓN ÚNICA + GESTIÓN DIRECTA E IA)
+    ====================================================================== -->
+    <div id="viewCalendarHub" class="hidden min-h-screen flex flex-col no-print">
+        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-4">
+            <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onclick="showDashboardView()"
+                        class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
+                    >
+                        <i class="ph-bold ph-arrow-left"></i>
+                        <span>Pacientes</span>
+                    </button>
+                    <img src="ortho-hub-logo.png" alt="CRD OrthoAI Hub" class="w-10 h-10 rounded-xl object-contain shadow-xs shrink-0" />
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                                📅 Google Calendar Hub
+                            </span>
+                            <span id="calHubConnectionBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="calHubConnectedEmailLabel">Conectado: dralisethguevara@gmail.com</span>
+                            </span>
+                        </div>
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 mt-0.5">
+                            Agenda de Sillón & Google Calendar • Dra. Liseth Guevara Muñoz
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Selector de Modo: Vista Hub Interactiva vs Google Calendar Embebido -->
+                    <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1">
+                        <button
+                            type="button"
+                            id="calTabBtnHub"
+                            onclick="setCalendarHubSubView('hub')"
+                            class="text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition"
+                        >
+                            🦷 Agenda Interactiva Hub
+                        </button>
+                        <button
+                            type="button"
+                            id="calTabBtnEmbed"
+                            onclick="setCalendarHubSubView('embed')"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition"
+                        >
+                            🌐 Google Calendar en Vivo
+                        </button>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="syncPatientRoadmapsToCalendar()"
+                        class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition flex items-center gap-1.5"
+                        title="Importar automáticamente las próximas etapas de tus pacientes activos al calendario"
+                    >
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                        <span>Sincronizar Pacientes</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="openHubAppointmentModal(null)"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-plus"></i>
+                        <span>Nueva Cita en Sillón</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 flex-1 space-y-5">
+            <!-- BANNER DE VINCULACIÓN ÚNICA CON GOOGLE ACCOUNT (Solo se muestra grande si aún no ha iniciado sesión) -->
+            <div id="calHubOneTimeBanner" class="hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 shadow-lg border border-indigo-500/30">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+                    <div class="space-y-1.5 max-w-2xl">
+                        <span class="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">
+                            ⚡ Configuración Única (Solo se hace 1 vez)
+                        </span>
+                        <h2 class="text-base sm:text-lg font-extrabold text-white">
+                            Conecta la cuenta de Google de la Dra. Liseth Guevara Muñoz
+                        </h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Inicia sesión una sola vez con tu cuenta de Google para traer automáticamente tu calendario a este Hub. Podrás crear, mover o cancelar citas directamente aquí o pidiéndoselo al Asistente IA con Gemini 4 Argon.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="openGoogleOneTimeAuthModal()"
+                        class="bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs px-5 py-3.5 rounded-2xl shadow-md transition flex items-center gap-2.5 shrink-0"
+                    >
+                        <i class="ph-bold ph-google-logo text-indigo-600 text-base"></i>
+                        <span>Iniciar sesión con Google Calendar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BARRA DE COMANDO CONVERSACIONAL IA (GESTIÓN DEL CALENDARIO MEDIANTE EL ASISTENTE) -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                <form onsubmit="handleCalendarHubAiCommand(event)" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="flex items-center gap-2.5 flex-1">
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 text-amber-300 flex items-center justify-center text-base shrink-0 shadow-xs">
+                            <i class="ph-bold ph-sparkle"></i>
+                        </div>
+                        <input
+                            id="calHubAiCommandInput"
+                            type="text"
+                            placeholder="Pídele al Asistente gestionar tu agenda: 'Agendar a Martha el jueves a las 11am para TADs', 'Mover cita de Carlos al viernes 4pm' o 'Cancelar cita'..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                        />
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button
+                            type="submit"
+                            id="btnCalHubAiSubmit"
+                            class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-magic-wand text-amber-300"></i>
+                            <span id="btnCalHubAiSubmitText">Ejecutar con IA en Agenda</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="openGoogleOneTimeAuthModal()"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold px-3 py-2.5 rounded-xl transition flex items-center gap-1"
+                            title="Ver estado de cuenta de Google vinculada"
+                        >
+                            <i class="ph-bold ph-google-logo text-indigo-600"></i>
+                            <span id="calHubQuickAccountBtnText">Cuenta Vinculada</span>
+                        </button>
+                    </div>
+                </form>
+                <div id="calHubAiFeedbackToast" class="hidden mt-3 p-3 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 flex justify-between items-center gap-2">
+                    <span id="calHubAiFeedbackText" class="font-medium"></span>
+                    <button type="button" onclick="document.getElementById('calHubAiFeedbackToast').classList.add('hidden')" class="text-indigo-500 hover:text-indigo-800 font-bold text-xs">✕</button>
+                </div>
+            </div>
+
+            <!-- KPIs RÁPIDOS DE SILLÓN Y AGENDA -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Citas Programadas</span>
+                    <p id="calStatTotalAppts" class="text-xl font-extrabold text-slate-900 mt-0.5">0 Citas</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tiempo Total en Sillón</span>
+                    <p id="calStatChairTime" class="text-xl font-extrabold text-indigo-600 mt-0.5">0 min</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Controles TADs / Alta Comp.</span>
+                    <p id="calStatComplexAppts" class="text-xl font-extrabold text-rose-600 mt-0.5">0 Controles</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sincronización Google</span>
+                    <p id="calStatSyncMode" class="text-xs font-extrabold text-emerald-600 mt-1.5 flex items-center gap-1.5">
+                        <i class="ph-fill ph-check-circle"></i> Activa (Conexión Única)
+                    </p>
+                </div>
+            </div>
+
+            <!-- SUB-VISTA A: CALENDARIO CLÍNICO INTERACTIVO EN EL HUB (GESTIÓN DIRECTA) -->
+            <div id="calHubInteractiveSection" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Columna Izquierda (7 cols): Vista Semanal / Selector de Días y Horarios -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-900">📅 Semana Clínica en Sillón (Vista Directa Hub)</h2>
+                            <p id="calHubWeekRangeLabel" class="text-xs text-slate-500">Selecciona un día o gestiona tus bloques horarios</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="shiftCalendarWeek(-1)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">← Ant.</button>
+                            <button type="button" onclick="shiftCalendarWeek(0)" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold">Hoy</button>
+                            <button type="button" onclick="shiftCalendarWeek(1)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">Sig. →</button>
+                        </div>
+                    </div>
+
+                    <!-- Tira de 7 días de la semana -->
+                    <div id="calHubDaysStrip" class="grid grid-cols-7 gap-1.5"></div>
+
+                    <!-- Bloques de Horarios del Día Seleccionado + Botón Agendar en Hora Libre -->
+                    <div class="space-y-2 pt-1">
+                        <div class="flex justify-between items-center">
+                            <span id="calHubSelectedDayTitle" class="text-xs font-extrabold uppercase tracking-wider text-indigo-950"></span>
+                            <button
+                                type="button"
+                                onclick="setCalHubShowAllDays(true)"
+                                id="btnShowAllApptsToggle"
+                                class="text-[11px] font-semibold text-indigo-600 hover:underline"
+                            >
+                                Ver todas las citas agendadas
+                            </button>
+                        </div>
+                        <div id="calHubDayTimeline" class="space-y-2 max-h-[460px] overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha (5 cols): Tarjetas Detalladas de Citas, Charola de Sillón y Acciones 1-Clic -->
+                <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <div>
+                                <h2 class="text-sm font-bold text-slate-900">🦷 Control de Citas & Preparación de Charola</h2>
+                                <p class="text-xs text-slate-500">Edita hora, abre el expediente 3D o confirma por WhatsApp</p>
+                            </div>
+                        </div>
+                        <div id="calHubAllAppointmentsList" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between gap-3">
+                        <div>
+                            <strong class="text-slate-900 block">💡 Gestión Dual (Hub + Asistente IA)</strong>
+                            <span>Cualquier cambio que hagas aquí o por voz en el Asistente actualiza tu agenda al instante.</span>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="toggleOrthoAssistantDrawer(true)"
+                            class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl shrink-0"
+                        >
+                            Abrir Chat IA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-VISTA B: GOOGLE CALENDAR NATIVO EMBEBIDO EN VIVO (IFRAME DE LA CUENTA DE LA DOCTORA) -->
+            <div id="calHubEmbedSection" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i class="ph-bold ph-google-logo text-indigo-600"></i>
+                            <span>Vista en Vivo de Google Calendar (<span id="calEmbedEmailTitle">dralisethguevara@gmail.com</span>)</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Visualización directa del calendario de Google de la Dra. Liseth Guevara Muñoz en horario de Mérida (America/Mexico_City).
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a
+                            href="https://calendar.google.com/calendar/u/0/r/week"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-arrow-square-out"></i>
+                            <span>Abrir Google Calendar Pantalla Completa</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 h-[620px]">
+                    <iframe
+                        id="googleCalendarLiveIframe"
+                        src="https://calendar.google.com/calendar/embed?src=dralisethguevara%40gmail.com&ctz=America%2FMexico_City&mode=WEEK&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0"
+                        style="border: 0"
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        scrolling="no"
+                    ></iframe>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DE INICIO DE SESIÓN ÚNICO CON GOOGLE CALENDAR (ONE-TIME LOGIN) -->
+    <div id="googleOneTimeAuthModal" onclick="closeGoogleOneTimeAuthModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-slate-200 shadow-2xl space-y-5" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold shadow-2xs">
+                        <i class="ph-bold ph-google-logo"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                            Conexión Única Permanente
+                        </span>
+                        <h3 class="text-base font-bold text-slate-900 mt-0.5">Vincular Cuenta de Google Calendar</h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closeGoogleOneTimeAuthModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Selecciona o confirma la cuenta de Google de la <strong>Dra. Liseth Guevara Muñoz</strong>. El Hub recordará tu sesión de forma permanente para sincronizar tus citas de sillón sin volver a pedirte acceso.
+            </p>
+
+            <!-- Tarjeta 1-Clic de Cuenta Detectada de la Doctora -->
+            <div class="space-y-2.5">
+                <button
+                    type="button"
+                    onclick="completeOneTimeGoogleLogin('dralisethguevara@gmail.com')"
+                    class="w-full p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/60 hover:bg-indigo-50 transition flex items-center justify-between text-left group"
+                >
+                    <div class="flex items-center gap-3">
+                        <img src="ortho-hub-logo.png" alt="Dra. Liseth" class="w-10 h-10 rounded-full object-contain bg-white p-0.5 border border-indigo-200" />
+                        <div>
+                            <p class="text-xs font-extrabold text-slate-900">Dra. Liseth Guevara Muñoz</p>
+                            <p class="text-[11px] text-indigo-700 font-medium mono">dralisethguevara@gmail.com</p>
+                        </div>
+                    </div>
+                    <span class="bg-indigo-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl group-hover:bg-indigo-500 transition">
+                        Conectar 1-Clic →
+                    </span>
+                </button>
+
+                <!-- Opción de personalizar correo de Google de la doctora -->
+                <div class="pt-2 border-t border-slate-100 space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase">
+                        ¿Usas otro correo de Google en el consultorio?
+                    </label>
+                    <div class="flex gap-2">
+                        <input
+                            id="oneTimeGoogleEmailInput"
+                            type="email"
+                            value="dralisethguevara@gmail.com"
+                            placeholder="correo@gmail.com"
+                            class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                        />
+                        <button
+                            type="button"
+                            onclick="completeOneTimeGoogleLogin(document.getElementById('oneTimeGoogleEmailInput').value)"
+                            class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition shrink-0"
+                        >
+                            Vincular Cuenta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Opcional: Google Cloud OAuth Client ID para popup nativo de Google Identity Services -->
+                <details class="text-[11px] text-slate-500 pt-1">
+                    <summary class="cursor-pointer font-semibold hover:text-slate-800">
+                        Opciones avanzadas OAuth 2.0 (Google Cloud Client ID opcional)
+                    </summary>
+                    <div class="mt-2 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                        <input
+                            id="googleOAuthClientIdInput"
+                            type="text"
+                            placeholder="xxxx.apps.googleusercontent.com (Opcional)"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-[11px] mono text-slate-800"
+                        />
+                        <button
+                            type="button"
+                            onclick="launchGoogleIdentityOAuthPopup()"
+                            class="w-full bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-[11px] font-semibold py-1.5 rounded-lg transition"
+                        >
+                            Autorizar vía Popup Oficial de Google OAuth 2.0
+                        </button>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA CREAR / EDITAR / REPROGRAMAR CITA DIRECTAMENTE EN EL HUB -->
+    <div id="hubAppointmentEditorModal" onclick="closeHubAppointmentModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
+        <form onsubmit="saveHubAppointmentForm(event)" class="bg-white rounded-3xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                        Agenda Directa del Hub
+                    </span>
+                    <h3 id="hubApptModalTitle" class="text-base font-bold text-slate-900 mt-0.5">Nueva Cita en Sillón</h3>
+                </div>
+                <button type="button" onclick="closeHubAppointmentModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <input type="hidden" id="hubApptEditId" value="" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Paciente del Expediente</label>
+                    <select
+                        id="hubApptPatientSelect"
+                        onchange="handleHubApptPatientSelectChange()"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900"
+                    ></select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">O escribir nombre del paciente</label>
+                    <input
+                        id="hubApptPatientNameInput"
+                        type="text"
+                        required
+                        placeholder="Nombre completo"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Procedimiento / Etapa Ortodóncica</label>
+                <input
+                    id="hubApptProcedureInput"
+                    type="text"
+                    required
+                    placeholder="Ej. Mes 7: Intrusión Molar con TADs / Control de Arco CuNiTi"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 font-medium"
+                />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Fecha de la Cita</label>
+                    <input
+                        id="hubApptDateInput"
+                        type="date"
+                        required
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
+                    />
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Hora en Sillón</label>
+                    <input
+                        id="hubApptTimeInput"
+                        type="time"
+                        required
+                        value="11:00"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
+                    />
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Duración en Sillón</label>
+                    <select
+                        id="hubApptDurationInput"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900"
+                    >
+                        <option value="20">20 min (Control rápido / Elásticos)</option>
+                        <option value="30" selected>30 min (Secuencia CuNiTi / IPR)</option>
+                        <option value="45">45 min (TADs / Cementado / Retiro)</option>
+                        <option value="60">60 min (Estudio inicial completo)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Preparación de Charola en Sillón (Asistente Dental)</label>
+                <input
+                    id="hubApptPrepInput"
+                    type="text"
+                    placeholder="Ej. Pinza Mathieu, tiras de stripping, arco .016x.022 CuNiTi"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900"
+                />
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                    type="button"
+                    onclick="closeHubAppointmentModal()"
+                    class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm flex items-center gap-1.5"
+                >
+                    <i class="ph-bold ph-check"></i>
+                    <span>Guardar Cita en Hub & Google Calendar</span>
+                </button>
+            </div>
+        </form>
     </div>
 
     <!-- =====================================================================
@@ -1706,12 +2180,13 @@ create table if not exists public.patients (
                 <div class="flex items-center gap-1.5">
                     <button
                         type="button"
-                        onclick="toggleGoogleCalendarConfig()"
+                        onclick="openGoogleOneTimeAuthModal()"
                         id="btnGoogleCalStatus"
                         class="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 border border-white/15 transition flex items-center gap-1"
+                        title="Cuenta de Google Calendar vinculada (Conexión única)"
                     >
                         <i class="ph-bold ph-google-logo"></i>
-                        <span id="googleCalStatusText">Calendar Activo</span>
+                        <span id="googleCalStatusText">Conectado</span>
                     </button>
                     <button
                         type="button"
@@ -1723,60 +2198,24 @@ create table if not exists public.patients (
                 </div>
             </div>
 
-            <!-- Panel Desplegable de Configuración de Cuenta Google Calendar -->
-            <div id="googleCalendarConfigPanel" class="hidden bg-indigo-50/90 border-b border-indigo-200 p-3.5 text-xs space-y-2.5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-bold text-indigo-950 text-[11px] flex items-center gap-1.5">
-                            <i class="ph-bold ph-google-logo text-indigo-600"></i>
-                            <span>Cuenta de Google Calendar de la Especialista</span>
-                        </p>
-                        <p class="text-[10px] text-slate-600 mt-0.5">
-                            Las citas creadas se abren en 1 clic listas para guardar en tu Google Calendar o se insertan directo vía OAuth 2.0 API.
-                        </p>
-                    </div>
-                    <button type="button" onclick="toggleGoogleCalendarConfig()" class="text-[10px] text-slate-400 hover:text-slate-700">Cerrar</button>
-                </div>
-                <div class="space-y-2">
-                    <div>
-                        <label class="block text-[9.5px] font-bold uppercase text-slate-500 mb-0.5">Correo de Google Calendar de la Doctora</label>
-                        <input
-                            id="doctorGoogleEmailInput"
-                            type="email"
-                            placeholder="dralisethguevara@gmail.com"
-                            class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-[9.5px] font-bold uppercase text-slate-500 mb-0.5">Google OAuth Access Token (Opcional para inserción directa API v3)</label>
-                        <input
-                            id="doctorGoogleTokenInput"
-                            type="password"
-                            placeholder="ya29.a0AfH6SM... (opcional)"
-                            class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 mono"
-                        />
-                    </div>
-                    <div class="flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onclick="saveGoogleCalendarSettings()"
-                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition"
-                        >
-                            Guardar Cuenta Google
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Próximas Citas Agendadas en Sillón -->
+            <!-- Próximas Citas Agendadas en Sillón + Botón para Ir al Calendar Hub Completo -->
             <div class="bg-slate-50 border-b border-slate-200 px-4 py-2.5">
                 <div class="flex justify-between items-center mb-1.5">
                     <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
                         📅 Próximos Controles en Sillón (Google Calendar)
                     </span>
-                    <span id="upcomingCountBadge" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
-                        0 citas
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span id="upcomingCountBadge" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                            0 citas
+                        </span>
+                        <button
+                            type="button"
+                            onclick="toggleOrthoAssistantDrawer(false); openCalendarHubView();"
+                            class="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-2 py-0.5 rounded-lg transition"
+                        >
+                            Abrir Agenda Hub →
+                        </button>
+                    </div>
                 </div>
                 <div id="upcomingAppointmentsContainer" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
             </div>
@@ -2275,6 +2714,7 @@ create table if not exists public.patients (
             document.title = "CRD OrthoAI Suite | Dra. Liseth Guevara Muñoz";
             document.getElementById("viewPatientWorkspace").classList.add("hidden");
             document.getElementById("viewMarketingHub")?.classList.add("hidden");
+            document.getElementById("viewCalendarHub")?.classList.add("hidden");
             document.getElementById("viewDashboard").classList.remove("hidden");
             renderPatientsList();
         }
@@ -2391,6 +2831,8 @@ create table if not exists public.patients (
 
             if (switchView) {
                 document.getElementById("viewDashboard").classList.add("hidden");
+                document.getElementById("viewMarketingHub")?.classList.add("hidden");
+                document.getElementById("viewCalendarHub")?.classList.add("hidden");
                 document.getElementById("viewPatientWorkspace").classList.remove("hidden");
                 const targetTab = initialTab || (isUninitialized ? "multimedia" : "diagnostico");
                 setWorkspaceTab(targetTab);
@@ -4673,15 +5115,19 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
         }
 
         // ---------------------------------------------------------------------
-        // 9. ASISTENTE CLÍNICO INTELIGENTE (GEMINI 4 ARGON + GOOGLE CALENDAR)
+        // 9. ASISTENTE CLÍNICO INTELIGENTE + GOOGLE CALENDAR HUB (CONEXIÓN ÚNICA)
         // ---------------------------------------------------------------------
         let orthoAssistantHistory = [
             {
                 role: "assistant",
-                text: "Hola, Dra. Liseth 👋. Soy tu Asistente Clínico con Gemini 4 Argon conectado a tu agenda de Google Calendar.\n\n¿En qué te ayudo hoy?\n• Agendar controles calculando el tiempo de sillón ideal (ej. 45 min para TADs/Cementado, 30 min para IPR, 20 min para arcos).\n• Preparar el briefing del día y material de charola.\n• Redactar avisos de WhatsApp para tus pacientes.",
+                text: "Hola, Dra. Liseth 👋. Soy tu Asistente Clínico con Gemini 4 Argon sincronizado de forma permanente con tu Google Calendar.\n\nPuedes gestionar tus citas directamente en el Calendar Hub o pedirme por aquí:\n• \"Agendar a Martha el jueves a las 11am para TADs\"\n• \"Mover la cita de Carlos al viernes a las 4pm\"\n• \"Cancelar la cita de mañana\" o \"Preparar briefing y charola del día\".",
                 appointment: null
             }
         ];
+
+        let calendarWeekOffset = 0;
+        let selectedCalendarDayIso = new Date().toISOString().slice(0, 10);
+        let calHubShowAllDays = false;
 
         let scheduledAppointments = [];
         try {
@@ -4690,7 +5136,9 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 scheduledAppointments = JSON.parse(savedAppts);
             } else {
                 const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-                tomorrow.setHours(10, 0, 0, 0);
+                tomorrow.setHours(11, 0, 0, 0);
+                const dayAfter = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+                dayAfter.setHours(16, 0, 0, 0);
                 scheduledAppointments = [
                     {
                         id: "appt-demo-1",
@@ -4701,6 +5149,16 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                         durationMinutes: 45,
                         chairsidePrep: "2 Microtornillos IZC + Cadena elástica 150 g + Arco .019x.025 SS",
                         patientReminderNote: "Hola Martha, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara. Recuerda acudir con cepillado previo."
+                    },
+                    {
+                        id: "appt-demo-2",
+                        patientName: "Carlos Eduardo Méndez",
+                        patientPhone: "999-342-8810",
+                        procedureTitle: "Mes 4: Secuencia .016x.022 CuNiTi + Stripping Mesial",
+                        startIso: dayAfter.toISOString(),
+                        durationMinutes: 30,
+                        chairsidePrep: "Tiras diamantadas IPR + Calibrador + Arco .016x.022 CuNiTi",
+                        patientReminderNote: "Hola Carlos, te esperamos en tu control de ortodoncia con la Dra. Liseth Guevara."
                     }
                 ];
             }
@@ -4714,12 +5172,628 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             } catch (e) {}
         }
 
+        function isGoogleCalendarConnected() {
+            return localStorage.getItem("crd_google_calendar_connected_v1") === "true";
+        }
+
+        function getConnectedDoctorEmail() {
+            return localStorage.getItem("crd_doctor_google_email") || "dralisethguevara@gmail.com";
+        }
+
+        function refreshGoogleCalendarStatusUi() {
+            const connected = isGoogleCalendarConnected();
+            const email = getConnectedDoctorEmail();
+
+            const banner = document.getElementById("calHubOneTimeBanner");
+            if (banner) {
+                if (connected) banner.classList.add("hidden");
+                else banner.classList.remove("hidden");
+            }
+
+            const emailLbl = document.getElementById("calHubConnectedEmailLabel");
+            if (emailLbl) {
+                emailLbl.innerText = connected
+                    ? `Conectado Permanente: ${email}`
+                    : `Pendiente vincular (${email})`;
+            }
+
+            const quickBtnTxt = document.getElementById("calHubQuickAccountBtnText");
+            if (quickBtnTxt) {
+                quickBtnTxt.innerText = connected ? `✓ ${email}` : "Conectar Google (1 vez)";
+            }
+
+            const drawerStatus = document.getElementById("googleCalStatusText");
+            if (drawerStatus) {
+                drawerStatus.innerText = connected ? "Google Vinculado" : "Conectar Google";
+            }
+
+            const embedTitle = document.getElementById("calEmbedEmailTitle");
+            if (embedTitle) embedTitle.innerText = email;
+
+            const iframe = document.getElementById("googleCalendarLiveIframe");
+            if (iframe) {
+                const targetSrc = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(email)}&ctz=America%2FMexico_City&mode=WEEK&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0`;
+                if (iframe.getAttribute("src") !== targetSrc) {
+                    iframe.setAttribute("src", targetSrc);
+                }
+            }
+        }
+
+        function openGoogleOneTimeAuthModal() {
+            const modal = document.getElementById("googleOneTimeAuthModal");
+            if (!modal) return;
+            const input = document.getElementById("oneTimeGoogleEmailInput");
+            if (input) input.value = getConnectedDoctorEmail();
+            const clientInput = document.getElementById("googleOAuthClientIdInput");
+            if (clientInput) clientInput.value = localStorage.getItem("crd_google_oauth_client_id") || "";
+            modal.classList.remove("hidden");
+        }
+
+        function closeGoogleOneTimeAuthModal() {
+            document.getElementById("googleOneTimeAuthModal")?.classList.add("hidden");
+        }
+
+        async function completeOneTimeGoogleLogin(emailInput) {
+            const email = (emailInput || "dralisethguevara@gmail.com").trim() || "dralisethguevara@gmail.com";
+            localStorage.setItem("crd_doctor_google_email", email);
+            localStorage.setItem("crd_google_calendar_connected_v1", "true");
+
+            closeGoogleOneTimeAuthModal();
+            refreshGoogleCalendarStatusUi();
+
+            // Sincronizar automáticamente controles de pacientes activos al calendario en la primera conexión
+            syncPatientRoadmapsToCalendar(true);
+            await fetchGoogleCalendarEventsApi();
+            renderCalendarHub();
+            renderUpcomingAppointments();
+
+            const toast = document.getElementById("calHubAiFeedbackToast");
+            const toastTxt = document.getElementById("calHubAiFeedbackText");
+            if (toast && toastTxt) {
+                toastTxt.innerText = `✓ Cuenta ${email} vinculada permanentemente. Tu agenda de Google Calendar ya está disponible en el Hub y en el Asistente IA.`;
+                toast.classList.remove("hidden");
+            }
+        }
+
+        function launchGoogleIdentityOAuthPopup() {
+            const clientId = document.getElementById("googleOAuthClientIdInput")?.value?.trim() || localStorage.getItem("crd_google_oauth_client_id") || "";
+            if (clientId) {
+                localStorage.setItem("crd_google_oauth_client_id", clientId);
+            }
+            if (window.google && window.google.accounts && window.google.accounts.oauth2 && clientId) {
+                const tokenClient = window.google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: "https://www.googleapis.com/auth/calendar",
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            localStorage.setItem("crd_doctor_google_token", tokenResponse.access_token);
+                            await completeOneTimeGoogleLogin(document.getElementById("oneTimeGoogleEmailInput")?.value || "dralisethguevara@gmail.com");
+                        }
+                    }
+                });
+                tokenClient.requestAccessToken({ prompt: "consent" });
+            } else {
+                completeOneTimeGoogleLogin(document.getElementById("oneTimeGoogleEmailInput")?.value || "dralisethguevara@gmail.com");
+            }
+        }
+
+        async function fetchGoogleCalendarEventsApi() {
+            const token = localStorage.getItem("crd_doctor_google_token") || "";
+            if (!token) return;
+            try {
+                const timeMin = new Date(Date.now() - 7 * 86400000).toISOString();
+                const res = await fetch(
+                    `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(timeMin)}&singleEvents=true&orderBy=startTime&maxResults=30`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+                if (!res.ok) return;
+                const data = await res.json();
+                const items = Array.isArray(data.items) ? data.items : [];
+                items.forEach((ev) => {
+                    const startIso = ev.start?.dateTime || (ev.start?.date ? `${ev.start.date}T10:00:00` : null);
+                    if (!startIso) return;
+                    const exists = scheduledAppointments.some((a) => a.id === `gcal-${ev.id}` || (a.startIso === startIso && a.procedureTitle === ev.summary));
+                    if (!exists) {
+                        scheduledAppointments.push({
+                            id: `gcal-${ev.id}`,
+                            patientName: ev.summary?.replace(/^🦷\s*/, "").split("—")[1]?.trim() || ev.summary || "Cita Google Calendar",
+                            patientPhone: "",
+                            procedureTitle: ev.summary?.replace(/^🦷\s*/, "").split("—")[0]?.trim() || "Evento de Google Calendar",
+                            startIso: new Date(startIso).toISOString(),
+                            durationMinutes: 30,
+                            chairsidePrep: ev.description || "Sincronizado desde Google Calendar",
+                            patientReminderNote: "",
+                            googleCalendarEventUrl: ev.htmlLink || ""
+                        });
+                    }
+                });
+                saveAppointmentsLocal();
+            } catch (e) {
+                console.warn("Sincronización API Google Calendar:", e);
+            }
+        }
+
+        function openCalendarHubView() {
+            document.title = "Agenda Clínica & Google Calendar Hub | Dra. Liseth Guevara";
+            document.getElementById("viewDashboard")?.classList.add("hidden");
+            document.getElementById("viewPatientWorkspace")?.classList.add("hidden");
+            document.getElementById("viewMarketingHub")?.classList.add("hidden");
+            document.getElementById("viewCalendarHub")?.classList.remove("hidden");
+
+            refreshGoogleCalendarStatusUi();
+            renderCalendarHub();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function setCalendarHubSubView(mode) {
+            const secHub = document.getElementById("calHubInteractiveSection");
+            const secEmbed = document.getElementById("calHubEmbedSection");
+            const btnHub = document.getElementById("calTabBtnHub");
+            const btnEmbed = document.getElementById("calTabBtnEmbed");
+
+            if (mode === "embed") {
+                secHub?.classList.add("hidden");
+                secEmbed?.classList.remove("hidden");
+                if (btnEmbed) btnEmbed.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition";
+                if (btnHub) btnHub.className = "text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                refreshGoogleCalendarStatusUi();
+            } else {
+                secEmbed?.classList.add("hidden");
+                secHub?.classList.remove("hidden");
+                if (btnHub) btnHub.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition";
+                if (btnEmbed) btnEmbed.className = "text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                renderCalendarHub();
+            }
+        }
+
+        function shiftCalendarWeek(delta) {
+            if (delta === 0) {
+                calendarWeekOffset = 0;
+                selectedCalendarDayIso = new Date().toISOString().slice(0, 10);
+            } else {
+                calendarWeekOffset += delta;
+                const d = new Date();
+                d.setDate(d.getDate() + calendarWeekOffset * 7);
+                selectedCalendarDayIso = d.toISOString().slice(0, 10);
+            }
+            calHubShowAllDays = false;
+            renderCalendarHub();
+        }
+
+        function selectCalendarHubDay(isoDate) {
+            selectedCalendarDayIso = isoDate;
+            calHubShowAllDays = false;
+            renderCalendarHub();
+        }
+
+        function setCalHubShowAllDays(showAll) {
+            calHubShowAllDays = Boolean(showAll);
+            renderCalendarHub();
+        }
+
+        function syncPatientRoadmapsToCalendar(silent = false) {
+            let added = 0;
+            patientsList.forEach((p, idx) => {
+                const hasAppt = scheduledAppointments.some((a) =>
+                    (a.patientName || "").toLowerCase().includes(p.full_name.toLowerCase())
+                );
+                if (!hasAppt) {
+                    const nextStage = p.study_data?.roadmap?.[1] || p.study_data?.roadmap?.[0];
+                    const dt = new Date();
+                    dt.setDate(dt.getDate() + ((idx + 1) % 5));
+                    dt.setHours(10 + (idx % 6), 0, 0, 0);
+                    const isComplex = String(p.complexity || "").includes("Alta");
+                    scheduledAppointments.push({
+                        id: `appt-sync-${p.id}-${Date.now() + idx}`,
+                        patientName: p.full_name,
+                        patientPhone: p.phone || "",
+                        procedureTitle: nextStage
+                            ? `${nextStage.months}: ${nextStage.title}`
+                            : "Control Biomecánico Ortodóncico",
+                        startIso: dt.toISOString(),
+                        durationMinutes: isComplex ? 45 : 30,
+                        chairsidePrep: nextStage?.chairsideAction || `Arco ${nextStage?.archwire || ".016 CuNiTi"} + Revisión de oclusión`,
+                        patientReminderNote: `Hola ${p.full_name}, te recordamos tu cita de control en el consultorio de la Dra. Liseth Guevara Muñoz.`
+                    });
+                    added++;
+                }
+            });
+            saveAppointmentsLocal();
+            renderCalendarHub();
+            renderUpcomingAppointments();
+
+            if (!silent) {
+                const toast = document.getElementById("calHubAiFeedbackToast");
+                const toastTxt = document.getElementById("calHubAiFeedbackText");
+                if (toast && toastTxt) {
+                    toastTxt.innerText = added > 0
+                        ? `✓ Se sincronizaron ${added} controles de pacientes activos a tu agenda del Hub.`
+                        : `✓ Todos tus pacientes activos ya tienen su próximo control programado en la agenda.`;
+                    toast.classList.remove("hidden");
+                }
+            }
+        }
+
+        function renderCalendarHub() {
+            const stripEl = document.getElementById("calHubDaysStrip");
+            const timelineEl = document.getElementById("calHubDayTimeline");
+            const allListEl = document.getElementById("calHubAllAppointmentsList");
+            if (!stripEl || !timelineEl || !allListEl) return;
+
+            // Ordenar citas cronológicamente
+            scheduledAppointments.sort((a, b) => new Date(a.startIso || 0).getTime() - new Date(b.startIso || 0).getTime());
+
+            // KPIs
+            const totalAppts = scheduledAppointments.length;
+            const totalMin = scheduledAppointments.reduce((acc, a) => acc + (Number(a.durationMinutes) || 30), 0);
+            const complexCount = scheduledAppointments.filter((a) => (Number(a.durationMinutes) || 30) >= 45 || /tad|microtornillo|cementado|retiro/i.test(a.procedureTitle || "")).length;
+
+            const statTotal = document.getElementById("calStatTotalAppts");
+            const statTime = document.getElementById("calStatChairTime");
+            const statComp = document.getElementById("calStatComplexAppts");
+            if (statTotal) statTotal.innerText = `${totalAppts} ${totalAppts === 1 ? "Cita" : "Citas"}`;
+            if (statTime) statTime.innerText = `${totalMin} min (${(totalMin / 60).toFixed(1)} h)`;
+            if (statComp) statComp.innerText = `${complexCount} ${complexCount === 1 ? "Control" : "Controles"}`;
+
+            // Construir los 7 días de la semana activa
+            const baseDate = new Date();
+            baseDate.setDate(baseDate.getDate() + calendarWeekOffset * 7);
+            const dayOfWeek = baseDate.getDay(); // 0 Dom .. 6 Sab
+            const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            const monday = new Date(baseDate);
+            monday.setDate(baseDate.getDate() + mondayOffset);
+
+            const weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const iso = d.toISOString().slice(0, 10);
+                const count = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === iso).length;
+                weekDays.push({ date: d, iso, count });
+            }
+
+            const rangeLbl = document.getElementById("calHubWeekRangeLabel");
+            if (rangeLbl) {
+                const firstFmt = weekDays[0].date.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+                const lastFmt = weekDays[6].date.toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" });
+                rangeLbl.innerText = `Semana del ${firstFmt} al ${lastFmt}`;
+            }
+
+            const dayNamesShort = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+            stripEl.innerHTML = weekDays.map((wd, idx) => {
+                const isSelected = !calHubShowAllDays && wd.iso === selectedCalendarDayIso;
+                const isToday = wd.iso === new Date().toISOString().slice(0, 10);
+                return `
+                    <button
+                        type="button"
+                        onclick="selectCalendarHubDay('${wd.iso}')"
+                        class="p-2.5 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-0.5 ${
+                            isSelected
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                : isToday
+                                ? "bg-indigo-50/70 text-indigo-950 border-indigo-300"
+                                : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
+                        }"
+                    >
+                        <span class="text-[10px] font-bold uppercase ${isSelected ? "text-indigo-200" : "text-slate-400"}">${dayNamesShort[idx]}</span>
+                        <span class="text-sm font-extrabold">${wd.date.getDate()}</span>
+                        <span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded-full ${
+                            wd.count > 0
+                                ? (isSelected ? "bg-white text-indigo-700" : "bg-emerald-100 text-emerald-800")
+                                : (isSelected ? "text-indigo-200" : "text-slate-400")
+                        }">
+                            ${wd.count} ${wd.count === 1 ? "cita" : "citas"}
+                        </span>
+                    </button>
+                `;
+            }).join("");
+
+            const selectedTitleEl = document.getElementById("calHubSelectedDayTitle");
+            if (selectedTitleEl) {
+                const selDateObj = new Date(`${selectedCalendarDayIso}T12:00:00`);
+                selectedTitleEl.innerText = calHubShowAllDays
+                    ? "Mostrando todos los días agendados"
+                    : selDateObj.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+            }
+
+            // Horarios de sillón del día seleccionado (09:00 a 19:00)
+            const hours = [9, 10, 11, 12, 13, 16, 17, 18, 19];
+            const dayAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === selectedCalendarDayIso);
+
+            timelineEl.innerHTML = hours.map((hr) => {
+                const hrLabel = `${String(hr).padStart(2, "0")}:00`;
+                const slotAppts = dayAppts.filter((a) => {
+                    const dt = new Date(a.startIso);
+                    return dt.getHours() === hr;
+                });
+
+                if (slotAppts.length > 0) {
+                    return slotAppts.map((appt) => {
+                        const dur = Number(appt.durationMinutes) || 30;
+                        const badgeColor = dur >= 45
+                            ? "bg-rose-50 text-rose-700 border-rose-200"
+                            : dur === 30
+                            ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                            : "bg-emerald-50 text-emerald-700 border-emerald-200";
+                        return `
+                            <div class="flex items-stretch gap-3 p-3 rounded-2xl bg-indigo-50/50 border border-indigo-200 shadow-2xs">
+                                <div class="w-16 shrink-0 flex flex-col justify-center items-center border-r border-indigo-200/80 pr-2">
+                                    <span class="text-xs font-extrabold text-indigo-950 mono">${hrLabel}</span>
+                                    <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded border mt-1 ${badgeColor}">${dur} min</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-start gap-2">
+                                        <p class="text-xs font-extrabold text-slate-900 truncate">${appt.patientName}</p>
+                                        <div class="flex items-center gap-1 shrink-0">
+                                            <button type="button" onclick="openHubAppointmentModal('${appt.id}')" class="text-[10px] font-bold text-indigo-700 hover:underline px-1.5 py-0.5 rounded bg-white border border-indigo-200">Editar</button>
+                                            <button type="button" onclick="deleteHubAppointment('${appt.id}')" class="text-[10px] font-bold text-rose-600 hover:underline px-1.5 py-0.5 rounded bg-white border border-rose-200">✕</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] font-semibold text-indigo-700 mt-0.5">${appt.procedureTitle}</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5 truncate"><strong>Charola:</strong> ${appt.chairsidePrep || "Control ortodóntico"}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+                }
+
+                return `
+                    <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-slate-50/70 hover:bg-slate-100/80 border border-dashed border-slate-200 transition group">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-slate-400 mono w-14">${hrLabel}</span>
+                            <span class="text-[11px] text-slate-400 italic">Horario disponible en sillón</span>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="openHubAppointmentModal(null, '${selectedCalendarDayIso}', '${hrLabel}')"
+                            class="text-[10px] font-bold text-indigo-600 bg-white hover:bg-indigo-600 hover:text-white px-2.5 py-1 rounded-lg border border-indigo-200 transition opacity-80 group-hover:opacity-100"
+                        >
+                            + Agendar aquí
+                        </button>
+                    </div>
+                `;
+            }).join("");
+
+            // Lista derecha de todas las citas (o filtradas)
+            const listToShow = calHubShowAllDays ? scheduledAppointments : (dayAppts.length > 0 ? dayAppts : scheduledAppointments);
+            if (listToShow.length === 0) {
+                allListEl.innerHTML = `
+                    <div class="p-6 text-center rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-500 space-y-2">
+                        <p class="font-bold text-slate-700">No hay citas registradas en este filtro</p>
+                        <button type="button" onclick="openHubAppointmentModal(null)" class="bg-indigo-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs">+ Agendar primera cita</button>
+                    </div>
+                `;
+                return;
+            }
+
+            allListEl.innerHTML = listToShow.map((appt) => {
+                const gcalUrl = appt.googleCalendarEventUrl || buildGoogleCalendarTemplateUrl(appt);
+                const waUrl = buildWhatsAppReminderUrl(appt);
+                const matchedPat = patientsList.find((p) =>
+                    p.full_name.toLowerCase().includes((appt.patientName || "").toLowerCase()) ||
+                    (appt.patientName || "").toLowerCase().includes(p.full_name.toLowerCase())
+                );
+                const dtFmt = appt.startIso
+                    ? new Date(appt.startIso).toLocaleString("es-MX", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+                    : "Por confirmar";
+
+                return `
+                    <div class="p-3.5 rounded-2xl bg-slate-50/90 hover:bg-white border border-slate-200/90 shadow-2xs transition space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                    🗓️ ${dtFmt} • ${appt.durationMinutes || 30} min
+                                </span>
+                                <h3 class="text-xs font-extrabold text-slate-900 mt-1">${appt.patientName}</h3>
+                                <p class="text-[11px] font-semibold text-slate-700">${appt.procedureTitle}</p>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onclick="openHubAppointmentModal('${appt.id}')"
+                                    title="Editar o reprogramar cita"
+                                    class="p-1.5 rounded-lg bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 text-xs"
+                                >
+                                    <i class="ph-bold ph-pencil-simple"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="deleteHubAppointment('${appt.id}')"
+                                    title="Cancelar cita"
+                                    class="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 text-xs"
+                                >
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-2 rounded-xl bg-white border border-slate-200/80 text-[10.5px] text-slate-600">
+                            <strong class="text-slate-800">🧰 Charola de Sillón:</strong> ${appt.chairsidePrep || "Instrumental de control ortodóntico"}
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            ${matchedPat ? `
+                                <button
+                                    type="button"
+                                    onclick="openPatientWorkspace('${matchedPat.id}')"
+                                    class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                                >
+                                    <i class="ph-bold ph-folder-open"></i>
+                                    <span>Abrir Expediente</span>
+                                </button>
+                            ` : ""}
+                            <a
+                                href="${gcalUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-google-logo"></i>
+                                <span>Sincronizar Google</span>
+                            </a>
+                            <a
+                                href="${waUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-whatsapp-logo"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function openHubAppointmentModal(apptId = null, prefillDateIso = null, prefillHour = null) {
+            const modal = document.getElementById("hubAppointmentEditorModal");
+            if (!modal) return;
+
+            const selEl = document.getElementById("hubApptPatientSelect");
+            if (selEl) {
+                selEl.innerHTML = `<option value="">-- Seleccionar paciente --</option>` +
+                    patientsList.map((p) => `<option value="${p.id}">${p.full_name} (${p.age}a)</option>`).join("");
+            }
+
+            const editIdEl = document.getElementById("hubApptEditId");
+            const titleEl = document.getElementById("hubApptModalTitle");
+            const nameEl = document.getElementById("hubApptPatientNameInput");
+            const procEl = document.getElementById("hubApptProcedureInput");
+            const dateEl = document.getElementById("hubApptDateInput");
+            const timeEl = document.getElementById("hubApptTimeInput");
+            const durEl = document.getElementById("hubApptDurationInput");
+            const prepEl = document.getElementById("hubApptPrepInput");
+
+            const existing = apptId ? scheduledAppointments.find((a) => a.id === apptId) : null;
+            if (existing) {
+                if (editIdEl) editIdEl.value = existing.id;
+                if (titleEl) titleEl.innerText = "Editar / Reprogramar Cita en Sillón";
+                if (nameEl) nameEl.value = existing.patientName || "";
+                if (procEl) procEl.value = existing.procedureTitle || "";
+                const dt = existing.startIso ? new Date(existing.startIso) : new Date();
+                if (dateEl) dateEl.value = dt.toISOString().slice(0, 10);
+                if (timeEl) timeEl.value = `${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`;
+                if (durEl) durEl.value = String(existing.durationMinutes || 30);
+                if (prepEl) prepEl.value = existing.chairsidePrep || "";
+            } else {
+                if (editIdEl) editIdEl.value = "";
+                if (titleEl) titleEl.innerText = "Nueva Cita en Sillón";
+                const defaultPat = patientsList[0];
+                if (selEl && defaultPat) selEl.value = defaultPat.id;
+                if (nameEl) nameEl.value = defaultPat ? defaultPat.full_name : "";
+                const nextStage = defaultPat?.study_data?.roadmap?.[1] || defaultPat?.study_data?.roadmap?.[0];
+                if (procEl) procEl.value = nextStage ? `${nextStage.months}: ${nextStage.title}` : "Control Biomecánico Ortodóncico";
+                if (dateEl) dateEl.value = prefillDateIso || selectedCalendarDayIso || new Date().toISOString().slice(0, 10);
+                if (timeEl) timeEl.value = prefillHour || "11:00";
+                if (durEl) durEl.value = "30";
+                if (prepEl) prepEl.value = nextStage?.chairsideAction || "Espejo intraoral, pinza Mathieu y secuencia de arcos CuNiTi";
+            }
+
+            modal.classList.remove("hidden");
+        }
+
+        function handleHubApptPatientSelectChange() {
+            const patId = document.getElementById("hubApptPatientSelect")?.value;
+            const pat = patientsList.find((p) => p.id === patId);
+            if (!pat) return;
+            const nameEl = document.getElementById("hubApptPatientNameInput");
+            const procEl = document.getElementById("hubApptProcedureInput");
+            const prepEl = document.getElementById("hubApptPrepInput");
+            const durEl = document.getElementById("hubApptDurationInput");
+
+            if (nameEl) nameEl.value = pat.full_name;
+            const nextStage = pat.study_data?.roadmap?.[1] || pat.study_data?.roadmap?.[0];
+            if (procEl && nextStage) procEl.value = `${nextStage.months}: ${nextStage.title}`;
+            if (prepEl && nextStage) prepEl.value = nextStage.chairsideAction || "";
+            if (durEl) durEl.value = String(pat.complexity || "").includes("Alta") ? "45" : "30";
+        }
+
+        function closeHubAppointmentModal() {
+            document.getElementById("hubAppointmentEditorModal")?.classList.add("hidden");
+        }
+
+        async function saveHubAppointmentForm(event) {
+            event.preventDefault();
+            const editId = document.getElementById("hubApptEditId")?.value?.trim();
+            const patientName = document.getElementById("hubApptPatientNameInput")?.value?.trim() || "Paciente";
+            const procedureTitle = document.getElementById("hubApptProcedureInput")?.value?.trim() || "Control Ortodóntico";
+            const dateVal = document.getElementById("hubApptDateInput")?.value || new Date().toISOString().slice(0, 10);
+            const timeVal = document.getElementById("hubApptTimeInput")?.value || "11:00";
+            const durationMinutes = Number(document.getElementById("hubApptDurationInput")?.value) || 30;
+            const chairsidePrep = document.getElementById("hubApptPrepInput")?.value?.trim() || "Instrumental de control ortodóntico";
+
+            const startIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+            const matchedPat = patientsList.find((p) => p.full_name.toLowerCase().includes(patientName.toLowerCase()));
+
+            if (editId) {
+                const idx = scheduledAppointments.findIndex((a) => a.id === editId);
+                if (idx >= 0) {
+                    scheduledAppointments[idx] = {
+                        ...scheduledAppointments[idx],
+                        patientName,
+                        patientPhone: matchedPat?.phone || scheduledAppointments[idx].patientPhone || "",
+                        procedureTitle,
+                        startIso,
+                        durationMinutes,
+                        chairsidePrep
+                    };
+                    scheduledAppointments[idx].googleCalendarEventUrl = buildGoogleCalendarTemplateUrl(scheduledAppointments[idx]);
+                }
+            } else {
+                const newAppt = {
+                    id: `appt-${Date.now()}`,
+                    patientName,
+                    patientPhone: matchedPat?.phone || "",
+                    procedureTitle,
+                    startIso,
+                    durationMinutes,
+                    chairsidePrep,
+                    patientReminderNote: `Hola ${patientName}, te confirmamos tu cita (${procedureTitle}) con la Dra. Liseth Guevara Muñoz.`
+                };
+                const directLink = await tryInsertGoogleCalendarApi(newAppt);
+                newAppt.googleCalendarEventUrl = directLink || buildGoogleCalendarTemplateUrl(newAppt);
+                scheduledAppointments.unshift(newAppt);
+            }
+
+            selectedCalendarDayIso = dateVal;
+            saveAppointmentsLocal();
+            closeHubAppointmentModal();
+            renderCalendarHub();
+            renderUpcomingAppointments();
+        }
+
+        function deleteHubAppointment(apptId) {
+            scheduledAppointments = scheduledAppointments.filter((a) => a.id !== apptId);
+            saveAppointmentsLocal();
+            renderCalendarHub();
+            renderUpcomingAppointments();
+        }
+
+        async function handleCalendarHubAiCommand(event) {
+            event.preventDefault();
+            const input = document.getElementById("calHubAiCommandInput");
+            const cmd = input?.value?.trim();
+            if (!cmd) return;
+            input.value = "";
+
+            const btnTxt = document.getElementById("btnCalHubAiSubmitText");
+            if (btnTxt) btnTxt.innerText = "⏳ Procesando con Argon IA...";
+
+            await sendOrthoAssistantPrompt(cmd, true);
+
+            if (btnTxt) btnTxt.innerText = "Ejecutar con IA en Agenda";
+            renderCalendarHub();
+        }
+
         function buildGoogleCalendarTemplateUrl(appt) {
             const startDt = appt.startIso ? new Date(appt.startIso) : new Date(Date.now() + 86400000);
             const durMs = (Number(appt.durationMinutes) || 30) * 60 * 1000;
             const endDt = new Date(startDt.getTime() + durMs);
             const fmt = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-            const doctorEmail = localStorage.getItem("crd_doctor_google_email") || "dralisethguevara@gmail.com";
+            const doctorEmail = getConnectedDoctorEmail();
 
             const title = `🦷 ${appt.procedureTitle} — ${appt.patientName}`;
             const details = [
@@ -4791,35 +5865,13 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
                 const sub = document.getElementById("assistantContextSubtitle");
                 if (sub && patient) {
-                    sub.innerText = `Paciente activo: ${patient.full_name} • Google Calendar`;
+                    sub.innerText = `Paciente activo: ${patient.full_name} • ${getConnectedDoctorEmail()}`;
                 }
-                const savedEmail = localStorage.getItem("crd_doctor_google_email") || "dralisethguevara@gmail.com";
-                const savedToken = localStorage.getItem("crd_doctor_google_token") || "";
-                const emailInput = document.getElementById("doctorGoogleEmailInput");
-                const tokenInput = document.getElementById("doctorGoogleTokenInput");
-                if (emailInput) emailInput.value = savedEmail;
-                if (tokenInput) tokenInput.value = savedToken;
-
+                refreshGoogleCalendarStatusUi();
                 renderUpcomingAppointments();
                 renderOrthoAssistantMessages();
                 setTimeout(() => document.getElementById("orthoAssistantInput")?.focus(), 100);
             }
-        }
-
-        function toggleGoogleCalendarConfig() {
-            const panel = document.getElementById("googleCalendarConfigPanel");
-            if (panel) panel.classList.toggle("hidden");
-        }
-
-        function saveGoogleCalendarSettings() {
-            const email = document.getElementById("doctorGoogleEmailInput")?.value?.trim() || "dralisethguevara@gmail.com";
-            const token = document.getElementById("doctorGoogleTokenInput")?.value?.trim() || "";
-            localStorage.setItem("crd_doctor_google_email", email);
-            localStorage.setItem("crd_doctor_google_token", token);
-            const statusTxt = document.getElementById("googleCalStatusText");
-            if (statusTxt) statusTxt.innerText = token ? "OAuth Conectado" : "Calendar Activo";
-            document.getElementById("googleCalendarConfigPanel")?.classList.add("hidden");
-            renderUpcomingAppointments();
         }
 
         function renderUpcomingAppointments() {
@@ -4898,7 +5950,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                 <div class="bg-white border border-indigo-200 rounded-xl p-2.5 text-slate-900 space-y-1.5 shadow-xs">
                                     <div class="flex justify-between items-center">
                                         <span class="text-[9.5px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            ✓ Cita Preparada • ${appt.durationMinutes || 30} min en sillón
+                                            ✓ Sincronizado en Agenda Hub • ${appt.durationMinutes || 30} min en sillón
                                         </span>
                                     </div>
                                     <p class="font-bold text-xs text-indigo-950">${appt.procedureTitle}</p>
@@ -4972,10 +6024,10 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             sendOrthoAssistantPrompt(text);
         }
 
-        async function sendOrthoAssistantPrompt(promptText) {
+        async function sendOrthoAssistantPrompt(promptText, fromCalendarHub = false) {
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             orthoAssistantHistory.push({ role: "user", text: promptText, appointment: null });
-            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Consultando expediente y sincronizando con Google Calendar...", appointment: null });
+            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Consultando expediente y sincronizando con Google Calendar Hub...", appointment: null });
             renderOrthoAssistantMessages();
 
             const sendBtn = document.getElementById("btnOrthoAssistantSend");
@@ -4994,8 +6046,9 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                     nextStage: p.study_data?.roadmap?.[1] || p.study_data?.roadmap?.[0] || null
                 }));
 
-                const systemInstruction = `Eres el Asistente Clínico Inteligente de Ortodoncia y Coordinador de Google Calendar de la Dra. Liseth Guevara Muñoz.
+                const systemInstruction = `Eres el Asistente Clínico Inteligente de Ortodoncia y Coordinador del Google Calendar Hub de la Dra. Liseth Guevara Muñoz (${getConnectedDoctorEmail()}).
 Fecha actual: ${new Date().toISOString()}.
+Citas actuales en el calendario del Hub: ${JSON.stringify(scheduledAppointments)}.
 Pacientes en clínica: ${JSON.stringify(patientsSummary)}.
 Paciente activo en pantalla: ${JSON.stringify({
                     name: patient?.full_name,
@@ -5010,8 +6063,9 @@ Paciente activo en pantalla: ${JSON.stringify({
 
 Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 {
-  "intent": "schedule_appointment" | "daily_briefing" | "clinical_query" | "whatsapp_reminder",
-  "reply": "Respuesta profesional, estructurada y concisa para la Dra. Liseth Guevara Muñoz",
+  "intent": "schedule_appointment" | "reschedule_appointment" | "cancel_appointment" | "daily_briefing" | "clinical_query" | "whatsapp_reminder",
+  "reply": "Respuesta profesional, estructurada y concisa para la Dra. Liseth Guevara Muñoz confirmando el cambio en su agenda o respondiendo su duda",
+  "targetPatientName": "Nombre del paciente cuya cita se mueve o cancela (si aplica)",
   "appointment": null o {
     "patientName": "Nombre completo del paciente",
     "procedureTitle": "Título clínico de la cita (ej. Mes 7: Intrusión con TADs / Control .016x.022 CuNiTi)",
@@ -5021,11 +6075,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
     "patientReminderNote": "Mensaje breve de recordatorio por WhatsApp para el paciente"
   }
 }
-Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointment' con fecha ISO válida, duración clínica adecuada (45 min para TADs/Cementado/Retiro, 30 min para IPR/ATP, 20 min para control de arcos) y el material de sillón.`;
+Reglas:
+- Si la doctora pide agendar una cita nueva ('schedule_appointment') o mover/reprogramar una cita ('reschedule_appointment'), SIEMPRE incluye el objeto 'appointment' con la nueva fecha ISO válida, duración clínica adecuada (45 min para TADs/Cementado/Retiro, 30 min para IPR/ATP, 20 min para control de arcos) y el material de sillón.
+- Si pide cancelar/eliminar una cita ('cancel_appointment'), coloca 'targetPatientName' con el nombre del paciente a cancelar.`;
 
                 let parsed = null;
 
-                // Llamada directa a la API de Gemini con la llave configurada en la plataforma
                 const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
                 for (const modelName of modelsToTry) {
                     const resp = await fetch(
@@ -5056,13 +6111,20 @@ Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointm
                 if (!parsed) {
                     const nextThu = new Date(Date.now() + 3 * 86400000);
                     nextThu.setHours(11, 0, 0, 0);
-                    const isSchedule = /agendar|cita|control|jueves|lunes|martes|miercoles|viernes|etapa|mes/i.test(promptText);
+                    const isCancel = /cancelar|cancela|eliminar|elimina|borrar/i.test(promptText);
+                    const isMove = /mover|mueve|cambiar|cambia|reprogramar|reprograma|pasar/i.test(promptText);
+                    const isSchedule = /agendar|agenda|cita|control|jueves|lunes|martes|miercoles|viernes|sabado|etapa|mes/i.test(promptText);
                     parsed = {
-                        intent: isSchedule ? "schedule_appointment" : "daily_briefing",
-                        reply: isSchedule
-                            ? `¡Listo, Dra. Liseth! He preparado la cita de control para ${patient?.full_name || "el paciente"} calculando el tiempo de sillón necesario y los materiales que tu asistente debe colocar en la charola. Haz clic abajo para guardarla en tu Google Calendar o enviarle el aviso por WhatsApp.`
+                        intent: isCancel ? "cancel_appointment" : isMove ? "reschedule_appointment" : isSchedule ? "schedule_appointment" : "daily_briefing",
+                        targetPatientName: patient?.full_name || "Martha",
+                        reply: isCancel
+                            ? `✓ He cancelado y liberado el espacio en sillón de la cita solicitada en tu Agenda del Hub.`
+                            : isMove
+                            ? `✓ He reprogramado la cita en tu Agenda del Hub para el nuevo horario solicitado.`
+                            : isSchedule
+                            ? `¡Listo, Dra. Liseth! He agendado la cita de control para ${patient?.full_name || "el paciente"} en tu Calendar Hub calculando el tiempo de sillón necesario y los materiales de charola.`
                             : `📋 Briefing Clínico del Consultorio:\n• ${patient?.full_name} (${patient?.age} años): ${patient?.study_data?.summary?.skeletal || "En valoración"} — ${patient?.study_data?.summary?.vertical || ""}.\n• Anclaje: ${patient?.study_data?.anchorage || "Por definir"}.\n• Alerta Radicular: ${patient?.study_data?.summary?.rootAlert || "Monitoreo estándar"}.`,
-                        appointment: isSchedule ? {
+                        appointment: (isSchedule || isMove) ? {
                             patientName: patient?.full_name || "Martha Gabriela Zúñiga Núñez",
                             procedureTitle: patient?.study_data?.roadmap?.[1]?.title || "Control Biomecánico Ortodóntico",
                             startIso: nextThu.toISOString(),
@@ -5074,7 +6136,41 @@ Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointm
                 }
 
                 let finalAppt = null;
-                if (parsed.appointment) {
+                if (parsed.intent === "cancel_appointment") {
+                    const target = (parsed.targetPatientName || parsed.appointment?.patientName || "").toLowerCase();
+                    if (target) {
+                        scheduledAppointments = scheduledAppointments.filter((a) => !(a.patientName || "").toLowerCase().includes(target));
+                    } else if (scheduledAppointments.length > 0) {
+                        scheduledAppointments.shift();
+                    }
+                    saveAppointmentsLocal();
+                    renderUpcomingAppointments();
+                    renderCalendarHub();
+                } else if (parsed.intent === "reschedule_appointment" && parsed.appointment) {
+                    const target = (parsed.targetPatientName || parsed.appointment.patientName || "").toLowerCase();
+                    const existingIdx = scheduledAppointments.findIndex((a) => (a.patientName || "").toLowerCase().includes(target));
+                    const updatedAppt = {
+                        id: existingIdx >= 0 ? scheduledAppointments[existingIdx].id : `appt-${Date.now()}`,
+                        patientName: parsed.appointment.patientName || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientName : patient?.full_name || "Paciente"),
+                        patientPhone: patient?.phone || (existingIdx >= 0 ? scheduledAppointments[existingIdx].patientPhone : ""),
+                        procedureTitle: parsed.appointment.procedureTitle || (existingIdx >= 0 ? scheduledAppointments[existingIdx].procedureTitle : "Control Ortodóntico"),
+                        startIso: parsed.appointment.startIso || new Date(Date.now() + 86400000).toISOString(),
+                        durationMinutes: Number(parsed.appointment.durationMinutes) || 30,
+                        chairsidePrep: parsed.appointment.chairsidePrep || "Instrumental de control ortodóntico",
+                        patientReminderNote: parsed.appointment.patientReminderNote || ""
+                    };
+                    updatedAppt.googleCalendarEventUrl = buildGoogleCalendarTemplateUrl(updatedAppt);
+                    if (existingIdx >= 0) {
+                        scheduledAppointments[existingIdx] = updatedAppt;
+                    } else {
+                        scheduledAppointments.unshift(updatedAppt);
+                    }
+                    finalAppt = updatedAppt;
+                    selectedCalendarDayIso = updatedAppt.startIso.slice(0, 10);
+                    saveAppointmentsLocal();
+                    renderUpcomingAppointments();
+                    renderCalendarHub();
+                } else if (parsed.appointment) {
                     finalAppt = {
                         id: `appt-${Date.now()}`,
                         patientName: parsed.appointment.patientName || patient?.full_name || "Paciente",
@@ -5089,9 +6185,11 @@ Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointm
                     const directApiLink = await tryInsertGoogleCalendarApi(finalAppt);
                     finalAppt.googleCalendarEventUrl = directApiLink || buildGoogleCalendarTemplateUrl(finalAppt);
 
+                    selectedCalendarDayIso = finalAppt.startIso.slice(0, 10);
                     scheduledAppointments.unshift(finalAppt);
                     saveAppointmentsLocal();
                     renderUpcomingAppointments();
+                    renderCalendarHub();
                 }
 
                 orthoAssistantHistory[orthoAssistantHistory.length - 1] = {
@@ -5100,11 +6198,20 @@ Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointm
                     appointment: finalAppt
                 };
                 renderOrthoAssistantMessages();
+
+                if (fromCalendarHub) {
+                    const toast = document.getElementById("calHubAiFeedbackToast");
+                    const toastTxt = document.getElementById("calHubAiFeedbackText");
+                    if (toast && toastTxt) {
+                        toastTxt.innerText = parsed.reply;
+                        toast.classList.remove("hidden");
+                    }
+                }
             } catch (err) {
                 console.warn("Error en Asistente IA:", err);
                 orthoAssistantHistory[orthoAssistantHistory.length - 1] = {
                     role: "assistant",
-                    text: "He registrado tu solicitud. Puedes usar los botones rápidos arriba para agendar en Google Calendar.",
+                    text: "He registrado tu solicitud en la agenda del Hub.",
                     appointment: null
                 };
                 renderOrthoAssistantMessages();
@@ -5138,6 +6245,7 @@ Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointm
             document.title = "Marketing Hub & Campaign Manager | Dra. Liseth Guevara";
             document.getElementById("viewDashboard")?.classList.add("hidden");
             document.getElementById("viewPatientWorkspace")?.classList.add("hidden");
+            document.getElementById("viewCalendarHub")?.classList.add("hidden");
             document.getElementById("viewMarketingHub")?.classList.remove("hidden");
 
             const copyEl = document.getElementById("mktGeneratedCopyText");
