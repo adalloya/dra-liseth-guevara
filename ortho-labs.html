@@ -953,7 +953,7 @@ create table if not exists public.patients (
 
         const DEMO_PATIENTS = [
             {
-                id: "martha-zuniga-0912",
+                id: "556e7487-fe66-4b3c-98c9-7349d8df835a",
                 record_code: "#IDI-2026-0912",
                 full_name: "Martha Gabriela Zúñiga Núñez",
                 age: 40,
@@ -986,7 +986,7 @@ create table if not exists public.patients (
                 study_data: MARTHA_STUDY_DATA
             },
             {
-                id: "fatima-escamilla-1016",
+                id: "75f73740-016f-4c0b-a100-a379542e28e0",
                 record_code: "#CRD-2026-1016",
                 full_name: "Fátima Escamilla",
                 age: 26,
@@ -1027,7 +1027,7 @@ create table if not exists public.patients (
 
         // Estado Global Modular
         let patientsList = [];
-        let activePatientId = "martha-zuniga-0912";
+        let activePatientId = "556e7487-fe66-4b3c-98c9-7349d8df835a";
         let selectedFDI = 42;
         let currentPhaseFilter = "all";
         let supabaseClient = null;
@@ -1059,7 +1059,7 @@ create table if not exists public.patients (
             }
 
             // Cargar pacientes locales o inicializar demo
-            const savedLocal = localStorage.getItem("crd_ortho_patients_v10");
+            const savedLocal = localStorage.getItem("crd_ortho_patients_v11");
             if (savedLocal) {
                 try {
                     patientsList = JSON.parse(savedLocal);
@@ -1081,7 +1081,7 @@ create table if not exists public.patients (
 
         function savePatientsLocal() {
             try {
-                localStorage.setItem("crd_ortho_patients_v10", JSON.stringify(patientsList));
+                localStorage.setItem("crd_ortho_patients_v11", JSON.stringify(patientsList));
             } catch (e) {}
         }
 
@@ -1101,76 +1101,45 @@ create table if not exists public.patients (
                     const { data, error } = await supabaseClient
                         .from("patients")
                         .select("*")
-                        .order("created_at", { ascending: false });
+                        .order("created_at", { ascending: true });
 
                     if (error) {
                         if (noticeEl) {
-                            noticeEl.innerHTML = `<span class="text-amber-700 font-semibold">⚠ Falta ejecutar el SQL inicial:</span> Haz clic en <strong>1. Copiar SQL</strong> y pégalo en <strong>2. Abrir SQL Editor</strong> para activar las tablas <code class="bg-white px-1 rounded">patients</code> y <code class="bg-white px-1 rounded">ortho_studies</code>.`;
+                            noticeEl.innerHTML = `<span class="text-amber-700 font-semibold">⚠ Falta ejecutar el SQL inicial:</span> Haz clic en <strong>1. Copiar SQL</strong> y pégalo en <strong>2. Abrir SQL Editor</strong>.`;
                         }
                         return;
                     }
 
                     if (noticeEl) {
-                        noticeEl.innerHTML = `<span class="text-emerald-700 font-semibold">✓ Tablas SQL activas y sincronizadas en kripphmingdxnkwkpglo.supabase.co</span>`;
+                        noticeEl.innerHTML = `<span class="text-emerald-700 font-semibold">✓ Tablas SQL activas y sincronizadas en kripphmingdxnkwkpglo.supabase.co (${data ? data.length : 0} pacientes en la nube)</span>`;
                     }
 
-                    // Si la tabla recién creada está vacía, sembrar los expedientes iniciales automáticamente
-                    if (data && data.length === 0) {
-                        for (const demoPat of DEMO_PATIENTS) {
-                            const { data: insertedPat } = await supabaseClient
-                                .from("patients")
-                                .insert([
-                                    {
-                                        full_name: demoPat.full_name,
-                                        age: demoPat.age,
-                                        phone: demoPat.phone,
-                                        referring_doctor: demoPat.referring_doctor,
-                                        medical_history: {
-                                            ...demoPat.medical_history,
-                                            complexity: demoPat.complexity,
-                                            photos: demoPat.photos,
-                                            notes: demoPat.notes
-                                        }
-                                    }
-                                ])
-                                .select()
-                                .single();
-
-                            if (insertedPat && insertedPat.id) {
-                                await supabaseClient.from("ortho_studies").insert([
-                                    {
-                                        patient_id: insertedPat.id,
-                                        center_name: "IDI Mérida",
-                                        rx_panoramic_url: demoPat.photos?.["Rx Panorámica (IDI)"] || null,
-                                        rx_lateral_url: demoPat.photos?.["Rx Lateral de Cráneo"] || null,
-                                        photos_urls: demoPat.photos || {},
-                                        clinical_data: demoPat.study_data
-                                    }
-                                ]);
-                            }
-                        }
-                    } else if (data && data.length > 0) {
-                        const cloudMapped = data.map((p) => ({
-                            id: p.id,
-                            record_code: `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`,
-                            full_name: p.full_name,
-                            age: p.age,
-                            phone: p.phone || "Sin teléfono",
-                            referring_doctor: p.referring_doctor || "Dra. Liseth Guevara Muñoz",
-                            created_at: new Date(p.created_at).toISOString().split("T")[0],
-                            case_summary: p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial",
-                            complexity: p.medical_history?.complexity || "Moderada",
-                            has_stl: true,
-                            medical_history: p.medical_history || {},
-                            patient_signature: p.patient_signature || "",
-                            doctor_signature: p.doctor_signature || "",
-                            photos: p.medical_history?.photos || {},
-                            notes: p.medical_history?.notes || [],
-                            study_data: MARTHA_STUDY_DATA
-                        }));
-                        const existingNames = new Set(DEMO_PATIENTS.map(d => d.full_name.toLowerCase()));
-                        const uniqueCloud = cloudMapped.filter(c => !existingNames.has(c.full_name.toLowerCase()));
-                        patientsList = [...DEMO_PATIENTS, ...uniqueCloud];
+                    if (data && data.length > 0) {
+                        const cloudMapped = data.map((p) => {
+                            const demoMatch = DEMO_PATIENTS.find(
+                                (d) => d.id === p.id || d.full_name.toLowerCase() === p.full_name.toLowerCase()
+                            );
+                            return {
+                                id: p.id,
+                                record_code: demoMatch ? demoMatch.record_code : `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`,
+                                full_name: p.full_name,
+                                age: p.age,
+                                phone: p.phone || "Sin teléfono",
+                                referring_doctor: p.referring_doctor || "Dra. Liseth Guevara Muñoz",
+                                created_at: new Date(p.created_at).toISOString().split("T")[0],
+                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial"),
+                                complexity: p.medical_history?.complexity || (demoMatch ? demoMatch.complexity : "Moderada"),
+                                has_stl: true,
+                                medical_history: p.medical_history || (demoMatch ? demoMatch.medical_history : {}),
+                                patient_signature: p.patient_signature || "",
+                                doctor_signature: p.doctor_signature || "",
+                                photos: p.medical_history?.photos || (demoMatch ? demoMatch.photos : {}),
+                                notes: p.medical_history?.notes || (demoMatch ? demoMatch.notes : []),
+                                study_data: demoMatch ? demoMatch.study_data : MARTHA_STUDY_DATA
+                            };
+                        });
+                        patientsList = cloudMapped;
+                        savePatientsLocal();
                         renderPatientsList();
                     }
                 } catch (err) {
