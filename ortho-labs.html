@@ -795,21 +795,37 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <!-- Selector de Modo: Vista Hub Interactiva vs Google Calendar Embebido -->
-                    <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1">
+                    <!-- Selector de Sub-Vistas del Calendar Hub (4 Modos Clínicos) -->
+                    <div class="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1 overflow-x-auto">
                         <button
                             type="button"
-                            id="calTabBtnHub"
-                            onclick="setCalendarHubSubView('hub')"
-                            class="text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition"
+                            id="calTabBtnAgenda"
+                            onclick="setCalendarHubSubView('agenda')"
+                            class="text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition whitespace-nowrap"
                         >
-                            🦷 Agenda Interactiva Hub
+                            🦷 Agenda de Sillón
+                        </button>
+                        <button
+                            type="button"
+                            id="calTabBtnProcedures"
+                            onclick="setCalendarHubSubView('procedures')"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition whitespace-nowrap"
+                        >
+                            ⏱️ Tiempos de Consulta (9)
+                        </button>
+                        <button
+                            type="button"
+                            id="calTabBtnSchedule"
+                            onclick="setCalendarHubSubView('schedule')"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition whitespace-nowrap"
+                        >
+                            🕒 Horarios & Días
                         </button>
                         <button
                             type="button"
                             id="calTabBtnEmbed"
                             onclick="setCalendarHubSubView('embed')"
-                            class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition whitespace-nowrap"
                         >
                             🌐 Google Calendar en Vivo
                         </button>
@@ -941,6 +957,26 @@
                         </div>
                     </div>
 
+                    <!-- Filtro Rápido por Sillón y Capacidad -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold text-slate-600">Sillón Activo:</span>
+                            <select
+                                id="calChairFilterSelect"
+                                onchange="onCalendarChairFilterChange(this.value)"
+                                class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                            >
+                                <option value="all">═ Todos los Sillones</option>
+                                <option value="Sillón 1 (Ortodoncia Principal)">🦷 Sillón 1 (Ortodoncia Principal)</option>
+                                <option value="Sillón 2 (Escáner 3D / Urgencias)">🔬 Sillón 2 (Escáner 3D / Urgencias)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-[10.5px]">
+                            <span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-md">Sillón 1: Tratamientos & TADs</span>
+                            <span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Sillón 2: Escáner 3D & Urgencias</span>
+                        </div>
+                    </div>
+
                     <!-- Tira de 7 días de la semana -->
                     <div id="calHubDaysStrip" class="grid grid-cols-7 gap-1.5"></div>
 
@@ -989,7 +1025,72 @@
                 </div>
             </div>
 
-            <!-- SUB-VISTA B: GOOGLE CALENDAR NATIVO EMBEBIDO EN VIVO (IFRAME DE LA CUENTA DE LA DOCTORA) -->
+            <!-- SUB-VISTA B: CONFIGURADOR DE TIEMPOS POR PROCEDIMIENTO (9 TIPOS DE CONSULTA) -->
+            <div id="calHubProceduresSection" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+                <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                            Algoritmo de Tiempos Inteligentes
+                        </span>
+                        <h2 class="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
+                            <i class="ph-bold ph-timer text-indigo-600"></i>
+                            <span>Tiempos de Sillón y Buffers de Desinfección (9 Procedimientos)</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Personaliza la duración de cada procedimiento, el tiempo de buffer para sanitización, el sillón predeterminado y los protocolos clínicos.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onclick="resetCalendarProceduresToDefault()"
+                            class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                        >
+                            Restaurar Valores por Defecto
+                        </button>
+                        <button
+                            type="button"
+                            onclick="saveCalendarProceduresConfig()"
+                            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-check"></i>
+                            <span>Guardar Configuración de Tiempos</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="calProceduresConfigList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- SUB-VISTA C: CONFIGURADOR DE HORARIOS Y DÍAS DE ATENCIÓN (LUNES A DOMINGO) -->
+            <div id="calHubScheduleSection" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+                <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Disponibilidad Semanal
+                        </span>
+                        <h2 class="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
+                            <i class="ph-bold ph-clock text-emerald-600"></i>
+                            <span>Horarios y Días de Atención en Clínica (Dra. Liseth Guevara)</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Define qué días atiendes pacientes, tu horario de apertura/cierre y tus bloques de receso o comida para que no se empalmen citas.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="saveClinicScheduleConfig()"
+                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-check"></i>
+                        <span>Guardar Horarios Semanales</span>
+                    </button>
+                </div>
+
+                <div id="calScheduleDaysConfigList" class="space-y-3"></div>
+            </div>
+
+            <!-- SUB-VISTA D: GOOGLE CALENDAR NATIVO EMBEBIDO EN VIVO (IFRAME DE LA CUENTA DE LA DOCTORA) -->
             <div id="calHubEmbedSection" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-3">
                     <div>
@@ -1284,6 +1385,13 @@
                         class="text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900"
                     >
                         3. Historia y Timeline de Citas
+                    </button>
+                    <button
+                        id="tabBtn-comparador"
+                        onclick="setWorkspaceTab('comparador')"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900"
+                    >
+                        4. Comparador Before/After (Fotos y 3D)
                     </button>
                 </div>
 
@@ -2102,6 +2210,231 @@
                 </div>
             </div>
 
+            <!-- =====================================================================
+                 MÓDULO 4: COMPARADOR TEMPORAL DE EVOLUCIÓN (BEFORE / AFTER Y 3D GHOST)
+                 (src/components/modules/EvolutionComparator.tsx)
+            ====================================================================== -->
+            <div id="module-comparador" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-6">
+                    <!-- Header del Comparador Temporal -->
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                Motivación y Adherencia del Paciente
+                            </span>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-1">
+                                Comparador Temporal de Evolución (Before / After) • <span id="comparadorPatientTitle">Martha Gabriela Zúñiga</span>
+                            </h2>
+                            <p class="text-xs text-slate-500">
+                                Desliza la cortina interactiva o superpón la malla 3D para demostrar el avance milimétrico mes a mes.
+                            </p>
+                        </div>
+
+                        <!-- Selector de Modo: Cortina Fotográfica vs Superposición 3D -->
+                        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                            <button
+                                type="button"
+                                id="compModeBtnPhotos"
+                                onclick="setEvolutionComparatorMode('photos')"
+                                class="text-xs font-bold px-3.5 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition"
+                            >
+                                📸 Cortina Fotográfica (Before / After)
+                            </button>
+                            <button
+                                type="button"
+                                id="compModeBtn3d"
+                                onclick="setEvolutionComparatorMode('mesh3d')"
+                                class="text-xs font-semibold px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition"
+                            >
+                                🧊 Superposición 3D (.STL Ghost)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Selección de Mes Base (Antes) vs Mes de Evolución (Después) + KPI -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                                Estado Inicial / Base (ANTES)
+                            </label>
+                            <select
+                                id="compBaseMonthSelect"
+                                onchange="onEvolutionMonthChange()"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            ></select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-indigo-600 uppercase mb-1">
+                                Cita de Evolución Comparada (DESPUÉS)
+                            </label>
+                            <select
+                                id="compAfterMonthSelect"
+                                onchange="onEvolutionMonthChange()"
+                                class="w-full bg-white border border-indigo-300 rounded-xl px-3 py-2 text-xs font-bold text-indigo-950 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                            ></select>
+                        </div>
+
+                        <!-- KPI de Avance Clínico Real -->
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
+                            <div>
+                                <span class="block text-[10px] font-bold text-emerald-700 uppercase">
+                                    Mejora Vertical (Overbite)
+                                </span>
+                                <span id="compOverbiteDeltaKpi" class="text-lg font-extrabold text-emerald-900">
+                                    +3.5 mm cerrados
+                                </span>
+                            </div>
+                            <div class="text-right text-[11px] text-emerald-800">
+                                <div>Antes: <strong id="compOverbiteBeforeVal">-4.5 mm</strong></div>
+                                <div>Ahora: <strong id="compOverbiteAfterVal">-1.0 mm</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODO 1: CORTINA FOTOGRÁFICA INTERACTIVA -->
+                    <div id="compViewPhotosSection" class="space-y-4">
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <div class="flex gap-2">
+                                <button
+                                    type="button"
+                                    id="compAngleBtnFrontal"
+                                    onclick="setEvolutionAngleType('frontal')"
+                                    class="text-xs px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 text-white shadow-2xs transition"
+                                >
+                                    Toma 1: Frontal en Oclusión
+                                </button>
+                                <button
+                                    type="button"
+                                    id="compAngleBtnOverjet"
+                                    onclick="setEvolutionAngleType('overjet')"
+                                    class="text-xs px-3.5 py-1.5 rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                                >
+                                    Toma 2: Lateral / Sobremordida
+                                </button>
+                            </div>
+                            <span class="text-xs text-slate-500 flex items-center gap-1.5">
+                                <i class="ph-bold ph-hand-pointing text-indigo-600"></i>
+                                Arrastra la cortina con el mouse o en tu iPad para comparar
+                            </span>
+                        </div>
+
+                        <!-- Contenedor Split-Screen con Clip-Path Dinámico -->
+                        <div id="compSliderContainer" class="relative w-full h-[380px] sm:h-[460px] rounded-2xl overflow-hidden border border-slate-300 bg-slate-900 select-none shadow-inner">
+                            <!-- Imagen DESPUÉS (Fondo completo) -->
+                            <img
+                                id="compImgAfter"
+                                src=""
+                                alt="Después"
+                                class="absolute inset-0 w-full h-full object-cover"
+                            />
+                            <span id="compBadgeAfter" class="absolute top-4 right-4 bg-emerald-600/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md z-10">
+                                DESPUÉS • Mes X
+                            </span>
+
+                            <!-- Imagen ANTES (Recortada dinámicamente) -->
+                            <div
+                                id="compClipBefore"
+                                class="absolute inset-0 overflow-hidden"
+                                style="clip-path: inset(0 50% 0 0);"
+                            >
+                                <img
+                                    id="compImgBefore"
+                                    src=""
+                                    alt="Antes"
+                                    class="absolute inset-0 w-full h-full object-cover filter brightness-95"
+                                />
+                                <span id="compBadgeBefore" class="absolute top-4 left-4 bg-amber-600/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                                    ANTES • Mes 0 (Inicial)
+                                </span>
+                            </div>
+
+                            <!-- Línea Divisoria Vertical de la Cortina -->
+                            <div
+                                id="compDividerLine"
+                                class="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_15px_rgba(0,0,0,0.7)] pointer-events-none z-10"
+                                style="left: 50%;"
+                            >
+                                <div class="w-10 h-10 rounded-full bg-white text-indigo-900 shadow-xl border-2 border-indigo-600 flex items-center justify-center font-extrabold text-sm absolute top-1/2 -translate-y-1/2 -translate-x-1/2">
+                                    ↔
+                                </div>
+                            </div>
+
+                            <!-- Input Range Invisible que cubre el 100% para touch/mouse nativo -->
+                            <input
+                                id="compRangeInput"
+                                type="range"
+                                min="0"
+                                max="100"
+                                value="50"
+                                oninput="onEvolutionSliderMove(this.value)"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20 m-0"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- MODO 2: SUPERPOSICIÓN DE MALLAS 3D (GHOST SUPERIMPOSITION) -->
+                    <div id="compView3dSection" class="hidden space-y-3">
+                        <div class="flex flex-wrap justify-between items-center gap-3 bg-zinc-900 text-white px-4 py-3 rounded-2xl border border-zinc-800">
+                            <div class="flex items-center gap-4 text-xs">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-amber-500 inline-block shadow-xs"></span>
+                                    <span>Malla Fantasma: <strong id="comp3dBaseLabel">Mes 0 (Antes)</strong></span>
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <span class="w-3.5 h-3.5 rounded-full bg-[#f6f2e6] border border-zinc-600 inline-block shadow-xs"></span>
+                                    <span>Malla Actual: <strong id="comp3dAfterLabel">Mes X (Progreso)</strong></span>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="text-zinc-300 font-semibold">Opacidad Fantasma:</span>
+                                <input
+                                    id="compGhostOpacityInput"
+                                    type="range"
+                                    min="0.1"
+                                    max="0.9"
+                                    step="0.05"
+                                    value="0.45"
+                                    oninput="updateGhostOpacity(this.value)"
+                                    class="w-32 accent-amber-500 cursor-pointer"
+                                />
+                                <span id="compGhostOpacityVal" class="text-amber-400 font-mono font-bold">45%</span>
+                            </div>
+                        </div>
+
+                        <div
+                            id="evolution3dCanvasMount"
+                            class="w-full h-[440px] rounded-2xl overflow-hidden border border-zinc-800 bg-[#121214] relative shadow-inner flex items-center justify-center"
+                        ></div>
+                    </div>
+
+                    <!-- Barra de Acciones Clínicas Inferiores -->
+                    <div class="pt-4 border-t border-slate-100 flex flex-wrap justify-between items-center gap-3">
+                        <div class="text-xs text-slate-500">
+                            <strong class="text-slate-800">💡 Tip Clínico:</strong> Cada vez que realices una cita mensual, registra las 2 fotos de evolución para alimentar automáticamente este comparador.
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onclick="openEvolutionCheckinModal()"
+                                class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2"
+                            >
+                                <i class="ph-bold ph-camera"></i>
+                                <span>+ Registrar 2 Fotos de Evolución</span>
+                            </button>
+                            <button
+                                type="button"
+                                onclick="autoSchedulePatientAppointments()"
+                                class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition flex items-center gap-2"
+                            >
+                                <i class="ph-bold ph-arrows-clockwise text-emerald-600"></i>
+                                <span>Auto-Agendar 18 Citas en Google Calendar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -2231,9 +2564,167 @@
     </div>
 
     <!-- =====================================================================
-         MÓDULO 4 (LAZY LOAD): VISOR LIGERO EXCLUSIVO PARA .STL REALES
-         (src/components/modules/StlViewerModal.tsx)
+         MODAL DE CHECK-IN FOTOGRÁFICO OBLIGATORIO (2 FOTOS POR CITA)
+         (src/components/modules/PatientCalendarAndCheckin.tsx)
     ====================================================================== -->
+    <div id="evolutionPhotoCheckinModal" onclick="closeEvolutionCheckinModal()" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto no-print">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 border border-slate-200 shadow-2xl space-y-4 my-6" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-xl shadow-2xs">
+                        <i class="ph-bold ph-camera"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                            Protocolo Obligatorio de Evolución
+                        </span>
+                        <h3 class="text-base font-extrabold text-slate-900 mt-0.5">
+                            Check-in Clínico de Cita (2 Fotos Obligatorias)
+                        </h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEvolutionCheckinModal()" class="text-slate-400 hover:text-slate-700 text-xs font-bold px-2 py-1">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Para cerrar la cita y actualizar el Comparador Temporal Before/After, debes capturar o adjuntar las <strong>2 fotografías protocolarias</strong> de evolución en sillón.
+            </p>
+
+            <form onsubmit="handleSaveEvolutionCheckin(event)" class="space-y-4">
+                <input type="hidden" id="checkinApptId" value="" />
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cita en Sillón</label>
+                        <select
+                            id="checkinStageSelect"
+                            class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                        ></select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Medición de Overbite en Sillón</label>
+                        <div class="relative">
+                            <input
+                                id="checkinOverbiteInput"
+                                type="number"
+                                step="0.1"
+                                placeholder="-3.0"
+                                value="-3.0"
+                                required
+                                class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                            />
+                            <span class="absolute right-3 top-2 text-xs font-bold text-slate-400">mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 Fotos Obligatorias -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Foto 1: Frontal -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                                <span>1. Frontal en Oclusión</span>
+                                <span class="text-rose-500 font-extrabold">*</span>
+                            </label>
+                            <span id="checkinPhoto1Status" class="text-[9.5px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">Requerida</span>
+                        </div>
+                        <div
+                            id="checkinPhoto1PreviewContainer"
+                            onclick="document.getElementById('checkinFileInput1').click()"
+                            class="w-full h-36 rounded-2xl border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition relative group"
+                        >
+                            <img id="checkinPhoto1PreviewImg" src="" alt="Preview 1" class="hidden w-full h-full object-cover" />
+                            <div id="checkinPhoto1Placeholder" class="text-center p-3 space-y-1">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="ph-bold ph-camera"></i>
+                                </div>
+                                <span class="block text-xs font-bold text-slate-700">Tomar / Subir Foto</span>
+                                <span class="block text-[10px] text-slate-400">Cámara móvil o archivo</span>
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            id="checkinFileInput1"
+                            accept="image/*"
+                            capture="environment"
+                            class="hidden"
+                            onchange="handleCheckinPhotoFileChange(event, 1)"
+                        />
+                    </div>
+
+                    <!-- Foto 2: Lateral / Overjet -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                                <span>2. Lateral / Sobremordida</span>
+                                <span class="text-rose-500 font-extrabold">*</span>
+                            </label>
+                            <span id="checkinPhoto2Status" class="text-[9.5px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">Requerida</span>
+                        </div>
+                        <div
+                            id="checkinPhoto2PreviewContainer"
+                            onclick="document.getElementById('checkinFileInput2').click()"
+                            class="w-full h-36 rounded-2xl border-2 border-dashed border-slate-300 hover:border-indigo-400 bg-slate-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition relative group"
+                        >
+                            <img id="checkinPhoto2PreviewImg" src="" alt="Preview 2" class="hidden w-full h-full object-cover" />
+                            <div id="checkinPhoto2Placeholder" class="text-center p-3 space-y-1">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="ph-bold ph-camera"></i>
+                                </div>
+                                <span class="block text-xs font-bold text-slate-700">Tomar / Subir Foto</span>
+                                <span class="block text-[10px] text-slate-400">Cámara móvil o archivo</span>
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            id="checkinFileInput2"
+                            accept="image/*"
+                            capture="environment"
+                            class="hidden"
+                            onchange="handleCheckinPhotoFileChange(event, 2)"
+                        />
+                    </div>
+                </div>
+
+                <!-- Notas Clínicas de la Cita -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Notas de Evolución y Charola</label>
+                    <textarea
+                        id="checkinClinicalNotes"
+                        rows="2"
+                        placeholder="Ej. Se activa arco .016 CuNiTi. Mordida abierta redujo 0.8 mm. Excelente cooperación con elásticos."
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                    ></textarea>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                    <span id="checkinValidationMessage" class="text-[11px] font-semibold text-rose-600 flex items-center gap-1">
+                        <i class="ph-bold ph-warning-circle"></i>
+                        <span>Se requieren las 2 fotos para cerrar la consulta</span>
+                    </span>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button
+                            type="button"
+                            onclick="closeEvolutionCheckinModal()"
+                            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            id="btnSaveCheckinSubmit"
+                            disabled
+                            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-check"></i>
+                            <span>Completar Cita & Guardar Fotos</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div id="stlViewerModal" class="hidden fixed inset-0 bg-[#121214] z-50 flex flex-col text-white font-sans no-print">
         <!-- Barra Superior ClinCheck Pro Dark Studio -->
         <header class="flex flex-wrap justify-between items-center px-6 py-3 border-b border-zinc-800 bg-zinc-900/95 gap-3">
@@ -4341,7 +4832,7 @@ create table if not exists public.patients (
         }
 
         function setWorkspaceTab(tabName) {
-            const tabs = ["diagnostico", "multimedia", "historia"];
+            const tabs = ["diagnostico", "multimedia", "historia", "comparador"];
             tabs.forEach((t) => {
                 const btn = document.getElementById(`tabBtn-${t}`);
                 const mod = document.getElementById(`module-${t}`);
@@ -4353,10 +4844,595 @@ create table if not exists public.patients (
                     if (mod) mod.classList.add("hidden");
                 }
             });
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             if (tabName === "historia") {
-                const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
                 renderPatientTimeline(patient);
+            } else if (tabName === "comparador") {
+                renderEvolutionComparator(patient);
             }
+        }
+
+        // =====================================================================
+        // MÓDULO 4: COMPARADOR TEMPORAL DE EVOLUCIÓN (BEFORE / AFTER Y 3D GHOST)
+        // (src/components/modules/EvolutionComparator.tsx)
+        // =====================================================================
+        let evolutionViewMode = "photos"; // "photos" | "mesh3d"
+        let evolutionAngleType = "frontal"; // "frontal" | "overjet"
+        let evolutionBaseMonthIdx = 0;
+        let evolutionCompareMonthIdx = 0;
+        let evolutionSliderPos = 50;
+        let evolutionGhostOpacity = 0.45;
+        let evolution3dRenderer = null;
+        let evolution3dCamera = null;
+        let evolution3dControls = null;
+        let evolution3dReqId = null;
+        let evolutionGhostGroup = null;
+        let evolutionCurrentGroup = null;
+
+        function getPatientEvolutionRecords(patient) {
+            if (!patient) return [];
+            if (patient.evolution_records && Array.isArray(patient.evolution_records) && patient.evolution_records.length > 0) {
+                return patient.evolution_records;
+            }
+            if (patient.full_name && patient.full_name.includes("Martha")) {
+                const defaultRecords = [
+                    {
+                        month: 0,
+                        date: "12/09/2026",
+                        stageTitle: "Estudio Inicial IDI",
+                        archwire: "Pre-Ortodoncia",
+                        overbiteMm: -4.5,
+                        photoFrontalUrl: "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/foto_frontal_demo.jpg",
+                        photoOverjetUrl: "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/foto_lateral_demo.jpg",
+                        notes: "Mordida abierta anterior de -4.5 mm con proyección lingual y ausencia previa de premolares."
+                    },
+                    {
+                        month: 1,
+                        date: "12/10/2026",
+                        stageTitle: "Cementado Diferencial + Espuelas",
+                        archwire: '.014" CuNiTi',
+                        overbiteMm: -3.8,
+                        photoFrontalUrl: "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&w=800&q=80",
+                        photoOverjetUrl: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=800&q=80",
+                        notes: "Espuelas linguales cementadas, contención de hábito e IPR inicial 0.2 mm en 31-41."
+                    },
+                    {
+                        month: 3,
+                        date: "07/12/2026",
+                        stageTitle: "IPR Anteroinferior y Desrotación",
+                        archwire: '.016" CuNiTi',
+                        overbiteMm: -2.5,
+                        photoFrontalUrl: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&w=800&q=80",
+                        photoOverjetUrl: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=800&q=80",
+                        notes: "Stripping selectivo completado en 33-43, mordida cerrando a -2.5 mm."
+                    }
+                ];
+                patient.evolution_records = defaultRecords;
+                return defaultRecords;
+            }
+            const fallback = [
+                {
+                    month: 0,
+                    date: patient.created_at || "Inicial",
+                    stageTitle: "Inicio de Tratamiento",
+                    archwire: "Inicial",
+                    overbiteMm: 0,
+                    photoFrontalUrl: (patient.photos && patient.photos["Intraoral Frontal (Mordida Abierta)"]) || "https://images.unsplash.com/photo-1606811841689-23dfddce6395?auto=format&fit=crop&w=800&q=80",
+                    photoOverjetUrl: (patient.photos && patient.photos["Sobremordida / Hábito Lingual"]) || "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=800&q=80",
+                    notes: "Registro clínico protocolario inicial."
+                }
+            ];
+            patient.evolution_records = fallback;
+            return fallback;
+        }
+
+        function renderEvolutionComparator(patient = null) {
+            if (!patient) patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const titleEl = document.getElementById("comparadorPatientTitle");
+            if (titleEl) titleEl.innerText = `${patient.full_name} (${patient.record_code || '#CRD-2026'})`;
+
+            const records = getPatientEvolutionRecords(patient);
+
+            const baseSel = document.getElementById("compBaseMonthSelect");
+            const afterSel = document.getElementById("compAfterMonthSelect");
+
+            if (baseSel) {
+                baseSel.innerHTML = records.map((r, idx) => `
+                    <option value="${idx}" ${idx === evolutionBaseMonthIdx ? "selected" : ""}>
+                        Mes ${r.month} (${r.date}) — ${r.stageTitle}
+                    </option>
+                `).join("");
+            }
+
+            if (afterSel) {
+                if (evolutionCompareMonthIdx >= records.length || evolutionCompareMonthIdx === 0) {
+                    evolutionCompareMonthIdx = Math.max(0, records.length - 1);
+                }
+                afterSel.innerHTML = records.map((r, idx) => `
+                    <option value="${idx}" ${idx === evolutionCompareMonthIdx ? "selected" : ""}>
+                        Mes ${r.month} (${r.date}) — ${r.stageTitle}
+                    </option>
+                `).join("");
+            }
+
+            updateEvolutionComparatorDisplay(records);
+        }
+
+        function onEvolutionMonthChange() {
+            const baseSel = document.getElementById("compBaseMonthSelect");
+            const afterSel = document.getElementById("compAfterMonthSelect");
+            if (baseSel) evolutionBaseMonthIdx = Number(baseSel.value);
+            if (afterSel) evolutionCompareMonthIdx = Number(afterSel.value);
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const records = getPatientEvolutionRecords(patient);
+            updateEvolutionComparatorDisplay(records);
+        }
+
+        function updateEvolutionComparatorDisplay(records) {
+            const beforeRec = records[evolutionBaseMonthIdx] || records[0];
+            const afterRec = records[evolutionCompareMonthIdx] || records[records.length - 1] || beforeRec;
+
+            const overbiteDelta = (afterRec.overbiteMm - beforeRec.overbiteMm).toFixed(1);
+            const deltaEl = document.getElementById("compOverbiteDeltaKpi");
+            const beforeValEl = document.getElementById("compOverbiteBeforeVal");
+            const afterValEl = document.getElementById("compOverbiteAfterVal");
+
+            if (deltaEl) {
+                const sign = Number(overbiteDelta) > 0 ? "+" : "";
+                deltaEl.innerText = `${sign}${overbiteDelta} mm cerrados`;
+            }
+            if (beforeValEl) beforeValEl.innerText = `${beforeRec.overbiteMm} mm`;
+            if (afterValEl) afterValEl.innerText = `${afterRec.overbiteMm} mm`;
+
+            // Cortina Fotográfica
+            const beforeImgUrl = evolutionAngleType === "frontal" ? (beforeRec.photoFrontalUrl || beforeRec.photoOverjetUrl) : (beforeRec.photoOverjetUrl || beforeRec.photoFrontalUrl);
+            const afterImgUrl = evolutionAngleType === "frontal" ? (afterRec.photoFrontalUrl || afterRec.photoOverjetUrl) : (afterRec.photoOverjetUrl || afterRec.photoFrontalUrl);
+
+            const imgBefore = document.getElementById("compImgBefore");
+            const imgAfter = document.getElementById("compImgAfter");
+            const badgeBefore = document.getElementById("compBadgeBefore");
+            const badgeAfter = document.getElementById("compBadgeAfter");
+
+            if (imgBefore && beforeImgUrl) imgBefore.src = beforeImgUrl;
+            if (imgAfter && afterImgUrl) imgAfter.src = afterImgUrl;
+            if (badgeBefore) badgeBefore.innerText = `ANTES • Mes ${beforeRec.month} (${beforeRec.date})`;
+            if (badgeAfter) badgeAfter.innerText = `DESPUÉS • Mes ${afterRec.month} (${afterRec.archwire || afterRec.stageTitle})`;
+
+            // Superposición 3D
+            const label3dBase = document.getElementById("comp3dBaseLabel");
+            const label3dAfter = document.getElementById("comp3dAfterLabel");
+            if (label3dBase) label3dBase.innerText = `Mes ${beforeRec.month} (Antes)`;
+            if (label3dAfter) label3dAfter.innerText = `Mes ${afterRec.month} (Progreso)`;
+
+            if (evolutionViewMode === "mesh3d") {
+                initEvolution3dScene(beforeRec.month, afterRec.month);
+            }
+        }
+
+        function setEvolutionComparatorMode(mode) {
+            evolutionViewMode = mode;
+            const btnPhotos = document.getElementById("compModeBtnPhotos");
+            const btn3d = document.getElementById("compModeBtn3d");
+            const secPhotos = document.getElementById("compViewPhotosSection");
+            const sec3d = document.getElementById("compView3dSection");
+
+            if (mode === "photos") {
+                if (btnPhotos) btnPhotos.className = "text-xs font-bold px-3.5 py-2 rounded-lg bg-white text-slate-900 shadow-sm transition";
+                if (btn3d) btn3d.className = "text-xs font-semibold px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                secPhotos?.classList.remove("hidden");
+                sec3d?.classList.add("hidden");
+                if (evolution3dReqId) cancelAnimationFrame(evolution3dReqId);
+            } else {
+                if (btn3d) btn3d.className = "text-xs font-bold px-3.5 py-2 rounded-lg bg-slate-900 text-white shadow-sm transition";
+                if (btnPhotos) btnPhotos.className = "text-xs font-semibold px-3.5 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                secPhotos?.classList.add("hidden");
+                sec3d?.classList.remove("hidden");
+
+                const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+                const records = getPatientEvolutionRecords(patient);
+                const beforeRec = records[evolutionBaseMonthIdx] || records[0];
+                const afterRec = records[evolutionCompareMonthIdx] || records[records.length - 1] || beforeRec;
+                initEvolution3dScene(beforeRec.month, afterRec.month);
+            }
+        }
+
+        function setEvolutionAngleType(angle) {
+            evolutionAngleType = angle;
+            const btnFrontal = document.getElementById("compAngleBtnFrontal");
+            const btnOverjet = document.getElementById("compAngleBtnOverjet");
+
+            if (angle === "frontal") {
+                if (btnFrontal) btnFrontal.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 text-white shadow-2xs transition";
+                if (btnOverjet) btnOverjet.className = "text-xs px-3.5 py-1.5 rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition";
+            } else {
+                if (btnOverjet) btnOverjet.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 text-white shadow-2xs transition";
+                if (btnFrontal) btnFrontal.className = "text-xs px-3.5 py-1.5 rounded-xl font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition";
+            }
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const records = getPatientEvolutionRecords(patient);
+            updateEvolutionComparatorDisplay(records);
+        }
+
+        function onEvolutionSliderMove(val) {
+            evolutionSliderPos = Number(val);
+            const clipEl = document.getElementById("compClipBefore");
+            const divLine = document.getElementById("compDividerLine");
+            if (clipEl) clipEl.style.clipPath = `inset(0 ${100 - evolutionSliderPos}% 0 0)`;
+            if (divLine) divLine.style.left = `${evolutionSliderPos}%`;
+        }
+
+        function updateGhostOpacity(val) {
+            evolutionGhostOpacity = Number(val);
+            const labelEl = document.getElementById("compGhostOpacityVal");
+            if (labelEl) labelEl.innerText = `${Math.round(evolutionGhostOpacity * 100)}%`;
+            if (evolutionGhostGroup) {
+                evolutionGhostGroup.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.opacity = evolutionGhostOpacity;
+                    }
+                });
+            }
+        }
+
+        function initEvolution3dScene(baseMonth = 0, compareMonth = 3) {
+            const container = document.getElementById("evolution3dCanvasMount");
+            if (!container) return;
+
+            if (evolution3dReqId) cancelAnimationFrame(evolution3dReqId);
+            if (evolution3dRenderer) {
+                evolution3dRenderer.dispose();
+                evolution3dRenderer = null;
+            }
+            container.innerHTML = "";
+
+            const width = container.clientWidth || 700;
+            const height = container.clientHeight || 440;
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color("#121214");
+
+            evolution3dCamera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
+            evolution3dCamera.position.set(0, -95, 50);
+
+            evolution3dRenderer = new THREE.WebGLRenderer({ antialias: true });
+            evolution3dRenderer.setSize(width, height);
+            evolution3dRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(evolution3dRenderer.domElement);
+
+            evolution3dControls = new THREE.OrbitControls(evolution3dCamera, evolution3dRenderer.domElement);
+            evolution3dControls.enableDamping = true;
+            evolution3dControls.dampingFactor = 0.05;
+
+            // Iluminación
+            scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+            keyLight.position.set(30, -50, 75);
+            scene.add(keyLight);
+            const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.5);
+            fillLight.position.set(-30, 40, -40);
+            scene.add(fillLight);
+
+            // Materiales de Superposición
+            const ghostMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#f59e0b"), // Ámbar clínico de inicio
+                transparent: true,
+                opacity: evolutionGhostOpacity,
+                roughness: 0.35,
+                metalness: 0.1
+            });
+
+            const currentMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#f6f2e6"), // Marfil esmalte natural actual
+                roughness: 0.22,
+                clearcoat: 0.9,
+                clearcoatRoughness: 0.1
+            });
+
+            // Generador Biomecánico de Arcada según Mes de Tratamiento
+            const buildArchGroup = (month, mat) => {
+                const group = new THREE.Group();
+                const progress = Math.min(1, month / 18);
+                const openBiteGap = 4.5 * (1 - progress); // Cierre milimétrico del overbite
+
+                for (let i = -6; i <= 6; i++) {
+                    const angle = (i / 6) * (Math.PI * 0.42);
+                    const x = Math.sin(angle) * 24;
+                    const y = -Math.cos(angle) * 26;
+                    const crownGeo = new THREE.BoxGeometry(3.1, 2.6, 4.2);
+
+                    // Diente Superior
+                    const upperTooth = new THREE.Mesh(crownGeo, mat);
+                    const anteriorFactor = Math.max(0, 1 - Math.abs(i) / 4);
+                    upperTooth.position.set(x, y, 3.2 + anteriorFactor * openBiteGap * 0.5);
+                    group.add(upperTooth);
+
+                    // Diente Inferior
+                    const lowerTooth = new THREE.Mesh(crownGeo, mat);
+                    const crowdingOffset = Math.abs(i) <= 2 ? (i % 2 === 0 ? 1.8 : -1.8) * (1 - progress) : 0;
+                    lowerTooth.position.set(x, y + crowdingOffset, -3.2 - anteriorFactor * openBiteGap * 0.5);
+                    lowerTooth.rotation.z = Math.abs(i) === 1 ? 0.55 * (1 - progress) : 0;
+                    group.add(lowerTooth);
+                }
+                return group;
+            };
+
+            evolutionGhostGroup = buildArchGroup(baseMonth, ghostMat);
+            evolutionCurrentGroup = buildArchGroup(compareMonth, currentMat);
+
+            scene.add(evolutionGhostGroup);
+            scene.add(evolutionCurrentGroup);
+
+            const animate = () => {
+                evolution3dReqId = requestAnimationFrame(animate);
+                if (evolution3dControls) evolution3dControls.update();
+                if (evolution3dRenderer && evolution3dCamera) {
+                    evolution3dRenderer.render(scene, evolution3dCamera);
+                }
+            };
+            animate();
+        }
+
+        // =====================================================================
+        // MODAL DE CHECK-IN FOTOGRÁFICO OBLIGATORIO (2 FOTOS POR CITA)
+        // (src/components/modules/PatientCalendarAndCheckin.tsx)
+        // =====================================================================
+        let checkinUploadedPhoto1 = "";
+        let checkinUploadedPhoto2 = "";
+
+        function openEvolutionCheckinModal(apptId = null) {
+            const modal = document.getElementById("evolutionPhotoCheckinModal");
+            if (!modal) return;
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const timeline = getPatientTimeline(patient);
+
+            const sel = document.getElementById("checkinStageSelect");
+            if (sel) {
+                sel.innerHTML = timeline.map((a) => `
+                    <option value="${a.id}" ${apptId === a.id || (!apptId && a.status === 'current') ? 'selected' : ''}>
+                        Cita #${a.stageNumber || 1}: ${a.title} (${a.status === 'completed' ? '✓ Completada' : 'Pendiente'})
+                    </option>
+                `).join("");
+            }
+
+            const idInput = document.getElementById("checkinApptId");
+            if (idInput) idInput.value = apptId || (timeline.find(a => a.status === "current")?.id || timeline[0]?.id || "");
+
+            // Buscar si la cita ya tenía fotos previas
+            const targetAppt = timeline.find(a => a.id === (apptId || idInput?.value));
+            if (targetAppt && targetAppt.photoFrontalUrl && targetAppt.photoOverjetUrl) {
+                checkinUploadedPhoto1 = targetAppt.photoFrontalUrl;
+                checkinUploadedPhoto2 = targetAppt.photoOverjetUrl;
+            } else {
+                checkinUploadedPhoto1 = "";
+                checkinUploadedPhoto2 = "";
+            }
+
+            renderCheckinPhotoPreviews();
+            validateCheckinForm();
+            modal.classList.remove("hidden");
+        }
+
+        function closeEvolutionCheckinModal() {
+            document.getElementById("evolutionPhotoCheckinModal")?.classList.add("hidden");
+        }
+
+        function handleCheckinPhotoFileChange(event, slot) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const url = e.target?.result;
+                if (slot === 1) checkinUploadedPhoto1 = url;
+                else checkinUploadedPhoto2 = url;
+                renderCheckinPhotoPreviews();
+                validateCheckinForm();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderCheckinPhotoPreviews() {
+            // Foto 1
+            const img1 = document.getElementById("checkinPhoto1PreviewImg");
+            const ph1 = document.getElementById("checkinPhoto1Placeholder");
+            const st1 = document.getElementById("checkinPhoto1Status");
+            if (checkinUploadedPhoto1) {
+                if (img1) { img1.src = checkinUploadedPhoto1; img1.classList.remove("hidden"); }
+                if (ph1) ph1.classList.add("hidden");
+                if (st1) { st1.innerText = "✓ Capturada"; st1.className = "text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"; }
+            } else {
+                if (img1) { img1.src = ""; img1.classList.add("hidden"); }
+                if (ph1) ph1.classList.remove("hidden");
+                if (st1) { st1.innerText = "Requerida"; st1.className = "text-[9.5px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200"; }
+            }
+
+            // Foto 2
+            const img2 = document.getElementById("checkinPhoto2PreviewImg");
+            const ph2 = document.getElementById("checkinPhoto2Placeholder");
+            const st2 = document.getElementById("checkinPhoto2Status");
+            if (checkinUploadedPhoto2) {
+                if (img2) { img2.src = checkinUploadedPhoto2; img2.classList.remove("hidden"); }
+                if (ph2) ph2.classList.add("hidden");
+                if (st2) { st2.innerText = "✓ Capturada"; st2.className = "text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"; }
+            } else {
+                if (img2) { img2.src = ""; img2.classList.add("hidden"); }
+                if (ph2) ph2.classList.remove("hidden");
+                if (st2) { st2.innerText = "Requerida"; st2.className = "text-[9.5px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200"; }
+            }
+        }
+
+        function validateCheckinForm() {
+            const btn = document.getElementById("btnSaveCheckinSubmit");
+            const msg = document.getElementById("checkinValidationMessage");
+            const hasBoth = Boolean(checkinUploadedPhoto1 && checkinUploadedPhoto2);
+
+            if (btn) btn.disabled = !hasBoth;
+            if (msg) {
+                if (hasBoth) {
+                    msg.innerHTML = `<span class="text-emerald-700 font-bold flex items-center gap-1"><i class="ph-bold ph-check-circle"></i> Ambas fotos validadas para el comparador</span>`;
+                } else {
+                    msg.innerHTML = `<span class="text-rose-600 font-semibold flex items-center gap-1"><i class="ph-bold ph-warning-circle"></i> Se requieren las 2 fotos para cerrar la consulta</span>`;
+                }
+            }
+        }
+
+        function handleSaveEvolutionCheckin(event) {
+            event.preventDefault();
+            if (!checkinUploadedPhoto1 || !checkinUploadedPhoto2) {
+                alert("Protocolo Clínico Obligatorio: Debes tomar o subir las 2 fotografías de evolución (Frontal y Lateral) para cerrar la consulta.");
+                return;
+            }
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const selectedApptId = document.getElementById("checkinStageSelect")?.value || document.getElementById("checkinApptId")?.value;
+            const timeline = getPatientTimeline(patient);
+            const apptIndex = timeline.findIndex((a) => a.id === selectedApptId);
+            const appt = apptIndex >= 0 ? timeline[apptIndex] : timeline[0];
+
+            const overbiteVal = Number(document.getElementById("checkinOverbiteInput")?.value) || -3.0;
+            const notesVal = document.getElementById("checkinClinicalNotes")?.value?.trim() || "";
+
+            // 1. Marcar cita como realizada y almacenar fotos
+            appt.status = "completed";
+            appt.completedDate = new Date().toLocaleDateString("es-MX");
+            appt.photoFrontalUrl = checkinUploadedPhoto1;
+            appt.photoOverjetUrl = checkinUploadedPhoto2;
+            appt.hasTwoPhotos = true;
+            if (notesVal) appt.notes = notesVal;
+
+            // Avanzar a la siguiente cita
+            if (apptIndex >= 0 && apptIndex + 1 < timeline.length) {
+                const nextAppt = timeline[apptIndex + 1];
+                if (nextAppt.status !== "completed") {
+                    nextAppt.status = "current";
+                    if (!nextAppt.startIso) {
+                        const nextMonth = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000);
+                        nextMonth.setHours(11, 0, 0, 0);
+                        nextAppt.startIso = nextMonth.toISOString();
+                    }
+                }
+            }
+
+            patient.timeline_appointments = timeline;
+
+            // 2. Inyectar nuevo hito en el Comparador Temporal Before/After
+            const recs = getPatientEvolutionRecords(patient);
+            const newRecord = {
+                month: appt.stageNumber || recs.length,
+                date: new Date().toLocaleDateString("es-MX"),
+                stageTitle: appt.title || "Control de Evolución",
+                archwire: appt.archwire || "Control Activo",
+                overbiteMm: overbiteVal,
+                photoFrontalUrl: checkinUploadedPhoto1,
+                photoOverjetUrl: checkinUploadedPhoto2,
+                notes: notesVal || appt.notes || "Check-in fotográfico de sillón completado con éxito."
+            };
+            recs.push(newRecord);
+            patient.evolution_records = recs;
+
+            // 3. Bitácora de notas clínicas
+            if (!patient.notes) patient.notes = [];
+            patient.notes.unshift({
+                date: new Date().toLocaleDateString("es-MX"),
+                author: "Dra. Liseth Guevara",
+                text: `Cita #${appt.stageNumber || 1} completada: ${appt.title}. Overbite medido: ${overbiteVal} mm. 2 Fotos de evolución registradas en expediente.`
+            });
+
+            // 4. Sincronizar scheduledAppointments
+            syncTimelineToScheduledAppointments(patient, appt);
+
+            saveAppointmentsLocal();
+            savePatientsLocal();
+            closeEvolutionCheckinModal();
+
+            renderPatientTimeline(patient);
+            renderEvolutionComparator(patient);
+            renderDashboardHome();
+            renderCalendarHub();
+
+            alert("✓ Cita completada con éxito. Las 2 fotografías obligatorias han sido archivadas y añadidas al Comparador Temporal Before/After.");
+        }
+
+        // =====================================================================
+        // MOTOR DE AUTO-AGENDAMIENTO DE 18 CITAS CONSECUTIVAS CADA 4 SEMANAS
+        // Sincronizado en tiempo real con Google Calendar y Agenda de Sillón
+        // (src/app/api/calendar-sync/route.ts)
+        // =====================================================================
+        function autoSchedulePatientAppointments() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const baseDate = new Date();
+            baseDate.setHours(11, 0, 0, 0);
+
+            const roadmapStages = [
+                { months: "Mes 1", title: "Cementado Diferencial + Espuelas Linguales", archwire: '.014" CuNiTi', duration: 60, chair: "Sillón 1 (Ortodoncia Principal)", action: "Bonding completo, adhesión de spurs, kit de higiene" },
+                { months: "Mes 2", title: "Control de Hábito y Desrotación Inicial", archwire: '.014" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Revisar espuelas y reactivar ligaduras" },
+                { months: "Mes 3", title: "IPR Anteroinferior (31-41) + Desrotación", archwire: '.016" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Stripping inicial selectivo y pulido con tiras" },
+                { months: "Mes 4", title: "IPR Caninos y Premolares (33-43)", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Completar ganancia de espacio anteroinferior" },
+                { months: "Mes 5", title: "Nivelación Transversal y Control de Torque", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Revisar curvatura de Spee inferior" },
+                { months: "Mes 6", title: "Preparación de Anclaje Esquelético + Rx Control", archwire: '.019"x.025" SS', duration: 30, chair: "Sillón 1 (Ortodoncia Principal)", action: "Evaluación periapical y toma de medidas para TADs" },
+                { months: "Mes 7", title: "Colocación de 2 Microtornillos TADs IZC + ATP", archwire: '.019"x.025" SS + 150g', duration: 45, chair: "Sillón 1 (Ortodoncia Principal)", action: "Inserción de 2 TADs IZC 2x12mm y carga inmediata" },
+                { months: "Mes 8", title: "Reactivación de Intrusión Molar (150g)", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Cambio de cadenas elásticas hacia TADs" },
+                { months: "Mes 9", title: "Control de Cierre Vertical y Autorrotación", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Medición milimétrica del overbite anterior" },
+                { months: "Mes 10", title: "Evaluación de Guía Anterior y Resalte", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Chequeo de contactos posteriores prematuros" },
+                { months: "Mes 11", title: "Consolidación de Cierre de Mordida Abierta", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Retiro programado de espuelas linguales" },
+                { months: "Mes 12", title: "Retiro de TADs y Escaneo de Progreso 3D", archwire: '.019"x.025" TMA', duration: 35, chair: "Sillón 2 (Escáner 3D / Urgencias)", action: "Retiro atraumático de TADs y escaneo intraoral" },
+                { months: "Mes 13", title: "Inicio de Asentamiento Oclusal", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Elásticos en caja 3/16 4.5 oz nocturnos" },
+                { months: "Mes 14", title: "Intercuspidación y Guía Canina Bilateral", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Ajuste de torque fino y oclusión céntrica" },
+                { months: "Mes 15", title: "Dobleces de Tercer Orden / Finalización", archwire: '.019"x.025" TMA', duration: 30, chair: "Sillón 1 (Ortodoncia Principal)", action: "Detallado estético de sonrisa y márgenes" },
+                { months: "Mes 16", title: "Estabilización y Desprogramación Muscular", archwire: '.019"x.025" TMA', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Prueba de estabilidad sin elásticos" },
+                { months: "Mes 17", title: "Toma de Registros Finales y Profilaxis", archwire: "Fase Final", duration: 30, chair: "Sillón 2 (Escáner 3D / Urgencias)", action: "Escaneo para retenedores fijos y Essix" },
+                { months: "Mes 18", title: "Retiro Completo (Debonding) + Retención Fija", archwire: "Retención Final", duration: 60, chair: "Sillón 1 (Ortodoncia Principal)", action: "Retiro de brackets, pulido y cementado de retenedor 3-3" }
+            ];
+
+            const generatedTimeline = [];
+
+            for (let m = 1; m <= 18; m++) {
+                const stage = roadmapStages[m - 1];
+                const apptDate = new Date(baseDate.getTime() + (m - 1) * 28 * 24 * 60 * 60 * 1000);
+                const isFirst = m === 1;
+
+                const apptObj = {
+                    id: `auto-appt-${patient.id}-${m}`,
+                    stageNumber: m,
+                    stageMonths: stage.months,
+                    title: stage.title,
+                    archwire: stage.archwire,
+                    startIso: apptDate.toISOString(),
+                    durationMinutes: stage.duration,
+                    chair: stage.chair,
+                    status: isFirst ? "current" : "scheduled",
+                    completedDate: null,
+                    chairsideAction: stage.action,
+                    notes: `Consulta programada automáticamente en Google Calendar (Ciclo de 4 semanas / 28 días). Requiere 2 fotos de evolución.`,
+                    googleCalendarEventId: `gcal-${patient.id}-${m}`,
+                    googleCalendarEventUrl: `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('🦷 Control Mes ' + m + '/18: ' + patient.full_name)}&dates=${apptDate.toISOString().replace(/-|:|\.\d\d\d/g, "")}/${new Date(apptDate.getTime() + stage.duration * 60000).toISOString().replace(/-|:|\.\d\d\d/g, "")}&details=${encodeURIComponent('Etapa: ' + stage.title + '\nArco: ' + stage.archwire + '\nSillón: ' + stage.chair + '\n📸 OBLIGATORIO: Tomar 2 fotos de evolución')}`,
+                    hasTwoPhotos: false
+                };
+
+                generatedTimeline.push(apptObj);
+
+                // Inyectar en scheduledAppointments (Agenda Global del Hub)
+                syncTimelineToScheduledAppointments(patient, apptObj);
+            }
+
+            patient.timeline_appointments = generatedTimeline;
+            saveAppointmentsLocal();
+            savePatientsLocal();
+
+            renderPatientTimeline(patient);
+            renderCalendarHub();
+            renderDashboardHome();
+
+            alert(`✓ Plan de 18 Consultas Subsecuentes programado con éxito cada 4 semanas (28 días).\n\n• Duración inteligente: 60 min en cementado y retiro, 45 min en TADs y 25 min en controles.\n• Eventos sincronizados con Google Calendar y la Agenda de Sillón de la Dra. Liseth.`);
         }
 
         // ---------------------------------------------------------------------
@@ -5295,10 +6371,21 @@ create table if not exists public.patients (
                                     </div>
 
                                     <!-- Badge de Fecha Programada / Estado -->
-                                    <div class="mb-3">
+                                    <div class="mb-2.5 flex flex-wrap items-center gap-1.5">
                                         <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg border ${dateBadgeClass}">
                                             ${dateBadgeText}
                                         </span>
+                                        ${(appt.hasTwoPhotos || isCompleted) ? `
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-lg">
+                                                <i class="ph-bold ph-camera"></i>
+                                                <span>2 Fotos OK</span>
+                                            </span>
+                                        ` : `
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-100/90 border border-amber-200 px-2 py-0.5 rounded-lg">
+                                                <i class="ph-bold ph-camera"></i>
+                                                <span>Requiere 2 Fotos</span>
+                                            </span>
+                                        `}
                                     </div>
 
                                     <!-- Detalles Clínicos -->
@@ -5327,11 +6414,22 @@ create table if not exists public.patients (
 
                                 <!-- Botones de Gestión Directa (1 Clic) -->
                                 <div class="pt-2 border-t border-slate-100/80 space-y-1.5">
+                                    <!-- Botón Primario: Check-in Fotográfico Obligatorio -->
+                                    <button
+                                        type="button"
+                                        onclick="openEvolutionCheckinModal('${appt.id}')"
+                                        class="w-full ${isCompleted ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs'} text-[11px] font-bold py-2 px-2.5 rounded-xl transition flex items-center justify-center gap-1.5"
+                                        title="Registrar las 2 fotografías de evolución obligatorias (Frontal y Lateral)"
+                                    >
+                                        <i class="ph-bold ph-camera text-sm"></i>
+                                        <span>${isCompleted ? '📸 Ver / Editar 2 Fotos' : '📸 Check-in (2 Fotos Obligatorias)'}</span>
+                                    </button>
+
                                     <div class="grid grid-cols-2 gap-1.5">
                                         <button
                                             type="button"
                                             onclick="openTimelineRescheduleModal('${appt.id}')"
-                                            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1"
+                                            class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold py-1.5 px-2 rounded-xl transition flex items-center justify-center gap-1"
                                             title="Reprogramar fecha, hora y duración"
                                         >
                                             <i class="ph-bold ph-calendar-pencil text-indigo-600"></i>
@@ -5341,7 +6439,7 @@ create table if not exists public.patients (
                                         <button
                                             type="button"
                                             onclick="toggleTimelineAppointmentStatus('${appt.id}')"
-                                            class="w-full ${isCompleted ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200'} text-[11px] font-bold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1"
+                                            class="w-full ${isCompleted ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200'} text-[11px] font-bold py-1.5 px-2 rounded-xl transition flex items-center justify-center gap-1"
                                             title="${isCompleted ? 'Desmarcar cita' : 'Marcar cita como completada en sillón'}"
                                         >
                                             <i class="ph-bold ${isCompleted ? 'ph-arrow-counter-clockwise' : 'ph-check-circle'}"></i>
@@ -5491,6 +6589,11 @@ create table if not exists public.patients (
                 appt.status = "current";
                 appt.completedDate = null;
             } else {
+                // Protocolo Clínico Obligatorio: si no tiene las 2 fotos, abrir modal de check-in
+                if (!appt.hasTwoPhotos) {
+                    openEvolutionCheckinModal(apptId);
+                    return;
+                }
                 appt.status = "completed";
                 appt.completedDate = new Date().toLocaleDateString("es-MX");
 
@@ -7203,23 +8306,410 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
+        // =====================================================================
+        // MOTOR AVANZADO DEL CALENDARIO: 9 PROCEDIMIENTOS, HORARIOS Y SILLONES
+        // (src/components/modules/OrthoCalendarHub.tsx)
+        // =====================================================================
+        const DEFAULT_ORTHO_PROCEDURES = [
+            {
+                id: "valoracion_1a",
+                name: "1ª Vez: Valoración + Fotos + Escaneo .STL",
+                category: "Diagnóstico",
+                durationMinutes: 45,
+                bufferMinutes: 10,
+                colorHex: "#6366f1",
+                googleColorId: "9",
+                requiresTwoPhotos: false,
+                requiresLabReady: false,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["8 Fotos Intraorales", "Orden Rx IDI", "Escaneo Dual .STL", "Firma Consentimiento"]
+            },
+            {
+                id: "cementado_brackets",
+                name: "Cementado de Brackets (Bonding Completo)",
+                category: "Instalación",
+                durationMinutes: 60,
+                bufferMinutes: 15,
+                colorHex: "#10b981",
+                googleColorId: "10",
+                requiresTwoPhotos: true,
+                requiresLabReady: false,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Profilaxis previa", "Cementado diferencial", "Arco .014 CuNiTi", "Kit higiene"]
+            },
+            {
+                id: "entrega_alineadores",
+                name: "Entrega de Alineadores + Attachments + IPR",
+                category: "Instalación",
+                durationMinutes: 45,
+                bufferMinutes: 10,
+                colorHex: "#06b6d4",
+                googleColorId: "7",
+                requiresTwoPhotos: true,
+                requiresLabReady: true,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Revisar set de alineadores", "Adhesión de attachments", "IPR inicial"]
+            },
+            {
+                id: "control_mensual",
+                name: "Control Mensual (Cambio de Arco / Ligaduras)",
+                category: "Control",
+                durationMinutes: 20,
+                bufferMinutes: 5,
+                colorHex: "#3b82f6",
+                googleColorId: "1",
+                requiresTwoPhotos: true,
+                requiresLabReady: false,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Tomar 2 Fotos de Evolución", "Evaluar oclusión", "Activar arco"]
+            },
+            {
+                id: "control_ipr",
+                name: "Control + Stripping (IPR Mesial / Distal)",
+                category: "Biomecánica",
+                durationMinutes: 30,
+                bufferMinutes: 5,
+                colorHex: "#f59e0b",
+                googleColorId: "5",
+                requiresTwoPhotos: true,
+                requiresLabReady: false,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Revisar Odontograma IPR", "Calibrar con galgas", "Pulido interproximal"]
+            },
+            {
+                id: "colocacion_tads",
+                name: "Colocación de Microtornillos (TADs IZC) / ATP",
+                category: "Biomecánica",
+                durationMinutes: 45,
+                bufferMinutes: 10,
+                colorHex: "#f43f5e",
+                googleColorId: "11",
+                requiresTwoPhotos: true,
+                requiresLabReady: true,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Anestesia local", "Inserción 2 TADs IZC", "Activar 150g por lado", "Rx control"]
+            },
+            {
+                id: "urgencia_bracket",
+                name: "Urgencia (Bracket Caído / Arco Pungente)",
+                category: "Urgencia",
+                durationMinutes: 15,
+                bufferMinutes: 5,
+                colorHex: "#ef4444",
+                googleColorId: "4",
+                requiresTwoPhotos: false,
+                requiresLabReady: false,
+                defaultChair: "Sillón 2 (Escáner 3D / Urgencias)",
+                checklist: ["Recementar bracket", "Cortar extremo distal"]
+            },
+            {
+                id: "retiro_debonding",
+                name: "Retiro de Ortodoncia (Debonding) + Retenedores",
+                category: "Retiro",
+                durationMinutes: 60,
+                bufferMinutes: 15,
+                colorHex: "#8b5cf6",
+                googleColorId: "3",
+                requiresTwoPhotos: true,
+                requiresLabReady: true,
+                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                checklist: ["Retiro cuidadoso", "Limpieza de resina", "Escaneo final", "Colocación de retenedores"]
+            },
+            {
+                id: "escaneo_evolucion",
+                name: "Escaneo Intraoral de Progreso (.STL)",
+                category: "Diagnóstico",
+                durationMinutes: 30,
+                bufferMinutes: 10,
+                colorHex: "#ec4899",
+                googleColorId: "6",
+                requiresTwoPhotos: true,
+                requiresLabReady: false,
+                defaultChair: "Sillón 2 (Escáner 3D / Urgencias)",
+                checklist: ["Calibrar escáner", "Escaneo maxilar y mandibular", "Registro de mordida", "Exportar a nube"]
+            }
+        ];
+
+        const DEFAULT_CLINIC_SCHEDULE = [
+            { dayIndex: 1, dayName: "Lunes", active: true, open: "09:00", close: "19:00", breakStart: "14:00", breakEnd: "16:00" },
+            { dayIndex: 2, dayName: "Martes", active: true, open: "09:00", close: "19:00", breakStart: "14:00", breakEnd: "16:00" },
+            { dayIndex: 3, dayName: "Miércoles", active: true, open: "09:00", close: "19:00", breakStart: "14:00", breakEnd: "16:00" },
+            { dayIndex: 4, dayName: "Jueves", active: true, open: "09:00", close: "19:00", breakStart: "14:00", breakEnd: "16:00" },
+            { dayIndex: 5, dayName: "Viernes", active: true, open: "09:00", close: "19:00", breakStart: "14:00", breakEnd: "16:00" },
+            { dayIndex: 6, dayName: "Sábado", active: true, open: "09:00", close: "14:00", breakStart: "", breakEnd: "" },
+            { dayIndex: 0, dayName: "Domingo", active: false, open: "09:00", close: "14:00", breakStart: "", breakEnd: "" }
+        ];
+
+        let orthoProceduresList = null;
+        let clinicScheduleList = null;
+        let selectedCalendarChairFilter = "all";
+
+        function getCalendarProceduresList() {
+            if (orthoProceduresList) return orthoProceduresList;
+            try {
+                const saved = localStorage.getItem("crd_ortho_procedures_v1");
+                if (saved) orthoProceduresList = JSON.parse(saved);
+            } catch (e) {}
+            if (!orthoProceduresList || orthoProceduresList.length === 0) {
+                orthoProceduresList = JSON.parse(JSON.stringify(DEFAULT_ORTHO_PROCEDURES));
+            }
+            return orthoProceduresList;
+        }
+
+        function saveCalendarProceduresConfig() {
+            const list = getCalendarProceduresList();
+            list.forEach((proc) => {
+                const durEl = document.getElementById(`procDur_${proc.id}`);
+                const bufEl = document.getElementById(`procBuf_${proc.id}`);
+                const chairEl = document.getElementById(`procChair_${proc.id}`);
+                const photoEl = document.getElementById(`procPhoto_${proc.id}`);
+                const labEl = document.getElementById(`procLab_${proc.id}`);
+
+                if (durEl) proc.durationMinutes = Number(durEl.value) || proc.durationMinutes;
+                if (bufEl) proc.bufferMinutes = Number(bufEl.value) || proc.bufferMinutes;
+                if (chairEl) proc.defaultChair = chairEl.value;
+                if (photoEl) proc.requiresTwoPhotos = photoEl.checked;
+                if (labEl) proc.requiresLabReady = labEl.checked;
+            });
+            try {
+                localStorage.setItem("crd_ortho_procedures_v1", JSON.stringify(list));
+            } catch (e) {}
+            renderCalendarProceduresConfig();
+            renderCalendarHub();
+            alert("✓ Configuración de tiempos, buffers y sillones guardada con éxito.");
+        }
+
+        function resetCalendarProceduresToDefault() {
+            if (!confirm("¿Deseas restaurar los tiempos y buffers de los 9 procedimientos a los valores clínicos recomendados?")) return;
+            orthoProceduresList = JSON.parse(JSON.stringify(DEFAULT_ORTHO_PROCEDURES));
+            try {
+                localStorage.setItem("crd_ortho_procedures_v1", JSON.stringify(orthoProceduresList));
+            } catch (e) {}
+            renderCalendarProceduresConfig();
+            renderCalendarHub();
+        }
+
+        function renderCalendarProceduresConfig() {
+            const container = document.getElementById("calProceduresConfigList");
+            if (!container) return;
+            const procs = getCalendarProceduresList();
+
+            container.innerHTML = procs.map((p) => `
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-2xs hover:border-indigo-300 transition">
+                    <div class="flex items-start justify-between gap-2 border-b border-slate-200/80 pb-2">
+                        <div>
+                            <span class="text-[9.5px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full" style="background-color: ${p.colorHex}20; color: ${p.colorHex};">
+                                ${p.category}
+                            </span>
+                            <h4 class="text-xs font-bold text-slate-900 mt-1">${p.name}</h4>
+                        </div>
+                        <span class="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs mt-1" style="background-color: ${p.colorHex};" title="Color Google Calendar"></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="block text-[9.5px] font-bold text-slate-500 uppercase mb-0.5">Duración (min)</label>
+                            <input
+                                type="number"
+                                id="procDur_${p.id}"
+                                value="${p.durationMinutes}"
+                                step="5"
+                                min="10"
+                                max="180"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-[9.5px] font-bold text-slate-500 uppercase mb-0.5">Buffer Desinfección</label>
+                            <input
+                                type="number"
+                                id="procBuf_${p.id}"
+                                value="${p.bufferMinutes}"
+                                step="5"
+                                min="0"
+                                max="30"
+                                class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[9.5px] font-bold text-slate-500 uppercase mb-0.5">Sillón Predeterminado</label>
+                        <select
+                            id="procChair_${p.id}"
+                            class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-900"
+                        >
+                            <option value="Sillón 1 (Ortodoncia Principal)" ${p.defaultChair.includes("Sillón 1") ? "selected" : ""}>🦷 Sillón 1 (Ortodoncia Principal)</option>
+                            <option value="Sillón 2 (Escáner 3D / Urgencias)" ${p.defaultChair.includes("Sillón 2") ? "selected" : ""}>🔬 Sillón 2 (Escáner 3D / Urgencias)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5 pt-1 border-t border-slate-200/60 text-[11px]">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                id="procPhoto_${p.id}"
+                                ${p.requiresTwoPhotos ? "checked" : ""}
+                                class="rounded text-indigo-600 accent-indigo-600"
+                            />
+                            <span class="font-semibold text-slate-700">📸 Requiere 2 fotos obligatorias</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                id="procLab_${p.id}"
+                                ${p.requiresLabReady ? "checked" : ""}
+                                class="rounded text-indigo-600 accent-indigo-600"
+                            />
+                            <span class="font-semibold text-slate-700">🔬 Requiere confirmar laboratorio</span>
+                        </label>
+                    </div>
+
+                    <div class="pt-1 text-[10px] text-slate-500">
+                        <strong>Checklist:</strong> ${p.checklist.join(" • ")}
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function getClinicScheduleList() {
+            if (clinicScheduleList) return clinicScheduleList;
+            try {
+                const saved = localStorage.getItem("crd_clinic_schedule_v1");
+                if (saved) clinicScheduleList = JSON.parse(saved);
+            } catch (e) {}
+            if (!clinicScheduleList || clinicScheduleList.length === 0) {
+                clinicScheduleList = JSON.parse(JSON.stringify(DEFAULT_CLINIC_SCHEDULE));
+            }
+            return clinicScheduleList;
+        }
+
+        function saveClinicScheduleConfig() {
+            const list = getClinicScheduleList();
+            list.forEach((day) => {
+                const actEl = document.getElementById(`schedAct_${day.dayIndex}`);
+                const openEl = document.getElementById(`schedOpen_${day.dayIndex}`);
+                const closeEl = document.getElementById(`schedClose_${day.dayIndex}`);
+                const bStartEl = document.getElementById(`schedBStart_${day.dayIndex}`);
+                const bEndEl = document.getElementById(`schedBEnd_${day.dayIndex}`);
+
+                if (actEl) day.active = actEl.checked;
+                if (openEl) day.open = openEl.value;
+                if (closeEl) day.close = closeEl.value;
+                if (bStartEl) day.breakStart = bStartEl.value;
+                if (bEndEl) day.breakEnd = bEndEl.value;
+            });
+            try {
+                localStorage.setItem("crd_clinic_schedule_v1", JSON.stringify(list));
+            } catch (e) {}
+            renderClinicScheduleConfig();
+            renderCalendarHub();
+            alert("✓ Horarios y días de atención clínica guardados con éxito.");
+        }
+
+        function renderClinicScheduleConfig() {
+            const container = document.getElementById("calScheduleDaysConfigList");
+            if (!container) return;
+            const days = getClinicScheduleList();
+
+            container.innerHTML = days.map((d) => `
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl border ${d.active ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-200 opacity-60'}">
+                    <div class="flex items-center gap-3 w-40 shrink-0">
+                        <input
+                            type="checkbox"
+                            id="schedAct_${d.dayIndex}"
+                            ${d.active ? "checked" : ""}
+                            class="w-4 h-4 rounded text-emerald-600 accent-emerald-600 cursor-pointer"
+                        />
+                        <div>
+                            <h4 class="text-xs font-extrabold text-slate-900">${d.dayName}</h4>
+                            <span class="text-[10px] ${d.active ? 'text-emerald-700 font-bold' : 'text-slate-400'}">
+                                ${d.active ? 'Atención activa' : 'Cerrado'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 text-xs flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Apertura:</span>
+                            <input
+                                type="time"
+                                id="schedOpen_${d.dayIndex}"
+                                value="${d.open}"
+                                class="bg-slate-50 border border-slate-300 rounded-xl px-2 py-1 text-xs font-semibold text-slate-900"
+                            />
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase">Cierre:</span>
+                            <input
+                                type="time"
+                                id="schedClose_${d.dayIndex}"
+                                value="${d.close}"
+                                class="bg-slate-50 border border-slate-300 rounded-xl px-2 py-1 text-xs font-semibold text-slate-900"
+                            />
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-amber-700 uppercase">Receso / Comida:</span>
+                            <input
+                                type="time"
+                                id="schedBStart_${d.dayIndex}"
+                                value="${d.breakStart}"
+                                placeholder="14:00"
+                                class="bg-slate-50 border border-slate-300 rounded-xl px-2 py-1 text-xs font-semibold text-slate-900"
+                            />
+                            <span class="text-slate-400">a</span>
+                            <input
+                                type="time"
+                                id="schedBEnd_${d.dayIndex}"
+                                value="${d.breakEnd}"
+                                placeholder="16:00"
+                                class="bg-slate-50 border border-slate-300 rounded-xl px-2 py-1 text-xs font-semibold text-slate-900"
+                            />
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function onCalendarChairFilterChange(chair) {
+            selectedCalendarChairFilter = chair;
+            renderCalendarHub();
+        }
+
         function setCalendarHubSubView(mode) {
-            const secHub = document.getElementById("calHubInteractiveSection");
+            const secAgenda = document.getElementById("calHubInteractiveSection");
+            const secProcs = document.getElementById("calHubProceduresSection");
+            const secSched = document.getElementById("calHubScheduleSection");
             const secEmbed = document.getElementById("calHubEmbedSection");
-            const btnHub = document.getElementById("calTabBtnHub");
+
+            const btnAgenda = document.getElementById("calTabBtnAgenda") || document.getElementById("calTabBtnHub");
+            const btnProcs = document.getElementById("calTabBtnProcedures");
+            const btnSched = document.getElementById("calTabBtnSchedule");
             const btnEmbed = document.getElementById("calTabBtnEmbed");
 
-            if (mode === "embed") {
-                secHub?.classList.add("hidden");
+            const allSecs = [secAgenda, secProcs, secSched, secEmbed];
+            const allBtns = [btnAgenda, btnProcs, btnSched, btnEmbed];
+
+            allSecs.forEach(s => s?.classList.add("hidden"));
+            allBtns.forEach(b => {
+                if (b) b.className = "text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition whitespace-nowrap";
+            });
+
+            if (mode === "procedures") {
+                secProcs?.classList.remove("hidden");
+                if (btnProcs) btnProcs.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition whitespace-nowrap";
+                renderCalendarProceduresConfig();
+            } else if (mode === "schedule") {
+                secSched?.classList.remove("hidden");
+                if (btnSched) btnSched.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition whitespace-nowrap";
+                renderClinicScheduleConfig();
+            } else if (mode === "embed") {
                 secEmbed?.classList.remove("hidden");
-                if (btnEmbed) btnEmbed.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition";
-                if (btnHub) btnHub.className = "text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                if (btnEmbed) btnEmbed.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition whitespace-nowrap";
                 refreshGoogleCalendarStatusUi();
             } else {
-                secEmbed?.classList.add("hidden");
-                secHub?.classList.remove("hidden");
-                if (btnHub) btnHub.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition";
-                if (btnEmbed) btnEmbed.className = "text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+                secAgenda?.classList.remove("hidden");
+                if (btnAgenda) btnAgenda.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition whitespace-nowrap";
                 renderCalendarHub();
             }
         }
@@ -7301,10 +8791,15 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             // Ordenar citas cronológicamente
             scheduledAppointments.sort((a, b) => new Date(a.startIso || 0).getTime() - new Date(b.startIso || 0).getTime());
 
+            // Filtrar por sillón si está seleccionado
+            const filteredAppointments = selectedCalendarChairFilter === "all"
+                ? scheduledAppointments
+                : scheduledAppointments.filter((a) => (a.chair || "Sillón 1").includes(selectedCalendarChairFilter));
+
             // KPIs
-            const totalAppts = scheduledAppointments.length;
-            const totalMin = scheduledAppointments.reduce((acc, a) => acc + (Number(a.durationMinutes) || 30), 0);
-            const complexCount = scheduledAppointments.filter((a) => (Number(a.durationMinutes) || 30) >= 45 || /tad|microtornillo|cementado|retiro/i.test(a.procedureTitle || "")).length;
+            const totalAppts = filteredAppointments.length;
+            const totalMin = filteredAppointments.reduce((acc, a) => acc + (Number(a.durationMinutes) || 30), 0);
+            const complexCount = filteredAppointments.filter((a) => (Number(a.durationMinutes) || 30) >= 45 || /tad|microtornillo|cementado|retiro/i.test(a.procedureTitle || "")).length;
 
             const statTotal = document.getElementById("calStatTotalAppts");
             const statTime = document.getElementById("calStatChairTime");
@@ -7326,7 +8821,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 const d = new Date(monday);
                 d.setDate(monday.getDate() + i);
                 const iso = d.toISOString().slice(0, 10);
-                const count = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === iso).length;
+                const count = filteredAppointments.filter((a) => (a.startIso || "").slice(0, 10) === iso).length;
                 weekDays.push({ date: d, iso, count });
             }
 
@@ -7376,7 +8871,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
 
             // Horarios de sillón del día seleccionado (09:00 a 19:00)
             const hours = [9, 10, 11, 12, 13, 16, 17, 18, 19];
-            const dayAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === selectedCalendarDayIso);
+            const dayAppts = filteredAppointments.filter((a) => (a.startIso || "").slice(0, 10) === selectedCalendarDayIso);
 
             timelineEl.innerHTML = hours.map((hr) => {
                 const hrLabel = `${String(hr).padStart(2, "0")}:00`;
@@ -7408,7 +8903,10 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                         </div>
                                     </div>
                                     <p class="text-[11px] font-semibold text-indigo-700 mt-0.5">${appt.procedureTitle}</p>
-                                    <p class="text-[10px] text-slate-500 mt-0.5 truncate"><strong>Charola:</strong> ${appt.chairsidePrep || "Control ortodóntico"}</p>
+                                    <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                        <span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-white border border-slate-200 text-slate-600">${appt.chair || "Sillón 1"}</span>
+                                        ${appt.hasTwoPhotos ? `<span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">📸 2 Fotos OK</span>` : `<span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-800">📸 Requiere 2 Fotos</span>`}
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -7433,11 +8931,11 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             }).join("");
 
             // Lista derecha de todas las citas (o filtradas)
-            const listToShow = calHubShowAllDays ? scheduledAppointments : (dayAppts.length > 0 ? dayAppts : scheduledAppointments);
+            const listToShow = calHubShowAllDays ? filteredAppointments : (dayAppts.length > 0 ? dayAppts : filteredAppointments);
             if (listToShow.length === 0) {
                 allListEl.innerHTML = `
                     <div class="p-6 text-center rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-500 space-y-2">
-                        <p class="font-bold text-slate-700">No hay citas registradas en este filtro</p>
+                        <p class="font-bold text-slate-700">No hay citas registradas en este filtro de sillón</p>
                         <button type="button" onclick="openHubAppointmentModal(null)" class="bg-indigo-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs">+ Agendar primera cita</button>
                     </div>
                 `;
@@ -7455,13 +8953,27 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                     ? new Date(appt.startIso).toLocaleString("es-MX", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
                     : "Por confirmar";
 
+                const isLabNeeded = /alineador|tad|atp|retenedor/i.test(appt.procedureTitle || "");
+                const labBadge = isLabNeeded
+                    ? (appt.labConfirmed ? `<span class="text-[9.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">🔬 Lab Listo</span>` : `<span class="text-[9.5px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">⚠️ Falta Confirmar Lab</span>`)
+                    : "";
+
+                const photoBadge = appt.hasTwoPhotos
+                    ? `<span class="text-[9.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">📸 2 Fotos OK</span>`
+                    : `<span class="text-[9.5px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">📸 Requiere 2 Fotos</span>`;
+
                 return `
                     <div class="p-3.5 rounded-2xl bg-slate-50/90 hover:bg-white border border-slate-200/90 shadow-2xs transition space-y-2">
                         <div class="flex justify-between items-start gap-2">
                             <div>
-                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-                                    🗓️ ${dtFmt} • ${appt.durationMinutes || 30} min
-                                </span>
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                        🗓️ ${dtFmt} • ${appt.durationMinutes || 30} min
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">
+                                        ${appt.chair || "Sillón 1 (Ortodoncia Principal)"}
+                                    </span>
+                                </div>
                                 <h3 class="text-xs font-extrabold text-slate-900 mt-1">${appt.patientName}</h3>
                                 <p class="text-[11px] font-semibold text-slate-700">${appt.procedureTitle}</p>
                             </div>
@@ -7485,6 +8997,12 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                             </div>
                         </div>
 
+                        <!-- Badges de Sillón, Laboratorio y Fotos Obligatorias -->
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            ${labBadge}
+                            ${photoBadge}
+                        </div>
+
                         <div class="p-2 rounded-xl bg-white border border-slate-200/80 text-[10.5px] text-slate-600">
                             <strong class="text-slate-800">🧰 Charola de Sillón:</strong> ${appt.chairsidePrep || "Instrumental de control ortodóntico"}
                         </div>
@@ -7497,7 +9015,15 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                     class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
                                 >
                                     <i class="ph-bold ph-folder-open"></i>
-                                    <span>Abrir Expediente</span>
+                                    <span>Expediente</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="openEvolutionCheckinModal('${appt.id}')"
+                                    class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                                >
+                                    <i class="ph-bold ph-camera"></i>
+                                    <span>2 Fotos</span>
                                 </button>
                             ` : ""}
                             <a
@@ -7507,7 +9033,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                 class="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
                             >
                                 <i class="ph-bold ph-google-logo"></i>
-                                <span>Sincronizar Google</span>
+                                <span>Google</span>
                             </a>
                             <a
                                 href="${waUrl}"
