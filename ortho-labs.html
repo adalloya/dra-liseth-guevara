@@ -283,6 +283,24 @@
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
         }
 
+        /* Estilos Doctor Site ClinCheck Records Suite */
+        #doctorSiteRecordsModal {
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        html.light #doctorSiteRecordsModal {
+            background-color: #f4f4f5 !important;
+            color: #18181b !important;
+        }
+        html.light #doctorSiteRecordsModal header {
+            background-color: #ffffff !important;
+            border-color: #e4e4e7 !important;
+        }
+        html.light #doctorSiteRecordsModal .bg-white {
+            background-color: #ffffff !important;
+            border-color: #e4e4e7 !important;
+        }
+
         .sig-pad-canvas {
             touch-action: none;
             cursor: crosshair;
@@ -724,9 +742,9 @@
                 <span class="hidden md:inline">Flujo Formlabs</span>
             </button>
 
-            <button onclick="openMediaUploadTrigger()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-medium text-emerald-300 flex items-center space-x-1.5 transition" title="Subir Fotografías o Radiografías">
-                <i class="ph-bold ph-camera-plus text-sm"></i>
-                <span class="hidden sm:inline">+ Fotos / Rx</span>
+            <button onclick="openDoctorSiteRecordsModal()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-semibold text-emerald-300 flex items-center space-x-1.5 transition shadow-sm" title="Abrir Suite Completa de Registros Clínicos, Rayos X y Escaneos 3D (Estilo ClinCheck Doctor Site)">
+                <i class="ph-bold ph-squares-four text-sm text-emerald-400"></i>
+                <span class="hidden sm:inline">Fotos, Rx &amp; 3D</span>
             </button>
 
             <button onclick="openExportPDFModal()" class="px-2.5 py-1.5 rounded-xl bg-[#0a84ff]/20 hover:bg-[#0a84ff]/30 border border-[#0a84ff]/40 text-xs font-semibold text-sky-300 flex items-center space-x-1.5 transition shadow-sm" title="Exportar Expediente Clínico PDF">
@@ -1168,12 +1186,32 @@
                         <h2 class="text-base font-bold text-white tracking-tight">Estudios Fotográficos y Radiográficos</h2>
                         <p class="text-xs text-zinc-400">Toca cualquier estudio para abrir en Pantalla Completa o reemplazar</p>
                     </div>
-                    <input type="file" id="batchPhotoInput" accept="image/*" multiple class="hidden" onchange="handleBatchPhotoUpload(event)">
-                    <button onclick="document.getElementById('batchPhotoInput').click()" class="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold flex items-center space-x-1.5 shadow-md transition shrink-0">
-                        <i class="ph-bold ph-upload-simple"></i>
-                        <span>Subir Fotos Reales</span>
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openDoctorSiteRecordsModal()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition shrink-0">
+                            <i class="ph-bold ph-squares-four"></i>
+                            <span>Suite 3 Columnas</span>
+                        </button>
+                        <input type="file" id="batchPhotoInput" accept="image/*" multiple class="hidden" onchange="handleBatchPhotoUpload(event)">
+                        <button onclick="document.getElementById('batchPhotoInput').click()" class="px-3 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold flex items-center space-x-1.5 shadow-md transition shrink-0">
+                            <i class="ph-bold ph-upload-simple"></i>
+                            <span class="hidden sm:inline">Subir Fotos</span>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Botón de apertura a pantalla completa estilo ClinCheck Doctor Site -->
+                <button onclick="openDoctorSiteRecordsModal()" class="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-sky-500/15 via-indigo-500/15 to-purple-500/15 hover:from-sky-500/25 hover:via-indigo-500/25 hover:to-purple-500/25 border border-sky-400/30 text-sky-300 font-semibold text-xs flex items-center justify-between transition shadow-sm">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400">
+                            <i class="ph-bold ph-squares-four text-base"></i>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-white text-xs font-bold">Suite ClinCheck Doctor Site (3 Columnas)</div>
+                            <div class="text-[11px] text-zinc-400">Fotos Individuales (12) • Rayo X (3) • Escaneo y 3D</div>
+                        </div>
+                    </div>
+                    <i class="ph-bold ph-arrow-square-out text-base text-sky-400"></i>
+                </button>
 
                 <!-- Banner informativo amigable -->
                 <div class="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/25 flex items-start space-x-2.5 text-xs text-zinc-300">
@@ -2723,6 +2761,301 @@
         // ============================================================================
         // 6. GALERÍA DE FOTOS INTRAORALES Y RAYOS X + UPLOAD DE ARCHIVOS REALES
         // ============================================================================
+        // ============================================================================
+        // CLINCHECK DOCTOR SITE RECORDS SUITE (DATA & LOGIC)
+        // ============================================================================
+        let dsActiveTab = 'main';
+        let dsTargetSlotId = null;
+
+        const dsPhotoSlots = [
+            { id: "foto-profile", title: "1. Perfil Derecho (Extraoral)", short: "Perfil", svg: "profile", findings: "Perfil convexo suave, ángulo nasolabial armónico, tercio inferior ligeramente aumentado." },
+            { id: "foto-front-rest", title: "2. Frontal en Reposo (Extraoral)", short: "Frontal Reposo", svg: "front_rest", findings: "Exposición incisal pasiva en reposo de 2.0 mm, simetría facial conservada." },
+            { id: "foto-front-smile", title: "3. Frontal en Sonrisa (Extraoral)", short: "Frontal Sonrisa", svg: "front_smile", findings: "Línea de sonrisa alta con exposición de la mordida abierta anterior y diastema 11-21." },
+            { id: "foto-upper", title: "4. Oclusal Superior (Intraoral)", short: "Oclusal Sup.", svg: "upper", findings: "Arco maxilar con ausencia de 14 y 24, diastema central de 0.6 mm entre 11 y 21." },
+            { id: "foto-smile-teeth", title: "5. Guía Facial / Hábito Lingual", short: "Guía Facial", svg: "face_smile", findings: "Hábito lingual adaptativo manteniendo la brecha anterior; referencia de plano estético." },
+            { id: "foto-lower", title: "6. Oclusal Inferior (Intraoral)", short: "Oclusal Inf.", svg: "lower", findings: "Arco mandibular sin 34 y 44, severo apiñamiento anteroinferior y rotación de 42 y 32." },
+            { id: "foto-right", title: "7. Lateral Derecha en Oclusión", short: "Lateral Der.", svg: "right", findings: "Relación canina Clase I con falta de guía incisiva anterior por desoclusión." },
+            { id: "foto-front-intra", title: "8. Frontal en Oclusión (Intraoral)", short: "Frontal Intraoral", svg: "frontal", findings: "Mordida abierta anterior severa (-4.5 mm) de canino a canino; diastema 11-21." },
+            { id: "foto-left", title: "9. Lateral Izquierda en Oclusión", short: "Lateral Izq.", svg: "left", findings: "Relación canina Clase I izquierda, contacto exclusivo en molares y premolares." },
+            { id: "schema-right", title: "10. Esquema Sagital Derecho", short: "Esquema Der.", svg: "schema_right", findings: "Diagrama oclusal sagital derecho mostrando anclaje molar y contactos premolares." },
+            { id: "schema-front", title: "11. Esquema de Sobremordida", short: "Sobremordida", svg: "schema_front", findings: "Esquema frontal de brecha vertical negativa (-4.5 mm) y desoclusión anterior." },
+            { id: "schema-left", title: "12. Esquema Sagital Izquierdo", short: "Esquema Izq.", svg: "schema_left", findings: "Diagrama oclusal sagital izquierdo mostrando alineación y espacios cerrados." }
+        ];
+
+        const dsXRaySlots = [
+            { id: "rx-panoramic", title: "1. Rx Panorámica (Ortopantomografía IDI)", badge: "IDI Mérida • Alerta Enanismo Radicular", svg: "panoramic", findings: "Raíces cortas con ápices blunted (proporción corona-raíz 1:1.1 en sector anterior). Ausencia de 14, 24, 34, 44." },
+            { id: "rx-periapical", title: "2. Serie Periapical & Cortes CBCT", badge: "Alta Resolución • Evaluación Ósea IZC", svg: "periapical", findings: "Evaluación ósea de cresta infracigomática (IZC) para microtornillos y soporte periodontal anteroinferior." },
+            { id: "rx-cephalometric", title: "3. Rx Lateral de Cráneo Cefalométrica", badge: "Trazado Cefalométrico • Ángulo Hiperdivergente", svg: "cephalometric", findings: "Patrón hiperdivergente, mordida abierta anterior severa (-4.5 mm) y proinclinación compensatoria (IMPA 98.5°)." }
+        ];
+
+        let dsCustomMedia = {};
+
+        function openDoctorSiteRecordsModal() {
+            const modal = document.getElementById('doctorSiteRecordsModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                renderDoctorSiteGallery();
+            }
+        }
+
+        function closeDoctorSiteRecordsModal() {
+            const modal = document.getElementById('doctorSiteRecordsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function setDoctorSiteTab(tab) {
+            dsActiveTab = tab;
+            const mainView = document.getElementById('dsMainView');
+            const compareView = document.getElementById('dsCompareView');
+            const tabMain = document.getElementById('dsTabMain');
+            const tabCompare = document.getElementById('dsTabCompare');
+
+            if (tab === 'main') {
+                if (mainView) mainView.classList.remove('hidden');
+                if (compareView) compareView.classList.add('hidden');
+                if (tabMain) tabMain.className = "px-3 py-1.5 text-xs font-semibold text-[#0a84ff] border-b-2 border-[#0a84ff] flex items-center space-x-1.5 transition";
+                if (tabCompare) tabCompare.className = "px-3 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border-b-2 border-transparent flex items-center space-x-1.5 transition";
+            } else {
+                if (mainView) mainView.classList.add('hidden');
+                if (compareView) compareView.classList.remove('hidden');
+                if (tabCompare) tabCompare.className = "px-3 py-1.5 text-xs font-semibold text-[#0a84ff] border-b-2 border-[#0a84ff] flex items-center space-x-1.5 transition";
+                if (tabMain) tabMain.className = "px-3 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border-b-2 border-transparent flex items-center space-x-1.5 transition";
+                renderDoctorSiteCompare();
+            }
+        }
+
+        function renderDoctorSiteGallery() {
+            // 1. Fotos individuales (12 Slots en Grid 3x4)
+            const photoGrid = document.getElementById('dsPhotoGrid');
+            if (photoGrid) {
+                photoGrid.innerHTML = dsPhotoSlots.map((slot, idx) => {
+                    const customImg = dsCustomMedia[slot.id];
+                    return `
+                        <div id="dsSlotCard-${slot.id}" 
+                             ondragover="handleDSSlotDragOver(event, '${slot.id}')"
+                             ondragleave="handleDSSlotDragLeave(event, '${slot.id}')"
+                             ondrop="handleDSSlotDrop(event, '${slot.id}')"
+                             class="group relative rounded-xl overflow-hidden bg-white dark:bg-[#18181c] border border-zinc-200 dark:border-white/10 aspect-[4/3] flex flex-col justify-between shadow-xs hover:shadow-md transition cursor-pointer">
+                            
+                            <!-- Contenedor Visual (Foto Subida o SVG Realista) -->
+                            <div onclick="openDSSlotLightbox('${slot.id}')" class="w-full h-full absolute inset-0 flex items-center justify-center overflow-hidden bg-zinc-100 dark:bg-zinc-950">
+                                ${customImg 
+                                    ? `<img src="${customImg}" alt="${slot.title}" class="w-full h-full object-cover">`
+                                    : generateClinicalArtworkSVG(slot.svg)}
+                            </div>
+
+                            <!-- Pastilla con Título en esquina inferior -->
+                            <div class="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between pointer-events-none">
+                                <span class="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white text-[9px] font-semibold truncate max-w-[85%]">
+                                    ${slot.short}
+                                </span>
+                                ${customImg ? `<span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>` : ''}
+                            </div>
+
+                            <!-- Overlay de Acciones Rápidas en Hover -->
+                            <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                                <div class="flex items-center justify-between text-white text-[10px]">
+                                    <span class="font-bold truncate">${slot.short}</span>
+                                    <button onclick="event.stopPropagation(); triggerDSSlotUpload('${slot.id}')" class="w-6 h-6 rounded-md bg-white/20 hover:bg-white/30 flex items-center justify-center" title="Subir Foto">
+                                        <i class="ph-bold ph-upload-simple"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-center space-x-1.5">
+                                    <button onclick="event.stopPropagation(); openDSSlotLightbox('${slot.id}')" class="px-2 py-1 rounded-md bg-white text-slate-900 text-[10px] font-bold shadow hover:bg-zinc-100 flex items-center space-x-1">
+                                        <i class="ph-bold ph-arrows-out"></i>
+                                        <span>Ver</span>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); openLiveCameraForSlot('${slot.id}')" class="px-2 py-1 rounded-md bg-rose-500 text-white text-[10px] font-bold shadow hover:bg-rose-600 flex items-center space-x-1">
+                                        <i class="ph-bold ph-camera"></i>
+                                        <span>Cámara</span>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); pinDSSlotToPiP('${slot.id}')" class="px-2 py-1 rounded-md bg-sky-500 text-white text-[10px] font-bold shadow hover:bg-sky-600" title="Ver en PiP 3D">
+                                        <i class="ph-bold ph-picture-in-picture"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 2. Columna Rayo X (3 Cards)
+            const xrayContainer = document.getElementById('dsXRayContainer');
+            if (xrayContainer) {
+                xrayContainer.innerHTML = dsXRaySlots.map((slot, idx) => {
+                    const customImg = dsCustomMedia[slot.id];
+                    return `
+                        <div id="dsSlotCard-${slot.id}"
+                             ondragover="handleDSSlotDragOver(event, '${slot.id}')"
+                             ondragleave="handleDSSlotDragLeave(event, '${slot.id}')"
+                             ondrop="handleDSSlotDrop(event, '${slot.id}')"
+                             class="group relative rounded-2xl overflow-hidden bg-white dark:bg-[#18181c] border border-zinc-200 dark:border-white/10 flex-1 min-h-[155px] sm:min-h-[175px] shadow-sm hover:shadow-md transition flex flex-col justify-between cursor-pointer">
+                            
+                            <!-- Viewport de Radiografía -->
+                            <div onclick="openDSSlotLightbox('${slot.id}')" class="w-full h-full absolute inset-0 flex items-center justify-center bg-[#07090e] overflow-hidden">
+                                ${customImg 
+                                    ? `<img src="${customImg}" alt="${slot.title}" class="w-full h-full object-contain">`
+                                    : generateClinicalArtworkSVG(slot.svg)}
+                            </div>
+
+                            <!-- Header flotante de la Rx -->
+                            <div class="absolute top-2 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                                <span class="px-2.5 py-0.5 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-bold text-sky-300 border border-white/10 truncate max-w-[85%]">
+                                    ${slot.badge}
+                                </span>
+                                ${customImg ? `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>` : ''}
+                            </div>
+
+                            <!-- Botón Expandir en Esquina Inferior Derecha (estilo ClinCheck ⤢) -->
+                            <button onclick="event.stopPropagation(); openDSSlotLightbox('${slot.id}')" class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-black/60 hover:bg-black/90 backdrop-blur-md text-white flex items-center justify-center shadow-md transition z-10" title="Ver en Pantalla Completa">
+                                <i class="ph-bold ph-corners-out text-xs"></i>
+                            </button>
+
+                            <!-- Overlay de Acciones Rápidas en Hover -->
+                            <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 p-3">
+                                <button onclick="event.stopPropagation(); openDSSlotLightbox('${slot.id}')" class="px-3 py-1.5 rounded-xl bg-white text-slate-900 text-xs font-semibold shadow hover:bg-zinc-100 flex items-center space-x-1.5">
+                                    <i class="ph-bold ph-arrows-out"></i>
+                                    <span>Expandir</span>
+                                </button>
+                                <button onclick="event.stopPropagation(); triggerDSSlotUpload('${slot.id}')" class="px-3 py-1.5 rounded-xl bg-[#0a84ff] text-white text-xs font-semibold shadow hover:bg-[#0070e0] flex items-center space-x-1.5">
+                                    <i class="ph-bold ph-upload-simple"></i>
+                                    <span>Subir Rx Real</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 3. Columna Escaneo y 3D (Placeholders Realistas)
+            const scanPlaceholder = document.getElementById('dsScanVisualPlaceholder');
+            if (scanPlaceholder) {
+                scanPlaceholder.innerHTML = generateClinicalArtworkSVG('scan_3d_thumb');
+            }
+
+            const clincheckPlaceholder = document.getElementById('dsClincheckVisualPlaceholder');
+            if (clincheckPlaceholder) {
+                clincheckPlaceholder.innerHTML = generateClinicalArtworkSVG('clincheck_3d_thumb');
+            }
+        }
+
+        function renderDoctorSiteCompare() {
+            const compA = document.getElementById('compareScanA');
+            const compB = document.getElementById('compareScanB');
+            if (compA) compA.innerHTML = generateClinicalArtworkSVG('scan_3d_thumb');
+            if (compB) compB.innerHTML = generateClinicalArtworkSVG('clincheck_3d_thumb');
+        }
+
+        // ============================================================================
+        // DRAG & DROP Y SUBIDA EN SLOTS DEL CLINCHECK DOCTOR SITE
+        // ============================================================================
+        function handleDSSlotDragOver(e, slotId) {
+            e.preventDefault();
+            const card = document.getElementById(`dsSlotCard-${slotId}`);
+            if (card) {
+                card.classList.add('ring-2', 'ring-sky-500', 'scale-[1.02]');
+            }
+        }
+
+        function handleDSSlotDragLeave(e, slotId) {
+            e.preventDefault();
+            const card = document.getElementById(`dsSlotCard-${slotId}`);
+            if (card) {
+                card.classList.remove('ring-2', 'ring-sky-500', 'scale-[1.02]');
+            }
+        }
+
+        function handleDSSlotDrop(e, slotId) {
+            e.preventDefault();
+            const card = document.getElementById(`dsSlotCard-${slotId}`);
+            if (card) {
+                card.classList.remove('ring-2', 'ring-sky-500', 'scale-[1.02]');
+            }
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+                const file = e.dataTransfer.files[0];
+                processDSSlotFile(file, slotId);
+            }
+        }
+
+        function triggerDSSlotUpload(slotId) {
+            dsTargetSlotId = slotId;
+            const input = document.getElementById('dsSlotFileInput');
+            if (input) input.click();
+        }
+
+        function handleDSSlotFileSelected(e) {
+            if (e.target.files && e.target.files[0] && dsTargetSlotId) {
+                processDSSlotFile(e.target.files[0], dsTargetSlotId);
+            }
+        }
+
+        function processDSSlotFile(file, slotId) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const dataUrl = evt.target.result;
+                dsCustomMedia[slotId] = dataUrl;
+                
+                // Sincronizar también con clinicalMediaItems si coincide
+                const mediaIdx = clinicalMediaItems.findIndex(m => m.id === slotId || m.svgType === slotId.replace('foto-', '').replace('rx-', ''));
+                if (mediaIdx !== -1) {
+                    clinicalMediaItems[mediaIdx].customUrl = dataUrl;
+                }
+
+                renderDoctorSiteGallery();
+                renderClinicalMediaGallery();
+                showToast(`¡Archivo asignado exitosamente a la casilla!`);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openLiveCameraForSlot(slotId) {
+            openLiveCameraModal(2);
+            const slotSelect = document.getElementById('cameraSlotTarget');
+            if (slotSelect) {
+                dsTargetSlotId = slotId;
+            }
+        }
+
+        function pinDSSlotToPiP(slotId) {
+            const customImg = dsCustomMedia[slotId];
+            const slot = [...dsPhotoSlots, ...dsXRaySlots].find(s => s.id === slotId);
+            if (!slot) return;
+
+            document.getElementById('pipPhotoTitle').innerText = slot.title;
+            document.getElementById('pipPhotoContainer').innerHTML = customImg
+                ? `<img src="${customImg}" class="w-full h-full object-cover">`
+                : generateClinicalArtworkSVG(slot.svg);
+            document.getElementById('photoComparePiP').classList.remove('hidden');
+            closeDoctorSiteRecordsModal();
+            showToast(`Mostrando "${slot.short || slot.title}" en PiP 3D`);
+        }
+
+        function openDSSlotLightbox(slotId) {
+            const slot = [...dsPhotoSlots, ...dsXRaySlots].find(s => s.id === slotId);
+            if (!slot) return;
+
+            document.getElementById('lightboxCategory').innerText = slot.title;
+            document.getElementById('lightboxTitle').innerText = slot.title;
+            document.getElementById('lightboxFindings').innerText = slot.findings;
+            document.getElementById('lightboxCounter').innerText = "Registro Clínico Doctor Site";
+
+            const vp = document.getElementById('lightboxVisualViewport');
+            if (vp) {
+                vp.innerHTML = dsCustomMedia[slotId]
+                    ? `<img src="${dsCustomMedia[slotId]}" class="max-h-full max-w-full object-contain rounded-xl">`
+                    : generateClinicalArtworkSVG(slot.svg);
+            }
+
+            document.getElementById('mediaLightboxModal').classList.remove('hidden');
+        }
+
+        // ============================================================================
+        // GENERADOR DE ARTE VECTORIAL CLÍNICO PARA TODOS LOS SLOTS
+        // ============================================================================
         function generateClinicalArtworkSVG(type) {
             if (type === 'panoramic') {
                 return `
@@ -2812,13 +3145,223 @@
                     <text x="130" y="19" fill="#fda4af" font-size="9" font-family="monospace">MORDIDA ABIERTA ANTERIOR (-4.5MM) + APIÑAMIENTO INF</text>
                 </svg>`;
             }
-            return `
-            <svg viewBox="0 0 400 220" class="w-full h-full bg-[#181216]">
-                <rect width="400" height="220" fill="#1f1318"/>
-                <circle cx="200" cy="110" r="82" fill="none" stroke="#f472b6" stroke-width="18" opacity="0.35"/>
-                <text x="115" y="112" fill="#f8fafc" font-size="11" font-family="monospace">VISTA ${type.toUpperCase()} • 12 DIENTES POR ARCADA</text>
-                <text x="110" y="130" fill="#fbbf24" font-size="9" font-family="monospace">Espacios de 14, 24, 34 y 44 Cerrados</text>
-            </svg>`;
+            if (type === 'upper' || type === 'lower') {
+                return `
+                <svg viewBox="0 0 400 220" class="w-full h-full bg-[#181216]">
+                    <rect width="400" height="220" fill="#1f1318"/>
+                    <circle cx="200" cy="110" r="82" fill="none" stroke="#f472b6" stroke-width="18" opacity="0.35"/>
+                    <text x="115" y="112" fill="#f8fafc" font-size="11" font-family="monospace">VISTA ${type.toUpperCase()} • 12 DIENTES POR ARCADA</text>
+                    <text x="110" y="130" fill="#fbbf24" font-size="9" font-family="monospace">Espacios de 14, 24, 34 y 44 Cerrados</text>
+                </svg>`;
+            }
+
+            if (type === 'profile') {
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900">
+                    <path d="M50,15 L105,15 Q145,20 145,65 Q158,80 145,95 L148,110 Q145,120 135,125 Q138,135 125,145 L70,145 Z" fill="#ffffff" stroke="#71717a" stroke-width="2"/>
+                    <path d="M125,55 Q148,70 145,85 L140,88 L147,105 Q145,115 136,120 L140,132 Q130,140 115,142" fill="none" stroke="#52525b" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="110" cy="62" r="3.5" fill="#52525b"/>
+                    <path d="M135,112 Q144,115 132,122" fill="none" stroke="#52525b" stroke-width="1.8"/>
+                    <text x="14" y="22" fill="#71717a" font-size="8" font-family="sans-serif" font-weight="bold">PERFIL DERECHO</text>
+                </svg>`;
+            }
+
+            if (type === 'front_rest') {
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900">
+                    <path d="M60,25 C60,5 140,5 140,25 C140,85 130,140 100,145 C70,140 60,85 60,25 Z" fill="#ffffff" stroke="#71717a" stroke-width="2"/>
+                    <ellipse cx="82" cy="68" rx="5" ry="3" fill="#52525b"/>
+                    <ellipse cx="118" cy="68" rx="5" ry="3" fill="#52525b"/>
+                    <path d="M98,78 L102,94 L96,96" fill="none" stroke="#71717a" stroke-width="2"/>
+                    <line x1="88" y1="112" x2="112" y2="112" stroke="#52525b" stroke-width="2.5" stroke-linecap="round"/>
+                    <text x="14" y="22" fill="#71717a" font-size="8" font-family="sans-serif" font-weight="bold">FRONTAL REPOSO</text>
+                </svg>`;
+            }
+
+            if (type === 'front_smile') {
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900">
+                    <path d="M60,25 C60,5 140,5 140,25 C140,85 130,140 100,145 C70,140 60,85 60,25 Z" fill="#ffffff" stroke="#71717a" stroke-width="2"/>
+                    <ellipse cx="82" cy="68" rx="5" ry="3" fill="#52525b"/>
+                    <ellipse cx="118" cy="68" rx="5" ry="3" fill="#52525b"/>
+                    <path d="M98,78 L102,94 L96,96" fill="none" stroke="#71717a" stroke-width="2"/>
+                    <path d="M78,110 Q100,132 122,110 Q100,118 78,110 Z" fill="#ffffff" stroke="#71717a" stroke-width="2"/>
+                    <text x="14" y="22" fill="#71717a" font-size="8" font-family="sans-serif" font-weight="bold">FRONTAL SONRISA</text>
+                </svg>`;
+            }
+
+            if (type === 'face_smile') {
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900">
+                    <circle cx="25" cy="25" r="11" fill="none" stroke="#71717a" stroke-width="1.8"/>
+                    <circle cx="25" cy="25" r="4" fill="#71717a"/>
+                    <path d="M65,40 C65,15 135,15 135,40 C135,95 125,140 100,144 C75,140 65,95 65,40 Z" fill="#ffffff" stroke="#71717a" stroke-width="2"/>
+                    <ellipse cx="84" cy="66" rx="4.5" ry="2.5" fill="#52525b"/>
+                    <ellipse cx="116" cy="66" rx="4.5" ry="2.5" fill="#52525b"/>
+                    <path d="M98,75 L102,88 L96,90" fill="none" stroke="#71717a" stroke-width="1.8"/>
+                    <path d="M80,105 Q100,126 120,105 Q100,114 80,105 Z" fill="#ffffff" stroke="#71717a" stroke-width="1.8"/>
+                </svg>`;
+            }
+
+            if (type === 'schema_front') {
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900 p-2">
+                    <g fill="#ffffff" stroke="#52525b" stroke-width="2" stroke-linejoin="round">
+                        <path d="M30,50 C30,28 48,28 48,50 C48,62 30,62 30,50 Z"/>
+                        <path d="M50,53 C50,26 70,26 70,53 C70,66 50,66 50,53 Z"/>
+                        <path d="M72,55 C72,24 94,24 94,55 C94,70 72,70 72,55 Z"/>
+                        <path d="M106,55 C106,24 128,24 128,55 C128,70 106,70 106,55 Z"/>
+                        <path d="M130,53 C130,26 150,26 150,53 C150,66 130,66 130,53 Z"/>
+                        <path d="M152,50 C152,28 170,28 170,50 C170,62 152,62 152,50 Z"/>
+                    </g>
+                    <line x1="75" y1="73" x2="125" y2="73" stroke="#f43f5e" stroke-width="2" stroke-dasharray="3,2"/>
+                    <g fill="#ffffff" stroke="#52525b" stroke-width="2" stroke-linejoin="round">
+                        <path d="M35,96 C35,116 50,116 50,96 C50,86 35,86 35,96 Z"/>
+                        <path d="M52,94 C52,118 68,118 68,94 C68,82 52,82 52,94 Z"/>
+                        <path d="M70,92 C70,120 92,120 92,92 C92,78 70,78 70,92 Z"/>
+                        <path d="M108,92 C108,120 130,120 130,92 C130,78 108,78 108,92 Z"/>
+                        <path d="M132,94 C132,118 148,118 148,94 C148,82 132,82 132,94 Z"/>
+                        <path d="M150,96 C150,116 165,116 165,96 C165,86 150,86 150,96 Z"/>
+                    </g>
+                    <text x="14" y="20" fill="#71717a" font-size="8" font-family="monospace">ESQUEMA OVERBITE -4.5MM</text>
+                </svg>`;
+            }
+
+            if (type === 'schema_right' || type === 'schema_left') {
+                const isR = (type === 'schema_right');
+                return `
+                <svg viewBox="0 0 200 150" class="w-full h-full bg-[#f4f4f5] dark:bg-zinc-900 p-2">
+                    <g fill="#ffffff" stroke="#52525b" stroke-width="2" stroke-linejoin="round" transform="${isR ? '' : 'scale(-1, 1) translate(-200, 0)'}">
+                        <path d="M25,52 C25,28 42,28 42,52 C42,65 25,65 25,52 Z"/>
+                        <path d="M45,54 C45,26 62,26 62,54 C62,67 45,67 45,54 Z"/>
+                        <path d="M65,56 C65,24 85,24 85,56 C85,70 65,70 65,56 Z"/>
+                        <path d="M88,58 C88,24 115,24 115,58 C115,70 88,70 88,58 Z"/>
+                        <path d="M118,58 C118,24 148,24 148,58 C148,70 118,70 118,58 Z"/>
+                        <path d="M151,58 C151,24 182,24 182,58 C182,70 151,70 151,58 Z"/>
+                        
+                        <path d="M30,95 C30,118 45,118 45,95 C45,84 30,84 30,95 Z"/>
+                        <path d="M48,93 C48,118 64,118 64,93 C64,82 48,82 48,93 Z"/>
+                        <path d="M67,91 C67,120 87,120 87,91 C87,79 67,79 67,91 Z"/>
+                        <path d="M90,89 C90,122 118,122 118,89 C118,78 90,78 90,89 Z"/>
+                        <path d="M121,89 C121,122 152,122 152,89 C152,78 121,78 121,89 Z"/>
+                        <path d="M155,89 C155,122 186,122 186,89 C186,78 155,78 155,89 Z"/>
+                    </g>
+                    <text x="14" y="20" fill="#71717a" font-size="8" font-family="monospace">${isR ? 'SAGITAL DER.' : 'SAGITAL IZQ.'}</text>
+                </svg>`;
+            }
+
+            if (type === 'periapical') {
+                return `
+                <svg viewBox="0 0 320 200" class="w-full h-full bg-[#0a0d14] p-3">
+                    <g stroke="#334155" stroke-width="1.2">
+                        <rect x="8" y="8" width="94" height="88" rx="6" fill="#131b2e"/>
+                        <rect x="113" y="8" width="94" height="88" rx="6" fill="#131b2e"/>
+                        <rect x="218" y="8" width="94" height="88" rx="6" fill="#131b2e"/>
+                        <rect x="8" y="104" width="94" height="88" rx="6" fill="#131b2e"/>
+                        <rect x="113" y="104" width="94" height="88" rx="6" fill="#131b2e"/>
+                        <rect x="218" y="104" width="94" height="88" rx="6" fill="#131b2e"/>
+                    </g>
+                    <g fill="#cbd5e1" opacity="0.85">
+                        <path d="M40,30 Q55,45 55,75 L65,75 Q65,45 80,30 Z"/>
+                        <path d="M145,28 Q160,45 160,78 L170,78 Q170,45 185,28 Z"/>
+                        <path d="M250,30 Q265,45 265,75 L275,75 Q275,45 290,30 Z"/>
+                        <path d="M45,170 Q55,145 55,120 L65,120 Q65,145 75,170 Z"/>
+                        <path d="M150,172 Q160,145 160,118 L170,118 Q170,145 180,172 Z"/>
+                        <path d="M255,170 Q265,145 265,120 L275,120 Q275,145 285,170 Z"/>
+                    </g>
+                    <text x="14" y="22" fill="#38bdf8" font-size="8" font-family="monospace">SERIE PERIAPICAL & CBCT IDI</text>
+                </svg>`;
+            }
+
+            if (type === 'scan_3d_thumb') {
+                return `
+                <svg viewBox="0 0 320 200" class="w-full h-full bg-[#f8fafc] dark:bg-[#0c0d12]">
+                    <defs>
+                        <linearGradient id="gumGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#fb7185"/>
+                            <stop offset="100%" stop-color="#e11d48"/>
+                        </linearGradient>
+                        <linearGradient id="toothGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="100%" stop-color="#e2e8f0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M30,30 Q160,10 290,30 L285,75 Q160,55 35,75 Z" fill="url(#gumGrad)" opacity="0.95"/>
+                    <path d="M30,170 Q160,190 290,170 L285,125 Q160,145 35,125 Z" fill="url(#gumGrad)" opacity="0.95"/>
+                    <g fill="url(#toothGrad)" stroke="#cbd5e1" stroke-width="0.8">
+                        <rect x="42" y="62" width="22" height="24" rx="4"/>
+                        <rect x="68" y="60" width="24" height="25" rx="4"/>
+                        <rect x="96" y="58" width="22" height="26" rx="4"/>
+                        <rect x="122" y="55" width="32" height="30" rx="5"/>
+                        <rect x="166" y="55" width="32" height="30" rx="5"/>
+                        <rect x="202" y="58" width="22" height="26" rx="4"/>
+                        <rect x="228" y="60" width="24" height="25" rx="4"/>
+                        <rect x="256" y="62" width="22" height="24" rx="4"/>
+                    </g>
+                    <g fill="url(#toothGrad)" stroke="#cbd5e1" stroke-width="0.8">
+                        <rect x="42" y="114" width="22" height="24" rx="4"/>
+                        <rect x="68" y="115" width="24" height="25" rx="4"/>
+                        <rect x="96" y="116" width="22" height="26" rx="4"/>
+                        <rect x="124" y="120" width="22" height="25" rx="4" transform="rotate(8 135 132)"/>
+                        <rect x="150" y="122" width="20" height="26" rx="4"/>
+                        <rect x="174" y="120" width="22" height="25" rx="4" transform="rotate(-8 185 132)"/>
+                        <rect x="202" y="116" width="22" height="26" rx="4"/>
+                        <rect x="228" y="115" width="24" height="25" rx="4"/>
+                        <rect x="256" y="114" width="22" height="24" rx="4"/>
+                    </g>
+                </svg>`;
+            }
+
+            if (type === 'clincheck_3d_thumb') {
+                return `
+                <svg viewBox="0 0 320 200" class="w-full h-full bg-[#f8fafc] dark:bg-[#0c0d12]">
+                    <defs>
+                        <linearGradient id="gumGradC" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#fb7185"/>
+                            <stop offset="100%" stop-color="#e11d48"/>
+                        </linearGradient>
+                        <linearGradient id="toothGradC" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="100%" stop-color="#e2e8f0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M30,30 Q160,10 290,30 L285,75 Q160,55 35,75 Z" fill="url(#gumGradC)" opacity="0.95"/>
+                    <path d="M30,170 Q160,190 290,170 L285,125 Q160,145 35,125 Z" fill="url(#gumGradC)" opacity="0.95"/>
+                    <g fill="url(#toothGradC)" stroke="#cbd5e1" stroke-width="0.8">
+                        <rect x="42" y="62" width="22" height="24" rx="4"/>
+                        <rect x="68" y="60" width="24" height="25" rx="4"/>
+                        <rect x="96" y="58" width="22" height="26" rx="4"/>
+                        <rect x="122" y="55" width="32" height="30" rx="5"/>
+                        <rect x="166" y="55" width="32" height="30" rx="5"/>
+                        <rect x="202" y="58" width="22" height="26" rx="4"/>
+                        <rect x="228" y="60" width="24" height="25" rx="4"/>
+                        <rect x="256" y="62" width="22" height="24" rx="4"/>
+                    </g>
+                    <circle cx="53" cy="74" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="80" cy="72" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="107" cy="71" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="213" cy="71" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="240" cy="72" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="267" cy="74" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <g fill="url(#toothGradC)" stroke="#cbd5e1" stroke-width="0.8">
+                        <rect x="42" y="114" width="22" height="24" rx="4"/>
+                        <rect x="68" y="115" width="24" height="25" rx="4"/>
+                        <rect x="96" y="116" width="22" height="26" rx="4"/>
+                        <rect x="122" y="118" width="24" height="26" rx="4"/>
+                        <rect x="148" y="118" width="24" height="26" rx="4"/>
+                        <rect x="174" y="118" width="24" height="26" rx="4"/>
+                        <rect x="202" y="116" width="22" height="26" rx="4"/>
+                        <rect x="228" y="115" width="24" height="25" rx="4"/>
+                        <rect x="256" y="114" width="22" height="24" rx="4"/>
+                    </g>
+                    <circle cx="53" cy="126" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="80" cy="127" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="107" cy="128" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="213" cy="128" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="240" cy="127" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                    <circle cx="267" cy="126" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                </svg>`;
+            }
         }
 
         function renderClinicalMediaGallery() {
@@ -2902,11 +3445,7 @@
         }
 
         function openMediaUploadTrigger() {
-            if (window.innerWidth < 1024) {
-                setMobileActiveTab('media');
-            } else {
-                setDesktopRightPanel('media');
-            }
+            openDoctorSiteRecordsModal();
         }
 
         function openLightbox(index) {
@@ -3995,6 +4534,236 @@ CREATE TABLE IF NOT EXISTS digital_signatures (
 
     <!-- CONTENEDOR EXCLUSIVO PARA IMPRESIÓN DIRECTA (@media print) -->
     <div id="clinicalPdfDossier" class="hidden"></div>
+
+    <!-- =====================================================================
+         MODAL SUITE DE REGISTROS CLÍNICOS, RAYOS X Y ESCANEOS 3D
+         (RÉPLICA EXACTA DEL CLINCHECK DOCTOR SITE / INVISALIGN 3 COLUMNAS)
+    ====================================================================== -->
+    <div id="doctorSiteRecordsModal" class="hidden fixed inset-0 z-50 bg-[#f4f4f5] dark:bg-[#09090b] text-slate-800 dark:text-zinc-100 flex flex-col overflow-hidden animate-fade-in no-print">
+        
+        <!-- BARRA SUPERIOR INSTITUCIONAL CLINCHECK DOCTOR SITE -->
+        <header class="h-16 px-4 sm:px-6 bg-white dark:bg-[#121215] border-b border-zinc-200 dark:border-white/10 flex items-center justify-between shrink-0 shadow-sm z-10">
+            <!-- Izquierda: Paciente & Caso -->
+            <div class="flex items-center space-x-3.5 min-w-0">
+                <div id="dsPatientAvatar" class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm border border-zinc-200 dark:border-white/10">
+                    <img id="dsAvatarImg" src="" alt="Avatar" class="w-full h-full object-cover hidden">
+                    <span id="dsAvatarFallback">MG</span>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-2">
+                        <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">Martha Gabriela Zúñiga Núñez</h2>
+                        <span class="px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-300 font-semibold text-[10px] hidden sm:inline">40 años</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span class="font-medium text-slate-700 dark:text-zinc-300">Comprehensive Package</span>
+                        <span>•</span>
+                        <span class="truncate">Dra. Liseth Guevara &bull; IDI Mérida</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Centro: Estado del Pedido / Etapa -->
+            <div class="hidden md:flex flex-col items-center justify-center text-center">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Pedido inicial | Inicial</span>
+                <span class="text-[11px] text-zinc-500 dark:text-zinc-400">16 oct 2026 • Caso #8819-IDI</span>
+            </div>
+
+            <!-- Derecha: Pestañas de Vista y Cerrar -->
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <div class="flex items-center space-x-1 border-b-2 border-transparent">
+                    <button id="dsTabMain" onclick="setDoctorSiteTab('main')" class="px-3 py-1.5 text-xs font-semibold text-[#0a84ff] border-b-2 border-[#0a84ff] flex items-center space-x-1.5 transition">
+                        <i class="ph-bold ph-squares-four"></i>
+                        <span>Vista principal</span>
+                    </button>
+                    <button id="dsTabCompare" onclick="setDoctorSiteTab('compare')" class="px-3 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white border-b-2 border-transparent flex items-center space-x-1.5 transition">
+                        <i class="ph-bold ph-columns"></i>
+                        <span>Comparar</span>
+                    </button>
+                </div>
+
+                <div class="h-6 w-[1px] bg-zinc-200 dark:bg-white/10 hidden sm:block"></div>
+
+                <button onclick="closeDoctorSiteRecordsModal()" class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-white/10 dark:hover:bg-white/20 flex items-center justify-center text-zinc-500 dark:text-zinc-300 transition" title="Volver al Visor 3D">
+                    <i class="ph-bold ph-x text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- CUERPO PRINCIPAL: VISTA DE 3 COLUMNAS (FOTOS | RAYO X | ESCANEO Y 3D) -->
+        <div id="dsMainView" class="flex-1 overflow-y-auto p-3 sm:p-5">
+            <div class="max-w-[1720px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 h-full">
+
+                <!-- =========================================================
+                     COLUMNA 1: FOTOS INDIVIDUALES (GRID DE 12 SLOTS)
+                ========================================================== -->
+                <section class="lg:col-span-5 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between pb-1 border-b border-zinc-200 dark:border-white/10">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white text-center flex-1">Fotos individuales</h3>
+                        <div class="flex items-center space-x-1.5">
+                            <input type="file" id="dsBatchPhotoInput" accept="image/*" multiple class="hidden" onchange="handleBatchPhotoUpload(event)">
+                            <button onclick="document.getElementById('dsBatchPhotoInput').click()" class="text-[11px] font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center space-x-1" title="Subir varias fotos a la vez">
+                                <i class="ph-bold ph-upload-simple"></i>
+                                <span class="hidden sm:inline">Subir Lote</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid 3x4 de Fotografías Clínicas -->
+                    <div id="dsPhotoGrid" class="grid grid-cols-3 gap-2 sm:gap-3 flex-1">
+                        <!-- Generado dinámicamente con las 12 casillas clínicas -->
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     COLUMNA 2: RAYO X (3 CARDS VERTICALES)
+                ========================================================== -->
+                <section class="lg:col-span-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-center pb-1 border-b border-zinc-200 dark:border-white/10">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white text-center">Rayo X</h3>
+                    </div>
+
+                    <!-- 3 Radiografías (Panorámica, Serie Periapical/CBCT, Cefalométrica) -->
+                    <div id="dsXRayContainer" class="flex flex-col space-y-3 flex-1">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </section>
+
+                <!-- =========================================================
+                     COLUMNA 3: ESCANEO Y 3D (ESCANEO INICIAL + CLINCHECK SETUP)
+                ========================================================== -->
+                <section class="lg:col-span-4 flex flex-col space-y-3">
+                    <div class="flex items-center justify-center pb-1 border-b border-zinc-200 dark:border-white/10">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white text-center">Escaneo y 3D</h3>
+                    </div>
+
+                    <div class="flex flex-col space-y-3.5 flex-1">
+                        
+                        <!-- CARD 1: ESCANEO INICIAL (.STL) -->
+                        <div class="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-white/10 rounded-2xl p-3 shadow-sm flex flex-col flex-1 relative group">
+                            <div class="text-center pb-2">
+                                <span class="text-xs font-bold text-slate-800 dark:text-white">Escaneo</span>
+                            </div>
+                            
+                            <!-- Visor Visual del Escaneo -->
+                            <div id="dsScanPreviewViewport" class="flex-1 w-full min-h-[160px] sm:min-h-[190px] rounded-xl bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-100 dark:border-white/5 flex items-center justify-center relative overflow-hidden">
+                                <!-- Ilustración realista o snapshot del modelo 3D inicial -->
+                                <div id="dsScanVisualPlaceholder" class="w-full h-full flex items-center justify-center p-2"></div>
+                                
+                                <!-- Botones Flotantes en Hover -->
+                                <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 p-2">
+                                    <button onclick="document.getElementById('stlFileInput').click()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 text-slate-900 dark:text-white text-xs font-semibold shadow-md flex items-center space-x-1.5 hover:scale-105 transition">
+                                        <i class="ph-bold ph-upload-simple text-sky-500"></i>
+                                        <span>Cargar STL</span>
+                                    </button>
+                                    <button onclick="openDualSTLModal()" class="px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md flex items-center space-x-1.5 hover:scale-105 transition">
+                                        <i class="ph-bold ph-layers"></i>
+                                        <span>Dual STL</span>
+                                    </button>
+                                </div>
+
+                                <!-- Botón Expandir Esquina Inferior Derecha (estilo ClinCheck ⤢) -->
+                                <button onclick="closeDoctorSiteRecordsModal(); setCameraView('front');" class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-black/60 hover:bg-black/90 backdrop-blur-md text-white flex items-center justify-center shadow-md transition" title="Abrir en Visor 3D Principal">
+                                    <i class="ph-bold ph-corners-out text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CARD 2: CLINCHECK (WCC) SETUP BIOMECÁNICO -->
+                        <div class="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-white/10 rounded-2xl p-3 shadow-sm flex flex-col flex-1 relative group">
+                            <div class="text-center pb-2">
+                                <span class="text-xs font-bold text-slate-800 dark:text-white">ClinCheck (WCC)</span>
+                            </div>
+
+                            <!-- Visor Visual del Setup con Ataches (Puntos Azules) -->
+                            <div id="dsClincheckPreviewViewport" class="flex-1 w-full min-h-[160px] sm:min-h-[190px] rounded-xl bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-100 dark:border-white/5 flex items-center justify-center relative overflow-hidden">
+                                <!-- Ilustración realista o snapshot del ClinCheck con Ataches y TADs -->
+                                <div id="dsClincheckVisualPlaceholder" class="w-full h-full flex items-center justify-center p-2"></div>
+
+                                <!-- Botones Flotantes en Hover -->
+                                <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 p-2">
+                                    <button onclick="toggleSimulationPlayback()" class="px-3.5 py-1.5 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-white text-xs font-semibold shadow-md flex items-center space-x-1.5 hover:scale-105 transition">
+                                        <i id="dsPlayIcon" class="ph-fill ph-play"></i>
+                                        <span>Simular 18 Meses</span>
+                                    </button>
+                                    <button onclick="openExportPDFModal()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 text-slate-900 dark:text-white text-xs font-semibold shadow-md flex items-center space-x-1.5 hover:scale-105 transition">
+                                        <i class="ph-bold ph-file-pdf text-rose-500"></i>
+                                        <span>Reporte</span>
+                                    </button>
+                                </div>
+
+                                <!-- Mini Indicador de Etapa / Ataches -->
+                                <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[10px] font-mono font-bold text-sky-400 border border-white/10 pointer-events-none">
+                                    Ataches Activos (10)
+                                </div>
+
+                                <!-- Botón Expandir Esquina Inferior Derecha (estilo ClinCheck ⤢) -->
+                                <button onclick="closeDoctorSiteRecordsModal(); setCameraView('front');" class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-black/60 hover:bg-black/90 backdrop-blur-md text-white flex items-center justify-center shadow-md transition" title="Abrir en Visor 3D Principal">
+                                    <i class="ph-bold ph-corners-out text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- VISTA ALTERNATIVA [A|B] COMPARAR (INICIAL VS FINAL / CLINCHECK) -->
+        <div id="dsCompareView" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
+            <div class="max-w-5xl mx-auto space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-white/10">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Comparador Biomecánico [A | B]</h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Inspección lado a lado: Maloclusión Inicial (Mes 0) vs Oclusión Final Funcional (Mes 18)</p>
+                    </div>
+                    <button onclick="setDoctorSiteTab('main')" class="px-3 py-1.5 rounded-xl bg-zinc-200 dark:bg-white/10 text-xs font-semibold hover:bg-zinc-300 dark:hover:bg-white/20 transition">
+                        Volver a Vista Principal
+                    </button>
+                </div>
+
+                <!-- Comparador Lado a Lado Split View -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Panel A: Inicial -->
+                    <div class="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-white/10 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold text-xs">
+                                [A] Estado Inicial (Mes 0)
+                            </span>
+                            <span class="font-mono text-xs font-bold text-rose-500">OB: -4.5 mm</span>
+                        </div>
+                        <div class="w-full h-64 rounded-xl overflow-hidden bg-zinc-950 flex items-center justify-center relative">
+                            <div id="compareScanA" class="w-full h-full flex items-center justify-center p-3"></div>
+                        </div>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                            Mordida abierta anterior severa (-4.5 mm) con interposición lingual adaptativa, apiñamiento severo inferior (rotación de 42 y 32) y diastema superior de 0.6 mm.
+                        </p>
+                    </div>
+
+                    <!-- Panel B: ClinCheck Final -->
+                    <div class="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-white/10 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-bold text-xs">
+                                [B] Objetivo ClinCheck (Mes 18)
+                            </span>
+                            <span class="font-mono text-xs font-bold text-emerald-500">OB: +1.8 mm</span>
+                        </div>
+                        <div class="w-full h-64 rounded-xl overflow-hidden bg-zinc-950 flex items-center justify-center relative">
+                            <div id="compareScanB" class="w-full h-full flex items-center justify-center p-3"></div>
+                        </div>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                            Intrusión molar superior (2.2 mm con TADs IZC), autorrotación mandibular cerrando la mordida abierta a sobremordida positiva funcional (+1.8 mm) y alineamiento anteroinferior con IPR de 2.0 mm.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Input oculto para subida de imagen de un slot específico en el Doctor Site -->
+    <input type="file" id="dsSlotFileInput" accept="image/*" class="hidden" onchange="handleDSSlotFileSelected(event)">
+
 
     <!-- =====================================================================
          MODAL DUAL .STL (MAXILAR Y MANDÍBULA HIPERREALISTA)
