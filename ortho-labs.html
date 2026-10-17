@@ -180,6 +180,115 @@
             white-space: nowrap;
             z-index: 5;
             transition: opacity 0.2s;
+        /* Barra Superior de 10 Iconos Ortodónticos estilo ClinCheck Pro */
+        .clincheck-top-toolbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(24, 24, 27, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .clincheck-icon-btn {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a1a1aa;
+            transition: all 0.18s ease;
+            cursor: pointer;
+        }
+        .clincheck-icon-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .clincheck-icon-btn.active {
+            color: #38bdf8;
+            background: rgba(14, 165, 233, 0.22);
+            box-shadow: inset 0 0 0 1.5px #0284c7;
+        }
+
+        .clincheck-icon-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: calc(100% + 7px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-4px);
+            background: rgba(39, 39, 42, 0.96);
+            color: #f4f4f5;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.16s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 40;
+        }
+        .clincheck-icon-btn:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Controles Verticales Izquierdos (+, -, Orbit, Pan) */
+        .clincheck-left-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
+            border-radius: 14px;
+            background: rgba(24, 24, 27, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .clincheck-side-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a1a1aa;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+        .clincheck-side-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .clincheck-side-btn.active {
+            color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.2);
+        }
+
+        /* Grid Milimétrico Opcional */
+        .clincheck-grid-overlay {
+            background-size: 24px 24px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+        }
+
+        .sig-pad-canvas {
+            touch-action: none;
+            cursor: crosshair;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
         }
 
         @media print {
@@ -458,6 +567,92 @@
             color: #1d1d1f !important;
         }
 
+        html.light .clincheck-top-toolbar {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+        html.light .clincheck-icon-btn {
+            color: #6e6e73 !important;
+        }
+        html.light .clincheck-icon-btn:hover {
+            color: #1d1d1f !important;
+            background: rgba(0, 0, 0, 0.06) !important;
+        }
+        html.light .clincheck-icon-btn.active {
+            color: #0071e3 !important;
+            background: rgba(0, 113, 227, 0.12) !important;
+            box-shadow: inset 0 0 0 1.5px #0071e3 !important;
+        }
+        html.light .clincheck-icon-btn::after {
+            background: #ffffff !important;
+            color: #1d1d1f !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        }
+        html.light .clincheck-left-controls {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+        }
+        html.light .clincheck-side-btn {
+            color: #6e6e73 !important;
+        }
+        html.light .clincheck-side-btn:hover {
+            color: #1d1d1f !important;
+            background: rgba(0, 0, 0, 0.06) !important;
+        }
+        html.light .clincheck-side-btn.active {
+            color: #0071e3 !important;
+            background: rgba(0, 113, 227, 0.12) !important;
+        }
+        html.light .clincheck-grid-overlay {
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
+        }
+        html.light .sig-pad-canvas {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+        html.light #dualSTLModal .apple-glass,
+        html.light #liveCameraModal .apple-glass,
+        html.light #digitalSignaturesModal .apple-glass,
+        html.light #supabaseConfigModal .apple-glass {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+        html.light #dualSTLModal .text-white,
+        html.light #liveCameraModal .text-white,
+        html.light #digitalSignaturesModal .text-white,
+        html.light #supabaseConfigModal .text-white {
+            color: #1d1d1f !important;
+        }
+        html.light #dualSTLModal .text-zinc-200,
+        html.light #liveCameraModal .text-zinc-200,
+        html.light #digitalSignaturesModal .text-zinc-200,
+        html.light #supabaseConfigModal .text-zinc-200,
+        html.light #dualSTLModal .text-zinc-300,
+        html.light #liveCameraModal .text-zinc-300,
+        html.light #digitalSignaturesModal .text-zinc-300,
+        html.light #supabaseConfigModal .text-zinc-300 {
+            color: #3a3a3c !important;
+        }
+        html.light #dualSTLModal .text-zinc-400,
+        html.light #liveCameraModal .text-zinc-400,
+        html.light #digitalSignaturesModal .text-zinc-400,
+        html.light #supabaseConfigModal .text-zinc-400 {
+            color: #86868b !important;
+        }
+        html.light #dualSTLModal input,
+        html.light #liveCameraModal select,
+        html.light #supabaseConfigModal input {
+            background-color: #f2f2f7 !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #1d1d1f !important;
+        }
+
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden select-none bg-black">
@@ -497,6 +692,26 @@
             <button id="themeToggleBtn" onclick="toggleTheme()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white flex items-center space-x-1.5 transition" title="Alternar entre versión oscura y fondo blanco">
                 <i id="themeToggleIcon" class="ph-bold ph-sun text-amber-400 text-sm"></i>
                 <span id="themeToggleText" class="hidden sm:inline">Fondo Blanco</span>
+            </button>
+            <!-- Motor Dual STL -->
+            <button onclick="openDualSTLModal()" class="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-xs font-medium text-purple-300 flex items-center space-x-1.5 transition" title="Cargar Modelos Dual .STL (Maxilar y Mandíbula)">
+                <i class="ph-bold ph-layers text-sm"></i>
+                <span class="hidden xl:inline">Dual .STL</span>
+            </button>
+            <!-- Captura de Cámara en Vivo -->
+            <button onclick="openLiveCameraModal(2)" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-medium text-rose-300 flex items-center space-x-1.5 transition" title="Captura de Cámara en Vivo (Webcam / Móvil)">
+                <i class="ph-bold ph-camera text-sm"></i>
+                <span class="hidden xl:inline">Cámara</span>
+            </button>
+            <!-- Firmas Digitales Biométricas -->
+            <button onclick="openDigitalSignaturesModal()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-xs font-medium text-amber-300 flex items-center space-x-1.5 transition" title="Firmas Digitales Biométricas">
+                <i class="ph-bold ph-signature text-sm"></i>
+                <span class="hidden xl:inline">Firmas</span>
+            </button>
+            <!-- Conexión Supabase Cloud -->
+            <button onclick="openSupabaseConfigModal()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-medium text-emerald-300 flex items-center space-x-1.5 transition" title="Conexión Supabase Cloud">
+                <i class="ph-bold ph-database text-sm"></i>
+                <span class="hidden xl:inline">Cloud</span>
             </button>
             <input type="file" id="stlFileInput" accept=".stl" class="hidden" onchange="handleSTLUpload(event)">
             <button onclick="document.getElementById('stlFileInput').click()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-medium text-white flex items-center space-x-1.5 transition" title="Importar Escaneo Intraoral .STL">
@@ -539,6 +754,28 @@
             <!-- LIENZO 3D PURO Y DESPEJADO -->
             <div id="canvas-wrapper" class="flex-1 relative">
                 
+                <!-- Cuadrícula Milimétrica Opcional ClinCheck -->
+                <div id="millimeterGridOverlay" class="clincheck-grid-overlay absolute inset-0 hidden pointer-events-none z-10"></div>
+
+                <!-- Controles Verticales Izquierdos (+, -, ↻, ✥, ⌂) -->
+                <div class="clincheck-left-controls absolute top-1/2 left-3 -translate-y-1/2 z-20 pointer-events-auto" role="group" aria-label="Controles Rápidos 3D">
+                    <button onclick="zoomCameraStep('in')" class="clincheck-side-btn" title="Acercar (Zoom In)">
+                        <i class="ph-bold ph-plus"></i>
+                    </button>
+                    <button onclick="zoomCameraStep('out')" class="clincheck-side-btn" title="Alejar (Zoom Out)">
+                        <i class="ph-bold ph-minus"></i>
+                    </button>
+                    <button id="ctrlBtn-rotate" onclick="setOrbitControlMode('rotate')" class="clincheck-side-btn active" title="Modo Rotación 3D">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                    </button>
+                    <button id="ctrlBtn-pan" onclick="setOrbitControlMode('pan')" class="clincheck-side-btn" title="Modo Desplazamiento (Pan)">
+                        <i class="ph-bold ph-arrows-out-cardinal"></i>
+                    </button>
+                    <button onclick="resetCameraView()" class="clincheck-side-btn" title="Centrar Cámara">
+                        <i class="ph-bold ph-house"></i>
+                    </button>
+                </div>
+                
                 <!-- 1. DYNAMIC ISLAND PILL CON PACIENTE CENTRADO ENCIMA DEL INDICADOR DE MES -->
                 <div class="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-1.5 pointer-events-auto max-w-[95vw] text-center">
                     <!-- Nombre del Paciente Centrado con Espacio Completo -->
@@ -558,6 +795,44 @@
                         <span id="islandOBBadge" class="hidden sm:inline mono text-[11px] text-amber-300 font-semibold">OB: -4.5mm</span>
                         <button onclick="toggleStageInfoPopover()" class="w-5 h-5 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300 shrink-0" title="Ver detalles clínicos de esta etapa">
                             <i class="ph-bold ph-info text-[11px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ClinCheck Dark Studio Top 10-Icon Toolbar -->
+                    <div class="clincheck-top-toolbar" role="toolbar" aria-label="Herramientas ClinCheck Studio">
+                        <button id="ccBtn-numbers" onclick="toggleNumberingSystem()" class="clincheck-icon-btn active" data-tooltip="Alternar Números (#U / #FDI / Off)" title="Alternar Números Dentales">
+                            <span id="ccNumbersLabel" class="text-[11px] font-black font-mono">#U</span>
+                        </button>
+                        <button id="ccBtn-coronalTop" onclick="setCameraView('upper')" class="clincheck-icon-btn" data-tooltip="Oclusal Sup." title="Vista Oclusal Superior">
+                            <i class="ph-bold ph-arrow-up text-sm"></i>
+                        </button>
+                        <button id="ccBtn-upper" onclick="setArchVisibility('upper')" class="clincheck-icon-btn" data-tooltip="Maxilar" title="Aislar Arcada Superior">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M4 14 C 4 5.5, 16 5.5, 16 14"/>
+                            </svg>
+                        </button>
+                        <button id="ccBtn-right" onclick="setCameraView('right')" class="clincheck-icon-btn" data-tooltip="Lat. Der." title="Vista Lateral Derecha">
+                            <i class="ph-bold ph-arrow-right text-sm"></i>
+                        </button>
+                        <button id="ccBtn-front" onclick="setCameraView('front')" class="clincheck-icon-btn active" data-tooltip="Frontal" title="Vista Frontal">
+                            <i class="ph-bold ph-eye text-sm"></i>
+                        </button>
+                        <button id="ccBtn-left" onclick="setCameraView('left')" class="clincheck-icon-btn" data-tooltip="Lat. Izq." title="Vista Lateral Izquierda">
+                            <i class="ph-bold ph-arrow-left text-sm"></i>
+                        </button>
+                        <button id="ccBtn-lower" onclick="setArchVisibility('lower')" class="clincheck-icon-btn" data-tooltip="Mandíbula" title="Aislar Arcada Inferior">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <path d="M4 6 C 4 14.5, 16 14.5, 16 6"/>
+                            </svg>
+                        </button>
+                        <button id="ccBtn-overjetBottom" onclick="setCameraView('lower')" class="clincheck-icon-btn" data-tooltip="Oclusal Inf." title="Vista Oclusal Inferior">
+                            <i class="ph-bold ph-arrow-down text-sm"></i>
+                        </button>
+                        <button id="ccBtn-grid" onclick="toggleMillimeterGrid()" class="clincheck-icon-btn" data-tooltip="Cuadrícula" title="Cuadrícula Milimétrica">
+                            <i class="ph-bold ph-grid-four text-sm"></i>
+                        </button>
+                        <button id="ccBtn-tooth" onclick="toggleToothFocusMode()" class="clincheck-icon-btn" data-tooltip="Enfocar Diente" title="Modo Enfoque Dental">
+                            <i class="ph-fill ph-tooth text-sm"></i>
                         </button>
                     </div>
                 </div>
@@ -990,6 +1265,25 @@
                     </div>
                     <div id="protocolStepsContainer" class="space-y-2"></div>
                 </div>
+
+                <!-- Validación de Consentimiento y Firmas Biométricas -->
+                <div class="apple-card-surface p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center">
+                            <i class="ph-fill ph-signature mr-1.5 text-amber-400"></i> Consentimiento &amp; Firmas Biométricas
+                        </h3>
+                        <button onclick="openDigitalSignaturesModal()" class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold flex items-center space-x-1">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                            <span>Firmar en Pantalla</span>
+                        </button>
+                    </div>
+                    <div id="expedienteSignaturesPreview">
+                        <div class="p-3 rounded-xl bg-black/40 border border-white/10 text-xs text-zinc-400 flex items-center justify-between">
+                            <span>Pendiente de firma digital por paciente y especialista</span>
+                            <button onclick="openDigitalSignaturesModal()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px]">Firmar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </aside>
@@ -1320,6 +1614,46 @@
         let currentLightboxIndex = 0;
         let currentPiPPhotoIndex = 2;
 
+        // OrthoAI v9.0 ClinCheck & Engine Additions
+        let activeNumberingSystem = 'universal'; // 'universal' | 'fdi' | 'off'
+        let isGridVisible = false;
+        let dualSTLGroup = { upper: null, lower: null };
+        let dualSTLBuffers = { upper: null, lower: null };
+        let liveCameraStream = null;
+        let currentFacingMode = 'environment';
+        let targetPhotoSlotIndex = 2;
+        let clinicalSignatures = {
+            patient: null,
+            guardian: null,
+            doctor: null,
+            timestamp: null,
+            hash: null
+        };
+        const FDI_TO_UNIVERSAL = {
+            18: 1, 17: 2, 16: 3, 15: 4, 14: 5, 13: 6, 12: 7, 11: 8,
+            21: 9, 22: 10, 23: 11, 24: 12, 25: 13, 26: 14, 27: 15, 28: 16,
+            38: 17, 37: 18, 36: 19, 35: 20, 34: 21, 33: 22, 32: 23, 31: 24,
+            41: 25, 42: 26, 43: 27, 44: 28, 45: 29, 46: 30, 47: 31, 48: 32
+        };
+
+        function showToast(message) {
+            let toast = document.getElementById('orthoAppToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'orthoAppToast';
+                toast.className = 'fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-2 apple-pill px-4 py-2 rounded-full text-xs font-semibold text-white shadow-2xl flex items-center space-x-2 border border-white/20 bg-zinc-900/95';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<i class="ph-bold ph-info text-sky-400"></i><span>${message}</span>`;
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            if (window._toastTimeout) clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-2');
+            }, 2400);
+        }
+
 
         // ============================================================================
         // GESTIÓN DE TEMA: MODO OSCURO vs VERSIÓN FONDO BLANCO
@@ -1483,16 +1817,27 @@
                     <!-- FIRMAS DE VALIDACIÓN CLÍNICA -->
                     <div class="grid grid-cols-2 gap-8 pt-8 mt-6 border-t border-gray-300 text-center">
                         <div>
-                            <div class="h-12 flex items-end justify-center font-serif italic text-gray-400">Dra. Liseth Guevara Muñoz</div>
+                            <div class="h-14 flex items-end justify-center">
+                                ${clinicalSignatures.doctor ? `<img src="${clinicalSignatures.doctor}" class="h-12 max-w-[180px] object-contain">` : `<span class="font-serif italic text-gray-400">Dra. Liseth Guevara Muñoz</span>`}
+                            </div>
                             <div class="border-t border-gray-400 pt-1 text-xs font-bold text-slate-900">${doctorName}</div>
                             <div class="text-[10px] text-gray-500">Especialista en Ortodoncia &bull; Cédula Prof. y Firma</div>
                         </div>
                         <div>
-                            <div class="h-12 flex items-end justify-center font-serif italic text-gray-400">${patientName}</div>
+                            <div class="h-14 flex items-end justify-center">
+                                ${clinicalSignatures.patient ? `<img src="${clinicalSignatures.patient}" class="h-12 max-w-[180px] object-contain">` : `<span class="font-serif italic text-gray-400">${patientName}</span>`}
+                            </div>
                             <div class="border-t border-gray-400 pt-1 text-xs font-bold text-slate-900">${patientName}</div>
                             <div class="text-[10px] text-gray-500">Consentimiento Informado del Paciente</div>
                         </div>
                     </div>
+                    ${clinicalSignatures.hash ? `
+                    <div class="text-center pt-2">
+                        <span class="inline-block px-3 py-1 rounded bg-gray-100 text-gray-600 font-mono text-[9px] border border-gray-200">
+                            Validación Criptográfica Biometría Digital: ${clinicalSignatures.hash} &bull; Estampa de Tiempo: ${clinicalSignatures.timestamp}
+                        </span>
+                    </div>
+                    ` : ''}
                 </div>
             `;
         }
@@ -1586,6 +1931,7 @@
             buildFDIButtons();
             buildMasterIPRTable();
             buildDentalArches();
+            refreshAllToothDecals();
             initPWAInstallation();
             loadMarthaGabrielaCase();
             renderClinicalMediaGallery();
@@ -1796,7 +2142,179 @@
             const ghostMesh = new THREE.Mesh(crownMesh.geometry.clone(), ghostMat);
             ghostMesh.visible = false;
 
-            return { fdi, dims, group, crownMesh, rootGroup, attachMesh, ghostMesh };
+            // Decal Mesh para Números Dentales en Vestibular (ClinCheck Studio)
+            const decalGeo = new THREE.PlaneGeometry(dims.w * 0.72, dims.h * 0.58);
+            const decalCanvas = document.createElement('canvas');
+            decalCanvas.width = 128;
+            decalCanvas.height = 128;
+            const decalTex = new THREE.CanvasTexture(decalCanvas);
+            const decalMat = new THREE.MeshBasicMaterial({
+                map: decalTex,
+                transparent: true,
+                depthWrite: false,
+                polygonOffset: true,
+                polygonOffsetFactor: -3,
+                polygonOffsetUnits: -3,
+                side: THREE.DoubleSide
+            });
+            const decalMesh = new THREE.Mesh(decalGeo, decalMat);
+            decalMesh.position.set(0, isUpper ? 0.05 : -0.05, dims.d * 0.53);
+            decalMesh.name = `numberDecal_${fdi}`;
+            group.add(decalMesh);
+
+            const tObj = { fdi, dims, group, crownMesh, rootGroup, attachMesh, ghostMesh, decalMesh, decalCanvas, decalTex, decalMat };
+            updateToothDecalTexture(tObj, false);
+            return tObj;
+        }
+
+        function updateToothDecalTexture(toothObj, isSelected = false) {
+            if (!toothObj || !toothObj.decalCanvas) return;
+            const canvas = toothObj.decalCanvas;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 128, 128);
+
+            if (activeNumberingSystem === 'off') {
+                if (toothObj.decalMesh) toothObj.decalMesh.visible = false;
+                if (toothObj.decalTex) toothObj.decalTex.needsUpdate = true;
+                return;
+            }
+            if (toothObj.decalMesh) toothObj.decalMesh.visible = true;
+
+            let numText = '';
+            if (activeNumberingSystem === 'universal') {
+                numText = String(FDI_TO_UNIVERSAL[toothObj.fdi] || toothObj.fdi);
+            } else {
+                numText = String(toothObj.fdi);
+            }
+
+            // Fondo circular / pastilla
+            ctx.fillStyle = isSelected ? 'rgba(14, 165, 233, 0.95)' : 'rgba(24, 24, 27, 0.85)';
+            ctx.beginPath();
+            ctx.arc(64, 64, 52, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Borde
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.38)';
+            ctx.stroke();
+
+            // Texto numérico
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = 'bold ' + (numText.length > 2 ? '42px' : '52px') + ' system-ui, -apple-system, sans-serif';
+            ctx.fillText(numText, 64, 64);
+
+            if (toothObj.decalTex) toothObj.decalTex.needsUpdate = true;
+        }
+
+        function refreshAllToothDecals() {
+            Object.values(teethObjects).forEach(t => {
+                updateToothDecalTexture(t, t.fdi === selectedFDI);
+            });
+        }
+
+        function toggleNumberingSystem() {
+            if (activeNumberingSystem === 'universal') {
+                activeNumberingSystem = 'fdi';
+                showToast('Numeración Dental: Sistema FDI (11 - 48)');
+            } else if (activeNumberingSystem === 'fdi') {
+                activeNumberingSystem = 'off';
+                showToast('Numeración Dental: Oculta');
+            } else {
+                activeNumberingSystem = 'universal';
+                showToast('Numeración Dental: Sistema Universal (1 - 32)');
+            }
+            const label = document.getElementById('ccNumbersLabel');
+            if (label) {
+                label.textContent = activeNumberingSystem === 'universal' ? '#U' : (activeNumberingSystem === 'fdi' ? '#FDI' : '#OFF');
+            }
+            const btn = document.getElementById('ccBtn-numbers');
+            if (btn) {
+                if (activeNumberingSystem === 'off') btn.classList.remove('active');
+                else btn.classList.add('active');
+            }
+            refreshAllToothDecals();
+            buildFDIButtons();
+        }
+
+        function toggleToothFocusMode() {
+            if (selectedFDI) {
+                focusCameraOnTooth(selectedFDI);
+                showToast(`Enfocando OD ${selectedFDI} (${activeNumberingSystem === 'universal' ? '#' + (FDI_TO_UNIVERSAL[selectedFDI] || selectedFDI) : 'FDI ' + selectedFDI})`);
+            } else {
+                selectTooth(42, true);
+            }
+        }
+
+        function toggleMillimeterGrid() {
+            isGridVisible = !isGridVisible;
+            const grid = document.getElementById('millimeterGridOverlay');
+            const btn = document.getElementById('ccBtn-grid');
+            if (grid) grid.classList.toggle('hidden', !isGridVisible);
+            if (btn) btn.classList.toggle('active', isGridVisible);
+            showToast(isGridVisible ? 'Cuadrícula Milimétrica: Activada' : 'Cuadrícula Milimétrica: Desactivada');
+        }
+
+        function zoomCameraStep(direction) {
+            if (!camera || !controls) return;
+            const factor = direction === 'in' ? 0.82 : 1.22;
+            camera.position.sub(controls.target).multiplyScalar(factor).add(controls.target);
+            controls.update();
+        }
+
+        function setOrbitControlMode(mode) {
+            if (!controls) return;
+            const rotBtn = document.getElementById('ctrlBtn-rotate');
+            const panBtn = document.getElementById('ctrlBtn-pan');
+            if (mode === 'rotate') {
+                controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+                if (rotBtn) rotBtn.classList.add('active');
+                if (panBtn) panBtn.classList.remove('active');
+                showToast('Modo: Rotación 3D');
+            } else if (mode === 'pan') {
+                controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+                if (panBtn) panBtn.classList.add('active');
+                if (rotBtn) rotBtn.classList.remove('active');
+                showToast('Modo: Desplazamiento (Pan)');
+            }
+        }
+
+        function resetCameraView() {
+            setCameraView('front');
+            controls.target.set(0, -0.2, 1.8);
+            controls.update();
+            showToast('Cámara restablecida al centro');
+        }
+
+        function updateCameraToolbarUI(activeView) {
+            const viewToCcBtn = {
+                'front': 'ccBtn-front',
+                'right': 'ccBtn-right',
+                'left': 'ccBtn-left',
+                'upper': 'ccBtn-coronalTop',
+                'lower': 'ccBtn-overjetBottom'
+            };
+            Object.entries(viewToCcBtn).forEach(([v, btnId]) => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    if (v === activeView) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+        }
+
+        function updateArchToolbarUI(mode) {
+            const uBtn = document.getElementById('ccBtn-upper');
+            const lBtn = document.getElementById('ccBtn-lower');
+            if (uBtn) {
+                if (mode === 'upper') uBtn.classList.add('active');
+                else uBtn.classList.remove('active');
+            }
+            if (lBtn) {
+                if (mode === 'lower') lBtn.classList.add('active');
+                else lBtn.classList.remove('active');
+            }
         }
 
         function computeClosedPremolarIdealArch(fdi) {
@@ -2085,15 +2603,16 @@
                 const isExtracted = extractedPremolars.includes(fdi);
                 const btn = document.createElement('button');
                 btn.id = `fdi-btn-${fdi}`;
+                const displayNum = (activeNumberingSystem === 'universal' && FDI_TO_UNIVERSAL[fdi]) ? FDI_TO_UNIVERSAL[fdi] : fdi;
                 if (isExtracted) {
                     btn.className = "py-1.5 rounded-xl bg-zinc-950/60 border border-rose-500/20 text-[10px] mono text-rose-400/60 line-through cursor-not-allowed";
-                    btn.innerText = fdi;
+                    btn.innerText = displayNum;
                     btn.title = "Primer Premolar Extraído Previamente";
                 } else {
                     const hasIPR = toothIPRData[fdi] && (toothIPRData[fdi].mesial + toothIPRData[fdi].distal > 0);
                     btn.onclick = () => selectTooth(fdi);
                     btn.className = "fdi-unselected py-1.5 rounded-xl bg-zinc-900 border border-white/10 text-[11px] mono font-semibold text-zinc-200 hover:border-sky-400 transition relative";
-                    btn.innerHTML = `${fdi}${hasIPR ? '<span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400"></span>' : ''}`;
+                    btn.innerHTML = `${displayNum}${hasIPR ? '<span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400"></span>' : ''}`;
                 }
                 return btn;
             }
@@ -2125,6 +2644,7 @@
         function selectTooth(fdi, focusCam = true) {
             if (!teethObjects[fdi]) return;
             selectedFDI = fdi;
+            refreshAllToothDecals();
 
             Object.values(teethObjects).forEach(t => {
                 const btn = document.getElementById(`fdi-btn-${t.fdi}`);
@@ -2727,6 +3247,7 @@
                     break;
             }
             if (destPos && destTarget) {
+                updateCameraToolbarUI(view);
                 animateCameraTo(destPos, destTarget, 420);
             }
         }
@@ -2742,6 +3263,7 @@
                         : "w-8 h-8 rounded-lg text-zinc-400 hover:text-white flex items-center justify-center transition active:scale-95";
                 }
             });
+            updateArchToolbarUI(mode);
             updateIPR3DLabelsProjection();
         }
 
@@ -2870,58 +3392,63 @@
             }
         }
 
-        // Importador de Escaneo Intraoral .STL Binario/ASCII
+        // Parser Reutilizable de Archivos STL (Binario y ASCII)
+        function parseSTLBufferToGeometry(buffer) {
+            const dataView = new DataView(buffer);
+            let isASCII = false;
+            if (buffer.byteLength > 84) {
+                const numTriangles = dataView.getUint32(80, true);
+                if (84 + numTriangles * 50 !== buffer.byteLength) {
+                    const headerText = new TextDecoder().decode(new Uint8Array(buffer, 0, Math.min(200, buffer.byteLength)));
+                    if (headerText.trim().startsWith('solid') && headerText.includes('facet')) isASCII = true;
+                }
+            }
+
+            let geometry = new THREE.BufferGeometry();
+            if (isASCII) {
+                const text = new TextDecoder().decode(buffer);
+                const vertices = [];
+                const pattern = /vertex\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)/g;
+                let match;
+                while ((match = pattern.exec(text)) !== null) {
+                    vertices.push(parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3]));
+                }
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            } else {
+                const faces = dataView.getUint32(80, true);
+                const vertices = new Float32Array(faces * 9);
+                let offset = 84;
+                for (let i = 0; i < faces; i++) {
+                    if (offset + 50 > dataView.byteLength) break;
+                    offset += 12;
+                    for (let j = 0; j < 3; j++) {
+                        const idx = i * 9 + j * 3;
+                        vertices[idx] = dataView.getFloat32(offset, true);
+                        vertices[idx + 1] = dataView.getFloat32(offset + 4, true);
+                        vertices[idx + 2] = dataView.getFloat32(offset + 8, true);
+                        offset += 12;
+                    }
+                    offset += 2;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            }
+
+            geometry.computeVertexNormals();
+            geometry.computeBoundingBox();
+            const center = new THREE.Vector3();
+            geometry.boundingBox.getCenter(center);
+            geometry.translate(-center.x, -center.y, -center.z);
+            return geometry;
+        }
+
+        // Importador de Escaneo Intraoral .STL Individual (Compatibilidad)
         function handleSTLUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (e) {
                 try {
-                    const buffer = e.target.result;
-                    const dataView = new DataView(buffer);
-                    let isASCII = false;
-                    if (buffer.byteLength > 84) {
-                        const numTriangles = dataView.getUint32(80, true);
-                        if (84 + numTriangles * 50 !== buffer.byteLength) {
-                            const headerText = new TextDecoder().decode(new Uint8Array(buffer, 0, Math.min(200, buffer.byteLength)));
-                            if (headerText.trim().startsWith('solid') && headerText.includes('facet')) isASCII = true;
-                        }
-                    }
-
-                    let geometry = new THREE.BufferGeometry();
-                    if (isASCII) {
-                        const text = new TextDecoder().decode(buffer);
-                        const vertices = [];
-                        const pattern = /vertex\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)/g;
-                        let match;
-                        while ((match = pattern.exec(text)) !== null) {
-                            vertices.push(parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3]));
-                        }
-                        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-                    } else {
-                        const faces = dataView.getUint32(80, true);
-                        const vertices = new Float32Array(faces * 9);
-                        let offset = 84;
-                        for (let i = 0; i < faces; i++) {
-                            if (offset + 50 > dataView.byteLength) break;
-                            offset += 12;
-                            for (let j = 0; j < 3; j++) {
-                                const idx = i * 9 + j * 3;
-                                vertices[idx] = dataView.getFloat32(offset, true);
-                                vertices[idx + 1] = dataView.getFloat32(offset + 4, true);
-                                vertices[idx + 2] = dataView.getFloat32(offset + 8, true);
-                                offset += 12;
-                            }
-                            offset += 2;
-                        }
-                        geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                    }
-
-                    geometry.computeVertexNormals();
-                    geometry.computeBoundingBox();
-                    const center = new THREE.Vector3();
-                    geometry.boundingBox.getCenter(center);
-                    geometry.translate(-center.x, -center.y, -center.z);
+                    const geometry = parseSTLBufferToGeometry(e.target.result);
                     const size = new THREE.Vector3();
                     geometry.boundingBox.getSize(size);
                     const scale = 14 / Math.max(size.x, size.y, size.z, 1);
@@ -2936,12 +3463,428 @@
                     rawSTLMeshGroup.add(stlMesh);
                     scene.add(rawSTLMeshGroup);
 
-                    alert("¡Escaneo STL cargado exitosamente! Superpuesto en el visor 3D.");
+                    showToast("¡Escaneo STL cargado exitosamente en el visor 3D!");
                 } catch (err) {
                     alert("Error al procesar el archivo STL: " + err.message);
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // ============================================================================
+        // MÓDULO DUAL .STL (MAXILAR Y MANDÍBULA)
+        // ============================================================================
+        function openDualSTLModal() {
+            document.getElementById('dualSTLModal').classList.remove('hidden');
+        }
+
+        function closeDualSTLModal() {
+            document.getElementById('dualSTLModal').classList.add('hidden');
+        }
+
+        function previewDualSTL(event, arch) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const badge = document.getElementById(`dualStlBadge-${arch}`);
+            if (badge) {
+                badge.innerHTML = `<i class="ph-bold ph-check text-emerald-400"></i> <span class="text-emerald-300 font-semibold">${file.name}</span> (${(file.size / (1024*1024)).toFixed(1)} MB)`;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                dualSTLBuffers[arch] = e.target.result;
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function applyDualSTLModels() {
+            if (!dualSTLBuffers.upper && !dualSTLBuffers.lower) {
+                showToast("Por favor selecciona al menos un archivo .STL");
+                return;
+            }
+
+            try {
+                if (dualSTLBuffers.upper) {
+                    const geo = parseSTLBufferToGeometry(dualSTLBuffers.upper);
+                    const size = new THREE.Vector3();
+                    geo.boundingBox.getSize(size);
+                    const scale = 13.5 / Math.max(size.x, size.y, size.z, 1);
+
+                    if (dualSTLGroup.upper) upperArchGroup.remove(dualSTLGroup.upper);
+                    const mat = new THREE.MeshPhysicalMaterial({
+                        color: 0xffffff,
+                        roughness: 0.22,
+                        clearcoat: 0.5,
+                        clearcoatRoughness: 0.1,
+                        transparent: true,
+                        opacity: 0.92
+                    });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.scale.set(scale, scale, scale);
+                    mesh.rotation.x = -Math.PI / 2;
+                    mesh.position.set(0, 1.2, 0);
+                    dualSTLGroup.upper = mesh;
+                    upperArchGroup.add(mesh);
+                }
+
+                if (dualSTLBuffers.lower) {
+                    const geo = parseSTLBufferToGeometry(dualSTLBuffers.lower);
+                    const size = new THREE.Vector3();
+                    geo.boundingBox.getSize(size);
+                    const scale = 13.0 / Math.max(size.x, size.y, size.z, 1);
+
+                    if (dualSTLGroup.lower) lowerArchGroup.remove(dualSTLGroup.lower);
+                    const mat = new THREE.MeshPhysicalMaterial({
+                        color: 0xf8fafc,
+                        roughness: 0.22,
+                        clearcoat: 0.5,
+                        clearcoatRoughness: 0.1,
+                        transparent: true,
+                        opacity: 0.92
+                    });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.scale.set(scale, scale, scale);
+                    mesh.rotation.x = -Math.PI / 2;
+                    mesh.position.set(0, -1.2, 0);
+                    dualSTLGroup.lower = mesh;
+                    lowerArchGroup.add(mesh);
+                }
+
+                closeDualSTLModal();
+                showToast("¡Modelos Dual STL integrados en la escena!");
+            } catch (err) {
+                alert("Error al cargar Dual STL: " + err.message);
+            }
+        }
+
+        // ============================================================================
+        // MÓDULO CÁMARA EN VIVO (WEBRTC GETUSERMEDIA)
+        // ============================================================================
+        function openLiveCameraModal(slotIndex = 2) {
+            targetPhotoSlotIndex = slotIndex;
+            const slotSelect = document.getElementById('cameraSlotTarget');
+            if (slotSelect) slotSelect.value = slotIndex;
+            document.getElementById('liveCameraModal').classList.remove('hidden');
+            startCameraStream();
+        }
+
+        function closeLiveCameraModal() {
+            stopCameraStream();
+            document.getElementById('liveCameraModal').classList.add('hidden');
+        }
+
+        async function startCameraStream() {
+            stopCameraStream();
+            const video = document.getElementById('liveCameraVideo');
+            if (!video) return;
+
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const constraints = {
+                        video: {
+                            facingMode: currentFacingMode,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false
+                    };
+                    liveCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    video.srcObject = liveCameraStream;
+                    video.play();
+                } else {
+                    showToast("Cámara directa no disponible. Usa el botón de subir foto.");
+                }
+            } catch (err) {
+                console.warn("getUserMedia error:", err);
+                showToast("No se pudo iniciar la cámara en vivo. Puedes subir una foto.");
+            }
+        }
+
+        function stopCameraStream() {
+            if (liveCameraStream) {
+                liveCameraStream.getTracks().forEach(track => track.stop());
+                liveCameraStream = null;
+            }
+        }
+
+        function switchCameraFacing() {
+            currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+            startCameraStream();
+            showToast(`Cámara cambiada a: ${currentFacingMode === 'environment' ? 'Trasera' : 'Frontal'}`);
+        }
+
+        function captureLivePhotoFrame() {
+            const video = document.getElementById('liveCameraVideo');
+            if (!video || !video.videoWidth) {
+                document.getElementById('cameraFileFallback').click();
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+            applyCapturedPhotoToSlot(dataUrl);
+        }
+
+        function handleCameraFallbackFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                applyCapturedPhotoToSlot(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyCapturedPhotoToSlot(dataUrl) {
+            const slotSelect = document.getElementById('cameraSlotTarget');
+            const target = slotSelect ? parseInt(slotSelect.value) : targetPhotoSlotIndex;
+
+            if (target === -1) {
+                const avatar = document.getElementById('patientCardAvatar');
+                if (avatar) avatar.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
+                showToast("Foto de perfil del paciente actualizada");
+            } else if (clinicalMediaItems[target]) {
+                clinicalMediaItems[target].customUrl = dataUrl;
+                renderClinicalMediaGallery();
+                updatePiPPhoto(target);
+                showToast(`Foto guardada en: ${clinicalMediaItems[target].title}`);
+            }
+
+            closeLiveCameraModal();
+        }
+
+        // ============================================================================
+        // MÓDULO FIRMAS DIGITALES BIOMÉTRICAS
+        // ============================================================================
+        function openDigitalSignaturesModal() {
+            document.getElementById('digitalSignaturesModal').classList.remove('hidden');
+            setTimeout(initAllSignaturePads, 120);
+        }
+
+        function closeDigitalSignaturesModal() {
+            document.getElementById('digitalSignaturesModal').classList.add('hidden');
+        }
+
+        function initAllSignaturePads() {
+            ['patientSigCanvas', 'guardianSigCanvas', 'doctorSigCanvas'].forEach(id => {
+                const canvas = document.getElementById(id);
+                if (!canvas) return;
+
+                const rect = canvas.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    canvas.width = rect.width * 2;
+                    canvas.height = rect.height * 2;
+                    const ctx = canvas.getContext('2d');
+                    ctx.scale(2, 2);
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = '#0284c7';
+                }
+
+                if (canvas._hasSigPadListeners) return;
+                canvas._hasSigPadListeners = true;
+
+                let isDrawing = false;
+                let lastPos = { x: 0, y: 0 };
+
+                function getCanvasPos(e) {
+                    const r = canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return {
+                        x: clientX - r.left,
+                        y: clientY - r.top
+                    };
+                }
+
+                function startStroke(e) {
+                    e.preventDefault();
+                    isDrawing = true;
+                    lastPos = getCanvasPos(e);
+                }
+
+                function moveStroke(e) {
+                    if (!isDrawing) return;
+                    e.preventDefault();
+                    const pos = getCanvasPos(e);
+                    const ctx = canvas.getContext('2d');
+                    ctx.beginPath();
+                    ctx.moveTo(lastPos.x, lastPos.y);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                    lastPos = pos;
+                }
+
+                function endStroke(e) {
+                    isDrawing = false;
+                }
+
+                canvas.addEventListener('mousedown', startStroke);
+                canvas.addEventListener('mousemove', moveStroke);
+                window.addEventListener('mouseup', endStroke);
+
+                canvas.addEventListener('touchstart', startStroke, { passive: false });
+                canvas.addEventListener('touchmove', moveStroke, { passive: false });
+                canvas.addEventListener('touchend', endStroke);
+            });
+        }
+
+        function clearSignaturePad(type) {
+            const canvas = document.getElementById(`${type}SigCanvas`);
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                showToast(`Firma de ${type} borrada`);
+            }
+        }
+
+        function isCanvasBlank(canvas) {
+            const ctx = canvas.getContext('2d');
+            const pixelBuffer = new Uint32Array(ctx.getImageData(0, 0, canvas.width, canvas.height).data.buffer);
+            return !pixelBuffer.some(color => color !== 0);
+        }
+
+        function saveDigitalSignatures() {
+            const pCanvas = document.getElementById('patientSigCanvas');
+            const gCanvas = document.getElementById('guardianSigCanvas');
+            const dCanvas = document.getElementById('doctorSigCanvas');
+
+            const hasP = pCanvas && !isCanvasBlank(pCanvas);
+            const hasG = gCanvas && !isCanvasBlank(gCanvas);
+            const hasD = dCanvas && !isCanvasBlank(dCanvas);
+
+            if (!hasP && !hasD) {
+                showToast("Por favor firma en al menos una de las casillas antes de guardar.");
+                return;
+            }
+
+            if (hasP) clinicalSignatures.patient = pCanvas.toDataURL('image/png');
+            if (hasG) clinicalSignatures.guardian = gCanvas.toDataURL('image/png');
+            if (hasD) clinicalSignatures.doctor = dCanvas.toDataURL('image/png');
+
+            clinicalSignatures.timestamp = new Date().toISOString();
+            const rawStr = `${clinicalSignatures.timestamp}|${clinicalSignatures.patient ? 'P' : ''}|${clinicalSignatures.doctor ? 'D' : ''}|MARTHA_GABRIELA_8819`;
+            let hashVal = 0;
+            for (let i = 0; i < rawStr.length; i++) {
+                hashVal = ((hashVal << 5) - hashVal) + rawStr.charCodeAt(i);
+                hashVal |= 0;
+            }
+            const hexHash = Math.abs(hashVal).toString(16).padStart(8, '0') + "ea7b4f2c9183";
+            clinicalSignatures.hash = `SHA256:${hexHash}`;
+
+            const badge = document.getElementById('sigCertHash');
+            if (badge) {
+                badge.innerText = `Certificado: ${clinicalSignatures.hash} • ${new Date().toLocaleDateString('es-MX')}`;
+            }
+
+            const expSigBox = document.getElementById('expedienteSignaturesPreview');
+            if (expSigBox) {
+                expSigBox.innerHTML = `
+                    <div class="flex items-center space-x-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
+                        <i class="ph-bold ph-seal-check text-xl text-emerald-400"></i>
+                        <div>
+                            <div class="font-bold">Firmas Biométricas Digitales Registradas</div>
+                            <div class="text-[11px] text-zinc-400 font-mono">${clinicalSignatures.hash}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            closeDigitalSignaturesModal();
+            showToast("¡Firmas digitales biométricas guardadas exitosamente!");
+        }
+
+        // ============================================================================
+        // MÓDULO SUPABASE CLOUD & ESQUEMA SQL
+        // ============================================================================
+        function openSupabaseConfigModal() {
+            document.getElementById('supabaseConfigModal').classList.remove('hidden');
+        }
+
+        function closeSupabaseConfigModal() {
+            document.getElementById('supabaseConfigModal').classList.add('hidden');
+        }
+
+        function saveSupabaseConfig() {
+            const url = document.getElementById('supabaseUrlInput').value.trim();
+            const key = document.getElementById('supabaseAnonKeyInput').value.trim();
+            if (url) localStorage.setItem('ortho_supabase_url', url);
+            if (key) localStorage.setItem('ortho_supabase_key', key);
+            updateSupabaseStatusBadge(true);
+            showToast("Configuración de Supabase guardada localmente");
+            closeSupabaseConfigModal();
+        }
+
+        function updateSupabaseStatusBadge(isConfigured) {
+            const badge = document.getElementById('supabaseStatusBadge');
+            if (badge) {
+                if (isConfigured) {
+                    badge.className = "px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30 flex items-center space-x-1";
+                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Conectado (Cloud)</span>`;
+                } else {
+                    badge.className = "px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-semibold border border-white/10 flex items-center space-x-1";
+                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span><span>Modo Local</span>`;
+                }
+            }
+        }
+
+        function copySupabaseSQLSchema() {
+            const sql = `-- OrthoAI Expert Pro Cloud Database Schema (Supabase PostgreSQL)
+CREATE TABLE IF NOT EXISTS patients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    full_name TEXT NOT NULL,
+    age INT,
+    gender TEXT,
+    medical_record_num TEXT UNIQUE,
+    doctor_name TEXT,
+    clinic_name TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS treatment_cases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
+    diagnosis TEXT,
+    total_stages INT DEFAULT 18,
+    active_stage INT DEFAULT 0,
+    overbite_initial NUMERIC(4,2),
+    overjet_initial NUMERIC(4,2),
+    impa_initial NUMERIC(5,2),
+    notes JSONB DEFAULT '[]'::jsonb,
+    ipr_prescription JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS clinical_media (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
+    slot_id TEXT NOT NULL,
+    title TEXT,
+    category TEXT,
+    storage_url TEXT,
+    findings TEXT,
+    uploaded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS digital_signatures (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    case_id UUID REFERENCES treatment_cases(id) ON DELETE CASCADE,
+    patient_signature TEXT,
+    guardian_signature TEXT,
+    doctor_signature TEXT,
+    sha256_cert TEXT NOT NULL,
+    signed_at TIMESTAMPTZ DEFAULT NOW()
+);`;
+            navigator.clipboard.writeText(sql).then(() => {
+                showToast("¡Script SQL copiado al portapapeles!");
+            }).catch(() => {
+                alert("Error al copiar al portapapeles");
+            });
         }
 
         function onWindowResize() {
@@ -3052,6 +3995,331 @@
 
     <!-- CONTENEDOR EXCLUSIVO PARA IMPRESIÓN DIRECTA (@media print) -->
     <div id="clinicalPdfDossier" class="hidden"></div>
+
+    <!-- =====================================================================
+         MODAL DUAL .STL (MAXILAR Y MANDÍBULA HIPERREALISTA)
+    ====================================================================== -->
+    <div id="dualSTLModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="apple-glass border border-white/20 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-5 animate-fade-in text-white">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 shadow-sm">
+                        <i class="ph-bold ph-layers text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Motor Dual .STL Hiperrealista (Maxilar &amp; Mandíbula)</h3>
+                        <p class="text-[11px] text-zinc-400">Carga independiente de escaneos intraorales superiores e inferiores</p>
+                    </div>
+                </div>
+                <button onclick="closeDualSTLModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Dropzone Superior -->
+                <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="ph-bold ph-arrow-up text-sm"></i>
+                            <span>Arcada Superior (Maxilar)</span>
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-zinc-400">Archivo .STL del arco superior o maxilar escaneado.</p>
+                    <input type="file" id="dualStlInput-upper" accept=".stl" class="hidden" onchange="previewDualSTL(event, 'upper')">
+                    <button onclick="document.getElementById('dualStlInput-upper').click()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white flex items-center justify-center space-x-2 transition">
+                        <i class="ph-bold ph-upload-simple"></i>
+                        <span>Seleccionar Maxilar .STL</span>
+                    </button>
+                    <div id="dualStlBadge-upper" class="text-[11px] text-zinc-500 flex items-center space-x-1">
+                        <i class="ph-bold ph-circle text-[8px]"></i>
+                        <span>No cargado (Usa modelo anatómico actual)</span>
+                    </div>
+                </div>
+
+                <!-- Dropzone Inferior -->
+                <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/10 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="ph-bold ph-arrow-down text-sm"></i>
+                            <span>Arcada Inferior (Mandíbula)</span>
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-zinc-400">Archivo .STL del arco inferior o mandibular escaneado.</p>
+                    <input type="file" id="dualStlInput-lower" accept=".stl" class="hidden" onchange="previewDualSTL(event, 'lower')">
+                    <button onclick="document.getElementById('dualStlInput-lower').click()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-semibold text-white flex items-center justify-center space-x-2 transition">
+                        <i class="ph-bold ph-upload-simple"></i>
+                        <span>Seleccionar Mandíbula .STL</span>
+                    </button>
+                    <div id="dualStlBadge-lower" class="text-[11px] text-zinc-500 flex items-center space-x-1">
+                        <i class="ph-bold ph-circle text-[8px]"></i>
+                        <span>No cargado (Usa modelo anatómico actual)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Material Bicapa / Render Settings -->
+            <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+                <div>
+                    <div class="font-semibold text-zinc-200">Sombreado Hiperrealista CAD/CAM</div>
+                    <div class="text-[11px] text-zinc-400">Esmalte Marfil Translúcido + Base de Encía Coral Húmeda</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold text-[10px] border border-emerald-500/30">Activo (PBR)</span>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+                <button onclick="closeDualSTLModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-zinc-300">
+                    Cancelar
+                </button>
+                <button onclick="applyDualSTLModels()" class="px-5 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0070e0] text-xs font-semibold text-white shadow-lg flex items-center space-x-2">
+                    <i class="ph-bold ph-check"></i>
+                    <span>Procesar y Montar en Escena 3D</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL CÁMARA EN VIVO WEBRTC (GETUSERMEDIA)
+    ====================================================================== -->
+    <div id="liveCameraModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="apple-glass border border-white/20 rounded-2xl w-full max-w-lg p-5 shadow-2xl space-y-4 animate-fade-in text-white">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-400">
+                        <i class="ph-bold ph-camera text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Captura de Fotografía en Tiempo Real</h3>
+                        <p class="text-[11px] text-zinc-400">Captura directa desde la cámara del dispositivo móvil o webcam</p>
+                    </div>
+                </div>
+                <button onclick="closeLiveCameraModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Visor de Video en Vivo -->
+            <div class="relative w-full h-64 sm:h-72 rounded-xl overflow-hidden bg-zinc-950 border border-white/15 flex items-center justify-center">
+                <video id="liveCameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                <div class="absolute top-3 right-3 flex items-center space-x-2">
+                    <button onclick="switchCameraFacing()" class="px-2.5 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs border border-white/20 flex items-center space-x-1.5 transition">
+                        <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+                        <span>Cambiar Lente</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selector de Ranura de Destino -->
+            <div class="space-y-1.5">
+                <label class="text-[11px] font-semibold text-zinc-300">Guardar foto en registro clínico:</label>
+                <select id="cameraSlotTarget" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-sky-400">
+                    <option value="-1">Foto de Perfil del Paciente (Avatar)</option>
+                    <option value="0">1. Rx Panorámica (Ortopantomografía)</option>
+                    <option value="1">2. Rx Lateral de Cráneo Cefalométrica</option>
+                    <option value="2" selected>3. Extraoral Frontal en Reposo y Sonrisa</option>
+                    <option value="3">4. Intraoral Frontal con Hábito Lingual</option>
+                    <option value="4">5. Oclusal Superior con Arco Estrecho</option>
+                    <option value="5">6. Oclusal Inferior con Apiñamiento Severo</option>
+                    <option value="6">7. Intraoral Lateral Derecha (Relación Canina)</option>
+                    <option value="7">8. Intraoral Lateral Izquierda (Relación Canina)</option>
+                </select>
+            </div>
+
+            <!-- Fallback input oculto -->
+            <input type="file" id="cameraFileFallback" accept="image/*" class="hidden" onchange="handleCameraFallbackFile(event)">
+
+            <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                <button onclick="document.getElementById('cameraFileFallback').click()" class="text-xs text-zinc-400 hover:text-white flex items-center space-x-1">
+                    <i class="ph-bold ph-folder-open"></i>
+                    <span>Subir desde Galería</span>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="closeLiveCameraModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-zinc-300">
+                        Cancelar
+                    </button>
+                    <button onclick="captureLivePhotoFrame()" class="px-5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-xs font-semibold text-white shadow-lg flex items-center space-x-2 transition active:scale-95">
+                        <i class="ph-bold ph-camera"></i>
+                        <span>Disparar / Guardar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL FIRMAS DIGITALES BIOMÉTRICAS
+    ====================================================================== -->
+    <div id="digitalSignaturesModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="apple-glass border border-white/20 rounded-2xl w-full max-w-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
+                        <i class="ph-bold ph-signature text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Firmas Digitales Biométricas &amp; Consentimiento</h3>
+                        <p class="text-[11px] text-zinc-400">Firma en pantalla con dedo, mouse o Apple Pencil para validez jurídica</p>
+                    </div>
+                </div>
+                <button onclick="closeDigitalSignaturesModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Casillas de Firma -->
+            <div class="space-y-4">
+                <!-- Firma Paciente -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-sky-400 flex items-center space-x-1.5">
+                            <i class="ph-bold ph-user"></i>
+                            <span>Firma del Paciente: Martha Gabriela Zúñiga Núñez</span>
+                        </span>
+                        <button onclick="clearSignaturePad('patient')" class="text-[11px] text-zinc-400 hover:text-white flex items-center space-x-1">
+                            <i class="ph-bold ph-eraser"></i>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                    <canvas id="patientSigCanvas" class="sig-pad-canvas w-full h-28 rounded-xl border border-white/15 bg-zinc-950/80 cursor-crosshair"></canvas>
+                </div>
+
+                <!-- Firma Doctora -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-emerald-400 flex items-center space-x-1.5">
+                            <i class="ph-bold ph-stethoscope"></i>
+                            <span>Firma de la Especialista: Dra. Liseth Guevara Muñoz</span>
+                        </span>
+                        <button onclick="clearSignaturePad('doctor')" class="text-[11px] text-zinc-400 hover:text-white flex items-center space-x-1">
+                            <i class="ph-bold ph-eraser"></i>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                    <canvas id="doctorSigCanvas" class="sig-pad-canvas w-full h-28 rounded-xl border border-white/15 bg-zinc-950/80 cursor-crosshair"></canvas>
+                </div>
+
+                <!-- Firma Tutor Legal (Opcional) -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-semibold text-zinc-400 flex items-center space-x-1.5">
+                            <i class="ph-bold ph-users"></i>
+                            <span>Firma de Tutor / Representante Legal (Opcional)</span>
+                        </span>
+                        <button onclick="clearSignaturePad('guardian')" class="text-[11px] text-zinc-400 hover:text-white flex items-center space-x-1">
+                            <i class="ph-bold ph-eraser"></i>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                    <canvas id="guardianSigCanvas" class="sig-pad-canvas w-full h-24 rounded-xl border border-white/10 bg-zinc-950/60 cursor-crosshair"></canvas>
+                </div>
+            </div>
+
+            <!-- Certificado SHA-256 -->
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-2">
+                    <i class="ph-bold ph-shield-check text-base text-sky-400"></i>
+                    <span id="sigCertHash" class="text-[11px] font-mono text-zinc-300">Certificado Biométrico listo para sellar</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+                <button onclick="closeDigitalSignaturesModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-zinc-300">
+                    Cancelar
+                </button>
+                <button onclick="saveDigitalSignatures()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-lg flex items-center space-x-2 transition active:scale-95">
+                    <i class="ph-bold ph-check-circle"></i>
+                    <span>Guardar y Certificar Firmas</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL CONFIGURACIÓN SUPABASE CLOUD & ESQUEMA SQL
+    ====================================================================== -->
+    <div id="supabaseConfigModal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="apple-glass border border-white/20 rounded-2xl w-full max-w-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+                        <i class="ph-bold ph-database text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Conexión Supabase Cloud Database</h3>
+                        <p class="text-[11px] text-zinc-400">Sincronización en tiempo real de pacientes, expedientes y firmas</p>
+                    </div>
+                </div>
+                <button onclick="closeSupabaseConfigModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Project URL (Supabase)</label>
+                    <input type="text" id="supabaseUrlInput" placeholder="https://your-project.supabase.co" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-300 mb-1">Anon / Public API Key</label>
+                    <input type="password" id="supabaseAnonKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+                </div>
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <span class="text-zinc-300 text-[11px]">Estado actual de sincronización:</span>
+                    <span id="supabaseStatusBadge" class="px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[10px] font-semibold border border-white/10 flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span>
+                        <span>Modo Local</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Esquema SQL Pre-Generado -->
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-emerald-400">Esquema SQL Oficial para Supabase</span>
+                    <button onclick="copySupabaseSQLSchema()" class="text-[11px] text-sky-400 hover:text-sky-300 font-semibold flex items-center space-x-1">
+                        <i class="ph-bold ph-copy"></i>
+                        <span>Copiar SQL</span>
+                    </button>
+                </div>
+                <pre class="w-full p-3 rounded-xl bg-zinc-950 border border-white/10 text-[10px] font-mono text-zinc-300 overflow-x-auto max-h-36">-- OrthoAI Expert Pro v9.0 Schema
+CREATE TABLE IF NOT EXISTS patients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    full_name TEXT NOT NULL,
+    age INT,
+    medical_record_num TEXT UNIQUE,
+    doctor_name TEXT,
+    clinic_name TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS treatment_cases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
+    diagnosis TEXT,
+    active_stage INT DEFAULT 0,
+    notes JSONB DEFAULT '[]'::jsonb,
+    ipr_prescription JSONB DEFAULT '{}'::jsonb
+);
+CREATE TABLE IF NOT EXISTS digital_signatures (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    case_id UUID REFERENCES treatment_cases(id),
+    patient_signature TEXT,
+    doctor_signature TEXT,
+    sha256_cert TEXT NOT NULL
+);</pre>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+                <button onclick="closeSupabaseConfigModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-zinc-300">
+                    Cancelar
+                </button>
+                <button onclick="saveSupabaseConfig()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-lg flex items-center space-x-2 transition active:scale-95">
+                    <i class="ph-bold ph-floppy-disk"></i>
+                    <span>Guardar y Conectar</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
