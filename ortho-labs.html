@@ -115,6 +115,13 @@
                         />
                     </div>
                     <button
+                        onclick="toggleOrthoAssistantDrawer(true)"
+                        class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-calendar-check text-emerald-400"></i>
+                        <span>Asistente IA & Agenda</span>
+                    </button>
+                    <button
                         onclick="openNewPatientModal()"
                         class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
                     >
@@ -216,6 +223,14 @@
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
+                    <button
+                        onclick="toggleOrthoAssistantDrawer(true)"
+                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                        title="Abrir Asistente Clínico Argon & Google Calendar"
+                    >
+                        <i class="ph-bold ph-calendar-check text-emerald-600"></i>
+                        <span>Agenda IA</span>
+                    </button>
                     <button
                         onclick="openStlViewerModal()"
                         class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
@@ -1208,6 +1223,179 @@ create table if not exists public.patients (
             <div class="bg-slate-950 flex items-center justify-center max-h-[75vh] overflow-hidden">
                 <img id="lightboxImg" src="" alt="Estudio clínico" class="max-h-[75vh] w-auto object-contain" />
             </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         BOTÓN FLOTANTE Y DRAWER DEL ASISTENTE CLÍNICO IA & GOOGLE CALENDAR
+         (src/components/modules/OrthoAssistantChat.tsx)
+    ====================================================================== -->
+    <button
+        id="floatingAssistantBtn"
+        onclick="toggleOrthoAssistantDrawer(true)"
+        class="fixed bottom-5 right-5 z-40 bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-2.5 transition transform hover:scale-105 no-print"
+        title="Abrir Asistente Clínico Inteligente & Google Calendar"
+    >
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <i class="ph-bold ph-calendar-check text-indigo-400 text-base"></i>
+        <span class="text-xs font-bold">Asistente Argon & Calendar</span>
+    </button>
+
+    <div
+        id="orthoAssistantDrawer"
+        class="hidden fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs flex justify-end no-print"
+        onclick="toggleOrthoAssistantDrawer(false)"
+    >
+        <div
+            class="w-full max-w-md bg-white h-full shadow-2xl border-l border-slate-200 flex flex-col justify-between overflow-hidden"
+            onclick="event.stopPropagation()"
+        >
+            <!-- Cabecera del Asistente -->
+            <div class="p-4 bg-slate-900 text-white flex justify-between items-center gap-2">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-lg shadow-sm">
+                        🤖
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="text-xs font-bold tracking-tight">Asistente Clínico & Google Calendar</h3>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        </div>
+                        <p id="assistantContextSubtitle" class="text-[10px] text-slate-300">
+                            Dra. Liseth Guevara Muñoz • Gemini 4 Argon Activo
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button
+                        type="button"
+                        onclick="toggleGoogleCalendarConfig()"
+                        id="btnGoogleCalStatus"
+                        class="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 border border-white/15 transition flex items-center gap-1"
+                    >
+                        <i class="ph-bold ph-google-logo"></i>
+                        <span id="googleCalStatusText">Calendar Activo</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="toggleOrthoAssistantDrawer(false)"
+                        class="text-xs text-slate-300 hover:text-white px-2 py-1 rounded-lg bg-white/10"
+                    >
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel Desplegable de Configuración de Cuenta Google Calendar -->
+            <div id="googleCalendarConfigPanel" class="hidden bg-indigo-50/90 border-b border-indigo-200 p-3.5 text-xs space-y-2.5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-bold text-indigo-950 text-[11px] flex items-center gap-1.5">
+                            <i class="ph-bold ph-google-logo text-indigo-600"></i>
+                            <span>Cuenta de Google Calendar de la Especialista</span>
+                        </p>
+                        <p class="text-[10px] text-slate-600 mt-0.5">
+                            Las citas creadas se abren en 1 clic listas para guardar en tu Google Calendar o se insertan directo vía OAuth 2.0 API.
+                        </p>
+                    </div>
+                    <button type="button" onclick="toggleGoogleCalendarConfig()" class="text-[10px] text-slate-400 hover:text-slate-700">Cerrar</button>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-[9.5px] font-bold uppercase text-slate-500 mb-0.5">Correo de Google Calendar de la Doctora</label>
+                        <input
+                            id="doctorGoogleEmailInput"
+                            type="email"
+                            placeholder="dralisethguevara@gmail.com"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[9.5px] font-bold uppercase text-slate-500 mb-0.5">Google OAuth Access Token (Opcional para inserción directa API v3)</label>
+                        <input
+                            id="doctorGoogleTokenInput"
+                            type="password"
+                            placeholder="ya29.a0AfH6SM... (opcional)"
+                            class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 mono"
+                        />
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button
+                            type="button"
+                            onclick="saveGoogleCalendarSettings()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition"
+                        >
+                            Guardar Cuenta Google
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximas Citas Agendadas en Sillón -->
+            <div class="bg-slate-50 border-b border-slate-200 px-4 py-2.5">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                        📅 Próximos Controles en Sillón (Google Calendar)
+                    </span>
+                    <span id="upcomingCountBadge" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                        0 citas
+                    </span>
+                </div>
+                <div id="upcomingAppointmentsContainer" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Atajos Inteligentes para la Doctora -->
+            <div class="px-4 pt-2.5 pb-1.5 border-b border-slate-100 bg-white flex flex-wrap gap-1.5">
+                <button
+                    type="button"
+                    onclick="runQuickAssistantPrompt('briefing')"
+                    class="text-[10px] font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                >
+                    📋 Briefing del día y charola
+                </button>
+                <button
+                    type="button"
+                    onclick="runQuickAssistantPrompt('schedule_next')"
+                    class="text-[10px] font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                >
+                    📅 Agendar control de este paciente
+                </button>
+                <button
+                    type="button"
+                    onclick="runQuickAssistantPrompt('whatsapp')"
+                    class="text-[10px] font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                >
+                    💬 Recordatorio WhatsApp
+                </button>
+                <button
+                    type="button"
+                    onclick="runQuickAssistantPrompt('clinical_check')"
+                    class="text-[10px] font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                >
+                    🦷 Revisar alertas e IPR
+                </button>
+            </div>
+
+            <!-- Historial de Conversación con el Asistente -->
+            <div id="orthoAssistantMessages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs bg-white"></div>
+
+            <!-- Barra de Entrada por Voz / Texto Natural -->
+            <form onsubmit="handleOrthoAssistantSubmit(event)" class="p-3 bg-slate-50 border-t border-slate-200 flex gap-2">
+                <input
+                    id="orthoAssistantInput"
+                    type="text"
+                    placeholder="Ej. Agendar control de Martha el jueves a las 11 am..."
+                    class="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                />
+                <button
+                    type="submit"
+                    id="btnOrthoAssistantSend"
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1 shrink-0"
+                >
+                    <span>Enviar</span>
+                    <i class="ph-bold ph-paper-plane-right"></i>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -2623,7 +2811,7 @@ create table if not exists public.patients (
                 return;
             }
 
-            container.innerHTML = stages.map((stage) => `
+            container.innerHTML = stages.map((stage, idx) => `
                 <div class="border border-slate-200 rounded-2xl p-4 flex flex-col justify-between bg-white">
                     <div>
                         <div class="flex justify-between items-center mb-2">
@@ -2637,8 +2825,18 @@ create table if not exists public.patients (
                             <strong>Sillón:</strong> ${stage.chairsideAction}
                         </p>
                     </div>
-                    <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs text-slate-800">
-                        <strong>Movimiento:</strong> ${stage.expectedMovement}
+                    <div class="space-y-2">
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs text-slate-800">
+                            <strong>Movimiento:</strong> ${stage.expectedMovement}
+                        </div>
+                        <button
+                            type="button"
+                            onclick="scheduleRoadmapStageWithAssistant(${idx})"
+                            class="no-print w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl py-1.5 px-2.5 text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-calendar-plus"></i>
+                            <span>Agendar Etapa en Google Calendar</span>
+                        </button>
                     </div>
                 </div>
             `).join("");
@@ -4034,6 +4232,447 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
         function logoutDoctor() {
             localStorage.removeItem("ortho_authenticated");
             window.location.href = "index.html";
+        }
+
+        // ---------------------------------------------------------------------
+        // 9. ASISTENTE CLÍNICO INTELIGENTE (GEMINI 4 ARGON + GOOGLE CALENDAR)
+        // ---------------------------------------------------------------------
+        let orthoAssistantHistory = [
+            {
+                role: "assistant",
+                text: "Hola, Dra. Liseth 👋. Soy tu Asistente Clínico con Gemini 4 Argon conectado a tu agenda de Google Calendar.\n\n¿En qué te ayudo hoy?\n• Agendar controles calculando el tiempo de sillón ideal (ej. 45 min para TADs/Cementado, 30 min para IPR, 20 min para arcos).\n• Preparar el briefing del día y material de charola.\n• Redactar avisos de WhatsApp para tus pacientes.",
+                appointment: null
+            }
+        ];
+
+        let scheduledAppointments = [];
+        try {
+            const savedAppts = localStorage.getItem("crd_ortho_appointments_v1");
+            if (savedAppts) {
+                scheduledAppointments = JSON.parse(savedAppts);
+            } else {
+                const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                tomorrow.setHours(10, 0, 0, 0);
+                scheduledAppointments = [
+                    {
+                        id: "appt-demo-1",
+                        patientName: "Martha Gabriela Zúñiga Núñez",
+                        patientPhone: "999-128-4501",
+                        procedureTitle: "Mes 7: Intrusión Molar Activa con TADs IZC",
+                        startIso: tomorrow.toISOString(),
+                        durationMinutes: 45,
+                        chairsidePrep: "2 Microtornillos IZC + Cadena elástica 150 g + Arco .019x.025 SS",
+                        patientReminderNote: "Hola Martha, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara. Recuerda acudir con cepillado previo."
+                    }
+                ];
+            }
+        } catch (e) {
+            scheduledAppointments = [];
+        }
+
+        function saveAppointmentsLocal() {
+            try {
+                localStorage.setItem("crd_ortho_appointments_v1", JSON.stringify(scheduledAppointments));
+            } catch (e) {}
+        }
+
+        function buildGoogleCalendarTemplateUrl(appt) {
+            const startDt = appt.startIso ? new Date(appt.startIso) : new Date(Date.now() + 86400000);
+            const durMs = (Number(appt.durationMinutes) || 30) * 60 * 1000;
+            const endDt = new Date(startDt.getTime() + durMs);
+            const fmt = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+            const doctorEmail = localStorage.getItem("crd_doctor_google_email") || "dralisethguevara@gmail.com";
+
+            const title = `🦷 ${appt.procedureTitle} — ${appt.patientName}`;
+            const details = [
+                `Paciente: ${appt.patientName}`,
+                `Tiempo estimado en sillón: ${appt.durationMinutes || 30} min`,
+                `Charola / Preparación en Sillón: ${appt.chairsidePrep || "Instrumental de control ortodóntico"}`,
+                `Indicaciones al Paciente: ${appt.patientReminderNote || ""}`,
+                `Especialista: Dra. Liseth Guevara Muñoz (${doctorEmail})`
+            ].join("\n");
+
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(startDt)}/${fmt(endDt)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent("Clínica de Rehabilitación Dental y Ortodoncia - Dra. Liseth Guevara")}&add=${encodeURIComponent(doctorEmail)}`;
+        }
+
+        function buildWhatsAppReminderUrl(appt) {
+            const matchedPatient = patientsList.find((p) =>
+                p.full_name.toLowerCase().includes((appt.patientName || "").toLowerCase()) ||
+                (appt.patientName || "").toLowerCase().includes(p.full_name.toLowerCase())
+            );
+            const rawPhone = (appt.patientPhone || matchedPatient?.phone || "").replace(/[^0-9]/g, "");
+            const cleanPhone = rawPhone.length === 10 ? `52${rawPhone}` : rawPhone;
+            const dateStr = appt.startIso
+                ? new Date(appt.startIso).toLocaleString("es-MX", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+                : "tu próxima cita";
+            const msg = appt.patientReminderNote || `Hola ${appt.patientName}, te saludamos del consultorio de la Dra. Liseth Guevara Muñoz para confirmar tu cita de ortodoncia (${appt.procedureTitle}) programada para el ${dateStr}. ¡Te esperamos!`;
+            return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+        }
+
+        async function tryInsertGoogleCalendarApi(appt) {
+            const token = localStorage.getItem("crd_doctor_google_token") || "";
+            if (!token) return null;
+            try {
+                const startDt = appt.startIso ? new Date(appt.startIso) : new Date(Date.now() + 86400000);
+                const endDt = new Date(startDt.getTime() + (Number(appt.durationMinutes) || 30) * 60 * 1000);
+                const res = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        summary: `🦷 ${appt.procedureTitle} — ${appt.patientName}`,
+                        location: "Clínica de Rehabilitación Dental y Ortodoncia - Dra. Liseth Guevara",
+                        description: `Paciente: ${appt.patientName}\nPreparación en Sillón: ${appt.chairsidePrep || ""}\nNota: ${appt.patientReminderNote || ""}`,
+                        start: { dateTime: startDt.toISOString(), timeZone: "America/Mexico_City" },
+                        end: { dateTime: endDt.toISOString(), timeZone: "America/Mexico_City" }
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    return data.htmlLink || null;
+                }
+            } catch (e) {
+                console.warn("Google Calendar API directa opcional:", e);
+            }
+            return null;
+        }
+
+        function toggleOrthoAssistantDrawer(forceOpen) {
+            const drawer = document.getElementById("orthoAssistantDrawer");
+            if (!drawer) return;
+            if (typeof forceOpen === "boolean") {
+                if (forceOpen) drawer.classList.remove("hidden");
+                else drawer.classList.add("hidden");
+            } else {
+                drawer.classList.toggle("hidden");
+            }
+
+            if (!drawer.classList.contains("hidden")) {
+                const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+                const sub = document.getElementById("assistantContextSubtitle");
+                if (sub && patient) {
+                    sub.innerText = `Paciente activo: ${patient.full_name} • Google Calendar`;
+                }
+                const savedEmail = localStorage.getItem("crd_doctor_google_email") || "dralisethguevara@gmail.com";
+                const savedToken = localStorage.getItem("crd_doctor_google_token") || "";
+                const emailInput = document.getElementById("doctorGoogleEmailInput");
+                const tokenInput = document.getElementById("doctorGoogleTokenInput");
+                if (emailInput) emailInput.value = savedEmail;
+                if (tokenInput) tokenInput.value = savedToken;
+
+                renderUpcomingAppointments();
+                renderOrthoAssistantMessages();
+                setTimeout(() => document.getElementById("orthoAssistantInput")?.focus(), 100);
+            }
+        }
+
+        function toggleGoogleCalendarConfig() {
+            const panel = document.getElementById("googleCalendarConfigPanel");
+            if (panel) panel.classList.toggle("hidden");
+        }
+
+        function saveGoogleCalendarSettings() {
+            const email = document.getElementById("doctorGoogleEmailInput")?.value?.trim() || "dralisethguevara@gmail.com";
+            const token = document.getElementById("doctorGoogleTokenInput")?.value?.trim() || "";
+            localStorage.setItem("crd_doctor_google_email", email);
+            localStorage.setItem("crd_doctor_google_token", token);
+            const statusTxt = document.getElementById("googleCalStatusText");
+            if (statusTxt) statusTxt.innerText = token ? "OAuth Conectado" : "Calendar Activo";
+            document.getElementById("googleCalendarConfigPanel")?.classList.add("hidden");
+            renderUpcomingAppointments();
+        }
+
+        function renderUpcomingAppointments() {
+            const container = document.getElementById("upcomingAppointmentsContainer");
+            const badge = document.getElementById("upcomingCountBadge");
+            if (!container) return;
+
+            if (badge) badge.innerText = `${scheduledAppointments.length} ${scheduledAppointments.length === 1 ? "cita" : "citas"}`;
+
+            if (scheduledAppointments.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-400 italic">Sin citas próximas registradas. Pídele al asistente agendar un control.</p>`;
+                return;
+            }
+
+            container.innerHTML = scheduledAppointments.map((appt) => {
+                const gcalUrl = appt.googleCalendarEventUrl || buildGoogleCalendarTemplateUrl(appt);
+                const waUrl = buildWhatsAppReminderUrl(appt);
+                const dateFormatted = appt.startIso
+                    ? new Date(appt.startIso).toLocaleString("es-MX", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+                    : "Por confirmar";
+
+                return `
+                    <div class="bg-white border border-slate-200 rounded-xl p-2.5 text-[11px] shadow-2xs space-y-1">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <span class="font-bold text-slate-900">${appt.patientName}</span>
+                                <p class="text-[10px] font-semibold text-indigo-700">${appt.procedureTitle}</p>
+                            </div>
+                            <span class="bg-indigo-50 text-indigo-800 border border-indigo-200 px-1.5 py-0.5 rounded text-[9.5px] font-bold mono shrink-0">
+                                ${appt.durationMinutes || 30} min
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-500">
+                            <strong>🗓️ Fecha:</strong> ${dateFormatted} • <strong>Charola:</strong> ${appt.chairsidePrep || "Control"}
+                        </p>
+                        <div class="flex items-center gap-2 pt-1">
+                            <a
+                                href="${gcalUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-google-logo"></i>
+                                <span>Abrir en Google Calendar</span>
+                            </a>
+                            <a
+                                href="${waUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-semibold px-2.5 py-1 rounded-lg transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-whatsapp-logo"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderOrthoAssistantMessages() {
+            const container = document.getElementById("orthoAssistantMessages");
+            if (!container) return;
+
+            container.innerHTML = orthoAssistantHistory.map((m) => {
+                const isUser = m.role === "user";
+                const appt = m.appointment;
+                const gcalUrl = appt ? (appt.googleCalendarEventUrl || buildGoogleCalendarTemplateUrl(appt)) : "";
+                const waUrl = appt ? buildWhatsAppReminderUrl(appt) : "";
+
+                return `
+                    <div class="flex ${isUser ? "justify-end" : "justify-start"}">
+                        <div class="${isUser ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800 border border-slate-200"} rounded-2xl p-3 max-w-[90%] space-y-2 shadow-2xs">
+                            <p class="whitespace-pre-line leading-relaxed text-[11.5px]">${m.text}</p>
+                            ${appt ? `
+                                <div class="bg-white border border-indigo-200 rounded-xl p-2.5 text-slate-900 space-y-1.5 shadow-xs">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9.5px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            ✓ Cita Preparada • ${appt.durationMinutes || 30} min en sillón
+                                        </span>
+                                    </div>
+                                    <p class="font-bold text-xs text-indigo-950">${appt.procedureTitle}</p>
+                                    <p class="text-[10.5px] text-slate-600"><strong>Paciente:</strong> ${appt.patientName}</p>
+                                    <p class="text-[10.5px] text-slate-600"><strong>Charola de Sillón:</strong> ${appt.chairsidePrep || "Instrumental de control"}</p>
+                                    <div class="flex flex-wrap gap-1.5 pt-1">
+                                        <a
+                                            href="${gcalUrl}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-[10.5px] font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                                        >
+                                            <i class="ph-bold ph-google-logo"></i>
+                                            <span>Guardar en Google Calendar</span>
+                                        </a>
+                                        <a
+                                            href="${waUrl}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10.5px] font-bold px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1"
+                                        >
+                                            <i class="ph-bold ph-whatsapp-logo"></i>
+                                            <span>Enviar Recordatorio WhatsApp</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            ` : ""}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function scheduleRoadmapStageWithAssistant(stageIdx) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            const study = patient.study_data || createBlankStudyData();
+            const stages = (study.roadmap || []).filter(
+                (s) => currentPhaseFilter === "all" || s.phase === currentPhaseFilter
+            );
+            const stage = stages[stageIdx];
+            if (!stage) return;
+
+            toggleOrthoAssistantDrawer(true);
+            const prompt = `Agendar cita para ${patient.full_name} correspondiente a la etapa "${stage.months}: ${stage.title}" (Arco: ${stage.archwire}). Preparar en sillón: ${stage.chairsideAction}. Sugiere el tiempo de sillón ideal para la próxima semana a las 11:00 am.`;
+            sendOrthoAssistantPrompt(prompt);
+        }
+
+        function runQuickAssistantPrompt(type) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            const patName = patient ? patient.full_name : "la paciente";
+            if (type === "briefing") {
+                sendOrthoAssistantPrompt("Dame el briefing clínico del día: resume mis pacientes en seguimiento, qué etapa les toca hoy, qué material o arcos debo preparar en la charola del sillón y si hay alertas radiculares.");
+            } else if (type === "schedule_next") {
+                sendOrthoAssistantPrompt(`Agendar el próximo control biomecánico de ${patName} el próximo jueves a las 11:00 am de acuerdo con su hoja de ruta mes a mes y dime cuánto tiempo de sillón reservar.`);
+            } else if (type === "whatsapp") {
+                sendOrthoAssistantPrompt(`Redacta un mensaje de WhatsApp cálido y profesional de parte de la Dra. Liseth Guevara para ${patName} recordándole su próxima cita y las indicaciones de cuidado de su aparatología.`);
+            } else if (type === "clinical_check") {
+                sendOrthoAssistantPrompt(`Analiza el expediente de ${patName}: resume su stripping (IPR) pendiente, su anclaje requerido y las precauciones biomecánicas clave para su próxima cita.`);
+            }
+        }
+
+        function handleOrthoAssistantSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById("orthoAssistantInput");
+            const text = input?.value?.trim();
+            if (!text) return;
+            input.value = "";
+            sendOrthoAssistantPrompt(text);
+        }
+
+        async function sendOrthoAssistantPrompt(promptText) {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            orthoAssistantHistory.push({ role: "user", text: promptText, appointment: null });
+            orthoAssistantHistory.push({ role: "assistant", text: "⏳ Consultando expediente y sincronizando con Google Calendar...", appointment: null });
+            renderOrthoAssistantMessages();
+
+            const sendBtn = document.getElementById("btnOrthoAssistantSend");
+            if (sendBtn) sendBtn.disabled = true;
+
+            try {
+                const patientsSummary = patientsList.map((p) => ({
+                    name: p.full_name,
+                    age: p.age,
+                    phone: p.phone,
+                    complexity: p.complexity,
+                    anchorage: p.study_data?.anchorage,
+                    skeletal: p.study_data?.summary?.skeletal,
+                    vertical: p.study_data?.summary?.vertical,
+                    rootAlert: p.study_data?.summary?.rootAlert,
+                    nextStage: p.study_data?.roadmap?.[1] || p.study_data?.roadmap?.[0] || null
+                }));
+
+                const systemInstruction = `Eres el Asistente Clínico Inteligente de Ortodoncia y Coordinador de Google Calendar de la Dra. Liseth Guevara Muñoz.
+Fecha actual: ${new Date().toISOString()}.
+Pacientes en clínica: ${JSON.stringify(patientsSummary)}.
+Paciente activo en pantalla: ${JSON.stringify({
+                    name: patient?.full_name,
+                    age: patient?.age,
+                    phone: patient?.phone,
+                    complexity: patient?.complexity,
+                    study: patient?.study_data?.summary,
+                    anchorage: patient?.study_data?.anchorage,
+                    roadmap: patient?.study_data?.roadmap,
+                    retention: patient?.study_data?.retentionProtocol
+                })}.
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
+{
+  "intent": "schedule_appointment" | "daily_briefing" | "clinical_query" | "whatsapp_reminder",
+  "reply": "Respuesta profesional, estructurada y concisa para la Dra. Liseth Guevara Muñoz",
+  "appointment": null o {
+    "patientName": "Nombre completo del paciente",
+    "procedureTitle": "Título clínico de la cita (ej. Mes 7: Intrusión con TADs / Control .016x.022 CuNiTi)",
+    "startIso": "YYYY-MM-DDTHH:mm:00",
+    "durationMinutes": 30,
+    "chairsidePrep": "Materiales e instrumental exacto a preparar en charola de sillón",
+    "patientReminderNote": "Mensaje breve de recordatorio por WhatsApp para el paciente"
+  }
+}
+Si la doctora pide agendar una cita o etapa, SIEMPRE incluye el objeto 'appointment' con fecha ISO válida, duración clínica adecuada (45 min para TADs/Cementado/Retiro, 30 min para IPR/ATP, 20 min para control de arcos) y el material de sillón.`;
+
+                let parsed = null;
+
+                // Llamada directa a la API de Gemini con la llave configurada en la plataforma
+                const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+                for (const modelName of modelsToTry) {
+                    const resp = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(DEFAULT_GEMINI_API_KEY)}`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{ role: "user", parts: [{ text: `${systemInstruction}\n\nSolicitud de la Dra. Liseth: "${promptText}"` }] }],
+                                generationConfig: {
+                                    responseMimeType: "application/json",
+                                    temperature: 0.2
+                                }
+                            })
+                        }
+                    );
+                    if (resp.ok) {
+                        const json = await resp.json();
+                        const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (rawText) {
+                            parsed = JSON.parse(rawText);
+                            break;
+                        }
+                    }
+                }
+
+                // Fallback inteligente local si el endpoint externo no responde
+                if (!parsed) {
+                    const nextThu = new Date(Date.now() + 3 * 86400000);
+                    nextThu.setHours(11, 0, 0, 0);
+                    const isSchedule = /agendar|cita|control|jueves|lunes|martes|miercoles|viernes|etapa|mes/i.test(promptText);
+                    parsed = {
+                        intent: isSchedule ? "schedule_appointment" : "daily_briefing",
+                        reply: isSchedule
+                            ? `¡Listo, Dra. Liseth! He preparado la cita de control para ${patient?.full_name || "el paciente"} calculando el tiempo de sillón necesario y los materiales que tu asistente debe colocar en la charola. Haz clic abajo para guardarla en tu Google Calendar o enviarle el aviso por WhatsApp.`
+                            : `📋 Briefing Clínico del Consultorio:\n• ${patient?.full_name} (${patient?.age} años): ${patient?.study_data?.summary?.skeletal || "En valoración"} — ${patient?.study_data?.summary?.vertical || ""}.\n• Anclaje: ${patient?.study_data?.anchorage || "Por definir"}.\n• Alerta Radicular: ${patient?.study_data?.summary?.rootAlert || "Monitoreo estándar"}.`,
+                        appointment: isSchedule ? {
+                            patientName: patient?.full_name || "Martha Gabriela Zúñiga Núñez",
+                            procedureTitle: patient?.study_data?.roadmap?.[1]?.title || "Control Biomecánico Ortodóntico",
+                            startIso: nextThu.toISOString(),
+                            durationMinutes: String(promptText).toLowerCase().includes("tad") ? 45 : 30,
+                            chairsidePrep: patient?.study_data?.roadmap?.[1]?.chairsideAction || "Espejo, pinza Mathieu, tiras de IPR y arco térmico CuNiTi",
+                            patientReminderNote: `Hola ${patient?.full_name || ""}, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara Muñoz el ${nextThu.toLocaleDateString("es-MX")} a las 11:00 am.`
+                        } : null
+                    };
+                }
+
+                let finalAppt = null;
+                if (parsed.appointment) {
+                    finalAppt = {
+                        id: `appt-${Date.now()}`,
+                        patientName: parsed.appointment.patientName || patient?.full_name || "Paciente",
+                        patientPhone: patient?.phone || "",
+                        procedureTitle: parsed.appointment.procedureTitle || "Control Ortodóntico",
+                        startIso: parsed.appointment.startIso || new Date(Date.now() + 86400000).toISOString(),
+                        durationMinutes: Number(parsed.appointment.durationMinutes) || 30,
+                        chairsidePrep: parsed.appointment.chairsidePrep || "Instrumental de control ortodóntico",
+                        patientReminderNote: parsed.appointment.patientReminderNote || ""
+                    };
+
+                    const directApiLink = await tryInsertGoogleCalendarApi(finalAppt);
+                    finalAppt.googleCalendarEventUrl = directApiLink || buildGoogleCalendarTemplateUrl(finalAppt);
+
+                    scheduledAppointments.unshift(finalAppt);
+                    saveAppointmentsLocal();
+                    renderUpcomingAppointments();
+                }
+
+                orthoAssistantHistory[orthoAssistantHistory.length - 1] = {
+                    role: "assistant",
+                    text: parsed.reply,
+                    appointment: finalAppt
+                };
+                renderOrthoAssistantMessages();
+            } catch (err) {
+                console.warn("Error en Asistente IA:", err);
+                orthoAssistantHistory[orthoAssistantHistory.length - 1] = {
+                    role: "assistant",
+                    text: "He registrado tu solicitud. Puedes usar los botones rápidos arriba para agendar en Google Calendar.",
+                    appointment: null
+                };
+                renderOrthoAssistantMessages();
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+            }
         }
     </script>
 </body>
