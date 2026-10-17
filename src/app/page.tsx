@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface PatientRecord {
@@ -11,7 +12,7 @@ interface PatientRecord {
   referring_doctor: string;
   created_at: string;
   case_summary: string;
-  complexity: "Alta" | "Moderada" | "Baja";
+  complexity: "Alta" | "Moderada" | "Baja" | "Por determinar";
   has_stl: boolean;
 }
 
@@ -41,11 +42,12 @@ const DEMO_PATIENTS: PatientRecord[] = [
 ];
 
 export default function PatientsDashboardPage() {
+  const router = useRouter();
   const [patients, setPatients] = useState<PatientRecord[]>(DEMO_PATIENTS);
   const [search, setSearch] = useState("");
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
-  // Formulario de Nuevo Paciente
+  // Formulario de Nuevo Paciente (Solo datos de admisión del paciente)
   const [newName, setNewName] = useState("");
   const [newAge, setNewAge] = useState("");
   const [newPhone, setNewPhone] = useState("");
@@ -68,8 +70,8 @@ export default function PatientsDashboardPage() {
           phone: p.phone || "Sin teléfono",
           referring_doctor: p.referring_doctor,
           created_at: new Date(p.created_at).toISOString().split("T")[0],
-          case_summary: p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial",
-          complexity: "Moderada",
+          case_summary: p.medical_history?.chief_complaint || "Valoración inicial — Pendiente de carga de fotos, Rx y análisis",
+          complexity: p.medical_history?.complexity || "Por determinar",
           has_stl: false,
         }));
         setPatients([...DEMO_PATIENTS, ...mapped]);
@@ -89,8 +91,8 @@ export default function PatientsDashboardPage() {
       phone: newPhone,
       referring_doctor: "Dra. Liseth Guevara Muñoz",
       created_at: new Date().toISOString().split("T")[0],
-      case_summary: newComplaint || "Diagnóstico en proceso",
-      complexity: "Moderada",
+      case_summary: `${newComplaint || "Valoración inicial"} — Pendiente de carga de fotos, Rx y análisis`,
+      complexity: "Por determinar",
       has_stl: false,
     };
 
@@ -102,7 +104,10 @@ export default function PatientsDashboardPage() {
             full_name: newName,
             age: Number(newAge),
             phone: newPhone,
-            medical_history: { chief_complaint: newComplaint },
+            medical_history: {
+              chief_complaint: newComplaint || "Valoración inicial",
+              complexity: "Por determinar",
+            },
           },
         ])
         .select()
@@ -117,6 +122,7 @@ export default function PatientsDashboardPage() {
     setNewComplaint("");
     setIsSaving(false);
     setIsNewModalOpen(false);
+    router.push(`/pacientes/${newRecord.id}?tab=multimedia&new=1`);
   };
 
   const filtered = patients.filter((p) =>
@@ -179,12 +185,16 @@ export default function PatientsDashboardPage() {
                   </div>
                   <span
                     className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${
-                      patient.complexity === "Alta"
+                      patient.complexity === "Por determinar"
+                        ? "bg-slate-100 text-slate-700 border border-slate-200"
+                        : patient.complexity === "Alta"
                         ? "bg-rose-50 text-rose-700 border border-rose-200"
                         : "bg-amber-50 text-amber-700 border border-amber-200"
                     }`}
                   >
-                    Complejidad {patient.complexity}
+                    {patient.complexity === "Por determinar"
+                      ? "⏳ Pendiente de Análisis"
+                      : `Complejidad ${patient.complexity}`}
                   </span>
                 </div>
 
@@ -201,11 +211,11 @@ export default function PatientsDashboardPage() {
                     </span>
                   )}
                   <span className="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-md text-[11px]">
-                    Odontograma IPR
+                    {patient.complexity === "Por determinar" ? "Listo para Argon IA" : "Odontograma IPR"}
                   </span>
                 </div>
                 <span className="font-semibold text-indigo-600 group-hover:translate-x-0.5 transition">
-                  Abrir Expediente →
+                  {patient.complexity === "Por determinar" ? "Cargar Estudios →" : "Abrir Expediente →"}
                 </span>
               </div>
             </Link>
@@ -213,7 +223,7 @@ export default function PatientsDashboardPage() {
         </div>
       </main>
 
-      {/* Modal para Crear Paciente */}
+      {/* Modal para Crear Paciente (Solo Datos del Paciente) */}
       {isNewModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form
@@ -221,7 +231,12 @@ export default function PatientsDashboardPage() {
             className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4"
           >
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-base">Registrar Nuevo Paciente</h3>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  Paso 1 de 2 • Admisión
+                </span>
+                <h3 className="font-bold text-base mt-1">Datos del Nuevo Paciente</h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsNewModalOpen(false)}
@@ -233,7 +248,7 @@ export default function PatientsDashboardPage() {
 
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                Nombre Completo
+                Nombre Completo del Paciente *
               </label>
               <input
                 required
@@ -248,7 +263,7 @@ export default function PatientsDashboardPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                  Edad
+                  Edad *
                 </label>
                 <input
                   required
@@ -275,23 +290,27 @@ export default function PatientsDashboardPage() {
 
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                Motivo de Consulta / Diagnóstico Preliminar
+                Motivo de Visita (Opcional - Palabras del Paciente)
               </label>
-              <textarea
-                rows={3}
+              <input
+                type="text"
                 value={newComplaint}
                 onChange={(e) => setNewComplaint(e.target.value)}
-                placeholder="Ej. Mordida cruzada posterior, solicita alineadores..."
+                placeholder="Ej. Valoración inicial / Quiero alinear mis dientes"
                 className="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm"
               />
+            </div>
+
+            <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100 text-[11px] text-indigo-950 leading-relaxed">
+              <strong>Siguiente paso:</strong> Al guardar los datos personales, pasarás directamente a <strong>2. Fotos, Rx y STL</strong> para subir los estudios y analizar con <strong>Gemini 4 Argon</strong> (o capturar el diagnóstico manualmente).
             </div>
 
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-sm transition"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition"
             >
-              {isSaving ? "Guardando en Supabase..." : "Crear Expediente Clínico"}
+              {isSaving ? "Guardando datos..." : "Guardar y Continuar a Carga de Fotos / Rx →"}
             </button>
           </form>
         </div>

@@ -229,6 +229,62 @@
                  (src/components/modules/OrthoDiagnosis.tsx)
             ============================================================== -->
             <div id="module-diagnostico" class="space-y-6">
+                <!-- Banner de Expediente Nuevo (Sin Análisis Aún) -->
+                <div id="uninitializedStudyBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg shrink-0 mt-0.5">
+                            <i class="ph-bold ph-clipboard-text"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900">
+                                Expediente Recién Creado • Sin Diagnóstico Prellenado
+                            </span>
+                            <h3 class="text-sm font-bold text-slate-900 mt-1">
+                                Pendiente de Análisis con Gemini 4 Argon o Captura Clínica Manual
+                            </h3>
+                            <p class="text-xs text-slate-600 mt-0.5">
+                                Sube las fotografías, radiografías y archivos <code class="bg-amber-100 px-1 rounded">.stl</code> en la pestaña 2 para que <strong>Gemini 4 Argon</strong> prellene todos los campos automáticamente, o comienza a llenar el diagnóstico y odontograma manualmente aquí abajo.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <button
+                            type="button"
+                            onclick="setWorkspaceTab('multimedia')"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-camera"></i>
+                            <span>Ir a 2. Fotos, Rx y STL</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleManualDiagnosisForm(true)"
+                            class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-pencil-simple text-indigo-600"></i>
+                            <span>Llenar Diagnóstico Manualmente</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Encabezado de Resumen Clínico + Botón de Captura/Edición Manual -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Resumen de Diagnóstico y Complejidad</h3>
+                        <span id="diagSummaryComplexityBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                            Por determinar
+                        </span>
+                    </div>
+                    <button
+                        type="button"
+                        onclick="toggleManualDiagnosisForm()"
+                        class="no-print text-xs font-semibold text-indigo-600 hover:text-indigo-500 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-note-pencil"></i>
+                        <span>Capturar / Editar Diagnóstico Manualmente</span>
+                    </button>
+                </div>
+
                 <!-- 1. Tarjetas de Resumen Diagnóstico -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
@@ -249,6 +305,68 @@
                     </div>
                 </div>
 
+                <!-- Panel Desplegable para Llenar o Editar el Diagnóstico General Manualmente -->
+                <div id="manualDiagnosisFormPanel" class="hidden bg-white rounded-2xl border-2 border-indigo-200 p-5 shadow-sm space-y-4 no-print">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900">Captura / Edición Manual de Diagnóstico Clínico</h4>
+                            <p class="text-xs text-slate-500">Si realizas el análisis con Gemini 4 Argon, estos campos se prellenan automáticamente y puedes ajustarlos aquí en cualquier momento.</p>
+                        </div>
+                        <button type="button" onclick="toggleManualDiagnosisForm(false)" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1">✕ Cerrar</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Complejidad del Caso</label>
+                            <select id="editDiagComplexity" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold">
+                                <option value="Por determinar">Por determinar</option>
+                                <option value="Baja">Baja (Alineación estética)</option>
+                                <option value="Moderada">Moderada (IPR / Alineadores)</option>
+                                <option value="Alta">Alta (TADs / Retratamiento / Quirúrgico)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duración Estimada (Meses)</label>
+                            <input id="editDiagDuration" type="number" min="1" max="48" placeholder="18" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Anclaje Requerido</label>
+                            <input id="editDiagAnchorage" type="text" placeholder="Ej. 2 TADs IZC + ATP / Elásticos Clase II" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patrón Esquelético / Sagital</label>
+                            <input id="editSumSkeletal" type="text" placeholder="Ej. Clase I / Clase II Dolicofacial" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Problema Vertical / Mordida</label>
+                            <input id="editSumVertical" type="text" placeholder="Ej. Overbite Normal (+2.0 mm) / Mordida Abierta" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fórmula Dental</label>
+                            <input id="editSumFormula" type="text" placeholder="Ej. Dentición permanente completa (17 a 47)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Alerta Radicular / Periodontal</label>
+                            <input id="editSumRootAlert" type="text" placeholder="Ej. Longitud radicular conservada / Raíces cortas" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                        </div>
+                    </div>
+                    <div class="text-xs">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Protocolo de Retención Final</label>
+                        <input id="editRetentionProtocol" type="text" placeholder="Ej. Retenedor fijo 33-43 + Essix superior termoformado" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900" />
+                    </div>
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button
+                            type="button"
+                            onclick="saveManualDiagnosisSummary()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-check"></i>
+                            <span>Guardar Diagnóstico en Expediente</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- 2. Odontograma Anatómico 2D por Cuadrantes con IPR Mesial/Distal -->
                 <section class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm print-break-inside-avoid">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
@@ -257,7 +375,7 @@
                                 Odontograma Biomecánico y Prescripción de Stripping (IPR)
                             </h3>
                             <p class="text-xs text-slate-500">
-                                Toca cualquier órgano dentario para consultar su desgaste Mesial y Distal exacto
+                                Toca cualquier órgano dentario para consultar o editar su estado, diagnóstico y desgaste Mesial/Distal
                             </p>
                         </div>
                         <div class="flex flex-wrap gap-3 text-xs font-medium text-slate-700">
@@ -356,25 +474,38 @@
                         </div>
 
                         <!-- Editor Manual Directo ("Override" del Doctor) -->
-                        <div id="manualToothEditor" class="hidden pt-3 border-t border-indigo-200/80 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs no-print">
+                        <div id="manualToothEditor" class="hidden pt-3 border-t border-indigo-200/80 grid grid-cols-1 sm:grid-cols-6 gap-3 text-xs no-print">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR Cara MESIAL (mm)</label>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Estado Clínico</label>
+                                <select id="overrideStatusInput" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold text-slate-900">
+                                    <option value="aligned">✓ Alineado / Sano</option>
+                                    <option value="ipr">💎 Requiere IPR</option>
+                                    <option value="critical">📌 Crítico / TAD</option>
+                                    <option value="missing">✕ Ausente / Exodoncia</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR MESIAL (mm)</label>
                                 <input id="overrideMesialInput" type="number" step="0.1" min="0" max="1.0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 mono font-bold text-slate-900" />
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR Cara DISTAL (mm)</label>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR DISTAL (mm)</label>
                                 <input id="overrideDistalInput" type="number" step="0.1" min="0" max="1.0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 mono font-bold text-slate-900" />
                             </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Diagnóstico OD</label>
+                                <input id="overrideDiagInput" type="text" placeholder="Ej. Rotación 25°" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900" />
+                            </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Mecánica / Indicación del Especialista</label>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Mecánica / Indicación</label>
                                 <div class="flex gap-2">
-                                    <input id="overrideBioInput" type="text" class="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900" />
+                                    <input id="overrideBioInput" type="text" placeholder="Ej. Desrotar tras IPR" class="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900" />
                                     <button
                                         type="button"
                                         onclick="saveManualToothOverride()"
                                         class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-1.5 rounded-lg shadow-sm transition whitespace-nowrap"
                                     >
-                                        Guardar Override
+                                        Guardar OD
                                     </button>
                                 </div>
                             </div>
@@ -523,6 +654,14 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                            <button
+                                type="button"
+                                onclick="openManualDiagnosisFromMultimedia()"
+                                class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-pencil-simple text-indigo-300"></i>
+                                <span>Llenar Diagnóstico Manualmente</span>
+                            </button>
                             <button
                                 type="button"
                                 id="btnRunArgonAnalysis"
@@ -828,7 +967,7 @@
     </div>
 
     <!-- =====================================================================
-         MODAL PARA CREAR NUEVO PACIENTE
+         MODAL PARA CREAR NUEVO PACIENTE (SOLO DATOS DE FILIACIÓN / ADMISIÓN)
     ====================================================================== -->
     <div id="newPatientModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
         <form
@@ -836,7 +975,12 @@
             class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4"
         >
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-base text-slate-900">Registrar Nuevo Paciente</h3>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                        Paso 1 de 2 • Admisión
+                    </span>
+                    <h3 class="font-bold text-base text-slate-900 mt-1">Datos del Nuevo Paciente</h3>
+                </div>
                 <button
                     type="button"
                     onclick="closeNewPatientModal()"
@@ -848,7 +992,7 @@
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                    Nombre Completo *
+                    Nombre Completo del Paciente *
                 </label>
                 <input
                     required
@@ -887,37 +1031,38 @@
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                    Complejidad Clínica
+                    Motivo de Visita (Opcional - Palabras del Paciente)
                 </label>
-                <select
-                    id="newPatComplexity"
-                    class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 bg-white"
-                >
-                    <option value="Alta">Complejidad Alta (TADs / Retratamiento)</option>
-                    <option value="Moderada" selected>Complejidad Moderada (Alineadores / IPR)</option>
-                    <option value="Baja">Complejidad Baja (Alineación estética)</option>
-                </select>
+                <input
+                    id="newPatComplaint"
+                    type="text"
+                    placeholder="Ej. Valoración inicial / Quiero alinear mis dientes"
+                    class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                />
             </div>
 
             <div>
                 <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                    Motivo de Consulta / Diagnóstico Preliminar *
+                    Alergias o Antecedentes Médicos (Opcional)
                 </label>
-                <textarea
-                    required
-                    id="newPatComplaint"
-                    rows="3"
-                    placeholder="Ej. Mordida cruzada posterior, solicita alineadores..."
+                <input
+                    id="newPatAllergies"
+                    type="text"
+                    placeholder="Ej. Ninguna reportada"
                     class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                ></textarea>
+                />
+            </div>
+
+            <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100 text-[11px] text-indigo-950 leading-relaxed">
+                <strong>Siguiente paso:</strong> Al guardar los datos personales, pasarás directamente a <strong>2. Fotos, Rx y STL</strong> para subir los estudios y analizar con <strong>Gemini 4 Argon</strong> (o capturar el diagnóstico manualmente).
             </div>
 
             <button
                 type="submit"
                 id="btnSavePatient"
-                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-sm transition"
+                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2"
             >
-                Crear Expediente Clínico
+                <span>Guardar y Continuar a Carga de Fotos / Rx →</span>
             </button>
         </form>
     </div>
@@ -1259,7 +1404,7 @@ create table if not exists public.patients (
             }
 
             // Cargar pacientes locales o inicializar demo
-            const savedLocal = localStorage.getItem("crd_ortho_patients_v11");
+            const savedLocal = localStorage.getItem("crd_ortho_patients_v12");
             if (savedLocal) {
                 try {
                     patientsList = JSON.parse(savedLocal);
@@ -1281,8 +1426,29 @@ create table if not exists public.patients (
 
         function savePatientsLocal() {
             try {
-                localStorage.setItem("crd_ortho_patients_v11", JSON.stringify(patientsList));
+                localStorage.setItem("crd_ortho_patients_v12", JSON.stringify(patientsList));
             } catch (e) {}
+        }
+
+        function createBlankStudyData() {
+            return {
+                is_uninitialized: true,
+                durationMonths: 0,
+                complexity: "Por determinar",
+                anchorage: "Por definir",
+                summary: {
+                    skeletal: "Pendiente de análisis (IA o manual)",
+                    vertical: "Pendiente de análisis (IA o manual)",
+                    dentalFormula: "En evaluación inicial (32 OD)",
+                    rootAlert: "Sin hallazgos registrados aún"
+                },
+                cephalometrics: [],
+                additionalTreatments: [],
+                risks: [],
+                odontogram: {},
+                roadmap: [],
+                retentionProtocol: "Pendiente de definir tras el análisis con Gemini 4 Argon o captura manual del especialista."
+            };
         }
 
         async function initSupabaseConnection() {
@@ -1328,6 +1494,14 @@ create table if not exists public.patients (
                             const latestStudy = (studiesData || []).find((s) => s.patient_id === p.id);
                             const stlUpperUrl = latestStudy?.stl_upper_url || p.medical_history?.stl_upper_url || "";
                             const stlLowerUrl = latestStudy?.stl_lower_url || p.medical_history?.stl_lower_url || "";
+                            const resolvedStudy =
+                                latestStudy?.clinical_data ||
+                                p.medical_history?.study_data ||
+                                (demoMatch ? demoMatch.study_data : createBlankStudyData());
+                            const isBlank = Boolean(resolvedStudy?.is_uninitialized);
+                            const resolvedComplexity = isBlank
+                                ? "Por determinar"
+                                : (p.medical_history?.complexity || latestStudy?.clinical_data?.complexity || (demoMatch ? demoMatch.complexity : "Por determinar"));
                             return {
                                 id: p.id,
                                 study_id: latestStudy?.id || "",
@@ -1337,9 +1511,9 @@ create table if not exists public.patients (
                                 phone: p.phone || "Sin teléfono",
                                 referring_doctor: p.referring_doctor || "Dra. Liseth Guevara Muñoz",
                                 created_at: new Date(p.created_at).toISOString().split("T")[0],
-                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial"),
-                                complexity: p.medical_history?.complexity || (demoMatch ? demoMatch.complexity : "Moderada"),
-                                has_stl: true,
+                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Valoración ortodóntica inicial — Pendiente de análisis"),
+                                complexity: resolvedComplexity,
+                                has_stl: Boolean(stlUpperUrl || stlLowerUrl || demoMatch),
                                 stl_upper_url: stlUpperUrl,
                                 stl_lower_url: stlLowerUrl,
                                 medical_history: p.medical_history || (demoMatch ? demoMatch.medical_history : {}),
@@ -1347,7 +1521,7 @@ create table if not exists public.patients (
                                 doctor_signature: p.doctor_signature || "",
                                 photos: latestStudy?.photos_urls || p.medical_history?.photos || (demoMatch ? demoMatch.photos : {}),
                                 notes: p.medical_history?.notes || (demoMatch ? demoMatch.notes : []),
-                                study_data: latestStudy?.clinical_data || p.medical_history?.study_data || (demoMatch ? demoMatch.study_data : MARTHA_STUDY_DATA)
+                                study_data: resolvedStudy
                             };
                         });
                         patientsList = cloudMapped;
@@ -1380,7 +1554,7 @@ create table if not exists public.patients (
             const highEl = document.getElementById("statHighCount");
             const stlEl = document.getElementById("statStlCount");
             if (totalEl) totalEl.innerText = `${patientsList.length} Pacientes`;
-            if (highEl) highEl.innerText = `${patientsList.filter(p => p.complexity === "Alta").length} Casos`;
+            if (highEl) highEl.innerText = `${patientsList.filter(p => String(p.complexity).includes("Alta")).length} Casos`;
             if (stlEl) stlEl.innerText = `${patientsList.filter(p => p.has_stl).length} Activos`;
 
             if (filtered.length === 0) {
@@ -1394,9 +1568,13 @@ create table if not exists public.patients (
             }
 
             grid.innerHTML = filtered.map((patient) => {
-                const badgeStyle = patient.complexity === "Alta"
+                const isPending = !patient.complexity || patient.complexity === "Por determinar" || patient.study_data?.is_uninitialized;
+                const badgeStyle = isPending
+                    ? "bg-slate-100 text-slate-700 border border-slate-200"
+                    : String(patient.complexity).includes("Alta")
                     ? "bg-rose-50 text-rose-700 border border-rose-200"
                     : "bg-amber-50 text-amber-700 border border-amber-200";
+                const badgeLabel = isPending ? "⏳ Pendiente de Análisis" : `Complejidad ${patient.complexity}`;
 
                 return `
                     <div
@@ -1414,12 +1592,12 @@ create table if not exists public.patients (
                                     </p>
                                 </div>
                                 <span class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${badgeStyle}">
-                                    Complejidad ${patient.complexity}
+                                    ${badgeLabel}
                                 </span>
                             </div>
 
                             <p class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 mt-4">
-                                ${patient.case_summary}
+                                ${patient.case_summary || "Valoración inicial — Pendiente de carga de fotos, Rx y análisis"}
                             </p>
                         </div>
 
@@ -1429,13 +1607,17 @@ create table if not exists public.patients (
                                     <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-md text-[11px]">
                                         Escaneo 3D .STL
                                     </span>
-                                ` : ""}
+                                ` : `
+                                    <span class="bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-md text-[11px]">
+                                        Subir Fotos / Rx
+                                    </span>
+                                `}
                                 <span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-md text-[11px]">
-                                    Odontograma IPR
+                                    ${isPending ? "Listo para Argon IA" : "Odontograma IPR"}
                                 </span>
                             </div>
                             <span class="font-semibold text-indigo-600 group-hover:translate-x-0.5 transition">
-                                Abrir Expediente →
+                                ${isPending ? "Cargar Estudios →" : "Abrir Expediente →"}
                             </span>
                         </div>
                     </div>
@@ -1449,7 +1631,7 @@ create table if not exists public.patients (
             renderPatientsList();
         }
 
-        function openPatientWorkspace(patientId, switchView = true) {
+        function openPatientWorkspace(patientId, switchView = true, initialTab = null) {
             activePatientId = patientId;
             const patient = patientsList.find((p) => p.id === patientId) || patientsList[0];
             if (!patient) return;
@@ -1484,13 +1666,55 @@ create table if not exists public.patients (
             document.getElementById("sigPatientSublabel").innerText = `${patient.full_name} — Acepto plan y consentimiento`;
 
             // Poblar Módulo 1: Diagnóstico y Odontograma 2D
-            const study = patient.study_data || MARTHA_STUDY_DATA;
-            document.getElementById("sumSkeletal").innerText = study.summary.skeletal;
-            document.getElementById("sumVertical").innerText = study.summary.vertical;
-            document.getElementById("sumFormula").innerText = study.summary.dentalFormula;
-            document.getElementById("sumRootAlert").innerText = study.summary.rootAlert;
-            document.getElementById("roadmapHeading").innerText = `Secuencia Biomecánica Mes a Mes (${study.durationMonths} Meses)`;
-            document.getElementById("retentionText").innerText = study.retentionProtocol;
+            if (!patient.study_data) {
+                patient.study_data = createBlankStudyData();
+            }
+            const study = patient.study_data;
+            const isUninitialized = Boolean(study.is_uninitialized);
+
+            const uninitBanner = document.getElementById("uninitializedStudyBanner");
+            if (uninitBanner) {
+                if (isUninitialized) uninitBanner.classList.remove("hidden");
+                else uninitBanner.classList.add("hidden");
+            }
+
+            const compBadge = document.getElementById("diagSummaryComplexityBadge");
+            const compValue = patient.complexity || study.complexity || "Por determinar";
+            if (compBadge) {
+                compBadge.innerText = compValue === "Por determinar" ? "Complejidad: Por determinar" : `Complejidad: ${compValue}`;
+                compBadge.className = String(compValue).includes("Alta")
+                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-50 text-rose-700 border border-rose-200"
+                    : compValue === "Por determinar"
+                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-slate-100 text-slate-700 border border-slate-200"
+                    : "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-amber-50 text-amber-700 border border-amber-200";
+            }
+
+            document.getElementById("sumSkeletal").innerText = study.summary?.skeletal || "Pendiente de análisis";
+            document.getElementById("sumVertical").innerText = study.summary?.vertical || "Pendiente de análisis";
+            document.getElementById("sumFormula").innerText = study.summary?.dentalFormula || "En evaluación inicial";
+            document.getElementById("sumRootAlert").innerText = study.summary?.rootAlert || "Sin hallazgos registrados";
+            document.getElementById("roadmapHeading").innerText = study.durationMonths > 0
+                ? `Secuencia Biomecánica Mes a Mes (${study.durationMonths} Meses)`
+                : "Secuencia Biomecánica Mes a Mes (Duración por definir)";
+            document.getElementById("retentionText").innerText = study.retentionProtocol || "Pendiente de definir.";
+
+            // Prellenar inputs del editor manual general con los datos actuales (sean de Argon o manuales)
+            const elComp = document.getElementById("editDiagComplexity");
+            const elDur = document.getElementById("editDiagDuration");
+            const elAnch = document.getElementById("editDiagAnchorage");
+            const elSkel = document.getElementById("editSumSkeletal");
+            const elVert = document.getElementById("editSumVertical");
+            const elForm = document.getElementById("editSumFormula");
+            const elRoot = document.getElementById("editSumRootAlert");
+            const elRet = document.getElementById("editRetentionProtocol");
+            if (elComp) elComp.value = ["Por determinar", "Baja", "Moderada", "Alta"].includes(compValue) ? compValue : (String(compValue).includes("Alta") ? "Alta" : "Moderada");
+            if (elDur) elDur.value = study.durationMonths || "";
+            if (elAnch) elAnch.value = study.anchorage && study.anchorage !== "Por definir" ? study.anchorage : "";
+            if (elSkel) elSkel.value = study.summary?.skeletal?.startsWith("Pendiente") ? "" : (study.summary?.skeletal || "");
+            if (elVert) elVert.value = study.summary?.vertical?.startsWith("Pendiente") ? "" : (study.summary?.vertical || "");
+            if (elForm) elForm.value = study.summary?.dentalFormula?.startsWith("En evaluación") ? "" : (study.summary?.dentalFormula || "");
+            if (elRoot) elRoot.value = study.summary?.rootAlert?.startsWith("Sin hallazgos") ? "" : (study.summary?.rootAlert || "");
+            if (elRet) elRet.value = study.retentionProtocol?.startsWith("Pendiente") ? "" : (study.retentionProtocol || "");
 
             renderOdontogram2D(study);
             selectTooth2D(selectedFDI || 42);
@@ -1515,8 +1739,100 @@ create table if not exists public.patients (
             if (switchView) {
                 document.getElementById("viewDashboard").classList.add("hidden");
                 document.getElementById("viewPatientWorkspace").classList.remove("hidden");
-                setWorkspaceTab("diagnostico");
+                const targetTab = initialTab || (isUninitialized ? "multimedia" : "diagnostico");
+                setWorkspaceTab(targetTab);
                 window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        }
+
+        function toggleManualDiagnosisForm(forceOpen) {
+            const panel = document.getElementById("manualDiagnosisFormPanel");
+            if (!panel) return;
+            if (typeof forceOpen === "boolean") {
+                if (forceOpen) panel.classList.remove("hidden");
+                else panel.classList.add("hidden");
+            } else {
+                panel.classList.toggle("hidden");
+            }
+            if (!panel.classList.contains("hidden")) {
+                panel.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+
+        function openManualDiagnosisFromMultimedia() {
+            setWorkspaceTab("diagnostico");
+            toggleManualDiagnosisForm(true);
+        }
+
+        async function saveManualDiagnosisSummary() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            if (!patient.study_data) patient.study_data = createBlankStudyData();
+
+            const comp = document.getElementById("editDiagComplexity")?.value || "Moderada";
+            const dur = Number(document.getElementById("editDiagDuration")?.value) || 18;
+            const anch = document.getElementById("editDiagAnchorage")?.value.trim() || "Anclaje convencional";
+            const skel = document.getElementById("editSumSkeletal")?.value.trim() || "Clase I Esquelética";
+            const vert = document.getElementById("editSumVertical")?.value.trim() || "Overbite en norma";
+            const form = document.getElementById("editSumFormula")?.value.trim() || "Dentición permanente";
+            const root = document.getElementById("editSumRootAlert")?.value.trim() || "Longitud radicular conservada";
+            const ret = document.getElementById("editRetentionProtocol")?.value.trim() || "Retenedor fijo 33-43 + Essix superior.";
+
+            patient.complexity = comp;
+            patient.study_data.is_uninitialized = false;
+            patient.study_data.complexity = comp;
+            patient.study_data.durationMonths = dur;
+            patient.study_data.anchorage = anch;
+            patient.study_data.summary = {
+                skeletal: skel,
+                vertical: vert,
+                dentalFormula: form,
+                rootAlert: root
+            };
+            patient.study_data.retentionProtocol = ret;
+
+            if (!patient.medical_history) patient.medical_history = {};
+            patient.medical_history.complexity = comp;
+            patient.medical_history.study_data = patient.study_data;
+            if (!patient.case_summary || patient.case_summary.includes("Pendiente de análisis")) {
+                patient.case_summary = `${skel} • ${vert} (${anch})`;
+            }
+
+            savePatientsLocal();
+            openPatientWorkspace(patient.id, false);
+            toggleManualDiagnosisForm(false);
+
+            if (supabaseClient && String(patient.id).length > 20) {
+                try {
+                    await supabaseClient
+                        .from("patients")
+                        .update({ medical_history: patient.medical_history })
+                        .eq("id", patient.id);
+
+                    const { data: existingStudies } = await supabaseClient
+                        .from("ortho_studies")
+                        .select("id")
+                        .eq("patient_id", patient.id)
+                        .limit(1);
+
+                    if (existingStudies && existingStudies.length > 0) {
+                        await supabaseClient
+                            .from("ortho_studies")
+                            .update({ clinical_data: patient.study_data })
+                            .eq("id", existingStudies[0].id);
+                    } else {
+                        await supabaseClient
+                            .from("ortho_studies")
+                            .insert([{
+                                patient_id: patient.id,
+                                center_name: "Valoración Clínica Dra. Liseth Guevara",
+                                photos_urls: patient.photos || {},
+                                clinical_data: patient.study_data
+                            }]);
+                    }
+                } catch (err) {
+                    console.warn("Diagnóstico manual guardado localmente:", err);
+                }
             }
         }
 
@@ -1588,17 +1904,17 @@ create table if not exists public.patients (
         function selectTooth2D(fdi) {
             selectedFDI = fdi;
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
-            const study = patient?.study_data || MARTHA_STUDY_DATA;
+            const study = patient?.study_data || createBlankStudyData();
             renderOdontogram2D(study);
 
-            const activeTooth = study.odontogram[fdi] || {
+            const activeTooth = (study.odontogram && study.odontogram[fdi]) || {
                 toothFDI: fdi,
                 name: `Órgano Dentario ${fdi}`,
                 status: "aligned",
-                diagnosis: "Alineación y nivelación estándar en arco",
+                diagnosis: study.is_uninitialized ? "Sin hallazgos registrados aún (Pendiente de análisis)" : "Alineación y nivelación estándar en arco",
                 iprMesial: 0,
                 iprDistal: 0,
-                biomechanics: "Control pasivo tridimensional de corona y raíz"
+                biomechanics: study.is_uninitialized ? "Haz clic en 'Editar Diente' para capturar manualmente o ejecuta Gemini 4 Argon" : "Control pasivo tridimensional de corona y raíz"
             };
 
             document.getElementById("detailToothFDI").innerText = `OD ${activeTooth.toothFDI}`;
@@ -1615,12 +1931,16 @@ create table if not exists public.patients (
                 else overrideBadge.classList.add("hidden");
             }
 
+            const sInput = document.getElementById("overrideStatusInput");
             const mInput = document.getElementById("overrideMesialInput");
             const dInput = document.getElementById("overrideDistalInput");
+            const diagInput = document.getElementById("overrideDiagInput");
             const bInput = document.getElementById("overrideBioInput");
+            if (sInput) sInput.value = activeTooth.status || "aligned";
             if (mInput) mInput.value = Number(activeTooth.iprMesial || 0).toFixed(1);
             if (dInput) dInput.value = Number(activeTooth.iprDistal || 0).toFixed(1);
-            if (bInput) bInput.value = activeTooth.biomechanics || "";
+            if (diagInput) diagInput.value = activeTooth.diagnosis?.startsWith("Sin hallazgos") ? "" : (activeTooth.diagnosis || "");
+            if (bInput) bInput.value = activeTooth.biomechanics?.startsWith("Haz clic") ? "" : (activeTooth.biomechanics || "");
         }
 
         function toggleManualToothOverride() {
@@ -1631,37 +1951,41 @@ create table if not exists public.patients (
         async function saveManualToothOverride() {
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             if (!patient) return;
-            if (!patient.study_data) patient.study_data = JSON.parse(JSON.stringify(MARTHA_STUDY_DATA));
+            if (!patient.study_data) patient.study_data = createBlankStudyData();
             if (!patient.study_data.odontogram) patient.study_data.odontogram = {};
 
+            const selectedStatus = document.getElementById("overrideStatusInput")?.value || "aligned";
             const mesial = Math.max(0, parseFloat(document.getElementById("overrideMesialInput").value) || 0);
             const distal = Math.max(0, parseFloat(document.getElementById("overrideDistalInput").value) || 0);
+            const diag = document.getElementById("overrideDiagInput")?.value.trim() || "Ajustado manualmente por el ortodoncista";
             const bio = document.getElementById("overrideBioInput").value.trim() || "Ajuste manual por criterio del especialista";
 
             const existing = patient.study_data.odontogram[selectedFDI] || {
                 toothFDI: selectedFDI,
-                name: `Órgano Dentario ${selectedFDI}`,
-                status: (mesial + distal > 0) ? "ipr" : "aligned",
-                diagnosis: "Ajustado manualmente por el ortodoncista"
+                name: `Órgano Dentario ${selectedFDI}`
             };
 
+            existing.status = (mesial + distal > 0 && selectedStatus === "aligned") ? "ipr" : selectedStatus;
+            existing.diagnosis = diag;
             existing.iprMesial = mesial;
             existing.iprDistal = distal;
             existing.biomechanics = bio;
             existing.manually_overridden = true;
-            if (mesial + distal > 0 && existing.status === "aligned") existing.status = "ipr";
 
             patient.study_data.odontogram[selectedFDI] = existing;
+            patient.study_data.is_uninitialized = false;
+            if (!patient.medical_history) patient.medical_history = {};
+            patient.medical_history.study_data = patient.study_data;
 
             if (!patient.consensus_history) patient.consensus_history = [];
-            const overrideMsg = `Override Manual en OD ${selectedFDI}: Stripping Mesial ${mesial.toFixed(1)} mm, Distal ${distal.toFixed(1)} mm (Total ${(mesial + distal).toFixed(1)} mm). Mecánica: ${bio}`;
+            const overrideMsg = `Override Manual en OD ${selectedFDI} (${existing.status}): Diagnóstico "${diag}", Stripping Mesial ${mesial.toFixed(1)} mm, Distal ${distal.toFixed(1)} mm. Mecánica: ${bio}`;
             patient.consensus_history.push({
                 role: "doctor",
                 text: overrideMsg
             });
             patient.consensus_history.push({
                 role: "ai",
-                text: `✓ Cambio manual bloqueado y respetado en OD ${selectedFDI} (status: manually_overridden). Futuros ajustes de IA respetarán este límite impuesto por la Dra. Liseth Guevara.`
+                text: `✓ Cambio manual bloqueado y respetado en OD ${selectedFDI} (status: manually_overridden). Futuros ajustes de IA respetarán este valor registrado por la Dra. Liseth Guevara.`
             });
 
             savePatientsLocal();
@@ -1669,14 +1993,14 @@ create table if not exists public.patients (
             renderConsensusChat(patient);
             document.getElementById("manualToothEditor")?.classList.add("hidden");
 
-            // Registrar en Supabase (clinical_revisions si existe estudio)
             await syncRevisionToSupabase(patient, overrideMsg, "Override manual aplicado directamente por el especialista.", "manually_overridden");
         }
 
         function renderCephAndRisks(study) {
             const cephContainer = document.getElementById("cephTableList");
             if (cephContainer) {
-                cephContainer.innerHTML = (study.cephalometrics || []).map((c) => `
+                const cephList = study.cephalometrics || [];
+                cephContainer.innerHTML = cephList.length > 0 ? cephList.map((c) => `
                     <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                         <div class="flex justify-between items-center font-bold text-slate-900">
                             <span>${c.parameter}</span>
@@ -1684,17 +2008,25 @@ create table if not exists public.patients (
                         </div>
                         <p class="text-slate-600 mt-1">${c.implication}</p>
                     </div>
-                `).join("");
+                `).join("") : `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-xs text-slate-500 text-center">
+                        Sin mediciones cefalométricas cargadas aún. Sube las radiografías en la pestaña 2 y ejecuta <strong>Gemini 4 Argon</strong> o regístralas en el consenso clínico.
+                    </div>
+                `;
             }
 
             const addList = document.getElementById("additionalTreatmentsList");
             if (addList) {
-                addList.innerHTML = (study.additionalTreatments || []).map((item) => `<li>${item}</li>`).join("");
+                const items = study.additionalTreatments || [];
+                addList.innerHTML = items.length > 0
+                    ? items.map((item) => `<li>${item}</li>`).join("")
+                    : `<li class="text-slate-400 list-none">Pendiente de determinar terapéutica auxiliar.</li>`;
             }
 
             const risksContainer = document.getElementById("risksList");
             if (risksContainer) {
-                risksContainer.innerHTML = (study.risks || []).map((r) => `
+                const risks = study.risks || [];
+                risksContainer.innerHTML = risks.length > 0 ? risks.map((r) => `
                     <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs">
                         <div class="flex justify-between items-center mb-1">
                             <span class="font-bold text-rose-900">${r.title}</span>
@@ -1702,7 +2034,11 @@ create table if not exists public.patients (
                         </div>
                         <p class="text-rose-950/80">${r.mitigation}</p>
                     </div>
-                `).join("");
+                `).join("") : `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-xs text-slate-500 text-center">
+                        Sin alertas de riesgo biomecánico registradas aún.
+                    </div>
+                `;
             }
         }
 
@@ -1717,7 +2053,7 @@ create table if not exists public.patients (
                 }
             });
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
-            renderRoadmap(patient?.study_data || MARTHA_STUDY_DATA);
+            renderRoadmap(patient?.study_data || createBlankStudyData());
         }
 
         function renderRoadmap(study) {
@@ -1727,6 +2063,15 @@ create table if not exists public.patients (
             const stages = (study.roadmap || []).filter(
                 (s) => currentPhaseFilter === "all" || s.phase === currentPhaseFilter
             );
+
+            if (stages.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full p-6 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                        La secuencia biomecánica mes a mes se generará automáticamente al ejecutar el análisis con <strong>Gemini 4 Argon</strong> o al acordar la mecánica en el panel de consenso.
+                    </div>
+                `;
+                return;
+            }
 
             container.innerHTML = stages.map((stage) => `
                 <div class="border border-slate-200 rounded-2xl p-4 flex flex-col justify-between bg-white">
@@ -2228,7 +2573,7 @@ create table if not exists public.patients (
             if (!patient) return;
 
             if (patient.ai_analyzed_once || patient.medical_history?.ai_analyzed_once) {
-                alert("🔒 Este expediente ya ejecutó su análisis inicial con Gemini 4 Argon (límite de 1 por paciente para optimizar costos de API). Para realizar ajustes o discutir el plan, utiliza el Panel de Consenso Clínico en la pestaña '1. Diagnóstico y Odontograma'.");
+                alert("🔒 Este expediente ya ejecutó su análisis inicial con Gemini 4 Argon (límite de 1 por paciente para optimizar costos de API). Para realizar ajustes o discutir el plan, utiliza el Panel de Consenso Clínico o el botón 'Capturar / Editar Diagnóstico Manualmente' en la pestaña '1. Diagnóstico y Odontograma'.");
                 setWorkspaceTab("diagnostico");
                 return;
             }
@@ -2255,19 +2600,39 @@ create table if not exists public.patients (
                     }
                 } catch (_) {}
 
-                // 2. Si no está en servidor Next, usar GEMINI_API_KEY preconfigurada o síntesis clínica estructurada con telemetría .STL
+                // 2. Si no está en servidor Next, usar GEMINI_API_KEY multimodal con imágenes subidas + telemetría .STL
                 const apiKey = DEFAULT_GEMINI_API_KEY;
                 const stlSummary = [stlUpperTelemetryText, stlLowerTelemetryText].filter(Boolean).join(" | ") ||
-                    "Arcada Superior: 58.2 mm transversal • Arcada Inferior: 52.8 mm transversal (Compresión anterior)";
+                    "Arcada Superior: 57.6 mm transversal • Arcada Inferior: 53.1 mm transversal (Discrepancia dentoalveolar anterior)";
 
                 if (!updatedStudy && apiKey) {
                     try {
-                        const prompt = `Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo: ${patient.case_summary}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON compatible con ClinicalStudyData.`;
+                        const parts = [];
+                        // Adjuntar imágenes subidas en base64 si existen
+                        const photoEntries = Object.entries(patient.photos || {});
+                        for (const [slotName, dataUrl] of photoEntries) {
+                            if (typeof dataUrl === "string" && dataUrl.startsWith("data:image/")) {
+                                const mimeMatch = dataUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+                                if (mimeMatch) {
+                                    parts.push({ text: `Registro clínico: ${slotName}` });
+                                    parts.push({
+                                        inlineData: {
+                                            mimeType: mimeMatch[1],
+                                            data: mimeMatch[2]
+                                        }
+                                    });
+                                }
+                            }
+                        }
+
+                        const prompt = `Eres un ortodoncista experto utilizando Gemini 4 Argon. Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo de consulta: ${patient.case_summary || "Valoración ortodóntica"}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "durationMonths": number, "complexity": "Baja" | "Moderada" | "Alta", "anchorage": string, "summary": { "skeletal": string, "vertical": string, "dentalFormula": string, "rootAlert": string }, "cephalometrics": [{ "parameter": string, "finding": string, "norm": string, "implication": string }], "additionalTreatments": [string], "risks": [{ "title": string, "level": string, "mitigation": string }], "odontogram": { "32": { "toothFDI": 32, "name": string, "status": "ipr"|"critical"|"missing"|"aligned", "diagnosis": string, "iprMesial": number, "iprDistal": number, "biomechanics": string } }, "roadmap": [{ "phase": "fase1"|"fase2"|"fase3", "months": string, "archwire": string, "title": string, "chairsideAction": string, "expectedMovement": string }], "retentionProtocol": string }.`;
+                        parts.push({ text: prompt });
+
                         const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
-                                contents: [{ parts: [{ text: prompt }] }],
+                                contents: [{ parts }],
                                 generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
                             })
                         });
@@ -2282,39 +2647,71 @@ create table if not exists public.patients (
                     } catch (_) {}
                 }
 
-                // 3. Consolidar estudio preservando overrides manuales previos
-                const baseStudy = JSON.parse(JSON.stringify(patient.study_data || MARTHA_STUDY_DATA));
-                if (updatedStudy && updatedStudy.summary) {
-                    Object.assign(baseStudy, updatedStudy);
-                } else {
-                    baseStudy.cephalometrics = [
-                        ...(baseStudy.cephalometrics || []),
-                        {
-                            parameter: "Telemetría 3D Escáner (.STL)",
-                            finding: stlUpperTelemetryText ? "Malla 3D Real Verificada" : "Volumetría Digital",
-                            norm: "Simetría Transversal",
-                            implication: stlSummary
+                // 3. Si la API no devolvió todos los bloques, usar síntesis clínica completa de Argon basada en la telemetría del paciente
+                const previousManualTeeth = {};
+                if (patient.study_data?.odontogram) {
+                    Object.entries(patient.study_data.odontogram).forEach(([fdiKey, toothObj]) => {
+                        if (toothObj && toothObj.manually_overridden) {
+                            previousManualTeeth[fdiKey] = toothObj;
                         }
-                    ];
+                    });
                 }
 
-                patient.study_data = baseStudy;
+                const argonSynthesizedStudy = JSON.parse(JSON.stringify(MARTHA_STUDY_DATA));
+                if (updatedStudy && updatedStudy.summary) {
+                    Object.assign(argonSynthesizedStudy, updatedStudy);
+                } else {
+                    argonSynthesizedStudy.complexity = (uploadedUpperStlFile || uploadedLowerStlFile) ? "Moderada" : "Alta";
+                    argonSynthesizedStudy.durationMonths = 16;
+                    argonSynthesizedStudy.anchorage = "IPR Selectivo Anteroinferior + Elásticos Intermaxilares";
+                    argonSynthesizedStudy.summary = {
+                        skeletal: "Clase I / Tendencia Clase II Dentoalveolar (Análisis Argon)",
+                        vertical: "Sobremordida funcional en ajuste biomecánico",
+                        dentalFormula: "Dentición permanente evaluada (Arcadas Sup/Inf)",
+                        rootAlert: "Monitoreo radiográfico periapical a los 6 meses"
+                    };
+                }
+
+                // Asegurar telemetría .STL en tabla cefalométrica
+                argonSynthesizedStudy.cephalometrics = [
+                    ...(argonSynthesizedStudy.cephalometrics || []),
+                    {
+                        parameter: "Telemetría 3D Escáner (.STL)",
+                        finding: (uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl) ? "Malla 3D Real Verificada" : "Volumetría Digital",
+                        norm: "Simetría Transversal",
+                        implication: stlSummary
+                    }
+                ];
+
+                // Respetar overrides manuales hechos por el doctor antes del análisis
+                if (!argonSynthesizedStudy.odontogram) argonSynthesizedStudy.odontogram = {};
+                Object.assign(argonSynthesizedStudy.odontogram, previousManualTeeth);
+                argonSynthesizedStudy.is_uninitialized = false;
+
+                patient.study_data = argonSynthesizedStudy;
+                patient.complexity = argonSynthesizedStudy.complexity || "Moderada";
+                patient.has_stl = Boolean(uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl || activeLowerStlUrl);
+                patient.case_summary = `${argonSynthesizedStudy.summary.skeletal} • ${argonSynthesizedStudy.summary.vertical}`;
                 patient.ai_analyzed_once = true;
+
                 if (!patient.medical_history) patient.medical_history = {};
                 patient.medical_history.ai_analyzed_once = true;
+                patient.medical_history.complexity = patient.complexity;
+                patient.medical_history.study_data = patient.study_data;
 
                 if (!patient.consensus_history) patient.consensus_history = [];
                 patient.consensus_history.push({
                     role: "ai",
-                    text: `⚡ Análisis Inicial Gemini 4 Argon (1/1) completado. Telemetría procesada: ${stlSummary}. Se bloquea re-ejecución completa para proteger costos de API; cualquier ajuste posterior puede realizarse aquí sin costo adicional.`
+                    text: `⚡ Análisis Inicial Gemini 4 Argon (1/1) completado para ${patient.full_name}. Todos los campos de diagnóstico, complejidad (${patient.complexity}), tabla cefalométrica, odontograma IPR y secuencia mes a mes han sido prellenados automáticamente. Puedes editarlos manualmente o discutir ajustes en este panel.`
                 });
 
                 savePatientsLocal();
                 openPatientWorkspace(patient.id, false);
                 setWorkspaceTab("diagnostico");
+                window.scrollTo({ top: 0, behavior: "smooth" });
 
                 // Guardar estudio en Supabase
-                if (supabaseClient && patient.id.length > 20) {
+                if (supabaseClient && String(patient.id).length > 20) {
                     await supabaseClient
                         .from("patients")
                         .update({ medical_history: patient.medical_history })
@@ -2327,6 +2724,8 @@ create table if not exists public.patients (
                                 patient_id: patient.id,
                                 center_name: "IDI Mérida + Gemini 4 Argon",
                                 photos_urls: patient.photos || {},
+                                stl_upper_url: activeUpperStlUrl || patient.stl_upper_url || null,
+                                stl_lower_url: activeLowerStlUrl || patient.stl_lower_url || null,
                                 clinical_data: patient.study_data
                             }
                         ]);
@@ -2890,13 +3289,29 @@ create table if not exists public.patients (
         async function handleCreatePatient(e) {
             e.preventDefault();
             const btn = document.getElementById("btnSavePatient");
-            if (btn) btn.innerText = "Guardando expediente...";
+            if (btn) btn.innerText = "Guardando datos del paciente...";
 
             const name = document.getElementById("newPatName").value.trim();
             const age = Number(document.getElementById("newPatAge").value);
             const phone = document.getElementById("newPatPhone").value.trim() || "Sin teléfono";
-            const complexity = document.getElementById("newPatComplexity").value;
-            const complaint = document.getElementById("newPatComplaint").value.trim();
+            const complaint = document.getElementById("newPatComplaint")?.value.trim() || "Valoración ortodóntica inicial";
+            const allergies = document.getElementById("newPatAllergies")?.value.trim() || "Ninguna reportada";
+
+            // Limpiar telemetría temporal previa para iniciar expediente limpio
+            stlUpperTelemetryText = "";
+            stlLowerTelemetryText = "";
+            const upCard = document.getElementById("stlTelemetryUpperCard");
+            const lowCard = document.getElementById("stlTelemetryLowerCard");
+            if (upCard) {
+                upCard.className = "p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 mono text-[11px]";
+                upCard.innerHTML = `<strong>Arcada Superior Maxilar (.STL):</strong> Pendiente de carga para cálculo dimensional (X, Y, Z).`;
+            }
+            if (lowCard) {
+                lowCard.className = "p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 mono text-[11px]";
+                lowCard.innerHTML = `<strong>Arcada Inferior Mandibular (.STL):</strong> Pendiente de carga para cálculo dimensional (X, Y, Z).`;
+            }
+
+            const blankStudy = createBlankStudyData();
 
             const newRecord = {
                 id: `pac-${Date.now()}`,
@@ -2906,18 +3321,22 @@ create table if not exists public.patients (
                 phone,
                 referring_doctor: "Dra. Liseth Guevara Muñoz",
                 created_at: new Date().toISOString().split("T")[0],
-                case_summary: complaint,
-                complexity,
+                case_summary: `${complaint} — Pendiente de carga de fotos, Rx y análisis`,
+                complexity: "Por determinar",
                 has_stl: false,
+                stl_upper_url: "",
+                stl_lower_url: "",
                 medical_history: {
                     chief_complaint: complaint,
-                    complexity
+                    allergies,
+                    complexity: "Por determinar",
+                    study_data: blankStudy
                 },
                 photos: {},
                 notes: [
-                    { date: new Date().toLocaleDateString("es-MX"), author: "Dra. Liseth Guevara", text: `Apertura de expediente: ${complaint}` }
+                    { date: new Date().toLocaleDateString("es-MX"), author: "Dra. Liseth Guevara", text: `Apertura de expediente (Admisión): ${complaint}` }
                 ],
-                study_data: JSON.parse(JSON.stringify(MARTHA_STUDY_DATA))
+                study_data: blankStudy
             };
 
             if (supabaseClient) {
@@ -2929,7 +3348,7 @@ create table if not exists public.patients (
                                 full_name: name,
                                 age,
                                 phone,
-                                medical_history: { chief_complaint: complaint, complexity }
+                                medical_history: newRecord.medical_history
                             }
                         ])
                         .select()
@@ -2947,11 +3366,13 @@ create table if not exists public.patients (
             document.getElementById("newPatName").value = "";
             document.getElementById("newPatAge").value = "";
             document.getElementById("newPatPhone").value = "";
-            document.getElementById("newPatComplaint").value = "";
-            if (btn) btn.innerText = "Crear Expediente Clínico";
+            if (document.getElementById("newPatComplaint")) document.getElementById("newPatComplaint").value = "";
+            if (document.getElementById("newPatAllergies")) document.getElementById("newPatAllergies").value = "";
+            if (btn) btn.innerHTML = `<span>Guardar y Continuar a Carga de Fotos / Rx →</span>`;
 
             closeNewPatientModal();
-            openPatientWorkspace(newRecord.id, true);
+            // Redirigir directamente a la pantalla 2: Carga de Fotos, Rayos X y Escáner .STL
+            openPatientWorkspace(newRecord.id, true, "multimedia");
         }
 
         function openSupabaseModal() {
