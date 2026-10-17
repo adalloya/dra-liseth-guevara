@@ -155,6 +155,26 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const patientName = (formData.get("patientName") as string) || "Paciente";
     const patientAge = (formData.get("patientAge") as string) || "30";
+    const orthoPreferencesRaw = (formData.get("orthoPreferences") as string) || "";
+
+    let parsedPrefs: any = null;
+    try {
+      if (orthoPreferencesRaw) parsedPrefs = JSON.parse(orthoPreferencesRaw);
+    } catch (_) {}
+
+    const prefsContext = parsedPrefs
+      ? `
+PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
+- Prescripción y Sistema de Brackets: ${parsedPrefs.bracketPrescription}
+- Calibre de Ranura (Slot): ${parsedPrefs.slotSize}
+- Secuencia de Arcos Fase 1: ${parsedPrefs.archwirePhase1}
+- Secuencia de Arcos Fase 2: ${parsedPrefs.archwirePhase2}
+- Secuencia de Arcos Fase 3: ${parsedPrefs.archwirePhase3}
+- Criterio de Espacio (IPR vs Extracciones): ${parsedPrefs.spacePhilosophy}
+- Anclaje y Auxiliares Preferidos: ${parsedPrefs.anchorageSystem}
+- Protocolo de Retención: ${parsedPrefs.retentionProtocol}
+- Reglas Clínicas Personalizadas: ${parsedPrefs.customRules}`
+      : "";
 
     const contents: any[] = [];
 
@@ -182,7 +202,8 @@ export async function POST(req: NextRequest) {
       Paciente: ${patientName} (${patientAge} años).
       
       TELEMETRÍA DE ESCÁNER INTRAORAL 3D (.STL):
-      ${stlContext}`
+      ${stlContext}
+      ${prefsContext}`
     );
 
     // 3. Adjuntar Radiografías (Panorámica y Lateral) y Fotografías Intraorales
@@ -200,19 +221,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4. Llamada a Gemini 4 Argon
-    const modelName = process.env.GEMINI_MODEL_ID || "gemini-4-argon";
+    // 4. Llamada a Gemini IA
+    const modelName = process.env.GEMINI_MODEL_ID || "gemini-3.8-flash";
 
     const response = await ai.models.generateContent({
       model: modelName,
       contents: contents,
       config: {
-        systemInstruction: `Eres el Sistema Experto de Ortodoncia y Biomecánica Avanzada de CRD Ortodoncia.
-        Analiza las radiografías (Panorámica y Lateral de Cráneo), las fotografías intraorales y las dimensiones del escáner .STL.
+        systemInstruction: `Eres el Sistema Experto de Ortodoncia y Biomecánica Avanzada de CRD Ortodoncia para la Dra. Liseth Guevara Muñoz.
+        Analiza las radiografías (Panorámica y Lateral de Cráneo), las fotografías intraorales, las dimensiones del escáner .STL y las Preferencias Clínicas de Ortodoncia seleccionadas por la doctora.
         Reglas obligatorias:
-        1. Evalúa proporción corona-raíz, reabsorciones radiculares previas, nivel óseo alveolar, terceros molares y ausencias previas (ej. primeros premolares).
-        2. Para CADA diente que requiera Stripping (IPR), especifica con precisión milimétrica cuánto corresponde a la cara MESIAL (iprMesial) y cuánto a la cara DISTAL (iprDistal), justificando el valor clínico (ej. evitar dehiscencia sinfisaria o proinclinación).
-        3. Diseña la secuencia mes a mes indicando calibres de arcos, gramos de fuerza para TADs y protocolo de retención.`,
+        1. Evalúa proporción corona-raíz, reabsorciones radiculares previas, nivel óseo alveolar, terceros molares y ausencias previas.
+        2. Para CADA diente que requiera Stripping (IPR), especifica con precisión milimétrica cuánto corresponde a la cara MESIAL (iprMesial) y cuánto a la cara DISTAL (iprDistal), respetando la filosofía de ganancia de espacio y límites periodontales configurados por la doctora.
+        3. Diseña la secuencia mes a mes (roadmap) utilizando estrictamente la prescripción de brackets, el calibre de slot, la secuencia de arcos de Fase 1, Fase 2 y Fase 3, el sistema de anclaje y el protocolo de retención configurados por la Dra. Liseth Guevara.`,
         responseMimeType: "application/json",
         responseSchema: orthoResponseSchema,
         temperature: 0.1,

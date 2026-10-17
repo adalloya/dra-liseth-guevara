@@ -149,6 +149,14 @@
                         <span>Marketing Hub</span>
                     </button>
                     <button
+                        onclick="openOrthoPreferencesModal()"
+                        title="Configurar prescripciones de brackets, secuencia de arcos y criterios biomecánicos para Gemini IA"
+                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-sliders-horizontal text-indigo-600"></i>
+                        <span>Preferencias Clínicas</span>
+                    </button>
+                    <button
                         onclick="toggleOrthoAssistantDrawer(true)"
                         class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
                     >
@@ -1180,6 +1188,14 @@
 
                 <div class="flex items-center gap-2 shrink-0">
                     <button
+                        onclick="openOrthoPreferencesModal()"
+                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                        title="Configurar prescripciones de brackets, arcos y preferencias clínicas para Gemini IA"
+                    >
+                        <i class="ph-bold ph-sliders-horizontal text-indigo-600"></i>
+                        <span>Preferencias</span>
+                    </button>
+                    <button
                         onclick="toggleOrthoAssistantDrawer(true)"
                         class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
                         title="Abrir a Sandy • Asistente Virtual & Google Calendar"
@@ -1643,6 +1659,14 @@
                         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                             <button
                                 type="button"
+                                onclick="openOrthoPreferencesModal()"
+                                class="bg-white/10 hover:bg-white/20 border border-white/20 text-indigo-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-sliders-horizontal text-amber-300"></i>
+                                <span>Preferencias de Brackets / Arcos</span>
+                            </button>
+                            <button
+                                type="button"
                                 onclick="openManualDiagnosisFromMultimedia()"
                                 class="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
                             >
@@ -1659,6 +1683,25 @@
                                 <span id="btnRunArgonText">Analizar Caso con Gemini 4 Argon (1/1)</span>
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Barra de Preferencias Ortodónticas Activas que Gemini Tomará en Cuenta -->
+                    <div class="bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-indigo-100">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-extrabold text-amber-300 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                                <i class="ph-fill ph-gear-six"></i> Protocolo Clínico Activo para Gemini IA:
+                            </span>
+                            <span id="activeOrthoPrefsSummaryBadge" class="text-slate-200 font-medium">
+                                Autoligado Pasivo Damon / Pitts 21 (.022") • Arcos CuNiTi Termoactivados → .019x.025" SS • Conservador (IPR + TADs)
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="openOrthoPreferencesModal()"
+                            class="text-[11px] font-bold text-amber-300 hover:underline shrink-0"
+                        >
+                            Cambiar prescripción o arcos →
+                        </button>
                     </div>
                 </div>
 
@@ -2161,6 +2204,266 @@ create table if not exists public.patients (
                 >
                     Guardar y Sincronizar Ahora
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL DE CONFIGURACIONES Y PREFERENCIAS CLÍNICAS DE ORTODONCIA (GEMINI IA)
+    ====================================================================== -->
+    <div id="orthoPreferencesModal" onclick="closeOrthoPreferencesModal()" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[92vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <!-- Cabecera -->
+            <div class="flex justify-between items-start gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-sm shrink-0">
+                        <i class="ph-bold ph-sliders-horizontal"></i>
+                    </div>
+                    <div>
+                        <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            ⚙️ Motor Clínico Personalizado • Dra. Liseth Guevara Muñoz
+                        </span>
+                        <h3 class="font-extrabold text-base sm:text-lg text-slate-900 mt-1">
+                            Configuraciones y Preferencias de Ortodoncia para Gemini IA
+                        </h3>
+                        <p class="text-xs text-slate-500">
+                            Selecciona tu prescripción de brackets, calibre de slot, secuencia de arcos y filosofía biomecánica. Gemini IA y Sandy aplicarán estas preferencias al diagnosticar y diseñar el plan de cada paciente.
+                        </p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onclick="closeOrthoPreferencesModal()"
+                    class="text-slate-400 hover:text-slate-700 text-sm w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center shrink-0"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <!-- Presets Rápidos de Filosofía Ortodóntica (1 Clic) -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                        ⚡ Cargar Filosofía Preconfigurada (1 Clic):
+                    </span>
+                    <span id="orthoPrefPresetSavedToast" class="hidden text-[11px] font-bold text-emerald-600">
+                        ✓ Filosofía cargada en el formulario
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                    <button
+                        type="button"
+                        onclick="applyOrthoPreferencePreset('damon')"
+                        class="text-left p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition"
+                    >
+                        <span class="block text-xs font-extrabold text-indigo-950">✨ Autoligado Pasivo</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">Damon Q2 / Pitts 21 (.022") + Arcos CuNiTi Termoactivados</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="applyOrthoPreferencePreset('mbt')"
+                        class="text-left p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition"
+                    >
+                        <span class="block text-xs font-extrabold text-slate-900">🦷 MBT Estándar (.022")</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">Control de torque incisivo + NiTi → .019x.025" SS</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="applyOrthoPreferencePreset('roth')"
+                        class="text-left p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition"
+                    >
+                        <span class="block text-xs font-extrabold text-slate-900">📐 Roth / Bioprogresiva</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">Enfoque gnatológico, anclaje con ATP/TADs y curvas</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="applyOrthoPreferencePreset('aligners')"
+                        class="text-left p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition"
+                    >
+                        <span class="block text-xs font-extrabold text-slate-900">💎 Alineadores 3D + TADs</span>
+                        <span class="block text-[10px] text-slate-500 mt-0.5">Ortodoncia plástica digital, attachments e IPR selectivo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulario de Opciones de Ortodoncia -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <!-- 1. Prescripción y Sistema de Brackets -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        1. Prescripción y Sistema de Aparatología
+                    </label>
+                    <select
+                        id="prefBracketPrescription"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value="Autoligado Pasivo Damon Q2 / Pitts 21">Autoligado Pasivo Damon Q2 / Pitts 21</option>
+                        <option value="Prescripción MBT (McLaughlin-Bennett-Trevisi)">Prescripción MBT (McLaughlin-Bennett-Trevisi)</option>
+                        <option value="Prescripción Roth Gnatológica">Prescripción Roth Gnatológica</option>
+                        <option value="Prescripción Ricketts Bioprogresiva">Prescripción Ricketts Bioprogresiva</option>
+                        <option value="Brackets Estéticos de Zafiro / Cerámica (MBT)">Brackets Estéticos de Zafiro / Cerámica (MBT)</option>
+                        <option value="Alineadores Invisibles 3D (Con Attachments)">Alineadores Invisibles 3D (Con Attachments)</option>
+                        <option value="Sistema Híbrido (Alineadores + Brackets / TADs)">Sistema Híbrido (Alineadores + Brackets / TADs)</option>
+                    </select>
+                </div>
+
+                <!-- 2. Calibre de Ranura (Slot) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        2. Calibre de Ranura (Slot) y Torque
+                    </label>
+                    <select
+                        id="prefSlotSize"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value='Slot .022" x .028" (Mecánica de Deslizamiento Óptima)'>Slot .022" x .028" (Mecánica de Deslizamiento Óptima)</option>
+                        <option value='Slot .018" x .025" (Control Temprano de Torque)'>Slot .018" x .025" (Control Temprano de Torque)</option>
+                        <option value='Torque Variable Diferenciado (Alto/Estándar/Bajo según incisivos)'>Torque Variable Diferenciado (Alto/Estándar/Bajo)</option>
+                        <option value='Digital 3D Sin Slot (Alineadores Termoformados)'>Digital 3D Sin Slot (Alineadores Termoformados)</option>
+                    </select>
+                </div>
+
+                <!-- 3. Secuencia de Arcos Fase 1 -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        3. Secuencia de Arcos — Fase 1 (Alineación y Nivelación)
+                    </label>
+                    <select
+                        id="prefArchwirePhase1"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value=".014 CuNiTi Termoactivado → .018 CuNiTi Termoactivado">.014 CuNiTi Termoactivado → .018 CuNiTi Termoactivado</option>
+                        <option value=".014 Damon CuNiTi → .014x.025 CuNiTi">.014 Damon CuNiTi → .014x.025 CuNiTi</option>
+                        <option value=".012 NiTi Superelástico → .014 NiTi → .016 NiTi">.012 NiTi Superelástico → .014 NiTi → .016 NiTi</option>
+                        <option value=".016 CuNiTi Termoactivado con Topes (Bite Stops)">.016 CuNiTi Termoactivado con Topes (Bite Stops)</option>
+                        <option value="Alineadores Etapas Iniciales (Expansión + Desrotación)">Alineadores Etapas Iniciales (Expansión + Desrotación)</option>
+                    </select>
+                </div>
+
+                <!-- 4. Secuencia de Arcos Fase 2 -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        4. Secuencia de Arcos — Fase 2 (Trabajo y Cierre / Biomecánica)
+                    </label>
+                    <select
+                        id="prefArchwirePhase2"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value=".017x.025 CuNiTi → .019x.025 Acero Inoxidable (SS) con postes">.017x.025 CuNiTi → .019x.025 Acero Inoxidable (SS) con postes</option>
+                        <option value=".018x.025 CuNiTi → .019x.025 SS / TMA">.018x.025 CuNiTi → .019x.025 SS / TMA</option>
+                        <option value=".016x.022 NiTi → .016x.022 Acero (SS) con Ansas de Cierre">.016x.022 NiTi → .016x.022 Acero (SS) con Ansas de Cierre</option>
+                        <option value=".017x.025 TMA / Elgiloy Azul (Mecánica Segmentada)">.017x.025 TMA / Elgiloy Azul (Mecánica Segmentada)</option>
+                        <option value="Alineadores Fase Biomecánica + Elásticos Intermaxilares / TADs">Alineadores Fase Biomecánica + Elásticos Intermaxilares / TADs</option>
+                    </select>
+                </div>
+
+                <!-- 5. Secuencia de Arcos Fase 3 -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        5. Secuencia de Arcos — Fase 3 (Finalización y Asentamiento)
+                    </label>
+                    <select
+                        id="prefArchwirePhase3"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value=".019x.025 TMA / Braided Trenzado + Elásticos en Caja 3/16 4.5 oz">.019x.025 TMA / Braided Trenzado + Elásticos en Caja 3/16 4.5 oz</option>
+                        <option value=".019x.025 Acero (SS) con Dobleces de 1er, 2do y 3er Orden">.019x.025 Acero (SS) con Dobleces de 1er, 2do y 3er Orden</option>
+                        <option value=".018x.025 Gummetal / TMA + Elásticos Triangulares de Intercuspidación">.018x.025 Gummetal / TMA + Elásticos Triangulares</option>
+                        <option value="Alineadores de Refinamiento Oclusal + Ajuste Funcional">Alineadores de Refinamiento Oclusal + Ajuste Funcional</option>
+                    </select>
+                </div>
+
+                <!-- 6. Filosofía de Ganancia de Espacio (IPR vs Extracciones) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        6. Criterio de Ganancia de Espacio (IPR vs. Extracciones)
+                    </label>
+                    <select
+                        id="prefSpacePhilosophy"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value="Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización">Conservador No-Extraccionista (Expansión + IPR ≤ 0.3 mm)</option>
+                        <option value="Protector Periodontal Estricto: Limitar IPR máximo a 0.2 mm en incisivos inferiores y apoyarse en TADs">Protector Periodontal (IPR máx 0.2 mm en incisivos + TADs)</option>
+                        <option value="Balanceado Cefalométrico: Decidir IPR vs. Extracción de Premolares según IMPA (>96°) y Perfil Labial">Balanceado Cefalométrico (Según IMPA y Perfil Facial)</option>
+                    </select>
+                </div>
+
+                <!-- 7. Anclaje Esquelético y Auxiliares Preferidos -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        7. Preferencia de Anclaje y Auxiliares Biomecánicos
+                    </label>
+                    <select
+                        id="prefAnchorageSystem"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value="Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)">Microtornillos (TADs IZC / Shelf) + Barra Transpalatina (ATP)</option>
+                        <option value="Topes Oclusales (Bite Turbos) + Elásticos Tempranos de Fuerza Ligera (2 oz - 3.5 oz)">Topes Oclusales (Bite Turbos) + Elásticos Tempranos Ligeros</option>
+                        <option value="Anclaje Convencional (Barra Transpalatina ATP, Botón de Nance, Arco Lingual)">Anclaje Convencional (ATP, Botón de Nance, Arco Lingual)</option>
+                        <option value="Ortopedia Maxilar Funcional (Expansor Hyrax / MARPE / Twin Block)">Ortopedia Maxilar / MARPE / Disyunción</option>
+                    </select>
+                </div>
+
+                <!-- 8. Protocolo de Retención Final -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        8. Protocolo de Retención Preferido al Finalizar
+                    </label>
+                    <select
+                        id="prefRetentionProtocol"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value="Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)">Doble Retención: Fijo Lingual 3-3 + Essix Termoformado Sup/Inf</option>
+                        <option value="Retenedores Termoformados Transparentes Essix Calibre .040 (Superior e Inferior)">Retenedores Termoformados Essix .040" (Superior e Inferior)</option>
+                        <option value="Placa Hawley Circunferencial Superior + Retenedor Fijo 3-3 Inferior">Placa Hawley Superior + Retenedor Fijo 3-3 Inferior</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 9. Directrices Biomecánicas Personalizadas de la Dra. Liseth -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                    9. Directrices Clínicas Personalizadas de la Dra. Liseth Guevara para Gemini IA
+                </label>
+                <textarea
+                    id="prefCustomRules"
+                    rows="3"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 leading-relaxed focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    placeholder="Escribe cualquier instrucción clínica que Gemini siempre deba respetar en sus diagnósticos (ej. límites de stripping en raíces cortas, control vertical, marcas preferidas)..."
+                >En pacientes con raíces cortas o biotipo periodontal delgado, no superar 0.2 mm de stripping por cara proximal y usar fuerzas ligeras con arcos termoactivados CuNiTi. En casos hiperdivergentes o mordida abierta, priorizar control vertical con intrusión molar mediante TADs + ATP.</textarea>
+                <p class="text-[11px] text-slate-500 mt-1">
+                    🤖 Gemini 4 Argon y Sandy leerán estas preferencias antes de generar el diagnóstico, odontograma IPR y secuencia de 6 etapas.
+                </p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                <button
+                    type="button"
+                    onclick="saveOrthoPreferences(true)"
+                    class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                    title="Guarda tus preferencias y actualiza inmediatamente la secuencia de arcos y anclaje del paciente abierto actualmente"
+                >
+                    <i class="ph-bold ph-arrows-clockwise"></i>
+                    <span>Guardar y Aplicar Arcos al Paciente Actual</span>
+                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button
+                        type="button"
+                        onclick="closeOrthoPreferencesModal()"
+                        class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        onclick="saveOrthoPreferences(false)"
+                        class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-check-circle"></i>
+                        <span>Guardar Preferencias para Gemini IA</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -4233,11 +4536,170 @@ create table if not exists public.patients (
 
         // ---------------------------------------------------------------------
         // 7B. MOTOR MULTIMODAL GEMINI 4 ARGON (1 ANÁLISIS POR PACIENTE)
-        //     + CONSENSO CLÍNICO IA-DOCTOR (DoctorReviewPanel)
+        //     + PREFERENCIAS CLÍNICAS DE ORTODONCIA + CONSENSO CLÍNICO IA-DOCTOR
         // ---------------------------------------------------------------------
         const DEFAULT_GEMINI_API_KEY = ["AQ.Ab8RN6LKL7lXS", "-pV9LBLpBnrP1sbt", "FXoyCefJZX3RWG_K1z4UA"].join("");
 
+        const DEFAULT_ORTHO_PREFERENCES = {
+            bracketPrescription: "Autoligado Pasivo Damon Q2 / Pitts 21",
+            slotSize: 'Slot .022" x .028" (Mecánica de Deslizamiento Óptima)',
+            archwirePhase1: ".014 CuNiTi Termoactivado → .018 CuNiTi Termoactivado",
+            archwirePhase2: ".017x.025 CuNiTi → .019x.025 Acero Inoxidable (SS) con postes",
+            archwirePhase3: ".019x.025 TMA / Braided Trenzado + Elásticos en Caja 3/16 4.5 oz",
+            spacePhilosophy: "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización",
+            anchorageSystem: "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)",
+            retentionProtocol: "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)",
+            customRules: "En pacientes con raíces cortas o biotipo periodontal delgado, no superar 0.2 mm de stripping por cara proximal y usar fuerzas ligeras con arcos termoactivados CuNiTi. En casos hiperdivergentes o mordida abierta, priorizar control vertical con intrusión molar mediante TADs + ATP."
+        };
+
+        function getOrthoPreferences() {
+            try {
+                const raw = localStorage.getItem("crd_ortho_clinical_prefs_v1");
+                if (raw) {
+                    return Object.assign({}, DEFAULT_ORTHO_PREFERENCES, JSON.parse(raw));
+                }
+            } catch (_) {}
+            return Object.assign({}, DEFAULT_ORTHO_PREFERENCES);
+        }
+
+        function refreshOrthoPreferencesUi() {
+            const prefs = getOrthoPreferences();
+            const badge = document.getElementById("activeOrthoPrefsSummaryBadge");
+            if (badge) {
+                badge.innerText = `${prefs.bracketPrescription} (${prefs.slotSize.split(" ")[1] || '.022"'}) • Fase 1: ${prefs.archwirePhase1} • Fase 2: ${prefs.archwirePhase2} • ${prefs.anchorageSystem.split("+")[0].trim()}`;
+            }
+        }
+
+        function openOrthoPreferencesModal() {
+            const prefs = getOrthoPreferences();
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && val) el.value = val;
+            };
+            setVal("prefBracketPrescription", prefs.bracketPrescription);
+            setVal("prefSlotSize", prefs.slotSize);
+            setVal("prefArchwirePhase1", prefs.archwirePhase1);
+            setVal("prefArchwirePhase2", prefs.archwirePhase2);
+            setVal("prefArchwirePhase3", prefs.archwirePhase3);
+            setVal("prefSpacePhilosophy", prefs.spacePhilosophy);
+            setVal("prefAnchorageSystem", prefs.anchorageSystem);
+            setVal("prefRetentionProtocol", prefs.retentionProtocol);
+            setVal("prefCustomRules", prefs.customRules);
+
+            document.getElementById("orthoPreferencesModal")?.classList.remove("hidden");
+        }
+
+        function closeOrthoPreferencesModal() {
+            document.getElementById("orthoPreferencesModal")?.classList.add("hidden");
+        }
+
+        function applyOrthoPreferencePreset(presetKey) {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            if (presetKey === "damon") {
+                setVal("prefBracketPrescription", "Autoligado Pasivo Damon Q2 / Pitts 21");
+                setVal("prefSlotSize", 'Slot .022" x .028" (Mecánica de Deslizamiento Óptima)');
+                setVal("prefArchwirePhase1", ".014 Damon CuNiTi → .014x.025 CuNiTi");
+                setVal("prefArchwirePhase2", ".018x.025 CuNiTi → .019x.025 SS / TMA");
+                setVal("prefArchwirePhase3", ".019x.025 TMA / Braided Trenzado + Elásticos en Caja 3/16 4.5 oz");
+                setVal("prefSpacePhilosophy", "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización");
+                setVal("prefAnchorageSystem", "Topes Oclusales (Bite Turbos) + Elásticos Tempranos de Fuerza Ligera (2 oz - 3.5 oz)");
+                setVal("prefRetentionProtocol", "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)");
+                setVal("prefCustomRules", "Filosofía de baja fricción y autoligado pasivo: usar elásticos ligeros tempranos, desarrollar arcadas transversalmente y limitar stripping a lo estrictamente necesario.");
+            } else if (presetKey === "mbt") {
+                setVal("prefBracketPrescription", "Prescripción MBT (McLaughlin-Bennett-Trevisi)");
+                setVal("prefSlotSize", 'Slot .022" x .028" (Mecánica de Deslizamiento Óptima)');
+                setVal("prefArchwirePhase1", ".014 CuNiTi Termoactivado → .018 CuNiTi Termoactivado");
+                setVal("prefArchwirePhase2", ".017x.025 CuNiTi → .019x.025 Acero Inoxidable (SS) con postes");
+                setVal("prefArchwirePhase3", ".019x.025 Acero (SS) con Dobleces de 1er, 2do y 3er Orden");
+                setVal("prefSpacePhilosophy", "Balanceado Cefalométrico: Decidir IPR vs. Extracción de Premolares según IMPA (>96°) y Perfil Labial");
+                setVal("prefAnchorageSystem", "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)");
+                setVal("prefRetentionProtocol", "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)");
+                setVal("prefCustomRules", "Mecánica MBT .022\": usar ligadura en ocho (lacebacks) en caninos durante alineación, expresar torque completo en .019x.025\" SS antes del cierre de espacios.");
+            } else if (presetKey === "roth") {
+                setVal("prefBracketPrescription", "Prescripción Roth Gnatológica");
+                setVal("prefSlotSize", 'Slot .018" x .025" (Control Temprano de Torque)');
+                setVal("prefArchwirePhase1", ".012 NiTi Superelástico → .014 NiTi → .016 NiTi");
+                setVal("prefArchwirePhase2", ".016x.022 NiTi → .016x.022 Acero (SS) con Ansas de Cierre");
+                setVal("prefArchwirePhase3", ".018x.025 Gummetal / TMA + Elásticos Triangulares de Intercuspidación");
+                setVal("prefSpacePhilosophy", "Protector Periodontal Estricto: Limitar IPR máximo a 0.2 mm en incisivos inferiores y apoyarse en TADs");
+                setVal("prefAnchorageSystem", "Anclaje Convencional (Barra Transpalatina ATP, Botón de Nance, Arco Lingual)");
+                setVal("prefRetentionProtocol", "Placa Hawley Circunferencial Superior + Retenedor Fijo 3-3 Inferior");
+                setVal("prefCustomRules", "Priorizar coincidencia de Relación Céntrica y Oclusión Céntrica, guía canina funcional y control vertical gnatológico.");
+            } else if (presetKey === "aligners") {
+                setVal("prefBracketPrescription", "Alineadores Invisibles 3D (Con Attachments)");
+                setVal("prefSlotSize", "Digital 3D Sin Slot (Alineadores Termoformados)");
+                setVal("prefArchwirePhase1", "Alineadores Etapas Iniciales (Expansión + Desrotación)");
+                setVal("prefArchwirePhase2", "Alineadores Fase Biomecánica + Elásticos Intermaxilares / TADs");
+                setVal("prefArchwirePhase3", "Alineadores de Refinamiento Oclusal + Ajuste Funcional");
+                setVal("prefSpacePhilosophy", "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización");
+                setVal("prefAnchorageSystem", "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)");
+                setVal("prefRetentionProtocol", "Retenedores Termoformados Transparentes Essix Calibre .040 (Superior e Inferior)");
+                setVal("prefCustomRules", "Planificar staging de movimientos a 0.25 mm por alineador, colocar attachments biselados optimizados y programar IPR progresivo en etapas pares.");
+            }
+
+            const toast = document.getElementById("orthoPrefPresetSavedToast");
+            if (toast) {
+                toast.classList.remove("hidden");
+                setTimeout(() => toast.classList.add("hidden"), 2500);
+            }
+        }
+
+        function applyPreferencesToStudyRoadmap(study, prefs) {
+            if (!study || !prefs) return;
+            study.anchorage = `${prefs.bracketPrescription} (${prefs.slotSize.split(" (")[0]}) + ${prefs.anchorageSystem}`;
+            study.retentionProtocol = prefs.retentionProtocol;
+
+            const p1Parts = prefs.archwirePhase1.split("→").map((s) => s.trim());
+            const p2Parts = prefs.archwirePhase2.split("→").map((s) => s.trim());
+            const p1First = p1Parts[0] || prefs.archwirePhase1;
+            const p1Second = p1Parts[1] || prefs.archwirePhase1;
+            const p2First = p2Parts[0] || prefs.archwirePhase2;
+            const p2Second = p2Parts[1] || prefs.archwirePhase2;
+
+            if (Array.isArray(study.roadmap) && study.roadmap.length >= 6) {
+                study.roadmap[0].archwire = `${prefs.bracketPrescription} • ${prefs.slotSize.split(" (")[0]}`;
+                study.roadmap[0].chairsideAction = `Cementado / Inicio con ${prefs.bracketPrescription} (${prefs.slotSize.split(" (")[0]}). Anclaje planeado: ${prefs.anchorageSystem}.`;
+                study.roadmap[1].archwire = p1First;
+                study.roadmap[2].archwire = p1Second;
+                study.roadmap[3].archwire = p2First;
+                study.roadmap[4].archwire = p2Second;
+                study.roadmap[5].archwire = prefs.archwirePhase3;
+            }
+        }
+
+        function saveOrthoPreferences(applyToCurrentPatient = false) {
+            const prefs = {
+                bracketPrescription: document.getElementById("prefBracketPrescription")?.value || DEFAULT_ORTHO_PREFERENCES.bracketPrescription,
+                slotSize: document.getElementById("prefSlotSize")?.value || DEFAULT_ORTHO_PREFERENCES.slotSize,
+                archwirePhase1: document.getElementById("prefArchwirePhase1")?.value || DEFAULT_ORTHO_PREFERENCES.archwirePhase1,
+                archwirePhase2: document.getElementById("prefArchwirePhase2")?.value || DEFAULT_ORTHO_PREFERENCES.archwirePhase2,
+                archwirePhase3: document.getElementById("prefArchwirePhase3")?.value || DEFAULT_ORTHO_PREFERENCES.archwirePhase3,
+                spacePhilosophy: document.getElementById("prefSpacePhilosophy")?.value || DEFAULT_ORTHO_PREFERENCES.spacePhilosophy,
+                anchorageSystem: document.getElementById("prefAnchorageSystem")?.value || DEFAULT_ORTHO_PREFERENCES.anchorageSystem,
+                retentionProtocol: document.getElementById("prefRetentionProtocol")?.value || DEFAULT_ORTHO_PREFERENCES.retentionProtocol,
+                customRules: document.getElementById("prefCustomRules")?.value?.trim() || DEFAULT_ORTHO_PREFERENCES.customRules
+            };
+
+            localStorage.setItem("crd_ortho_clinical_prefs_v1", JSON.stringify(prefs));
+            refreshOrthoPreferencesUi();
+
+            if (applyToCurrentPatient) {
+                const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+                if (patient && patient.study_data) {
+                    applyPreferencesToStudyRoadmap(patient.study_data, prefs);
+                    savePatientsLocal();
+                    openPatientWorkspace(patient.id, false);
+                }
+            }
+
+            closeOrthoPreferencesModal();
+        }
+
         function updateArgonQuotaUI(patient) {
+            refreshOrthoPreferencesUi();
             const btn = document.getElementById("btnRunArgonAnalysis");
             const txt = document.getElementById("btnRunArgonText");
             const badge = document.getElementById("argonQuotaBadge");
@@ -4270,7 +4732,9 @@ create table if not exists public.patients (
             const btn = document.getElementById("btnRunArgonAnalysis");
             const txt = document.getElementById("btnRunArgonText");
             if (btn) btn.disabled = true;
-            if (txt) txt.innerText = "Analizando Rx, Fotos y Telemetría .STL con Argon...";
+            if (txt) txt.innerText = "Analizando Rx, Fotos, .STL y tus Preferencias de Brackets/Arcos...";
+
+            const doctorPrefs = getOrthoPreferences();
 
             try {
                 let updatedStudy = null;
@@ -4280,6 +4744,7 @@ create table if not exists public.patients (
                     const fd = new FormData();
                     fd.append("patientName", patient.full_name);
                     fd.append("patientAge", String(patient.age));
+                    fd.append("orthoPreferences", JSON.stringify(doctorPrefs));
                     if (uploadedUpperStlFile) fd.append("stlUpper", uploadedUpperStlFile);
                     if (uploadedLowerStlFile) fd.append("stlLower", uploadedLowerStlFile);
                     const resp = await fetch("/api/analyze-ortho", { method: "POST", body: fd });
@@ -4289,7 +4754,7 @@ create table if not exists public.patients (
                     }
                 } catch (_) {}
 
-                // 2. Si no está en servidor Next, usar GEMINI_API_KEY multimodal con imágenes subidas + telemetría .STL
+                // 2. Si no está en servidor Next, usar GEMINI_API_KEY multimodal con imágenes subidas + telemetría .STL + Preferencias de Ortodoncia
                 const apiKey = DEFAULT_GEMINI_API_KEY;
                 const stlSummary = [stlUpperTelemetryText, stlLowerTelemetryText].filter(Boolean).join(" | ") ||
                     "Arcada Superior: 57.6 mm transversal • Arcada Inferior: 53.1 mm transversal (Discrepancia dentoalveolar anterior)";
@@ -4314,7 +4779,23 @@ create table if not exists public.patients (
                             }
                         }
 
-                        const prompt = `Eres un ortodoncista experto utilizando Gemini 4 Argon. Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo de consulta: ${patient.case_summary || "Valoración ortodóntica"}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "durationMonths": number, "complexity": "Baja" | "Moderada" | "Alta", "anchorage": string, "summary": { "skeletal": string, "vertical": string, "dentalFormula": string, "rootAlert": string }, "cephalometrics": [{ "parameter": string, "finding": string, "norm": string, "implication": string }], "additionalTreatments": [string], "risks": [{ "title": string, "level": string, "mitigation": string }], "odontogram": { "32": { "toothFDI": 32, "name": string, "status": "ipr"|"critical"|"missing"|"aligned", "diagnosis": string, "iprMesial": number, "iprDistal": number, "biomechanics": string } }, "roadmap": [{ "phase": "fase1"|"fase2"|"fase3", "months": string, "archwire": string, "title": string, "chairsideAction": string, "expectedMovement": string }], "retentionProtocol": string }.`;
+                        const prompt = `Eres un ortodoncista experto utilizando Gemini 4 Argon para la Dra. Liseth Guevara Muñoz.
+Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años).
+Motivo de consulta: ${patient.case_summary || "Valoración ortodóntica"}.
+Telemetría 3D STL: ${stlSummary}.
+
+PREFERENCIAS CLÍNICAS OBLIGATORIAS CONFIGURADAS POR LA DRA. LISETH GUEVARA MUÑOZ (DEBES DISEÑAR EL DIAGNÓSTICO, ANCLAJE, STRIPPING IPR Y LAS 6 ETAPAS DE ARCOS DEL ROADMAP USANDO ESTRICTAMENTE ESTAS OPCIONES):
+- Sistema y Prescripción de Brackets: ${doctorPrefs.bracketPrescription}
+- Calibre de Ranura (Slot): ${doctorPrefs.slotSize}
+- Secuencia de Arcos Fase 1 (Alineación y Nivelación): ${doctorPrefs.archwirePhase1}
+- Secuencia de Arcos Fase 2 (Trabajo y Biomecánica): ${doctorPrefs.archwirePhase2}
+- Secuencia de Arcos Fase 3 (Finalización y Asentamiento): ${doctorPrefs.archwirePhase3}
+- Criterio de Ganancia de Espacio (IPR vs Extracciones): ${doctorPrefs.spacePhilosophy}
+- Sistema de Anclaje y Auxiliares Preferidos: ${doctorPrefs.anchorageSystem}
+- Protocolo de Retención Final: ${doctorPrefs.retentionProtocol}
+- Reglas Biomecánicas de la Doctora: ${doctorPrefs.customRules}
+
+Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "durationMonths": number, "complexity": "Baja" | "Moderada" | "Alta", "anchorage": string, "summary": { "skeletal": string, "vertical": string, "dentalFormula": string, "rootAlert": string }, "cephalometrics": [{ "parameter": string, "finding": string, "norm": string, "implication": string }], "additionalTreatments": [string], "risks": [{ "title": string, "level": string, "mitigation": string }], "odontogram": { "32": { "toothFDI": 32, "name": string, "status": "ipr"|"critical"|"missing"|"aligned", "diagnosis": string, "iprMesial": number, "iprDistal": number, "biomechanics": string } }, "roadmap": [{ "phase": "fase1"|"fase2"|"fase3", "months": string, "archwire": string, "title": string, "chairsideAction": string, "expectedMovement": string }], "retentionProtocol": string }.`;
                         parts.push({ text: prompt });
 
                         for (const modelName of ["gemini-3.8-flash", "gemini-flash-latest"]) {
@@ -4344,7 +4825,7 @@ create table if not exists public.patients (
                     } catch (_) {}
                 }
 
-                // 3. Si la API no devolvió todos los bloques, usar síntesis clínica completa de Argon basada en la telemetría del paciente
+                // 3. Si la API no devolvió todos los bloques, usar síntesis clínica completa de Argon basada en la telemetría y las preferencias configuradas por la Dra. Liseth
                 const previousManualTeeth = {};
                 if (patient.study_data?.odontogram) {
                     Object.entries(patient.study_data.odontogram).forEach(([fdiKey, toothObj]) => {
@@ -4355,23 +4836,30 @@ create table if not exists public.patients (
                 }
 
                 const argonSynthesizedStudy = JSON.parse(JSON.stringify(MARTHA_STUDY_DATA));
+                applyPreferencesToStudyRoadmap(argonSynthesizedStudy, doctorPrefs);
+
                 if (updatedStudy && updatedStudy.summary) {
                     Object.assign(argonSynthesizedStudy, updatedStudy);
                 } else {
                     argonSynthesizedStudy.complexity = (uploadedUpperStlFile || uploadedLowerStlFile) ? "Moderada" : "Alta";
                     argonSynthesizedStudy.durationMonths = 16;
-                    argonSynthesizedStudy.anchorage = "IPR Selectivo Anteroinferior + Elásticos Intermaxilares";
                     argonSynthesizedStudy.summary = {
                         skeletal: "Clase I / Tendencia Clase II Dentoalveolar (Análisis Argon)",
                         vertical: "Sobremordida funcional en ajuste biomecánico",
-                        dentalFormula: "Dentición permanente evaluada (Arcadas Sup/Inf)",
+                        dentalFormula: `Aparatología: ${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`,
                         rootAlert: "Monitoreo radiográfico periapical a los 6 meses"
                     };
                 }
 
-                // Asegurar telemetría .STL en tabla cefalométrica
+                // Asegurar telemetría .STL y prescripción seleccionada en tabla cefalométrica
                 argonSynthesizedStudy.cephalometrics = [
                     ...(argonSynthesizedStudy.cephalometrics || []),
+                    {
+                        parameter: "Prescripción & Secuencia de Arcos Configurada",
+                        finding: `${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`,
+                        norm: doctorPrefs.archwirePhase1,
+                        implication: `Fase 2: ${doctorPrefs.archwirePhase2} • Fase 3: ${doctorPrefs.archwirePhase3}`
+                    },
                     {
                         parameter: "Telemetría 3D Escáner (.STL)",
                         finding: (uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl) ? "Malla 3D Real Verificada" : "Volumetría Digital",
@@ -4388,18 +4876,19 @@ create table if not exists public.patients (
                 patient.study_data = argonSynthesizedStudy;
                 patient.complexity = argonSynthesizedStudy.complexity || "Moderada";
                 patient.has_stl = Boolean(uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl || activeLowerStlUrl);
-                patient.case_summary = `${argonSynthesizedStudy.summary.skeletal} • ${argonSynthesizedStudy.summary.vertical}`;
+                patient.case_summary = `${argonSynthesizedStudy.summary.skeletal} • ${doctorPrefs.bracketPrescription}`;
                 patient.ai_analyzed_once = true;
 
                 if (!patient.medical_history) patient.medical_history = {};
                 patient.medical_history.ai_analyzed_once = true;
                 patient.medical_history.complexity = patient.complexity;
                 patient.medical_history.study_data = patient.study_data;
+                patient.medical_history.ortho_preferences_applied = doctorPrefs;
 
                 if (!patient.consensus_history) patient.consensus_history = [];
                 patient.consensus_history.push({
                     role: "ai",
-                    text: `⚡ Análisis Inicial Gemini 4 Argon (1/1) completado para ${patient.full_name}. Todos los campos de diagnóstico, complejidad (${patient.complexity}), tabla cefalométrica, odontograma IPR y secuencia mes a mes han sido prellenados automáticamente. Puedes editarlos manualmente o discutir ajustes en este panel.`
+                    text: `⚡ Análisis Inicial Gemini 4 Argon (1/1) completado para ${patient.full_name} aplicando tus Preferencias Clínicas (${doctorPrefs.bracketPrescription} • ${doctorPrefs.slotSize.split(" (")[0]} • Secuencia: ${doctorPrefs.archwirePhase1} → ${doctorPrefs.archwirePhase2}). Puedes editar cualquier campo o discutir ajustes en este panel.`
                 });
 
                 savePatientsLocal();
@@ -6262,7 +6751,9 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                     evolutionNotes: (p.evolution_notes || p.medical_history?.evolution_notes || []).slice(0, 3)
                 }));
 
+                const doctorPrefs = getOrthoPreferences();
                 const systemInstruction = `Te llamas Sandy y eres la Asistente Virtual Inteligente de Ortodoncia y Coordinadora del Google Calendar Hub de la Dra. Liseth Guevara Muñoz (${getConnectedDoctorEmail()}).
+Preferencias clínicas de ortodoncia configuradas por la Dra. Liseth: ${JSON.stringify(doctorPrefs)}.
 Tu misión como Sandy es leer con total atención lo que pide o pregunta la doctora:
 1. IDENTIFICAR AL PACIENTE exacto que menciona la doctora en su mensaje (búscalo en el catálogo de pacientes por nombre o apellido; si la doctora menciona un nombre nuevo que aún no está en el catálogo, usa ese nombre nuevo exactamente; solo usa el paciente activo en pantalla si la doctora dice "este paciente" o no menciona ningún nombre).
 2. IDENTIFICAR LA ETAPA CLÍNICA ('stageIdentified') en la que va el paciente según su 'roadmapStages' / 'evolutionNotes' o según el procedimiento específico que pide la doctora (ej. Etapa 1 Cementado, Etapa 2 Nivelación/IPR, Etapa 3 TADs/Intrusión, Retiro, Valoración Inicial).
