@@ -789,19 +789,33 @@
                 </div>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
-                <div class="flex justify-between items-center">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2.5">
+                <div class="flex flex-wrap justify-between items-center gap-2">
                     <span class="text-[11px] font-bold text-slate-700 uppercase">Esquema SQL Oficial (Tablas patients & ortho_studies)</span>
-                    <button
-                        type="button"
-                        onclick="copyDefinitiveSql()"
-                        class="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1"
-                    >
-                        <i class="ph-bold ph-copy"></i> Copiar SQL
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onclick="copyDefinitiveSql()"
+                            class="text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg hover:bg-indigo-100 flex items-center gap-1 transition"
+                        >
+                            <i class="ph-bold ph-copy"></i> 1. Copiar SQL
+                        </button>
+                        <a
+                            href="https://supabase.com/dashboard/project/kripphmingdxnkwkpglo/sql/new"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-xs font-semibold bg-slate-900 text-white px-2.5 py-1 rounded-lg hover:bg-slate-800 flex items-center gap-1 transition"
+                        >
+                            <span>2. Abrir SQL Editor</span>
+                            <i class="ph-bold ph-arrow-square-out"></i>
+                        </a>
+                    </div>
                 </div>
+                <p id="supabaseTableStatusNotice" class="text-[11px] text-slate-600">
+                    Proyecto vinculado: <strong class="mono text-slate-900">kripphmingdxnkwkpglo.supabase.co</strong> (Bucket <code class="bg-white px-1 rounded border">ortho-clinical-files</code> activo).
+                </p>
                 <pre class="text-[10px] mono text-slate-600 overflow-x-auto max-h-28 bg-white p-2.5 rounded-xl border border-slate-200">create extension if not exists "uuid-ossp";
-create table public.patients (
+create table if not exists public.patients (
   id uuid default uuid_generate_v4() primary key,
   created_at timestamptz default now() not null,
   full_name text not null,
@@ -810,7 +824,8 @@ create table public.patients (
   referring_doctor text default 'Dra. Liseth Guevara Muñoz',
   medical_history jsonb default '{}'::jsonb,
   patient_signature text,
-  doctor_signature text
+  doctor_signature text,
+  signed_at timestamptz
 );</pre>
             </div>
 
@@ -820,14 +835,14 @@ create table public.patients (
                     onclick="closeSupabaseModal()"
                     class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold"
                 >
-                    Cancelar
+                    Cerrar
                 </button>
                 <button
                     type="button"
                     onclick="saveSupabaseConnection()"
                     class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm"
                 >
-                    Guardar y Sincronizar
+                    Guardar y Sincronizar Ahora
                 </button>
             </div>
         </div>
@@ -955,10 +970,10 @@ create table public.patients (
                     allergies: "Ninguna alergia medicamentosa reportada"
                 },
                 photos: {
-                    "Rx Panorámica (IDI)": "ortho-media/rx_panoramica_demo.jpg",
-                    "Rx Lateral de Cráneo": "ortho-media/rx_lateral_demo.jpg",
-                    "Intraoral Frontal (Mordida Abierta)": "ortho-media/foto_frontal_demo.jpg",
-                    "Sobremordida / Hábito Lingual": "ortho-media/foto_lateral_demo.jpg",
+                    "Rx Panorámica (IDI)": "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/rx_panoramica_demo.jpg",
+                    "Rx Lateral de Cráneo": "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/rx_lateral_demo.jpg",
+                    "Intraoral Frontal (Mordida Abierta)": "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/foto_frontal_demo.jpg",
+                    "Sobremordida / Hábito Lingual": "https://kripphmingdxnkwkpglo.supabase.co/storage/v1/object/public/ortho-clinical-files/martha-zuniga/foto_lateral_demo.jpg",
                     "Oclusal Superior": "",
                     "Oclusal Inferior (Apiñamiento)": "",
                     "Lateral Derecha": "",
@@ -1006,6 +1021,10 @@ create table public.patients (
             }
         ];
 
+        // Credenciales Oficiales Supabase (Proyecto: kripphmingdxnkwkpglo)
+        const DEFAULT_SUPABASE_URL = "https://kripphmingdxnkwkpglo.supabase.co";
+        const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyaXBwaG1pbmdkeG5rd2twZ2xvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNzc1NzksImV4cCI6MjEwNzc1MzU3OX0.bq9dmdINJE_4hdA0WwObaPykkU6m2DsasDpX0JULZBw";
+
         // Estado Global Modular
         let patientsList = [];
         let activePatientId = "martha-zuniga-0912";
@@ -1032,6 +1051,13 @@ create table public.patients (
             initSignatureCanvas("patientSigCanvas", "patient");
             initSignatureCanvas("doctorSigCanvas", "doctor");
 
+            if (!localStorage.getItem("crd_supabase_url")) {
+                localStorage.setItem("crd_supabase_url", DEFAULT_SUPABASE_URL);
+            }
+            if (!localStorage.getItem("crd_supabase_anon_key")) {
+                localStorage.setItem("crd_supabase_anon_key", DEFAULT_SUPABASE_ANON_KEY);
+            }
+
             // Cargar pacientes locales o inicializar demo
             const savedLocal = localStorage.getItem("crd_ortho_patients_v10");
             if (savedLocal) {
@@ -1045,12 +1071,11 @@ create table public.patients (
                 savePatientsLocal();
             }
 
-            // Intentar conectar con Supabase si hay credenciales guardadas
+            // Conectar con Supabase Cloud automáticamente
             await initSupabaseConnection();
 
             renderPatientsList();
             openPatientWorkspace(activePatientId, false);
-            // Mostrar primero el Dashboard o el paciente activo
             showDashboardView();
         });
 
@@ -1061,10 +1086,11 @@ create table public.patients (
         }
 
         async function initSupabaseConnection() {
-            const url = localStorage.getItem("crd_supabase_url") || "";
-            const key = localStorage.getItem("crd_supabase_anon_key") || "";
+            const url = localStorage.getItem("crd_supabase_url") || DEFAULT_SUPABASE_URL;
+            const key = localStorage.getItem("crd_supabase_anon_key") || DEFAULT_SUPABASE_ANON_KEY;
             const statusText = document.getElementById("supabaseStatusText");
             const dbMode = document.getElementById("statDbMode");
+            const noticeEl = document.getElementById("supabaseTableStatusNotice");
 
             if (url && key && window.supabase) {
                 try {
@@ -1077,7 +1103,53 @@ create table public.patients (
                         .select("*")
                         .order("created_at", { ascending: false });
 
-                    if (!error && data && data.length > 0) {
+                    if (error) {
+                        if (noticeEl) {
+                            noticeEl.innerHTML = `<span class="text-amber-700 font-semibold">⚠ Falta ejecutar el SQL inicial:</span> Haz clic en <strong>1. Copiar SQL</strong> y pégalo en <strong>2. Abrir SQL Editor</strong> para activar las tablas <code class="bg-white px-1 rounded">patients</code> y <code class="bg-white px-1 rounded">ortho_studies</code>.`;
+                        }
+                        return;
+                    }
+
+                    if (noticeEl) {
+                        noticeEl.innerHTML = `<span class="text-emerald-700 font-semibold">✓ Tablas SQL activas y sincronizadas en kripphmingdxnkwkpglo.supabase.co</span>`;
+                    }
+
+                    // Si la tabla recién creada está vacía, sembrar los expedientes iniciales automáticamente
+                    if (data && data.length === 0) {
+                        for (const demoPat of DEMO_PATIENTS) {
+                            const { data: insertedPat } = await supabaseClient
+                                .from("patients")
+                                .insert([
+                                    {
+                                        full_name: demoPat.full_name,
+                                        age: demoPat.age,
+                                        phone: demoPat.phone,
+                                        referring_doctor: demoPat.referring_doctor,
+                                        medical_history: {
+                                            ...demoPat.medical_history,
+                                            complexity: demoPat.complexity,
+                                            photos: demoPat.photos,
+                                            notes: demoPat.notes
+                                        }
+                                    }
+                                ])
+                                .select()
+                                .single();
+
+                            if (insertedPat && insertedPat.id) {
+                                await supabaseClient.from("ortho_studies").insert([
+                                    {
+                                        patient_id: insertedPat.id,
+                                        center_name: "IDI Mérida",
+                                        rx_panoramic_url: demoPat.photos?.["Rx Panorámica (IDI)"] || null,
+                                        rx_lateral_url: demoPat.photos?.["Rx Lateral de Cráneo"] || null,
+                                        photos_urls: demoPat.photos || {},
+                                        clinical_data: demoPat.study_data
+                                    }
+                                ]);
+                            }
+                        }
+                    } else if (data && data.length > 0) {
                         const cloudMapped = data.map((p) => ({
                             id: p.id,
                             record_code: `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`,
@@ -1088,15 +1160,14 @@ create table public.patients (
                             created_at: new Date(p.created_at).toISOString().split("T")[0],
                             case_summary: p.medical_history?.chief_complaint || "Evaluación Ortodóntica Inicial",
                             complexity: p.medical_history?.complexity || "Moderada",
-                            has_stl: false,
+                            has_stl: true,
                             medical_history: p.medical_history || {},
                             patient_signature: p.patient_signature || "",
                             doctor_signature: p.doctor_signature || "",
-                            photos: {},
-                            notes: [],
+                            photos: p.medical_history?.photos || {},
+                            notes: p.medical_history?.notes || [],
                             study_data: MARTHA_STUDY_DATA
                         }));
-                        // Combinar sin duplicar por nombre
                         const existingNames = new Set(DEMO_PATIENTS.map(d => d.full_name.toLowerCase()));
                         const uniqueCloud = cloudMapped.filter(c => !existingNames.has(c.full_name.toLowerCase()));
                         patientsList = [...DEMO_PATIENTS, ...uniqueCloud];
@@ -1945,8 +2016,8 @@ create table public.patients (
         }
 
         function openSupabaseModal() {
-            document.getElementById("supaUrlInput").value = localStorage.getItem("crd_supabase_url") || "";
-            document.getElementById("supaKeyInput").value = localStorage.getItem("crd_supabase_anon_key") || "";
+            document.getElementById("supaUrlInput").value = localStorage.getItem("crd_supabase_url") || DEFAULT_SUPABASE_URL;
+            document.getElementById("supaKeyInput").value = localStorage.getItem("crd_supabase_anon_key") || DEFAULT_SUPABASE_ANON_KEY;
             document.getElementById("supabaseModal").classList.remove("hidden");
         }
 
@@ -1955,17 +2026,13 @@ create table public.patients (
         }
 
         async function saveSupabaseConnection() {
-            const url = document.getElementById("supaUrlInput").value.trim();
-            const key = document.getElementById("supaKeyInput").value.trim();
-            if (url && key) {
-                localStorage.setItem("crd_supabase_url", url);
-                localStorage.setItem("crd_supabase_anon_key", key);
-                await initSupabaseConnection();
-                closeSupabaseModal();
-                alert("✓ Credenciales de Supabase guardadas y sincronizadas.");
-            } else {
-                alert("Por favor ingresa tanto el Project URL como la clave anon public de Supabase.");
-            }
+            const url = document.getElementById("supaUrlInput").value.trim() || DEFAULT_SUPABASE_URL;
+            const key = document.getElementById("supaKeyInput").value.trim() || DEFAULT_SUPABASE_ANON_KEY;
+            localStorage.setItem("crd_supabase_url", url);
+            localStorage.setItem("crd_supabase_anon_key", key);
+            await initSupabaseConnection();
+            closeSupabaseModal();
+            alert("✓ Conexión con Supabase sincronizada.");
         }
 
         function copyDefinitiveSql() {
@@ -1997,9 +2064,26 @@ create table if not exists public.ortho_studies (
     stl_upper_url text,
     stl_lower_url text,
     clinical_data jsonb not null
-);`;
+);
+
+alter table public.patients enable row level security;
+alter table public.ortho_studies enable row level security;
+
+drop policy if exists "Permitir lectura de pacientes" on public.patients;
+create policy "Permitir lectura de pacientes" on public.patients for select using (true);
+drop policy if exists "Permitir insercion de pacientes" on public.patients;
+create policy "Permitir insercion de pacientes" on public.patients for insert with check (true);
+drop policy if exists "Permitir actualizacion de pacientes" on public.patients;
+create policy "Permitir actualizacion de pacientes" on public.patients for update using (true);
+
+drop policy if exists "Permitir lectura de estudios" on public.ortho_studies;
+create policy "Permitir lectura de estudios" on public.ortho_studies for select using (true);
+drop policy if exists "Permitir insercion de estudios" on public.ortho_studies;
+create policy "Permitir insercion de estudios" on public.ortho_studies for insert with check (true);
+drop policy if exists "Permitir actualizacion de estudios" on public.ortho_studies;
+create policy "Permitir actualizacion de estudios" on public.ortho_studies for update using (true);`;
             navigator.clipboard.writeText(sql).then(() => {
-                alert("✓ Esquema SQL copiado al portapapeles. Pégalo en el SQL Editor de Supabase.");
+                alert("✓ Esquema SQL copiado al portapapeles. Ahora haz clic en '2. Abrir SQL Editor', pégalo y presiona Run.");
             });
         }
 
