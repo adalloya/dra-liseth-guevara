@@ -104,112 +104,174 @@
          VISTA 1: DASHBOARD Y ADMINISTRADOR DE PACIENTES (src/app/page.tsx)
     ====================================================================== -->
     <div id="viewDashboard" class="min-h-screen flex flex-col">
-        <!-- Top Bar Estilo macOS / iPadOS -->
-        <header class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-6 py-4 no-print">
-            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-3 shrink-0">
-                    <img src="ortho-hub-logo.png" alt="CRD OrthoAI Hub" class="w-10 h-10 rounded-2xl object-contain shadow-xs shrink-0" />
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                CRD Ortodoncia
-                            </span>
-                            <span class="text-xs font-bold text-slate-900 hidden sm:inline">Dra. Liseth Guevara</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 hidden sm:block">
-                            Especialista en Ortodoncia y Ortopedia Maxilar
-                        </p>
-                    </div>
+        <!-- Top Bar Compacto y Responsivo (Mobile & Desktop: 1 sola fila con buscador central) -->
+        <header class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 no-print">
+            <div class="max-w-6xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4">
+                <!-- Izquierda: SOLO el icono de la app (máximo espacio libre en móvil) -->
+                <div class="flex items-center shrink-0">
+                    <img
+                        src="ortho-hub-logo.png"
+                        alt="CRD Ortho"
+                        onclick="showDashboardView()"
+                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain shadow-xs cursor-pointer hover:opacity-90 transition shrink-0"
+                        title="Ir al inicio"
+                    />
                 </div>
 
-                <!-- ÚNICO ELEMENTO EN EL NAVBAR: EL BUSCADOR (Apple Style) -->
-                <div class="flex-1 max-w-xl mx-2 sm:mx-6 relative">
+                <!-- Centro: La barra de búsqueda ocupa todo el centro disponible -->
+                <div class="flex-1 min-w-0 relative">
                     <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input
                         type="text"
                         id="patientSearchInput"
-                        oninput="renderDashboardHome()"
+                        oninput="handleDashboardSearch(this.value)"
                         placeholder="Buscar paciente por nombre, teléfono o diagnóstico..."
-                        class="w-full bg-slate-100/90 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white shadow-2xs transition"
+                        class="w-full bg-slate-100/90 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-2 sm:py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white shadow-2xs transition"
                     />
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
+                <!-- Derecha: Icono de menú con las 3 rayitas (Hamburguesa) que incluye Marketing Hub, Preferencias, etc. -->
+                <div class="relative shrink-0">
                     <button
-                        id="btnPwaInstall"
                         type="button"
-                        onclick="triggerPwaInstall()"
-                        class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs shrink-0"
-                        title="Instalar aplicación en tu pantalla de inicio"
+                        id="btnNavMenu"
+                        onclick="toggleNavDropdownMenu()"
+                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg sm:text-xl transition shadow-2xs"
+                        title="Menú de opciones"
                     >
-                        <i class="ph-bold ph-download-simple text-sm"></i>
-                        <span class="hidden sm:inline">Instalar App</span>
-                        <span class="sm:hidden">Instalar</span>
+                        <i class="ph-bold ph-list"></i>
                     </button>
-                    <button
-                        onclick="logoutDoctor()"
-                        title="Cerrar sesión y volver al sitio público"
-                        class="text-slate-400 hover:text-rose-600 p-2.5 rounded-xl hover:bg-slate-100 transition"
+
+                    <!-- Dropdown del Menú de 3 Rayitas -->
+                    <div
+                        id="navDropdownMenu"
+                        class="hidden absolute right-0 mt-2 w-56 sm:w-64 bg-white rounded-2xl border border-slate-200 shadow-2xl p-2 z-50 space-y-1 animate-in fade-in duration-150"
+                        onclick="event.stopPropagation()"
                     >
-                        <i class="ph-bold ph-sign-out text-base"></i>
-                    </button>
+                        <div class="px-3 py-2 border-b border-slate-100 mb-1">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">Dra. Liseth Guevara</span>
+                            <span class="text-xs font-bold text-slate-900 block truncate">CRD Ortodoncia Suite</span>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); openMarketingHubView();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-megaphone text-indigo-600 text-base"></i>
+                            <span>📣 Marketing Hub</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); openOrthoPreferencesModal();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-sliders-horizontal text-indigo-600 text-base"></i>
+                            <span>⚙️ Preferencias Clínicas</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); openCalendarHubView();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-calendar-check text-indigo-600 text-base"></i>
+                            <span>📅 Agenda Completa</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); openPatientsDirectoryModal();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-users text-indigo-600 text-base"></i>
+                            <span>👥 Directorio de Pacientes</span>
+                        </button>
+                        <button
+                            type="button"
+                            id="btnMenuPwaInstall"
+                            onclick="toggleNavDropdownMenu(false); triggerPwaInstall();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-download-simple text-indigo-600 text-base"></i>
+                            <span>📲 Instalar App (PWA)</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); openSupabaseModal();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-cloud text-emerald-600 text-base"></i>
+                            <span>☁️ Conexión Supabase</span>
+                        </button>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button
+                            type="button"
+                            onclick="toggleNavDropdownMenu(false); logoutDoctor();"
+                            class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition flex items-center gap-2.5"
+                        >
+                            <i class="ph-bold ph-sign-out text-rose-600 text-base"></i>
+                            <span>🚪 Cerrar Sesión</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- CUERPO PRINCIPAL DEL HOME: DÍA ACTUAL (HOY) + DÍA SIGUIENTE (MAÑANA) + EXPEDIENTES -->
-        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
-            <!-- Barra Superior de Bienvenida y Acciones Rápidas del Consultorio -->
-            <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="dashboardCurrentDateLabel" class="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                            Hoy en Consultorio
+        <!-- CUERPO PRINCIPAL DEL HOME: SALUDO DINÁMICO + AGENDA CLÍNICA (HOY Y MAÑANA) -->
+        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 flex-1 space-y-6">
+            <!-- Saludo Dinámico según la hora del día + Barra de Agenda Clínica -->
+            <div class="space-y-4">
+                <!-- 1. Saludo Dinámico con la fecha -->
+                <div class="flex flex-wrap justify-between items-end gap-2 border-b border-slate-200/60 pb-3">
+                    <div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="dashboardCurrentDateFormatted">Hoy en Consultorio</span>
                         </span>
+                        <h1 id="dashboardGreetingTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                            Buenos días, Dra. Liseth Guevara
+                        </h1>
                     </div>
-                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900 mt-0.5">
-                        Agenda Clínica en Sillón • Dra. Liseth Guevara Muñoz
-                    </h2>
                 </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <button
-                        type="button"
-                        onclick="openNewPatientModal()"
-                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-plus text-sm"></i>
-                        <span>Nuevo Paciente</span>
-                    </button>
-                    <button
-                        type="button"
-                        onclick="openCalendarHubView()"
-                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-calendar-check text-indigo-600"></i>
-                        <span>Agenda Completa</span>
-                    </button>
-                    <button
-                        type="button"
-                        onclick="openMarketingHubView()"
-                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-megaphone text-indigo-600"></i>
-                        <span>Marketing Hub</span>
-                    </button>
-                    <button
-                        type="button"
-                        onclick="openOrthoPreferencesModal()"
-                        title="Configurar prescripciones de brackets, secuencia de arcos y criterios biomecánicos para Gemini IA"
-                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-sliders-horizontal text-indigo-600"></i>
-                        <span>Preferencias</span>
-                    </button>
+
+                <!-- 2. Barra de Agenda Clínica + Acciones -->
+                <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900">
+                            Agenda Clínica
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Pacientes programados en sillón para hoy y mañana
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            onclick="openNewPatientModal()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-plus text-sm"></i>
+                            <span>Nuevo Paciente</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="openCalendarHubView()"
+                            class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-calendar-check text-indigo-600"></i>
+                            <span>Agenda Completa</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="openPatientsDirectoryModal()"
+                            class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
+                        >
+                            <i class="ph-bold ph-users text-indigo-600"></i>
+                            <span>Directorio Completo de Pacientes</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN CENTRAL: LO QUE SE NECESITA EN EL DÍA ACTUAL (HOY) Y PARA EL DÍA SIGUIENTE (MAÑANA) -->
+            <!-- SECCIÓN CENTRAL: SOLO 2 SECCIONES (PACIENTES DE HOY Y PACIENTES DE MAÑANA) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
                 <!-- COLUMNA 1: PACIENTES AGENDADOS PARA HOY (DÍA ACTUAL) -->
                 <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-4">
@@ -279,27 +341,6 @@
                     <div id="homeTomorrowAppointmentsList" class="space-y-3">
                         <!-- Renderizado dinámico por renderDashboardHome() -->
                     </div>
-                </div>
-            </div>
-
-            <!-- SECCIÓN INFERIOR: DIRECTORIO GENERAL DE EXPEDIENTES CLÍNICOS -->
-            <div class="space-y-4 pt-2">
-                <div class="flex flex-wrap justify-between items-center gap-3">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <span>📁 Directorio General de Pacientes</span>
-                            <span id="statTotalCount" class="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">2 Pacientes</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">Todos los expedientes registrados con escaneos 3D y estudios diagnósticos</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="bg-rose-50 text-rose-700 border border-rose-200 font-bold px-2.5 py-1 rounded-xl text-[11px]" id="statHighCount">1 Caso Alta Complejidad</span>
-                        <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-2.5 py-1 rounded-xl text-[11px]" id="statStlCount">2 con .STL 3D</span>
-                    </div>
-                </div>
-
-                <div id="patientsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Renderizado dinámico por renderPatientsList() -->
                 </div>
             </div>
         </main>
@@ -3064,6 +3105,73 @@
     </div>
 
     <!-- =====================================================================
+         MODAL: DIRECTORIO COMPLETO DE PACIENTES
+    ====================================================================== -->
+    <div id="patientsDirectoryModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 no-print">
+        <div class="bg-slate-50 rounded-3xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <!-- Modal Header -->
+            <div class="bg-white px-5 sm:px-8 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl">
+                        👥
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Directorio Completo de Pacientes</h3>
+                            <span id="statTotalCount" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                                0 Pacientes
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            Expedientes clínicos integrales, modelos 3D y planes biomecánicos
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onclick="closePatientsDirectoryModal(); openNewPatientModal();"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm"
+                    >
+                        <i class="ph-bold ph-plus text-sm"></i>
+                        <span>Nuevo Paciente</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="closePatientsDirectoryModal()"
+                        class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 w-9 h-9 rounded-xl flex items-center justify-center text-lg transition"
+                        title="Cerrar"
+                    >
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Sub-bar with Filters & Stats -->
+            <div class="bg-white/70 px-5 sm:px-8 py-2.5 border-b border-slate-200/80 flex flex-wrap justify-between items-center gap-3 shrink-0 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-500 font-medium">Casos de Alta Complejidad:</span>
+                    <span id="statHighCount" class="font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">0 Casos</span>
+                    <span class="text-slate-300">|</span>
+                    <span class="text-slate-500 font-medium">Escaneos 3D STL:</span>
+                    <span id="statStlCount" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">0 Activos</span>
+                </div>
+                <div class="text-[11px] text-slate-500">
+                    💡 Selecciona cualquier expediente para consultar la historia y visor 3D
+                </div>
+            </div>
+
+            <!-- Modal Body: Grid de Pacientes con scroll -->
+            <div class="flex-1 p-5 sm:p-8 overflow-y-auto bg-slate-100/50">
+                <div id="patientsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Renderizado dinámicamente por renderPatientsList() -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
          MODAL PARA CREAR NUEVO PACIENTE (SOLO DATOS DE FILIACIÓN / ADMISIÓN)
     ====================================================================== -->
     <div id="newPatientModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
@@ -4707,15 +4815,76 @@ create table if not exists public.patients (
         // ---------------------------------------------------------------------
         // 3. DASHBOARD DE PACIENTES (MÓDULO ADMINISTRADOR)
         // ---------------------------------------------------------------------
+        function getDoctorGreetingText() {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) {
+                return "Buenos días, Dra. Liseth Guevara";
+            } else if (hour >= 12 && hour < 19) {
+                return "Buenas tardes, Dra. Liseth Guevara";
+            } else {
+                return "Buenas noches, Dra. Liseth Guevara";
+            }
+        }
+
+        function toggleNavDropdownMenu(force) {
+            const menu = document.getElementById("navDropdownMenu");
+            if (!menu) return;
+            if (typeof force === "boolean") {
+                if (force) menu.classList.remove("hidden");
+                else menu.classList.add("hidden");
+            } else {
+                menu.classList.toggle("hidden");
+            }
+        }
+
+        function openPatientsDirectoryModal() {
+            const modal = document.getElementById("patientsDirectoryModal");
+            if (modal) {
+                modal.classList.remove("hidden");
+                renderPatientsList();
+            }
+        }
+
+        function closePatientsDirectoryModal() {
+            const modal = document.getElementById("patientsDirectoryModal");
+            if (modal) {
+                modal.classList.add("hidden");
+            }
+        }
+
+        function handleDashboardSearch(val) {
+            renderDashboardHome();
+            const modal = document.getElementById("patientsDirectoryModal");
+            if (modal && !modal.classList.contains("hidden")) {
+                renderPatientsList();
+            }
+        }
+
+        // Listener para cerrar dropdown del nav al hacer click afuera
+        document.addEventListener("click", function (event) {
+            const menu = document.getElementById("navDropdownMenu");
+            const btn = document.getElementById("btnNavMenu");
+            if (!menu || menu.classList.contains("hidden")) return;
+            if (btn && (btn === event.target || btn.contains(event.target))) return;
+            if (menu.contains(event.target)) return;
+            menu.classList.add("hidden");
+        });
+
         function renderDashboardHome() {
             const todayIso = new Date().toISOString().slice(0, 10);
             const tomorrowIso = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
-            // Formato de fechas amigable estilo Apple
-            const dateLbl = document.getElementById("dashboardCurrentDateLabel");
-            if (dateLbl) {
-                const todayFormatted = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
-                dateLbl.innerText = `Hoy en Consultorio • ${todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1)}`;
+            // 1. Saludo dinámico según la hora del día
+            const greetingEl = document.getElementById("dashboardGreetingTitle");
+            if (greetingEl) {
+                greetingEl.innerText = getDoctorGreetingText();
+            }
+
+            // 2. Formato de fecha amigable estilo Apple
+            const dateFormattedEl = document.getElementById("dashboardCurrentDateFormatted") || document.getElementById("dashboardCurrentDateLabel");
+            if (dateFormattedEl) {
+                const todayFormatted = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                dateFormattedEl.innerText = `Hoy en Consultorio • ${todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1)}`;
             }
 
             const todaySubtitle = document.getElementById("dashboardTodaySubtitle");
@@ -4729,9 +4898,24 @@ create table if not exists public.patients (
                 tomorrowSubtitle.innerText = `${tomorrowObj.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "short" })} • Preparación anticipada`;
             }
 
-            // Filtrar citas de hoy y mañana
-            const todayAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === todayIso);
-            const tomorrowAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === tomorrowIso);
+            // Filtrar citas por búsqueda activa si existe
+            const searchQuery = (document.getElementById("patientSearchInput")?.value || "").toLowerCase().trim();
+
+            let todayAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === todayIso);
+            let tomorrowAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === tomorrowIso);
+
+            if (searchQuery) {
+                todayAppts = todayAppts.filter((a) =>
+                    (a.patientName || "").toLowerCase().includes(searchQuery) ||
+                    (a.procedureTitle || "").toLowerCase().includes(searchQuery) ||
+                    (a.chairsidePrep || "").toLowerCase().includes(searchQuery)
+                );
+                tomorrowAppts = tomorrowAppts.filter((a) =>
+                    (a.patientName || "").toLowerCase().includes(searchQuery) ||
+                    (a.procedureTitle || "").toLowerCase().includes(searchQuery) ||
+                    (a.chairsidePrep || "").toLowerCase().includes(searchQuery)
+                );
+            }
 
             // Badges de contador
             const todayBadge = document.getElementById("dashboardTodayCountBadge");
@@ -5087,6 +5271,7 @@ create table if not exists public.patients (
             renderPrintFullReport(patient);
 
             if (switchView) {
+                closePatientsDirectoryModal();
                 document.getElementById("viewDashboard").classList.add("hidden");
                 document.getElementById("viewMarketingHub")?.classList.add("hidden");
                 document.getElementById("viewCalendarHub")?.classList.add("hidden");
