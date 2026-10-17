@@ -44,9 +44,21 @@ create table if not exists public.ortho_studies (
     clinical_data jsonb not null
 );
 
+-- 3. TABLA DE REVISIONES, DISCUSIÓN Y CONSENSO IA-DOCTOR
+create table if not exists public.clinical_revisions (
+    id uuid default uuid_generate_v4() primary key,
+    study_id uuid references public.ortho_studies(id) on delete cascade not null,
+    created_at timestamp with time zone default now() not null,
+    doctor_argument text not null,
+    ai_response text not null,
+    modifications_applied jsonb not null, -- Los cambios finales aceptados
+    status text default 'consensus_reached' check (status in ('ai_proposed', 'doctor_challenged', 'consensus_reached', 'manually_overridden'))
+);
+
 -- Habilitar Row Level Security (RLS) y políticas para acceso desde la app
 alter table public.patients enable row level security;
 alter table public.ortho_studies enable row level security;
+alter table public.clinical_revisions enable row level security;
 
 drop policy if exists "Permitir lectura de pacientes" on public.patients;
 create policy "Permitir lectura de pacientes" on public.patients for select using (true);
@@ -65,6 +77,15 @@ create policy "Permitir insercion de estudios" on public.ortho_studies for inser
 
 drop policy if exists "Permitir actualizacion de estudios" on public.ortho_studies;
 create policy "Permitir actualizacion de estudios" on public.ortho_studies for update using (true);
+
+drop policy if exists "Permitir lectura de revisiones" on public.clinical_revisions;
+create policy "Permitir lectura de revisiones" on public.clinical_revisions for select using (true);
+
+drop policy if exists "Permitir insercion de revisiones" on public.clinical_revisions;
+create policy "Permitir insercion de revisiones" on public.clinical_revisions for insert with check (true);
+
+drop policy if exists "Permitir actualizacion de revisiones" on public.clinical_revisions;
+create policy "Permitir actualizacion de revisiones" on public.clinical_revisions for update using (true);
 
 -- Políticas para el Bucket de Storage "ortho-clinical-files"
 insert into storage.buckets (id, name, public)

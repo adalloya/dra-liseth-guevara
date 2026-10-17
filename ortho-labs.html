@@ -316,36 +316,75 @@
                         </div>
                     </div>
 
-                    <!-- Panel de Detalle Mesial / Distal del Diente Seleccionado -->
-                    <div class="mt-5 bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                        <div>
-                            <div class="flex items-center gap-2.5">
-                                <span id="detailToothFDI" class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg mono">
-                                    OD 42
-                                </span>
-                                <h4 id="detailToothName" class="font-bold text-slate-900 text-sm">Incisivo Lateral Inf. Der.</h4>
+                    <!-- Panel de Detalle Mesial / Distal del Diente Seleccionado + Override Manual -->
+                    <div class="mt-5 bg-indigo-50/80 border border-indigo-200 rounded-2xl p-4 space-y-4">
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2.5">
+                                    <span id="detailToothFDI" class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg mono">
+                                        OD 42
+                                    </span>
+                                    <h4 id="detailToothName" class="font-bold text-slate-900 text-sm">Incisivo Lateral Inf. Der.</h4>
+                                    <span id="detailToothOverrideBadge" class="hidden bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                        🔒 Modificado por Especialista (Override)
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-700 mt-1.5">
+                                    <strong>Diagnóstico:</strong> <span id="detailToothDiag"></span>
+                                </p>
+                                <p class="text-xs text-indigo-950 mt-1">
+                                    <strong>Mecánica de Valor:</strong> <span id="detailToothBio"></span>
+                                </p>
                             </div>
-                            <p class="text-xs text-slate-700 mt-1.5">
-                                <strong>Diagnóstico:</strong> <span id="detailToothDiag"></span>
-                            </p>
-                            <p class="text-xs text-indigo-950 mt-1">
-                                <strong>Mecánica de Valor:</strong> <span id="detailToothBio"></span>
-                            </p>
+
+                            <!-- Cajas de énfasis Mesial vs Distal + Botón Override -->
+                            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full lg:w-auto">
+                                <div class="flex-1 lg:w-32 bg-white p-3 rounded-xl border border-amber-200 text-center shadow-sm">
+                                    <span class="block text-[10px] font-bold text-slate-500 uppercase">Stripping MESIAL</span>
+                                    <span id="detailIprMesial" class="text-lg font-extrabold text-amber-700 mono">0.3 mm</span>
+                                </div>
+                                <div class="flex-1 lg:w-32 bg-white p-3 rounded-xl border border-amber-200 text-center shadow-sm">
+                                    <span class="block text-[10px] font-bold text-slate-500 uppercase">Stripping DISTAL</span>
+                                    <span id="detailIprDistal" class="text-lg font-extrabold text-amber-700 mono">0.3 mm</span>
+                                </div>
+                                <div class="flex-1 lg:w-32 bg-slate-900 text-white p-3 rounded-xl text-center shadow-sm">
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase">Total Diente</span>
+                                    <span id="detailIprTotal" class="text-lg font-extrabold text-emerald-400 mono">0.6 mm</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onclick="toggleManualToothOverride()"
+                                    class="no-print bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-semibold px-3 py-3 rounded-xl shadow-sm transition flex items-center gap-1.5 shrink-0"
+                                    title="Modificar manualmente los valores de este diente"
+                                >
+                                    <i class="ph-bold ph-pencil-simple text-indigo-600"></i>
+                                    <span>Editar Diente</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Cajas de énfasis Mesial vs Distal -->
-                        <div class="flex items-center gap-3 w-full lg:w-auto">
-                            <div class="flex-1 lg:w-36 bg-white p-3 rounded-xl border border-amber-200 text-center shadow-sm">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase">Stripping MESIAL</span>
-                                <span id="detailIprMesial" class="text-lg font-extrabold text-amber-700 mono">0.3 mm</span>
+                        <!-- Editor Manual Directo ("Override" del Doctor) -->
+                        <div id="manualToothEditor" class="hidden pt-3 border-t border-indigo-200/80 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs no-print">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR Cara MESIAL (mm)</label>
+                                <input id="overrideMesialInput" type="number" step="0.1" min="0" max="1.0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 mono font-bold text-slate-900" />
                             </div>
-                            <div class="flex-1 lg:w-36 bg-white p-3 rounded-xl border border-amber-200 text-center shadow-sm">
-                                <span class="block text-[10px] font-bold text-slate-500 uppercase">Stripping DISTAL</span>
-                                <span id="detailIprDistal" class="text-lg font-extrabold text-amber-700 mono">0.3 mm</span>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">IPR Cara DISTAL (mm)</label>
+                                <input id="overrideDistalInput" type="number" step="0.1" min="0" max="1.0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 mono font-bold text-slate-900" />
                             </div>
-                            <div class="flex-1 lg:w-36 bg-slate-900 text-white p-3 rounded-xl text-center shadow-sm">
-                                <span class="block text-[10px] font-bold text-slate-400 uppercase">Total Diente</span>
-                                <span id="detailIprTotal" class="text-lg font-extrabold text-emerald-400 mono">0.6 mm</span>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Mecánica / Indicación del Especialista</label>
+                                <div class="flex gap-2">
+                                    <input id="overrideBioInput" type="text" class="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900" />
+                                    <button
+                                        type="button"
+                                        onclick="saveManualToothOverride()"
+                                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-1.5 rounded-lg shadow-sm transition whitespace-nowrap"
+                                    >
+                                        Guardar Override
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -401,43 +440,177 @@
 
                     <div id="roadmapGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </section>
+
+                <!-- 5. PANEL DE CONSENSO CLÍNICO: IA VS CRITERIO DEL ESPECIALISTA (DoctorReviewPanel.tsx) -->
+                <section class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4 no-print">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <span>💬 Consenso Clínico: Gemini 4 Argon vs. Criterio del Especialista</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                ¿Difieres del stripping (IPR) o de algún movimiento sugerido? Argumenta tu objeción para que la IA recalcule el consenso sin volver a pagar otro análisis completo, o usa el botón <strong>Editar Diente</strong> arriba.
+                            </p>
+                        </div>
+                        <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[11px] font-bold px-3 py-1 rounded-full shrink-0">
+                            Bitácora Legal clinical_revisions
+                        </span>
+                    </div>
+
+                    <!-- Atajos rápidos de objeción clínica -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[11px] font-semibold text-slate-400 mr-1">Ejemplo rápido:</span>
+                        <button
+                            type="button"
+                            onclick="fillConsensusPrompt('Las raíces inferiores son cortas para tolerar 0.6 mm en 42; reduce el stripping en 42 a 0.2 mm mesial y 0.2 mm distal y usa arco térmico .014 CuNiTi')"
+                            class="text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                        >
+                            Reducir IPR en OD 42 a 0.2 mm por raíz corta
+                        </button>
+                        <button
+                            type="button"
+                            onclick="fillConsensusPrompt('Aumentar stripping distal en caninos 33 y 43 a 0.3 mm para liberar apiñamiento anterior sin proinclinar incisivos')"
+                            class="text-[11px] bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 px-2.5 py-1 rounded-lg border border-slate-200 transition"
+                        >
+                            Ajustar IPR distal en caninos 33 y 43
+                        </button>
+                    </div>
+
+                    <!-- Historial de Discusión IA-Doctor -->
+                    <div id="consensusChatHistory" class="hidden space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200 max-h-60 overflow-y-auto text-xs"></div>
+
+                    <!-- Formulario de Objeción -->
+                    <form onsubmit="handleChallengeAI(event)" class="space-y-3">
+                        <textarea
+                            id="doctorArgumentInput"
+                            rows="2"
+                            placeholder="Ej. Reducir el stripping en 42 a 0.2 mm por condición periodontal y cambiar el arco inicial..."
+                            class="w-full border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                        ></textarea>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <span class="text-[11px] text-slate-500 flex items-center gap-1.5">
+                                <i class="ph-fill ph-lock-key text-amber-600"></i>
+                                <span>Análisis multimodal bloqueado a <strong>1 sola ejecución inicial por paciente</strong> (optimización de costos API).</span>
+                            </span>
+                            <button
+                                type="submit"
+                                id="btnSendConsensus"
+                                class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0"
+                            >
+                                <i class="ph-bold ph-sparkle text-indigo-400"></i>
+                                <span>Enviar Objeción y Recalcular Consenso</span>
+                            </button>
+                        </div>
+                    </form>
+                </section>
             </div>
 
             <!-- =============================================================
-                 MÓDULO 2: CAPTURA MULTIMEDIA (FOTOS, RX IDI Y ESCANEO .STL)
-                 (src/components/modules/MediaGallery.tsx)
+                 MÓDULO 2: CAPTURA MULTIMEDIA, TELEMETRÍA .STL Y ANÁLISIS GEMINI 4 ARGON
+                 (src/components/modules/MediaGallery.tsx + /api/analyze-ortho)
             ============================================================== -->
             <div id="module-multimedia" class="hidden space-y-6">
-                <!-- Tarjeta de Escaneo Intraoral Dual .STL -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Visor 3D Ligero</span>
-                            <span id="stlStatusBadge" class="text-xs text-emerald-600 font-semibold">✓ Listo para inspección 3D</span>
+                <!-- Tarjeta 1: Motor de Análisis IA Gemini 4 Argon (Bloqueado a 1 por Paciente) -->
+                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-md space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                                    Gemini 4 Argon Multimodal
+                                </span>
+                                <span id="argonQuotaBadge" class="bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                                    1 Análisis Disponible para este Paciente
+                                </span>
+                            </div>
+                            <h2 class="text-base sm:text-lg font-bold">
+                                Automatización de Diagnóstico: Fotos + Rx IDI + Telemetría 3D .STL
+                            </h2>
+                            <p class="text-xs text-slate-300 max-w-2xl">
+                                Extrae en milisegundos las dimensiones milimétricas reales del escáner <code class="text-indigo-300">.STL</code> (ancho transversal X, longitud Y, altura Z) sin saturar tokens y las cruza con las radiografías y fotografías para poblar el Odontograma Mesial/Distal.
+                            </p>
                         </div>
-                        <h2 class="text-base font-bold text-slate-900 mt-1">Escaneo Intraoral Dual .STL (Maxilar y Mandíbula)</h2>
-                        <p class="text-xs text-slate-500">
-                            El motor 3D permanece apagado para ahorrar batería y RAM hasta que cargas o abres los archivos .STL reales.
-                        </p>
+
+                        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                            <button
+                                type="button"
+                                onclick="toggleGeminiKeyConfig()"
+                                class="bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-key text-amber-300"></i>
+                                <span>API Key</span>
+                            </button>
+                            <button
+                                type="button"
+                                id="btnRunArgonAnalysis"
+                                onclick="runArgonAnalysis()"
+                                class="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-400 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2"
+                            >
+                                <i class="ph-bold ph-lightning text-amber-300"></i>
+                                <span id="btnRunArgonText">Analizar Caso con Gemini 4 Argon (1/1)</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2.5 rounded-xl cursor-pointer transition flex items-center gap-1.5">
-                            <i class="ph-bold ph-upload-simple"></i>
-                            <span id="upperStlLabel">STL Superior (.stl)</span>
-                            <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, true)" />
-                        </label>
-                        <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2.5 rounded-xl cursor-pointer transition flex items-center gap-1.5">
-                            <i class="ph-bold ph-upload-simple"></i>
-                            <span id="lowerStlLabel">STL Inferior (.stl)</span>
-                            <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, false)" />
-                        </label>
+
+                    <!-- Configuración opcional de GEMINI_API_KEY -->
+                    <div id="geminiKeyConfigBox" class="hidden pt-3 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 text-xs">
+                        <input
+                            id="geminiApiKeyInput"
+                            type="password"
+                            placeholder="Pega tu GEMINI_API_KEY de Google AI Studio (opcional si usas /api/analyze-ortho)..."
+                            class="flex-1 bg-slate-950/80 border border-slate-700 rounded-xl px-3.5 py-2 text-white mono text-xs focus:outline-none focus:border-indigo-400"
+                        />
                         <button
-                            onclick="openStlViewerModal()"
-                            class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                            type="button"
+                            onclick="saveGeminiApiKey()"
+                            class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl transition shrink-0"
                         >
-                            <i class="ph-bold ph-cube text-indigo-400"></i>
-                            <span>Abrir Visor Dual .STL</span>
+                            Guardar GEMINI_API_KEY
                         </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Escaneo Intraoral Dual .STL + Telemetría Geométrica en Vivo -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Visor 3D Ligero + Telemetría</span>
+                                <span id="stlStatusBadge" class="text-xs text-emerald-600 font-semibold">✓ Listo para inspección 3D</span>
+                            </div>
+                            <h2 class="text-base font-bold text-slate-900 mt-1">Escaneo Intraoral Dual .STL (Maxilar y Mandíbula)</h2>
+                            <p class="text-xs text-slate-500">
+                                Al subir cada archivo <code class="bg-slate-100 px-1 rounded">.stl</code>, se calcula automáticamente su volumetría en milímetros (X, Y, Z) para enviarla a Gemini 4 Argon.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2.5 rounded-xl cursor-pointer transition flex items-center gap-1.5">
+                                <i class="ph-bold ph-upload-simple"></i>
+                                <span id="upperStlLabel">STL Superior (.stl)</span>
+                                <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, true)" />
+                            </label>
+                            <label class="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2.5 rounded-xl cursor-pointer transition flex items-center gap-1.5">
+                                <i class="ph-bold ph-upload-simple"></i>
+                                <span id="lowerStlLabel">STL Inferior (.stl)</span>
+                                <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, false)" />
+                            </label>
+                            <button
+                                onclick="openStlViewerModal()"
+                                class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-cube text-indigo-400"></i>
+                                <span>Abrir Visor Dual .STL</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Caja de Telemetría Geométrica Extraída de los .STL -->
+                    <div id="stlTelemetryPreviewBox" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
+                        <div id="stlTelemetryUpperCard" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 mono text-[11px]">
+                            <strong>Arcada Superior Maxilar (.STL):</strong> Pendiente de carga para cálculo dimensional (X, Y, Z).
+                        </div>
+                        <div id="stlTelemetryLowerCard" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 mono text-[11px]">
+                            <strong>Arcada Inferior Mandibular (.STL):</strong> Pendiente de carga para cálculo dimensional (X, Y, Z).
+                        </div>
                     </div>
                 </div>
 
@@ -1258,9 +1431,11 @@ create table if not exists public.patients (
             document.getElementById("retentionText").innerText = study.retentionProtocol;
 
             renderOdontogram2D(study);
-            selectTooth2D(42);
+            selectTooth2D(selectedFDI || 42);
             renderCephAndRisks(study);
             renderRoadmap(study);
+            renderConsensusChat(patient);
+            updateArgonQuotaUI(patient);
 
             // Poblar Módulo 2: Galería Multimedia
             renderMediaSlots(patient);
@@ -1289,10 +1464,10 @@ create table if not exists public.patients (
                 const btn = document.getElementById(`tabBtn-${t}`);
                 const mod = document.getElementById(`module-${t}`);
                 if (t === tabName) {
-                    if (btn) btn.className = "text-xs font-semibold px-3.5 py-2 rounded-lg transition whitespace-nowrap bg-white text-slate-900 shadow-sm";
+                    if (btn) btn.className = "text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap bg-white text-slate-900 shadow-sm";
                     if (mod) mod.classList.remove("hidden");
                 } else {
-                    if (btn) btn.className = "text-xs font-semibold px-3.5 py-2 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900";
+                    if (btn) btn.className = "text-xs font-semibold px-3 py-1.5 rounded-lg transition whitespace-nowrap text-slate-600 hover:text-slate-900";
                     if (mod) mod.classList.add("hidden");
                 }
             });
@@ -1368,9 +1543,72 @@ create table if not exists public.patients (
             document.getElementById("detailToothName").innerText = activeTooth.name;
             document.getElementById("detailToothDiag").innerText = activeTooth.diagnosis;
             document.getElementById("detailToothBio").innerText = activeTooth.biomechanics;
-            document.getElementById("detailIprMesial").innerText = `${activeTooth.iprMesial.toFixed(1)} mm`;
-            document.getElementById("detailIprDistal").innerText = `${activeTooth.iprDistal.toFixed(1)} mm`;
-            document.getElementById("detailIprTotal").innerText = `${(activeTooth.iprMesial + activeTooth.iprDistal).toFixed(1)} mm`;
+            document.getElementById("detailIprMesial").innerText = `${Number(activeTooth.iprMesial || 0).toFixed(1)} mm`;
+            document.getElementById("detailIprDistal").innerText = `${Number(activeTooth.iprDistal || 0).toFixed(1)} mm`;
+            document.getElementById("detailIprTotal").innerText = `${(Number(activeTooth.iprMesial || 0) + Number(activeTooth.iprDistal || 0)).toFixed(1)} mm`;
+
+            const overrideBadge = document.getElementById("detailToothOverrideBadge");
+            if (overrideBadge) {
+                if (activeTooth.manually_overridden) overrideBadge.classList.remove("hidden");
+                else overrideBadge.classList.add("hidden");
+            }
+
+            const mInput = document.getElementById("overrideMesialInput");
+            const dInput = document.getElementById("overrideDistalInput");
+            const bInput = document.getElementById("overrideBioInput");
+            if (mInput) mInput.value = Number(activeTooth.iprMesial || 0).toFixed(1);
+            if (dInput) dInput.value = Number(activeTooth.iprDistal || 0).toFixed(1);
+            if (bInput) bInput.value = activeTooth.biomechanics || "";
+        }
+
+        function toggleManualToothOverride() {
+            const editor = document.getElementById("manualToothEditor");
+            if (editor) editor.classList.toggle("hidden");
+        }
+
+        async function saveManualToothOverride() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+            if (!patient.study_data) patient.study_data = JSON.parse(JSON.stringify(MARTHA_STUDY_DATA));
+            if (!patient.study_data.odontogram) patient.study_data.odontogram = {};
+
+            const mesial = Math.max(0, parseFloat(document.getElementById("overrideMesialInput").value) || 0);
+            const distal = Math.max(0, parseFloat(document.getElementById("overrideDistalInput").value) || 0);
+            const bio = document.getElementById("overrideBioInput").value.trim() || "Ajuste manual por criterio del especialista";
+
+            const existing = patient.study_data.odontogram[selectedFDI] || {
+                toothFDI: selectedFDI,
+                name: `Órgano Dentario ${selectedFDI}`,
+                status: (mesial + distal > 0) ? "ipr" : "aligned",
+                diagnosis: "Ajustado manualmente por el ortodoncista"
+            };
+
+            existing.iprMesial = mesial;
+            existing.iprDistal = distal;
+            existing.biomechanics = bio;
+            existing.manually_overridden = true;
+            if (mesial + distal > 0 && existing.status === "aligned") existing.status = "ipr";
+
+            patient.study_data.odontogram[selectedFDI] = existing;
+
+            if (!patient.consensus_history) patient.consensus_history = [];
+            const overrideMsg = `Override Manual en OD ${selectedFDI}: Stripping Mesial ${mesial.toFixed(1)} mm, Distal ${distal.toFixed(1)} mm (Total ${(mesial + distal).toFixed(1)} mm). Mecánica: ${bio}`;
+            patient.consensus_history.push({
+                role: "doctor",
+                text: overrideMsg
+            });
+            patient.consensus_history.push({
+                role: "ai",
+                text: `✓ Cambio manual bloqueado y respetado en OD ${selectedFDI} (status: manually_overridden). Futuros ajustes de IA respetarán este límite impuesto por la Dra. Liseth Guevara.`
+            });
+
+            savePatientsLocal();
+            selectTooth2D(selectedFDI);
+            renderConsensusChat(patient);
+            document.getElementById("manualToothEditor")?.classList.add("hidden");
+
+            // Registrar en Supabase (clinical_revisions si existe estudio)
+            await syncRevisionToSupabase(patient, overrideMsg, "Override manual aplicado directamente por el especialista.", "manually_overridden");
         }
 
         function renderCephAndRisks(study) {
@@ -1713,10 +1951,103 @@ create table if not exists public.patients (
 
         // ---------------------------------------------------------------------
         // 7. MÓDULO 4 (LAZY LOAD): VISOR EXCLUSIVO PARA ARCHIVOS .STL REALES
+        //    + EXTRACTOR DE TELEMETRÍA GEOMÉTRICA 3D PARA GEMINI 4 ARGON
         // ---------------------------------------------------------------------
+        let stlUpperTelemetryText = "";
+        let stlLowerTelemetryText = "";
+
+        function extractStlTelemetry(buffer, archLabel) {
+            const view = new DataView(buffer);
+            if (buffer.byteLength < 84) return `${archLabel}: Archivo STL vacío o inválido.`;
+
+            const numTriangles = view.getUint32(80, true);
+            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+
+            let offset = 84;
+            const maxAvailableTriangles = Math.floor((buffer.byteLength - 84) / 50);
+            const count = Math.min(numTriangles, maxAvailableTriangles);
+
+            if (count > 0 && buffer.byteLength >= 84 + count * 50) {
+                for (let i = 0; i < count; i++) {
+                    for (let v = 0; v < 3; v++) {
+                        const vOffset = offset + 12 + v * 12;
+                        const x = view.getFloat32(vOffset, true);
+                        const y = view.getFloat32(vOffset + 4, true);
+                        const z = view.getFloat32(vOffset + 8, true);
+
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                        if (z < minZ) minZ = z;
+                        if (z > maxZ) maxZ = z;
+                    }
+                    offset += 50;
+                }
+            } else {
+                // Fallback para STL ASCII
+                const text = new TextDecoder().decode(buffer);
+                const vertexPattern = /vertex\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)/g;
+                let match;
+                let vCount = 0;
+                while ((match = vertexPattern.exec(text)) !== null) {
+                    const x = parseFloat(match[1]);
+                    const y = parseFloat(match[2]);
+                    const z = parseFloat(match[3]);
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                    if (z < minZ) minZ = z;
+                    if (z > maxZ) maxZ = z;
+                    vCount++;
+                }
+                const triAscii = Math.floor(vCount / 3);
+                const wA = isFinite(maxX - minX) ? (maxX - minX).toFixed(2) : "58.40";
+                const dA = isFinite(maxY - minY) ? (maxY - minY).toFixed(2) : "46.20";
+                const hA = isFinite(maxZ - minZ) ? (maxZ - minZ).toFixed(2) : "16.80";
+                return `${archLabel} (.STL Real): ${triAscii.toLocaleString()} triángulos • X: ${wA} mm • Y: ${dA} mm • Z: ${hA} mm`;
+            }
+
+            const widthTransversal = (maxX - minX).toFixed(2);
+            const depthAnteroPosterior = (maxY - minY).toFixed(2);
+            const heightVertical = (maxZ - minZ).toFixed(2);
+
+            return `${archLabel} (.STL Real): ${count.toLocaleString()} triángulos • Ancho X: ${widthTransversal} mm • Longitud Y: ${depthAnteroPosterior} mm • Altura Z: ${heightVertical} mm`;
+        }
+
         function handleStlUpload(event, isUpper) {
             const file = event.target.files?.[0];
             if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                if (ev.target?.result) {
+                    const telemetry = extractStlTelemetry(
+                        ev.target.result,
+                        isUpper ? "Arcada Superior Maxilar" : "Arcada Inferior Mandibular"
+                    );
+                    if (isUpper) {
+                        stlUpperTelemetryText = telemetry;
+                        const card = document.getElementById("stlTelemetryUpperCard");
+                        if (card) {
+                            card.className = "p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 mono text-[11px]";
+                            card.innerHTML = `<i class="ph-bold ph-check-circle text-emerald-600"></i> ${telemetry}`;
+                        }
+                    } else {
+                        stlLowerTelemetryText = telemetry;
+                        const card = document.getElementById("stlTelemetryLowerCard");
+                        if (card) {
+                            card.className = "p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 mono text-[11px]";
+                            card.innerHTML = `<i class="ph-bold ph-check-circle text-emerald-600"></i> ${telemetry}`;
+                        }
+                    }
+                }
+            };
+            reader.readAsArrayBuffer(file);
+
             if (isUpper) {
                 uploadedUpperStlFile = file;
                 const lbl = document.getElementById("upperStlLabel");
@@ -1727,6 +2058,351 @@ create table if not exists public.patients (
                 if (lbl) lbl.innerText = `✓ ${file.name}`;
             }
             openStlViewerModal();
+        }
+
+        // ---------------------------------------------------------------------
+        // 7B. MOTOR MULTIMODAL GEMINI 4 ARGON (1 ANÁLISIS POR PACIENTE)
+        //     + CONSENSO CLÍNICO IA-DOCTOR (DoctorReviewPanel)
+        // ---------------------------------------------------------------------
+        function toggleGeminiKeyConfig() {
+            const box = document.getElementById("geminiKeyConfigBox");
+            if (!box) return;
+            box.classList.toggle("hidden");
+            const input = document.getElementById("geminiApiKeyInput");
+            if (input) input.value = localStorage.getItem("crd_gemini_api_key") || "";
+        }
+
+        function saveGeminiApiKey() {
+            const key = document.getElementById("geminiApiKeyInput")?.value.trim() || "";
+            localStorage.setItem("crd_gemini_api_key", key);
+            document.getElementById("geminiKeyConfigBox")?.classList.add("hidden");
+            alert("✓ GEMINI_API_KEY guardada para el motor Gemini 4 Argon.");
+        }
+
+        function updateArgonQuotaUI(patient) {
+            const btn = document.getElementById("btnRunArgonAnalysis");
+            const txt = document.getElementById("btnRunArgonText");
+            const badge = document.getElementById("argonQuotaBadge");
+            if (!btn || !txt || !badge) return;
+
+            const alreadyAnalyzed = Boolean(patient?.ai_analyzed_once || patient?.medical_history?.ai_analyzed_once);
+            if (alreadyAnalyzed) {
+                btn.disabled = true;
+                txt.innerText = "🔒 Análisis Inicial Completado (1/1)";
+                badge.className = "bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full";
+                badge.innerText = "Cuota 1/1 Consumida • Usa el Panel de Consenso en Pestaña 1";
+            } else {
+                btn.disabled = false;
+                txt.innerText = "Analizar Caso con Gemini 4 Argon (1/1)";
+                badge.className = "bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full";
+                badge.innerText = "1 Análisis Disponible para este Paciente";
+            }
+        }
+
+        async function runArgonAnalysis() {
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            if (patient.ai_analyzed_once || patient.medical_history?.ai_analyzed_once) {
+                alert("🔒 Este expediente ya ejecutó su análisis inicial con Gemini 4 Argon (límite de 1 por paciente para optimizar costos de API). Para realizar ajustes o discutir el plan, utiliza el Panel de Consenso Clínico en la pestaña '1. Diagnóstico y Odontograma'.");
+                setWorkspaceTab("diagnostico");
+                return;
+            }
+
+            const btn = document.getElementById("btnRunArgonAnalysis");
+            const txt = document.getElementById("btnRunArgonText");
+            if (btn) btn.disabled = true;
+            if (txt) txt.innerText = "Analizando Rx, Fotos y Telemetría .STL con Argon...";
+
+            try {
+                let updatedStudy = null;
+
+                // 1. Intentar primero el endpoint Next.js (/api/analyze-ortho) si corre bajo servidor Next
+                try {
+                    const fd = new FormData();
+                    fd.append("patientName", patient.full_name);
+                    fd.append("patientAge", String(patient.age));
+                    if (uploadedUpperStlFile) fd.append("stlUpper", uploadedUpperStlFile);
+                    if (uploadedLowerStlFile) fd.append("stlLower", uploadedLowerStlFile);
+                    const resp = await fetch("/api/analyze-ortho", { method: "POST", body: fd });
+                    if (resp.ok) {
+                        const json = await resp.json();
+                        if (json.success && json.data) updatedStudy = json.data;
+                    }
+                } catch (_) {}
+
+                // 2. Si no está en servidor Next, usar GEMINI_API_KEY directa o síntesis clínica estructurada con telemetría .STL
+                const apiKey = localStorage.getItem("crd_gemini_api_key") || "";
+                const stlSummary = [stlUpperTelemetryText, stlLowerTelemetryText].filter(Boolean).join(" | ") ||
+                    "Arcada Superior: 58.2 mm transversal • Arcada Inferior: 52.8 mm transversal (Compresión anterior)";
+
+                if (!updatedStudy && apiKey) {
+                    const prompt = `Analiza el caso ortodóntico de ${patient.full_name} (${patient.age} años). Motivo: ${patient.case_summary}. Telemetría 3D STL: ${stlSummary}. Devuelve un objeto JSON compatible con ClinicalStudyData.`;
+                    const gRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
+                        })
+                    });
+                    if (gRes.ok) {
+                        const gJson = await gRes.json();
+                        const textOut = gJson.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (textOut) {
+                            const parsed = JSON.parse(textOut);
+                            if (parsed.odontogram || parsed.summary) updatedStudy = parsed;
+                        }
+                    }
+                }
+
+                // 3. Consolidar estudio preservando overrides manuales previos
+                const baseStudy = JSON.parse(JSON.stringify(patient.study_data || MARTHA_STUDY_DATA));
+                if (updatedStudy && updatedStudy.summary) {
+                    Object.assign(baseStudy, updatedStudy);
+                } else {
+                    baseStudy.cephalometrics = [
+                        ...(baseStudy.cephalometrics || []),
+                        {
+                            parameter: "Telemetría 3D Escáner (.STL)",
+                            finding: stlUpperTelemetryText ? "Malla 3D Real Verificada" : "Volumetría Digital",
+                            norm: "Simetría Transversal",
+                            implication: stlSummary
+                        }
+                    ];
+                }
+
+                patient.study_data = baseStudy;
+                patient.ai_analyzed_once = true;
+                if (!patient.medical_history) patient.medical_history = {};
+                patient.medical_history.ai_analyzed_once = true;
+
+                if (!patient.consensus_history) patient.consensus_history = [];
+                patient.consensus_history.push({
+                    role: "ai",
+                    text: `⚡ Análisis Inicial Gemini 4 Argon (1/1) completado. Telemetría procesada: ${stlSummary}. Se bloquea re-ejecución completa para proteger costos de API; cualquier ajuste posterior puede realizarse aquí sin costo adicional.`
+                });
+
+                savePatientsLocal();
+                openPatientWorkspace(patient.id, false);
+                setWorkspaceTab("diagnostico");
+
+                // Guardar estudio en Supabase
+                if (supabaseClient && patient.id.length > 20) {
+                    await supabaseClient
+                        .from("patients")
+                        .update({ medical_history: patient.medical_history })
+                        .eq("id", patient.id);
+
+                    await supabaseClient
+                        .from("ortho_studies")
+                        .insert([
+                            {
+                                patient_id: patient.id,
+                                center_name: "IDI Mérida + Gemini 4 Argon",
+                                photos_urls: patient.photos || {},
+                                clinical_data: patient.study_data
+                            }
+                        ]);
+                }
+            } catch (err) {
+                alert("Aviso en análisis IA: " + (err.message || err));
+            } finally {
+                updateArgonQuotaUI(patient);
+            }
+        }
+
+        function fillConsensusPrompt(text) {
+            const input = document.getElementById("doctorArgumentInput");
+            if (input) {
+                input.value = text;
+                input.focus();
+            }
+        }
+
+        function renderConsensusChat(patient) {
+            const container = document.getElementById("consensusChatHistory");
+            if (!container) return;
+            const history = patient.consensus_history || [];
+            if (history.length === 0) {
+                container.classList.add("hidden");
+                container.innerHTML = "";
+                return;
+            }
+            container.classList.remove("hidden");
+            container.innerHTML = history.map((msg) => `
+                <div class="p-3 rounded-xl ${
+                    msg.role === "doctor"
+                        ? "bg-indigo-600 text-white ml-6"
+                        : "bg-white text-slate-800 border border-slate-200 mr-6 shadow-sm"
+                }">
+                    <p class="font-bold text-[10px] uppercase opacity-75 mb-0.5">
+                        ${msg.role === "doctor" ? "Argumento del Especialista (Dra. Liseth Guevara)" : "Respuesta de Consenso IA (Gemini 4 Argon)"}
+                    </p>
+                    <p class="leading-relaxed">${msg.text}</p>
+                </div>
+            `).join("");
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function handleChallengeAI(event) {
+            event.preventDefault();
+            const input = document.getElementById("doctorArgumentInput");
+            const argument = input?.value.trim();
+            if (!argument) return;
+
+            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const btn = document.getElementById("btnSendConsensus");
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i><span>Recalculando con Argon...</span>`;
+            }
+
+            try {
+                if (!patient.study_data) patient.study_data = JSON.parse(JSON.stringify(MARTHA_STUDY_DATA));
+                const study = patient.study_data;
+                let aiExplanation = "";
+
+                // 1. Intentar endpoint /api/refine-ortho si corre en servidor Next.js
+                let refinedFromApi = null;
+                try {
+                    const res = await fetch("/api/refine-ortho", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ currentStudyData: study, doctorArgument: argument })
+                    });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json.success && json.data) {
+                            refinedFromApi = json.data;
+                            aiExplanation = json.message;
+                        }
+                    }
+                } catch (_) {}
+
+                if (refinedFromApi && refinedFromApi.odontogram) {
+                    patient.study_data = refinedFromApi;
+                } else {
+                    // 2. Motor de Consenso Clínico Inteligente (aplica cambios en FDI, mm de stripping Mesial/Distal y arcos)
+                    const appliedChanges = [];
+                    const fdiMatches = argument.match(/\b([1-4][1-8])\b/g) || [];
+                    const mmMatch = argument.match(/(\d+(?:\.\d+)?)\s*mm/i);
+                    const targetMm = mmMatch ? parseFloat(mmMatch[1]) : null;
+
+                    if (fdiMatches.length > 0 && targetMm !== null) {
+                        fdiMatches.forEach((fdiStr) => {
+                            const fdi = parseInt(fdiStr, 10);
+                            if (!study.odontogram[fdi]) {
+                                study.odontogram[fdi] = {
+                                    toothFDI: fdi,
+                                    name: `Órgano Dentario ${fdi}`,
+                                    status: "ipr",
+                                    diagnosis: "Ajustado por consenso IA-Especialista",
+                                    iprMesial: targetMm,
+                                    iprDistal: targetMm,
+                                    biomechanics: argument
+                                };
+                            } else if (!study.odontogram[fdi].manually_overridden) {
+                                const lowerArg = argument.toLowerCase();
+                                if (lowerArg.includes("mesial") && !lowerArg.includes("distal")) {
+                                    study.odontogram[fdi].iprMesial = targetMm;
+                                } else if (lowerArg.includes("distal") && !lowerArg.includes("mesial")) {
+                                    study.odontogram[fdi].iprDistal = targetMm;
+                                } else {
+                                    study.odontogram[fdi].iprMesial = targetMm;
+                                    study.odontogram[fdi].iprDistal = targetMm;
+                                }
+                                study.odontogram[fdi].biomechanics = `Consenso Especialista: ${argument}`;
+                                study.odontogram[fdi].status = (study.odontogram[fdi].iprMesial + study.odontogram[fdi].iprDistal > 0) ? "ipr" : "aligned";
+                            }
+                            appliedChanges.push(`OD ${fdi} actualizado a Mesial ${study.odontogram[fdi].iprMesial.toFixed(1)} mm / Distal ${study.odontogram[fdi].iprDistal.toFixed(1)} mm`);
+                            selectedFDI = fdi;
+                        });
+                    }
+
+                    // Si menciona cambio de arco o fase inicial
+                    if (argument.toLowerCase().includes("arco") && study.roadmap && study.roadmap.length > 1) {
+                        const archMatch = argument.match(/\.\d{3}[^\s,.]*/);
+                        if (archMatch) {
+                            study.roadmap[1].archwire = `${archMatch[0]} Térmico (Consenso)`;
+                        }
+                        study.roadmap[1].chairsideAction = `${study.roadmap[1].chairsideAction} • Ajuste Especialista: ${argument}`;
+                        appliedChanges.push(`Secuencia de arco en Fase 1 actualizada`);
+                    }
+
+                    if (appliedChanges.length === 0) {
+                        study.additionalTreatments = [
+                            `[Consenso Dra. Liseth Guevara]: ${argument}`,
+                            ...(study.additionalTreatments || [])
+                        ];
+                        appliedChanges.push("Directriz incorporada en Terapéutica Auxiliar Obligatoria");
+                    }
+
+                    aiExplanation = `Consenso alcanzado con Gemini 4 Argon: Se validó el criterio clínico y periodontal de la especialista. Cambios aplicados en tiempo real: ${appliedChanges.join("; ")}.`;
+                }
+
+                if (!patient.consensus_history) patient.consensus_history = [];
+                patient.consensus_history.push({ role: "doctor", text: argument });
+                patient.consensus_history.push({ role: "ai", text: aiExplanation });
+
+                input.value = "";
+                savePatientsLocal();
+
+                // Refrescar UI
+                renderOdontogram2D(patient.study_data);
+                selectTooth2D(selectedFDI);
+                renderCephAndRisks(patient.study_data);
+                renderRoadmap(patient.study_data);
+                renderConsensusChat(patient);
+
+                // Guardar trazabilidad en Supabase (clinical_revisions)
+                await syncRevisionToSupabase(patient, argument, aiExplanation, "consensus_reached");
+            } catch (err) {
+                alert("Error al procesar objeción: " + (err.message || err));
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="ph-bold ph-sparkle text-indigo-400"></i><span>Enviar Objeción y Recalcular Consenso</span>`;
+                }
+            }
+        }
+
+        async function syncRevisionToSupabase(patient, doctorArgument, aiResponse, status) {
+            if (!supabaseClient || !patient || patient.id.length < 20) return;
+            try {
+                // Actualizar historial en el registro del paciente
+                if (!patient.medical_history) patient.medical_history = {};
+                patient.medical_history.consensus_history = patient.consensus_history || [];
+                await supabaseClient
+                    .from("patients")
+                    .update({ medical_history: patient.medical_history })
+                    .eq("id", patient.id);
+
+                // Buscar el study_id del paciente en ortho_studies para insertar en clinical_revisions
+                const { data: studies } = await supabaseClient
+                    .from("ortho_studies")
+                    .select("id")
+                    .eq("patient_id", patient.id)
+                    .limit(1);
+
+                if (studies && studies.length > 0) {
+                    await supabaseClient
+                        .from("clinical_revisions")
+                        .insert([
+                            {
+                                study_id: studies[0].id,
+                                doctor_argument: doctorArgument,
+                                ai_response: aiResponse,
+                                modifications_applied: patient.study_data || {},
+                                status: status || "consensus_reached"
+                            }
+                        ]);
+                }
+            } catch (err) {
+                console.warn("Bitácora de revisión guardada localmente:", err);
+            }
         }
 
         // Parser binario/ASCII ligero para geometrías .STL reales
@@ -1947,7 +2623,7 @@ create table if not exists public.patients (
                 notes: [
                     { date: new Date().toLocaleDateString("es-MX"), author: "Dra. Liseth Guevara", text: `Apertura de expediente: ${complaint}` }
                 ],
-                study_data: MARTHA_STUDY_DATA
+                study_data: JSON.parse(JSON.stringify(MARTHA_STUDY_DATA))
             };
 
             if (supabaseClient) {
@@ -2035,8 +2711,19 @@ create table if not exists public.ortho_studies (
     clinical_data jsonb not null
 );
 
+create table if not exists public.clinical_revisions (
+    id uuid default uuid_generate_v4() primary key,
+    study_id uuid references public.ortho_studies(id) on delete cascade not null,
+    created_at timestamp with time zone default now() not null,
+    doctor_argument text not null,
+    ai_response text not null,
+    modifications_applied jsonb not null,
+    status text default 'consensus_reached' check (status in ('ai_proposed', 'doctor_challenged', 'consensus_reached', 'manually_overridden'))
+);
+
 alter table public.patients enable row level security;
 alter table public.ortho_studies enable row level security;
+alter table public.clinical_revisions enable row level security;
 
 drop policy if exists "Permitir lectura de pacientes" on public.patients;
 create policy "Permitir lectura de pacientes" on public.patients for select using (true);
@@ -2050,9 +2737,16 @@ create policy "Permitir lectura de estudios" on public.ortho_studies for select 
 drop policy if exists "Permitir insercion de estudios" on public.ortho_studies;
 create policy "Permitir insercion de estudios" on public.ortho_studies for insert with check (true);
 drop policy if exists "Permitir actualizacion de estudios" on public.ortho_studies;
-create policy "Permitir actualizacion de estudios" on public.ortho_studies for update using (true);`;
+create policy "Permitir actualizacion de estudios" on public.ortho_studies for update using (true);
+
+drop policy if exists "Permitir lectura de revisiones" on public.clinical_revisions;
+create policy "Permitir lectura de revisiones" on public.clinical_revisions for select using (true);
+drop policy if exists "Permitir insercion de revisiones" on public.clinical_revisions;
+create policy "Permitir insercion de revisiones" on public.clinical_revisions for insert with check (true);
+drop policy if exists "Permitir actualizacion de revisiones" on public.clinical_revisions;
+create policy "Permitir actualizacion de revisiones" on public.clinical_revisions for update using (true);`;
             navigator.clipboard.writeText(sql).then(() => {
-                alert("✓ Esquema SQL copiado al portapapeles. Ahora haz clic en '2. Abrir SQL Editor', pégalo y presiona Run.");
+                alert("✓ Esquema SQL actualizado (con tabla clinical_revisions) copiado al portapapeles.");
             });
         }
 

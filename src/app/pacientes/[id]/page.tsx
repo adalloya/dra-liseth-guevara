@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import OrthoDiagnosis from "@/components/modules/OrthoDiagnosis";
+import DoctorReviewPanel from "@/components/modules/DoctorReviewPanel";
 import SignaturePad from "@/components/ui/SignaturePad";
 import StlViewerModal from "@/components/modules/StlViewerModal";
 import { ClinicalStudyData } from "@/types/ortho";
@@ -82,11 +83,45 @@ const MARTHA_STUDY_DATA: ClinicalStudyData = {
 
 export default function PatientWorkspacePage() {
   const [activeTab, setActiveTab] = useState<"diagnostico" | "historia" | "multimedia">("diagnostico");
+  const [studyData, setStudyData] = useState<ClinicalStudyData>(MARTHA_STUDY_DATA);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [patientSig, setPatientSig] = useState("");
   const [doctorSig, setDoctorSig] = useState("");
   const [upperStl, setUpperStl] = useState<File | null>(null);
   const [lowerStl, setLowerStl] = useState<File | null>(null);
   const [isStlViewerOpen, setIsStlViewerOpen] = useState(false);
+
+  const runArgonAnalysis = async () => {
+    if (hasAnalyzedOnce) return;
+    setIsAnalyzing(true);
+    try {
+      const formData = new FormData();
+      formData.append("patientName", "Martha Gabriela Zúñiga Núñez");
+      formData.append("patientAge", "40");
+
+      if (upperStl) formData.append("stlUpper", upperStl);
+      if (lowerStl) formData.append("stlLower", lowerStl);
+      uploadedImages.forEach((img) => formData.append("images", img));
+
+      const res = await fetch("/api/analyze-ortho", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+
+      setStudyData(result.data);
+      setHasAnalyzedOnce(true);
+      setActiveTab("diagnostico");
+    } catch (err: any) {
+      alert("Error en análisis IA: " + err.message);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] text-slate-900 pb-16">
@@ -143,8 +178,17 @@ export default function PatientWorkspacePage() {
       </header>
 
       {/* Contenido Dinámico por Pestaña */}
-      <main className="max-w-6xl mx-auto px-6 pt-6">
-        {activeTab === "diagnostico" && <OrthoDiagnosis data={MARTHA_STUDY_DATA} />}
+      <main className="max-w-6xl mx-auto px-6 pt-6 space-y-6">
+        {activeTab === "diagnostico" && (
+          <>
+            <OrthoDiagnosis data={studyData} />
+            <DoctorReviewPanel
+              studyId="fc94ba4e-45f4-4737-812e-7b3ba8fcf639"
+              studyData={studyData}
+              onUpdateStudy={setStudyData}
+            />
+          </>
+        )}
 
         {activeTab === "multimedia" && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
@@ -152,10 +196,10 @@ export default function PatientWorkspacePage() {
               <div>
                 <h2 className="text-base font-bold">Registros Fotográficos, Radiografías IDI y Escaneo .STL</h2>
                 <p className="text-xs text-slate-500">
-                  Sube las fotos desde cámara/archivo o carga los 2 archivos .STL (Superior e Inferior) si el caso cuenta con escaneo.
+                  Sube las fotos desde cámara/archivo o carga los 2 archivos .STL (Superior e Inferior) para extraer telemetría y analizar con Gemini 4 Argon.
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <label className="bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer">
                   + Subir STL Superior
                   <input
@@ -184,14 +228,17 @@ export default function PatientWorkspacePage() {
                     }}
                   />
                 </label>
-                {(upperStl || lowerStl) && (
-                  <button
-                    onClick={() => setIsStlViewerOpen(true)}
-                    className="bg-indigo-600 text-white text-xs font-semibold px-4 py-2 rounded-xl"
-                  >
-                    Abrir Visor 3D .STL
-                  </button>
-                )}
+                <button
+                  onClick={runArgonAnalysis}
+                  disabled={isAnalyzing || hasAnalyzedOnce}
+                  className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 text-white text-xs font-semibold px-4 py-2 rounded-xl transition"
+                >
+                  {hasAnalyzedOnce
+                    ? "✓ Análisis IA Ejecutado (1/1)"
+                    : isAnalyzing
+                    ? "Analizando con Gemini 4 Argon..."
+                    : "⚡ Analizar Caso con Gemini 4 Argon"}
+                </button>
               </div>
             </div>
 
@@ -211,7 +258,17 @@ export default function PatientWorkspacePage() {
                   <div className="my-auto text-center">
                     <label className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline">
                       Tomar foto / Subir archivo
-                      <input type="file" accept="image/*" capture="environment" className="hidden" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files?.[0]) {
+                            setUploadedImages((prev) => [...prev, e.target.files![0]]);
+                          }
+                        }}
+                      />
                     </label>
                   </div>
                   <span className="text-[10px] text-emerald-600 font-medium">✓ Registro vinculado al caso</span>
