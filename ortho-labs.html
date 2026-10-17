@@ -107,106 +107,189 @@
         <!-- Top Bar Estilo macOS / iPadOS -->
         <header class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-6 py-4 no-print">
             <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <img src="ortho-hub-logo.png" alt="CRD OrthoAI Hub" class="w-11 h-11 rounded-2xl object-contain shadow-sm shrink-0" />
+                <div class="flex items-center gap-3 shrink-0">
+                    <img src="ortho-hub-logo.png" alt="CRD OrthoAI Hub" class="w-10 h-10 rounded-2xl object-contain shadow-xs shrink-0" />
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="text-lg font-bold tracking-tight text-slate-900">CRD OrthoAI Suite</h1>
-                            <span id="supabaseStatusPill" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span id="supabaseStatusText">Supabase Conectado</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                CRD Ortodoncia
                             </span>
+                            <span class="text-xs font-bold text-slate-900 hidden sm:inline">Dra. Liseth Guevara</span>
                         </div>
-                        <p class="text-xs text-slate-500">
-                            Administrador Clínico de Pacientes • Dra. Liseth Guevara Muñoz
+                        <p class="text-[11px] text-slate-500 hidden sm:block">
+                            Especialista en Ortodoncia y Ortopedia Maxilar
                         </p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                    <div class="relative flex-1 sm:w-56">
-                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input
-                            type="text"
-                            id="patientSearchInput"
-                            oninput="renderPatientsList()"
-                            placeholder="Buscar paciente..."
-                            class="w-full bg-slate-100 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition"
-                        />
-                    </div>
-                    <button
-                        onclick="openCalendarHubView()"
-                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-calendar-check text-emerald-600"></i>
-                        <span>Agenda & Google Calendar</span>
-                    </button>
-                    <button
-                        onclick="openMarketingHubView()"
-                        class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-megaphone text-indigo-600"></i>
-                        <span>Marketing Hub</span>
-                    </button>
-                    <button
-                        onclick="openOrthoPreferencesModal()"
-                        title="Configurar prescripciones de brackets, secuencia de arcos y criterios biomecánicos para Gemini IA"
-                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-sliders-horizontal text-indigo-600"></i>
-                        <span>Preferencias Clínicas</span>
-                    </button>
-                    <button
-                        onclick="toggleOrthoAssistantDrawer(true)"
-                        class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-sparkle text-amber-300"></i>
-                        <span>Sandy IA</span>
-                    </button>
-                    <button
-                        onclick="openNewPatientModal()"
-                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm whitespace-nowrap transition flex items-center gap-1.5"
-                    >
-                        <i class="ph-bold ph-plus"></i>
-                        <span>Nuevo Paciente</span>
-                    </button>
+                <!-- ÚNICO ELEMENTO EN EL NAVBAR: EL BUSCADOR (Apple Style) -->
+                <div class="flex-1 max-w-xl mx-2 sm:mx-6 relative">
+                    <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input
+                        type="text"
+                        id="patientSearchInput"
+                        oninput="renderDashboardHome()"
+                        placeholder="Buscar paciente por nombre, teléfono o diagnóstico..."
+                        class="w-full bg-slate-100/90 border border-slate-200/90 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white shadow-2xs transition"
+                    />
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
                     <button
                         onclick="logoutDoctor()"
                         title="Cerrar sesión y volver al sitio público"
-                        class="bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 text-xs font-semibold p-2.5 rounded-xl shadow-sm transition"
+                        class="text-slate-400 hover:text-rose-600 p-2.5 rounded-xl hover:bg-slate-100 transition"
                     >
-                        <i class="ph-bold ph-sign-out"></i>
+                        <i class="ph-bold ph-sign-out text-base"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Lista de Expedientes -->
-        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
-            <!-- Resumen Rápido del Consultorio -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Expedientes</span>
-                    <p id="statTotalCount" class="text-xl font-extrabold text-slate-900 mt-0.5">2 Pacientes</p>
+        <!-- CUERPO PRINCIPAL DEL HOME: DÍA ACTUAL (HOY) + DÍA SIGUIENTE (MAÑANA) + EXPEDIENTES -->
+        <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
+            <!-- Barra Superior de Bienvenida y Acciones Rápidas del Consultorio -->
+            <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="dashboardCurrentDateLabel" class="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            Hoy en Consultorio
+                        </span>
+                    </div>
+                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900 mt-0.5">
+                        Agenda Clínica en Sillón • Dra. Liseth Guevara Muñoz
+                    </h2>
                 </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Casos Alta Complejidad</span>
-                    <p id="statHighCount" class="text-xl font-extrabold text-rose-600 mt-0.5">1 Caso</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Con Escaneo .STL</span>
-                    <p id="statStlCount" class="text-xl font-extrabold text-indigo-600 mt-0.5">2 Activos</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Base de Datos</span>
-                    <p id="statDbMode" class="text-sm font-bold text-emerald-600 mt-1.5 flex items-center gap-1.5">
-                        <i class="ph-fill ph-check-circle"></i> Sincronizado
-                    </p>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button
+                        type="button"
+                        onclick="openNewPatientModal()"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-plus text-sm"></i>
+                        <span>Nuevo Paciente</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="openCalendarHubView()"
+                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-calendar-check text-indigo-600"></i>
+                        <span>Agenda Completa</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="openMarketingHubView()"
+                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-megaphone text-indigo-600"></i>
+                        <span>Marketing Hub</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="openOrthoPreferencesModal()"
+                        title="Configurar prescripciones de brackets, secuencia de arcos y criterios biomecánicos para Gemini IA"
+                        class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-2xs transition flex items-center gap-1.5"
+                    >
+                        <i class="ph-bold ph-sliders-horizontal text-indigo-600"></i>
+                        <span>Preferencias</span>
+                    </button>
                 </div>
             </div>
 
-            <div id="patientsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Renderizado dinámico por JS -->
+            <!-- SECCIÓN CENTRAL: LO QUE SE NECESITA EN EL DÍA ACTUAL (HOY) Y PARA EL DÍA SIGUIENTE (MAÑANA) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                <!-- COLUMNA 1: PACIENTES AGENDADOS PARA HOY (DÍA ACTUAL) -->
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center text-lg font-bold">
+                                🗓️
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-extrabold text-slate-900">Pacientes Agendados para HOY</h3>
+                                    <span id="dashboardTodayCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                                        0 Citas
+                                    </span>
+                                </div>
+                                <p id="dashboardTodaySubtitle" class="text-[11px] text-slate-500">
+                                    Día actual en sillón
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="openHubAppointmentModal(null, new Date().toISOString().slice(0, 10))"
+                            class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"
+                        >
+                            <i class="ph-bold ph-plus"></i>
+                            <span>Agendar hoy</span>
+                        </button>
+                    </div>
+
+                    <!-- Lista de Tarjetas de Pacientes de Hoy -->
+                    <div id="homeTodayAppointmentsList" class="space-y-3">
+                        <!-- Renderizado dinámico por renderDashboardHome() -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA 2: PACIENTES AGENDADOS PARA MAÑANA (DÍA SIGUIENTE) -->
+                <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center text-lg font-bold">
+                                🌅
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-extrabold text-slate-900">Pacientes para MAÑANA</h3>
+                                    <span id="dashboardTomorrowCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                        0 Citas
+                                    </span>
+                                </div>
+                                <p id="dashboardTomorrowSubtitle" class="text-[11px] text-slate-500">
+                                    Preparación anticipada de charola y materiales
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="openHubAppointmentModal(null, new Date(Date.now() + 86400000).toISOString().slice(0, 10))"
+                            class="text-[11px] font-bold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-1"
+                        >
+                            <i class="ph-bold ph-plus"></i>
+                            <span>Agendar mañana</span>
+                        </button>
+                    </div>
+
+                    <!-- Lista de Tarjetas de Pacientes de Mañana -->
+                    <div id="homeTomorrowAppointmentsList" class="space-y-3">
+                        <!-- Renderizado dinámico por renderDashboardHome() -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN INFERIOR: DIRECTORIO GENERAL DE EXPEDIENTES CLÍNICOS -->
+            <div class="space-y-4 pt-2">
+                <div class="flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <span>📁 Directorio General de Pacientes</span>
+                            <span id="statTotalCount" class="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">2 Pacientes</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">Todos los expedientes registrados con escaneos 3D y estudios diagnósticos</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="bg-rose-50 text-rose-700 border border-rose-200 font-bold px-2.5 py-1 rounded-xl text-[11px]" id="statHighCount">1 Caso Alta Complejidad</span>
+                        <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-2.5 py-1 rounded-xl text-[11px]" id="statStlCount">2 con .STL 3D</span>
+                    </div>
+                </div>
+
+                <div id="patientsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Renderizado dinámico por renderPatientsList() -->
+                </div>
             </div>
         </main>
     </div>
@@ -319,15 +402,15 @@
 
                         <!-- Atajos rápidos de tipo de campaña -->
                         <div>
-                            <span class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Plantillas Rápidas de Alto Rendimiento:</span>
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Categorías / Plantillas Rápidas (Solo prellenan el prompt):</span>
                             <div class="flex flex-wrap gap-1.5">
-                                <button type="button" onclick="applyMarketingPreset('aligners')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
+                                <button type="button" id="mktPresetBtn_aligners" onclick="applyMarketingPreset('aligners')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
                                     ✨ Alineadores Invisibles
                                 </button>
-                                <button type="button" onclick="applyMarketingPreset('kids')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
+                                <button type="button" id="mktPresetBtn_kids" onclick="applyMarketingPreset('kids')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
                                     👧 Ortodoncia Infantil / Mamás
                                 </button>
-                                <button type="button" onclick="applyMarketingPreset('complex')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
+                                <button type="button" id="mktPresetBtn_complex" onclick="applyMarketingPreset('complex')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
                                     🦷 Mordida Abierta / Sin Cirugía
                                 </button>
                             </div>
@@ -393,7 +476,7 @@
                                 </label>
                                 <select
                                     id="mktVisualTheme"
-                                    onchange="updateMktAssembledPromptPreview(); renderMarketingCanvasAd()"
+                                    onchange="updateMktAssembledPromptPreview()"
                                     class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900"
                                 >
                                     <option value="indigo">Cupertino Indigo (Moderno)</option>
@@ -443,7 +526,7 @@
                                 placeholder="El formulario arma automáticamente aquí el prompt fotográfico que se envía a Gemini IA para generar la imagen..."
                             ></textarea>
                             <p class="text-[10px] text-indigo-700/80 mt-1">
-                                💡 Al hacer clic en <strong>Generar Anuncio</strong>, Gemini IA optimiza este prompt y genera una imagen fotorealista única de 1080×1080 px.
+                                💡 Cambiar de categoría o editar campos solo actualiza este prompt. La imagen <strong>únicamente se genera cuando das clic en el botón «Generar Imagen IA»</strong>.
                             </p>
                         </div>
 
@@ -508,11 +591,23 @@
                                 <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-slate-900 aspect-square">
                                     <canvas id="mktAdCanvas" width="1080" height="1080" class="w-full h-full object-contain block"></canvas>
                                     <span id="mktCanvasAiSourceBadge" class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/15 flex items-center gap-1.5">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                        1080 × 1080 px • Meta Ads Ready
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                        Esperando clic en Generar Anuncio
                                     </span>
+                                    <!-- Estado Inicial: Esperando clic en Generar Anuncio -->
+                                    <div id="mktCanvasWaitingOverlay" class="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center p-6 text-center z-10">
+                                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center mb-3 text-indigo-300 text-2xl">
+                                            <i class="ph-duotone ph-magic-wand"></i>
+                                        </div>
+                                        <p class="text-xs sm:text-sm font-bold text-white mb-1">
+                                            Listo para generar tu anuncio 1080×1080
+                                        </p>
+                                        <p class="text-[11px] text-slate-300 max-w-xs leading-relaxed">
+                                            Selecciona la categoría, ajusta tus opciones o revisa el prompt a la izquierda y haz clic en <strong>«✨ Generar Imagen IA 1080×1080 + Copy con Gemini»</strong>.
+                                        </p>
+                                    </div>
                                     <!-- Overlay de Carga de Generación de Imagen IA -->
-                                    <div id="mktCanvasLoadingOverlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-10">
+                                    <div id="mktCanvasLoadingOverlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
                                         <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center mb-3 animate-pulse">
                                             <i class="ph-fill ph-sparkle text-amber-300 text-2xl"></i>
                                         </div>
@@ -2418,12 +2513,27 @@ create table if not exists public.patients (
                         <option value="Placa Hawley Circunferencial Superior + Retenedor Fijo 3-3 Inferior">Placa Hawley Superior + Retenedor Fijo 3-3 Inferior</option>
                     </select>
                 </div>
+
+                <!-- 9. Frecuencia de Fotografías de Avance Clínico -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                        9. Frecuencia de Fotografías de Avance
+                    </label>
+                    <select
+                        id="prefPhotoProgressInterval"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    >
+                        <option value="1">Cada mes (En cada cita de control en sillón)</option>
+                        <option value="3" selected>Cada 3 meses (Trimestral — Hitos biomecánicos y torque)</option>
+                        <option value="6">Cada 6 meses (Semestral — Reevaluación cefalométrica y modelos)</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- 9. Directrices Biomecánicas Personalizadas de la Dra. Liseth -->
+            <!-- 10. Directrices Biomecánicas Personalizadas de la Dra. Liseth -->
             <div>
                 <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-                    9. Directrices Clínicas Personalizadas de la Dra. Liseth Guevara para Gemini IA
+                    10. Directrices Clínicas Personalizadas de la Dra. Liseth Guevara para Gemini IA
                 </label>
                 <textarea
                     id="prefCustomRules"
@@ -2432,7 +2542,7 @@ create table if not exists public.patients (
                     placeholder="Escribe cualquier instrucción clínica que Gemini siempre deba respetar en sus diagnósticos (ej. límites de stripping en raíces cortas, control vertical, marcas preferidas)..."
                 >En pacientes con raíces cortas o biotipo periodontal delgado, no superar 0.2 mm de stripping por cara proximal y usar fuerzas ligeras con arcos termoactivados CuNiTi. En casos hiperdivergentes o mordida abierta, priorizar control vertical con intrusión molar mediante TADs + ATP.</textarea>
                 <p class="text-[11px] text-slate-500 mt-1">
-                    🤖 Gemini 4 Argon y Sandy leerán estas preferencias antes de generar el diagnóstico, odontograma IPR y secuencia de 6 etapas.
+                    🤖 Gemini y Sandy leerán estas preferencias (incluyendo la frecuencia fotográfica) antes de generar el diagnóstico, odontograma IPR y secuencia de 6 etapas.
                 </p>
             </div>
 
@@ -2972,6 +3082,178 @@ create table if not exists public.patients (
         // ---------------------------------------------------------------------
         // 3. DASHBOARD DE PACIENTES (MÓDULO ADMINISTRADOR)
         // ---------------------------------------------------------------------
+        function renderDashboardHome() {
+            const todayIso = new Date().toISOString().slice(0, 10);
+            const tomorrowIso = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+            // Formato de fechas amigable estilo Apple
+            const dateLbl = document.getElementById("dashboardCurrentDateLabel");
+            if (dateLbl) {
+                const todayFormatted = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+                dateLbl.innerText = `Hoy en Consultorio • ${todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1)}`;
+            }
+
+            const todaySubtitle = document.getElementById("dashboardTodaySubtitle");
+            if (todaySubtitle) {
+                todaySubtitle.innerText = `${new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "short" })} • Consultas programadas`;
+            }
+
+            const tomorrowSubtitle = document.getElementById("dashboardTomorrowSubtitle");
+            if (tomorrowSubtitle) {
+                const tomorrowObj = new Date(Date.now() + 86400000);
+                tomorrowSubtitle.innerText = `${tomorrowObj.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "short" })} • Preparación anticipada`;
+            }
+
+            // Filtrar citas de hoy y mañana
+            const todayAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === todayIso);
+            const tomorrowAppts = scheduledAppointments.filter((a) => (a.startIso || "").slice(0, 10) === tomorrowIso);
+
+            // Badges de contador
+            const todayBadge = document.getElementById("dashboardTodayCountBadge");
+            if (todayBadge) todayBadge.innerText = `${todayAppts.length} ${todayAppts.length === 1 ? "Cita" : "Citas"}`;
+            const tomorrowBadge = document.getElementById("dashboardTomorrowCountBadge");
+            if (tomorrowBadge) tomorrowBadge.innerText = `${tomorrowAppts.length} ${tomorrowAppts.length === 1 ? "Cita" : "Citas"}`;
+
+            // Helper para renderizar tarjeta de cita en el Home
+            const renderHomeApptCard = (appt, isToday) => {
+                const matchedPat = patientsList.find((p) =>
+                    p.full_name.toLowerCase().includes((appt.patientName || "").toLowerCase()) ||
+                    (appt.patientName || "").toLowerCase().includes(p.full_name.toLowerCase())
+                );
+                const gcalUrl = appt.googleCalendarEventUrl || buildGoogleCalendarTemplateUrl(appt);
+                const waUrl = buildWhatsAppReminderUrl(appt);
+                const timeStr = appt.startIso
+                    ? new Date(appt.startIso).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
+                    : "10:00";
+                const dur = Number(appt.durationMinutes) || 30;
+
+                return `
+                    <div class="p-4 rounded-2xl border ${isToday ? "bg-indigo-50/40 border-indigo-200/90 hover:bg-indigo-50/70" : "bg-amber-50/30 border-amber-200/80 hover:bg-amber-50/60"} transition space-y-2.5 shadow-2xs">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="mono font-black text-xs px-2 py-0.5 rounded-lg ${isToday ? "bg-indigo-600 text-white" : "bg-amber-600 text-white"}">
+                                        ⏰ ${timeStr}
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${dur >= 45 ? "bg-rose-100 text-rose-800" : "bg-slate-100 text-slate-700"}">
+                                        ${dur} min en sillón
+                                    </span>
+                                </div>
+                                <h4 class="text-sm font-extrabold text-slate-900 mt-1.5 flex items-center gap-1.5">
+                                    <span>${appt.patientName}</span>
+                                    ${matchedPat ? `<span class="text-[11px] font-medium text-slate-500">(${matchedPat.age}a)</span>` : ""}
+                                </h4>
+                                <p class="text-xs font-semibold ${isToday ? "text-indigo-800" : "text-amber-900"} mt-0.5">
+                                    ${appt.procedureTitle}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button
+                                    type="button"
+                                    onclick="openHubAppointmentModal('${appt.id}')"
+                                    title="Editar cita"
+                                    class="p-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs"
+                                >
+                                    <i class="ph-bold ph-pencil-simple"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="deleteHubAppointment('${appt.id}')"
+                                    title="Cancelar cita"
+                                    class="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 text-xs"
+                                >
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-xl bg-white/90 border border-slate-200 text-[11px] text-slate-700">
+                            <strong class="text-slate-900">🧰 Charola y Materiales:</strong> ${appt.chairsidePrep || "Instrumental de control ortodóntico"}
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                            ${matchedPat ? `
+                                <button
+                                    type="button"
+                                    onclick="openPatientWorkspace('${matchedPat.id}')"
+                                    class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
+                                >
+                                    <i class="ph-bold ph-folder-open"></i>
+                                    <span>Abrir Expediente 3D</span>
+                                </button>
+                            ` : ""}
+                            <a
+                                href="${waUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-whatsapp-logo"></i>
+                                <span>${isToday ? "Recordar Cita" : "Confirmar Cita"}</span>
+                            </a>
+                            <a
+                                href="${gcalUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-semibold px-2.5 py-1.5 rounded-xl transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-google-logo text-indigo-600"></i>
+                                <span>Google Calendar</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            };
+
+            // Renderizar HOY
+            const todayContainer = document.getElementById("homeTodayAppointmentsList");
+            if (todayContainer) {
+                if (todayAppts.length === 0) {
+                    todayContainer.innerHTML = `
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500 space-y-2">
+                            <p class="font-bold text-slate-700">Sin pacientes agendados para hoy en sillón</p>
+                            <p class="text-[11px]">Puedes programar un control para hoy o pedirle a Sandy agendarlo.</p>
+                            <button
+                                type="button"
+                                onclick="openHubAppointmentModal(null, '${todayIso}')"
+                                class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-1.5 rounded-xl text-[11px] transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-plus"></i>
+                                <span>Agendar Cita para Hoy</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    todayContainer.innerHTML = todayAppts.map((a) => renderHomeApptCard(a, true)).join("");
+                }
+            }
+
+            // Renderizar MAÑANA
+            const tomorrowContainer = document.getElementById("homeTomorrowAppointmentsList");
+            if (tomorrowContainer) {
+                if (tomorrowAppts.length === 0) {
+                    tomorrowContainer.innerHTML = `
+                        <div class="p-5 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-500 space-y-2">
+                            <p class="font-bold text-slate-700">Sin pacientes agendados para mañana</p>
+                            <p class="text-[11px]">Ten listos los materiales y modelos con anticipación.</p>
+                            <button
+                                type="button"
+                                onclick="openHubAppointmentModal(null, '${tomorrowIso}')"
+                                class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3.5 py-1.5 rounded-xl text-[11px] transition inline-flex items-center gap-1"
+                            >
+                                <i class="ph-bold ph-plus"></i>
+                                <span>Agendar Cita para Mañana</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    tomorrowContainer.innerHTML = tomorrowAppts.map((a) => renderHomeApptCard(a, false)).join("");
+                }
+            }
+
+            renderPatientsList();
+        }
+
         function renderPatientsList() {
             const query = (document.getElementById("patientSearchInput")?.value || "").toLowerCase().trim();
             const grid = document.getElementById("patientsGrid");
@@ -3064,7 +3346,7 @@ create table if not exists public.patients (
             document.getElementById("viewMarketingHub")?.classList.add("hidden");
             document.getElementById("viewCalendarHub")?.classList.add("hidden");
             document.getElementById("viewDashboard").classList.remove("hidden");
-            renderPatientsList();
+            renderDashboardHome();
         }
 
         function openPatientWorkspace(patientId, switchView = true, initialTab = null) {
@@ -4026,6 +4308,9 @@ create table if not exists public.patients (
             const container = document.getElementById("roadmapGrid");
             if (!container) return;
 
+            const prefs = getOrthoPreferences();
+            const photoInterval = Number(prefs.photoProgressInterval) || 3;
+
             const stages = (study.roadmap || []).filter(
                 (s) => currentPhaseFilter === "all" || s.phase === currentPhaseFilter
             );
@@ -4039,35 +4324,46 @@ create table if not exists public.patients (
                 return;
             }
 
-            container.innerHTML = stages.map((stage, idx) => `
-                <div class="border border-slate-200 rounded-2xl p-4 flex flex-col justify-between bg-white">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md mono">
-                                ${stage.months}
-                            </span>
-                            <span class="text-xs font-semibold text-slate-500 mono">${stage.archwire}</span>
+            container.innerHTML = stages.map((stage, idx) => {
+                const isPhotoStage = (photoInterval === 1) || (idx === 0) || ((idx * 3) % photoInterval === 0) || /foto|fotograf/i.test(stage.chairsideAction || "");
+                const photoBadgeLabel = photoInterval === 1 ? "Fotos Mensuales" : photoInterval === 6 ? "Fotos Semestrales" : "Fotos Trimestrales";
+
+                return `
+                    <div class="border border-slate-200 rounded-2xl p-4 flex flex-col justify-between bg-white shadow-2xs">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md mono">
+                                    ${stage.months}
+                                </span>
+                                <span class="text-xs font-semibold text-slate-500 mono">${stage.archwire}</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-900 mb-1.5">${stage.title}</h4>
+                            <p class="text-xs text-slate-600 mb-2">
+                                <strong>Sillón:</strong> ${stage.chairsideAction}
+                            </p>
+                            ${isPhotoStage ? `
+                                <div class="mb-3 inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold">
+                                    <i class="ph-bold ph-camera"></i>
+                                    <span>📸 Toma de Fotografías de Avance (${photoBadgeLabel})</span>
+                                </div>
+                            ` : ""}
                         </div>
-                        <h4 class="font-bold text-sm text-slate-900 mb-1.5">${stage.title}</h4>
-                        <p class="text-xs text-slate-600 mb-3">
-                            <strong>Sillón:</strong> ${stage.chairsideAction}
-                        </p>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs text-slate-800">
-                            <strong>Movimiento:</strong> ${stage.expectedMovement}
+                        <div class="space-y-2">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs text-slate-800">
+                                <strong>Movimiento:</strong> ${stage.expectedMovement}
+                            </div>
+                            <button
+                                type="button"
+                                onclick="scheduleRoadmapStageWithAssistant(${idx})"
+                                class="no-print w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl py-1.5 px-2.5 text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-calendar-plus"></i>
+                                <span>Agendar Etapa con Sandy en Calendar</span>
+                            </button>
                         </div>
-                        <button
-                            type="button"
-                            onclick="scheduleRoadmapStageWithAssistant(${idx})"
-                            class="no-print w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl py-1.5 px-2.5 text-[11px] font-semibold transition flex items-center justify-center gap-1.5"
-                        >
-                            <i class="ph-bold ph-calendar-plus"></i>
-                            <span>Agendar Etapa con Sandy en Calendar</span>
-                        </button>
                     </div>
-                </div>
-            `).join("");
+                `;
+            }).join("");
         }
 
         // ---------------------------------------------------------------------
@@ -4549,6 +4845,7 @@ create table if not exists public.patients (
             spacePhilosophy: "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización",
             anchorageSystem: "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)",
             retentionProtocol: "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)",
+            photoProgressInterval: "3",
             customRules: "En pacientes con raíces cortas o biotipo periodontal delgado, no superar 0.2 mm de stripping por cara proximal y usar fuerzas ligeras con arcos termoactivados CuNiTi. En casos hiperdivergentes o mordida abierta, priorizar control vertical con intrusión molar mediante TADs + ATP."
         };
 
@@ -4566,7 +4863,8 @@ create table if not exists public.patients (
             const prefs = getOrthoPreferences();
             const badge = document.getElementById("activeOrthoPrefsSummaryBadge");
             if (badge) {
-                badge.innerText = `${prefs.bracketPrescription} (${prefs.slotSize.split(" ")[1] || '.022"'}) • Fase 1: ${prefs.archwirePhase1} • Fase 2: ${prefs.archwirePhase2} • ${prefs.anchorageSystem.split("+")[0].trim()}`;
+                const photoLabel = prefs.photoProgressInterval === "1" ? "Fotos cada mes" : prefs.photoProgressInterval === "6" ? "Fotos cada 6 meses" : "Fotos cada 3 meses";
+                badge.innerText = `${prefs.bracketPrescription} (${prefs.slotSize.split(" ")[1] || '.022"'}) • Fase 1: ${prefs.archwirePhase1} • ${photoLabel}`;
             }
         }
 
@@ -4574,7 +4872,7 @@ create table if not exists public.patients (
             const prefs = getOrthoPreferences();
             const setVal = (id, val) => {
                 const el = document.getElementById(id);
-                if (el && val) el.value = val;
+                if (el && val !== undefined && val !== null) el.value = val;
             };
             setVal("prefBracketPrescription", prefs.bracketPrescription);
             setVal("prefSlotSize", prefs.slotSize);
@@ -4584,6 +4882,7 @@ create table if not exists public.patients (
             setVal("prefSpacePhilosophy", prefs.spacePhilosophy);
             setVal("prefAnchorageSystem", prefs.anchorageSystem);
             setVal("prefRetentionProtocol", prefs.retentionProtocol);
+            setVal("prefPhotoProgressInterval", prefs.photoProgressInterval || "3");
             setVal("prefCustomRules", prefs.customRules);
 
             document.getElementById("orthoPreferencesModal")?.classList.remove("hidden");
@@ -4607,6 +4906,7 @@ create table if not exists public.patients (
                 setVal("prefSpacePhilosophy", "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización");
                 setVal("prefAnchorageSystem", "Topes Oclusales (Bite Turbos) + Elásticos Tempranos de Fuerza Ligera (2 oz - 3.5 oz)");
                 setVal("prefRetentionProtocol", "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)");
+                setVal("prefPhotoProgressInterval", "3");
                 setVal("prefCustomRules", "Filosofía de baja fricción y autoligado pasivo: usar elásticos ligeros tempranos, desarrollar arcadas transversalmente y limitar stripping a lo estrictamente necesario.");
             } else if (presetKey === "mbt") {
                 setVal("prefBracketPrescription", "Prescripción MBT (McLaughlin-Bennett-Trevisi)");
@@ -4617,6 +4917,7 @@ create table if not exists public.patients (
                 setVal("prefSpacePhilosophy", "Balanceado Cefalométrico: Decidir IPR vs. Extracción de Premolares según IMPA (>96°) y Perfil Labial");
                 setVal("prefAnchorageSystem", "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)");
                 setVal("prefRetentionProtocol", "Doble Retención: Retenedor Fijo Lingual 3-3 Trenzado + Guardas Termoformadas Essix (Sup/Inf)");
+                setVal("prefPhotoProgressInterval", "3");
                 setVal("prefCustomRules", "Mecánica MBT .022\": usar ligadura en ocho (lacebacks) en caninos durante alineación, expresar torque completo en .019x.025\" SS antes del cierre de espacios.");
             } else if (presetKey === "roth") {
                 setVal("prefBracketPrescription", "Prescripción Roth Gnatológica");
@@ -4627,6 +4928,7 @@ create table if not exists public.patients (
                 setVal("prefSpacePhilosophy", "Protector Periodontal Estricto: Limitar IPR máximo a 0.2 mm en incisivos inferiores y apoyarse en TADs");
                 setVal("prefAnchorageSystem", "Anclaje Convencional (Barra Transpalatina ATP, Botón de Nance, Arco Lingual)");
                 setVal("prefRetentionProtocol", "Placa Hawley Circunferencial Superior + Retenedor Fijo 3-3 Inferior");
+                setVal("prefPhotoProgressInterval", "6");
                 setVal("prefCustomRules", "Priorizar coincidencia de Relación Céntrica y Oclusión Céntrica, guía canina funcional y control vertical gnatológico.");
             } else if (presetKey === "aligners") {
                 setVal("prefBracketPrescription", "Alineadores Invisibles 3D (Con Attachments)");
@@ -4637,6 +4939,7 @@ create table if not exists public.patients (
                 setVal("prefSpacePhilosophy", "Conservador No-Extraccionista: Priorizar Expansión Dentoalveolar + Stripping (IPR ≤ 0.3 mm por cara) y Distalización");
                 setVal("prefAnchorageSystem", "Microtornillos Esqueléticos (TADs IZC / Buccal Shelf) + Barra Transpalatina (ATP)");
                 setVal("prefRetentionProtocol", "Retenedores Termoformados Transparentes Essix Calibre .040 (Superior e Inferior)");
+                setVal("prefPhotoProgressInterval", "1");
                 setVal("prefCustomRules", "Planificar staging de movimientos a 0.25 mm por alineador, colocar attachments biselados optimizados y programar IPR progresivo en etapas pares.");
             }
 
@@ -4680,6 +4983,7 @@ create table if not exists public.patients (
                 spacePhilosophy: document.getElementById("prefSpacePhilosophy")?.value || DEFAULT_ORTHO_PREFERENCES.spacePhilosophy,
                 anchorageSystem: document.getElementById("prefAnchorageSystem")?.value || DEFAULT_ORTHO_PREFERENCES.anchorageSystem,
                 retentionProtocol: document.getElementById("prefRetentionProtocol")?.value || DEFAULT_ORTHO_PREFERENCES.retentionProtocol,
+                photoProgressInterval: document.getElementById("prefPhotoProgressInterval")?.value || DEFAULT_ORTHO_PREFERENCES.photoProgressInterval || "3",
                 customRules: document.getElementById("prefCustomRules")?.value?.trim() || DEFAULT_ORTHO_PREFERENCES.customRules
             };
 
@@ -4793,6 +5097,7 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS CONFIGURADAS POR LA DRA. LISETH GUEVARA MUÑ
 - Criterio de Ganancia de Espacio (IPR vs Extracciones): ${doctorPrefs.spacePhilosophy}
 - Sistema de Anclaje y Auxiliares Preferidos: ${doctorPrefs.anchorageSystem}
 - Protocolo de Retención Final: ${doctorPrefs.retentionProtocol}
+- Frecuencia de Fotografías de Avance: Cada ${doctorPrefs.photoProgressInterval || 3} meses (incluir en los meses del roadmap correspondientes las tomas fotográficas de control)
 - Reglas Biomecánicas de la Doctora: ${doctorPrefs.customRules}
 
 Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "durationMonths": number, "complexity": "Baja" | "Moderada" | "Alta", "anchorage": string, "summary": { "skeletal": string, "vertical": string, "dentalFormula": string, "rootAlert": string }, "cephalometrics": [{ "parameter": string, "finding": string, "norm": string, "implication": string }], "additionalTreatments": [string], "risks": [{ "title": string, "level": string, "mitigation": string }], "odontogram": { "32": { "toothFDI": 32, "name": string, "status": "ipr"|"critical"|"missing"|"aligned", "diagnosis": string, "iprMesial": number, "iprDistal": number, "biomechanics": string } }, "roadmap": [{ "phase": "fase1"|"fase2"|"fase3", "months": string, "archwire": string, "title": string, "chairsideAction": string, "expectedMovement": string }], "retentionProtocol": string }.`;
@@ -5673,36 +5978,46 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
 
         let scheduledAppointments = [];
         try {
+            const today = new Date();
+            today.setHours(10, 30, 0, 0);
+            const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            tomorrow.setHours(11, 0, 0, 0);
+            const dayAfter = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+            dayAfter.setHours(16, 0, 0, 0);
+
             const savedAppts = localStorage.getItem("crd_ortho_appointments_v1");
             if (savedAppts) {
                 scheduledAppointments = JSON.parse(savedAppts);
-            } else {
-                const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-                tomorrow.setHours(11, 0, 0, 0);
-                const dayAfter = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
-                dayAfter.setHours(16, 0, 0, 0);
-                scheduledAppointments = [
-                    {
-                        id: "appt-demo-1",
-                        patientName: "Martha Gabriela Zúñiga Núñez",
-                        patientPhone: "999-128-4501",
-                        procedureTitle: "Mes 7: Intrusión Molar Activa con TADs IZC",
-                        startIso: tomorrow.toISOString(),
-                        durationMinutes: 45,
-                        chairsidePrep: "2 Microtornillos IZC + Cadena elástica 150 g + Arco .019x.025 SS",
-                        patientReminderNote: "Hola Martha, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara. Recuerda acudir con cepillado previo."
-                    },
-                    {
-                        id: "appt-demo-2",
-                        patientName: "Carlos Eduardo Méndez",
-                        patientPhone: "999-342-8810",
-                        procedureTitle: "Mes 4: Secuencia .016x.022 CuNiTi + Stripping Mesial",
-                        startIso: dayAfter.toISOString(),
-                        durationMinutes: 30,
-                        chairsidePrep: "Tiras diamantadas IPR + Calibrador + Arco .016x.022 CuNiTi",
-                        patientReminderNote: "Hola Carlos, te esperamos en tu control de ortodoncia con la Dra. Liseth Guevara."
-                    }
-                ];
+            }
+
+            // Si no hay citas registradas para hoy, prellenar un control de sillón activo de hoy
+            const todayIsoStr = today.toISOString().slice(0, 10);
+            if (!scheduledAppointments.some((a) => (a.startIso || "").slice(0, 10) === todayIsoStr)) {
+                scheduledAppointments.unshift({
+                    id: "appt-today-fatima",
+                    patientName: "Fátima Escamilla",
+                    patientPhone: "999-112-8900",
+                    procedureTitle: "Control de Alineadores: Entrega Etapa 3 + Revisión de Ataches",
+                    startIso: today.toISOString(),
+                    durationMinutes: 30,
+                    chairsidePrep: "Alineadores Etapa 3-5 + Chequeo de inserción y ajuste de ataches",
+                    patientReminderNote: "Hola Fátima, te esperamos hoy en tu cita de control con la Dra. Liseth Guevara."
+                });
+            }
+
+            // Si no hay citas registradas para mañana, prellenar cita de mañana
+            const tomorrowIsoStr = tomorrow.toISOString().slice(0, 10);
+            if (!scheduledAppointments.some((a) => (a.startIso || "").slice(0, 10) === tomorrowIsoStr)) {
+                scheduledAppointments.push({
+                    id: "appt-tomorrow-martha",
+                    patientName: "Martha Gabriela Zúñiga Núñez",
+                    patientPhone: "999-128-4501",
+                    procedureTitle: "Mes 7: Intrusión Molar Activa con TADs IZC + Cadena",
+                    startIso: tomorrow.toISOString(),
+                    durationMinutes: 45,
+                    chairsidePrep: "2 Microtornillos IZC + Cadena elástica 150 g + Arco .019x.025 SS",
+                    patientReminderNote: "Hola Martha, te recordamos tu cita de control ortodóntico con la Dra. Liseth Guevara."
+                });
             }
         } catch (e) {
             scheduledAppointments = [];
@@ -5712,6 +6027,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             try {
                 localStorage.setItem("crd_ortho_appointments_v1", JSON.stringify(scheduledAppointments));
             } catch (e) {}
+            renderDashboardHome();
         }
 
         function isGoogleCalendarConnected() {
@@ -6931,7 +7247,8 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             logoImageObj: null,
             customPhotoDataUrl: "",
             userEditedPrompt: false,
-            lastImagePromptEn: ""
+            lastImagePromptEn: "",
+            hasGeneratedAd: false
         };
 
         function buildMktPromptFromForm(feedbackText = "") {
@@ -6979,9 +7296,16 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                 copyEl.value = mktState.copy;
             }
             updateMktAssembledPromptPreview();
-            if (!mktState.bgImageObj) {
-                loadMktSceneImage(document.getElementById("mktSceneSelect")?.value || "smile_woman");
+
+            const waitingOverlay = document.getElementById("mktCanvasWaitingOverlay");
+            if (!mktState.hasGeneratedAd && !mktState.bgImageObj) {
+                if (waitingOverlay) waitingOverlay.classList.remove("hidden");
+                const badgeEl = document.getElementById("mktCanvasAiSourceBadge");
+                if (badgeEl) {
+                    badgeEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Esperando clic en Generar Anuncio`;
+                }
             } else {
+                if (waitingOverlay) waitingOverlay.classList.add("hidden");
                 renderMarketingCanvasAd();
             }
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -7007,10 +7331,8 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
             mktState.customPhotoDataUrl = "";
             mktState.userEditedPrompt = false;
             updateMktAssembledPromptPreview();
-            const sceneKey = document.getElementById("mktSceneSelect")?.value || "ai_dynamic";
-            if (sceneKey !== "ai_dynamic") {
-                loadMktSceneImage(sceneKey);
-            }
+            // Nota: No se carga la imagen automáticamente al cambiar de escena o categoría;
+            // se espera a que la doctora haga clic en "Generar Imagen IA + Copy".
         }
 
         function handleMktAssetUpload(event, type) {
@@ -7027,6 +7349,8 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                     } else {
                         mktState.customPhotoDataUrl = dataUrl;
                         mktState.bgImageObj = img;
+                        mktState.hasGeneratedAd = true;
+                        document.getElementById("mktCanvasWaitingOverlay")?.classList.add("hidden");
                         const badgeEl = document.getElementById("mktCanvasAiSourceBadge");
                         if (badgeEl) {
                             badgeEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Foto Propia de Clínica • 1080 × 1080 px`;
@@ -7073,7 +7397,7 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                 if (sceneEl) sceneEl.value = "ai_dynamic";
             }
             updateMktAssembledPromptPreview();
-            handleGenerateMarketingAd();
+            // Esperar explícitamente a que se presione el botón de generar
         }
 
         async function analyzePatientsForMarketing() {
@@ -7112,11 +7436,9 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                     head.innerText = `Análisis de ${total} Expedientes Reales (${adultsCount} adultos y ${kidsCount} pacientes pediátricos/jóvenes • ${highCompCount} de alta complejidad)`;
                     det.innerText = `Patrón dominante en tu consulta: Pacientes de ${minAge} a ${maxAge} años que requieren corrección estética con stripping (IPR) controlado y biomecánica con escaneo 3D. Hemos armado el prompt visual y prellenado la campaña para atraer exactamente este perfil en Mérida.`;
                 }
-
-                await handleGenerateMarketingAd();
             } finally {
                 if (btn) btn.disabled = false;
-                if (txt) txt.innerText = "✓ Target Optimizado con tus Pacientes";
+                if (txt) txt.innerText = "✓ Target Optimizado con tus Pacientes (Listo para Generar)";
             }
         }
 
@@ -7402,6 +7724,12 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
                 }
             }
 
+            mktState.hasGeneratedAd = true;
+            document.getElementById("mktCanvasWaitingOverlay")?.classList.add("hidden");
+
+            const doctorPrefs = getOrthoPreferences();
+            const clinicalContext = doctorPrefs ? `Enfoque clínico: Prescripción ${doctorPrefs.bracketPrescription}, Filosofía ${doctorPrefs.spacePhilosophy}, Fotos cada ${doctorPrefs.photoProgressInterval || 3} meses.` : "";
+
             try {
                 const prompt = `Eres un Director Creativo experto en Marketing Médico, Fotografía Dental Editorial y Meta Ads para Ortodoncia (estilo Apple).
 Diseña un anuncio de altísima conversión y el PROMPT FOTOGRÁFICO EXACTO para generar la imagen por IA para la Dra. Liseth Guevara Muñoz (Especialista en Ortodoncia y Ortopedia Maxilar en Mérida, Yucatán).
@@ -7411,6 +7739,7 @@ Datos del formulario de campaña:
 - Público Meta (quién debe aparecer o identificarse en la imagen): ${audience}
 - Rango de Edad del sujeto en la foto: ${ages}
 - Gancho / Beneficio: ${notes}
+- Contexto Clínico de la Clínica: ${clinicalContext}
 - Prompt base armado por el formulario: ${manualOrAssembledPrompt}
 ${feedbackText ? `- RETROALIMENTACIÓN OBLIGATORIA DE LA DOCTORA PARA MODIFICAR LA IMAGEN Y EL COPY: "${feedbackText}"` : ""}
 

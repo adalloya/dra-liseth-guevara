@@ -173,6 +173,7 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
 - Criterio de Espacio (IPR vs Extracciones): ${parsedPrefs.spacePhilosophy}
 - Anclaje y Auxiliares Preferidos: ${parsedPrefs.anchorageSystem}
 - Protocolo de Retención: ${parsedPrefs.retentionProtocol}
+- Frecuencia de Fotografías de Avance: Cada ${parsedPrefs.photoProgressInterval || 3} meses
 - Reglas Clínicas Personalizadas: ${parsedPrefs.customRules}`
       : "";
 
