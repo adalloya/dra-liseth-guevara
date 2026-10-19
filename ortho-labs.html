@@ -3138,6 +3138,17 @@
                     <span class="hidden md:inline">Guía In-House</span>
                 </button>
 
+                <!-- Cargar Escaneo Demo -->
+                <button
+                    onclick="loadClincheckDemoScan()"
+                    id="stlBtnDemoScan"
+                    class="bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 font-bold shadow-sm"
+                    title="Cargar Escaneo Intraoral 3D HD de Muestra"
+                >
+                    <i class="ph-bold ph-sparkle text-indigo-400"></i>
+                    <span class="hidden lg:inline">Escaneo Clínico Demo</span>
+                </button>
+
                 <!-- Subir STL o Cargar Demo -->
                 <label class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer transition flex items-center gap-1.5 text-zinc-300">
                     <i class="ph-bold ph-upload-simple"></i>
@@ -3489,9 +3500,11 @@
 
                     <!-- Selector Rápido de Shaders / Visualización -->
                     <div class="bg-zinc-950/80 backdrop-blur-md p-1 rounded-xl border border-zinc-800 text-[10.5px] font-bold text-zinc-400 shadow pointer-events-auto flex items-center gap-1">
-                        <button onclick="setClincheckShadingMode('natural')" id="ccShadingBtn-natural" class="px-2 py-0.5 rounded bg-zinc-800 text-white transition">Esmalte</button>
+                        <button onclick="setClincheckShadingMode('natural')" id="ccShadingBtn-natural" class="px-2 py-0.5 rounded bg-zinc-800 text-white transition">Esmalte HD</button>
                         <button onclick="setClincheckShadingMode('segmentation')" id="ccShadingBtn-segmentation" class="px-2 py-0.5 rounded hover:text-white transition">Segmentado FDI</button>
                         <button onclick="setClincheckShadingMode('aligner')" id="ccShadingBtn-aligner" class="px-2 py-0.5 rounded hover:text-white transition">Funda Plástico</button>
+                        <button onclick="setClincheckShadingMode('raw_scan')" id="ccShadingBtn-raw_scan" class="px-2 py-0.5 rounded hover:text-white transition">Malla Escáner</button>
+                        <button onclick="setClincheckShadingMode('ghost')" id="ccShadingBtn-ghost" class="px-2 py-0.5 rounded hover:text-white transition">Superposición Inicial</button>
                     </div>
                 </div>
 
@@ -9709,40 +9722,86 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             return geo;
         }
 
-        // Generador de Geometría Dental Anatómica por Tipo de Diente
-        function createAnatomicToothGeometry(toothType) {
-            let width = 7.5, height = 9.5, depth = 7.5;
+        // Generador de Geometría Dental Anatómica de Alta Definición
+        function createHighDefToothGeometry(toothType) {
+            let rx = 3.9, ry = 3.6, height = 9.8;
             if (toothType === "central") {
-                width = 8.5; height = 10.0; depth = 7.0;
+                rx = 4.3; ry = 3.2; height = 10.4;
             } else if (toothType === "lateral") {
-                width = 6.8; height = 8.8; depth = 6.2;
+                rx = 3.5; ry = 2.9; height = 9.2;
             } else if (toothType === "canine") {
-                width = 7.8; height = 10.5; depth = 8.0;
+                rx = 3.9; ry = 3.8; height = 11.2;
             } else if (toothType === "premolar") {
-                width = 7.2; height = 8.0; depth = 8.8;
+                rx = 3.7; ry = 4.4; height = 8.6;
             } else if (toothType === "molar") {
-                width = 10.5; height = 7.5; depth = 10.8;
+                rx = 5.4; ry = 5.3; height = 7.9;
             }
 
-            const geo = new THREE.BoxGeometry(width, depth, height, 4, 4, 4);
+            const radialSegs = 32;
+            const heightSegs = 20;
+            const geo = new THREE.CylinderGeometry(rx * 0.95, rx * 0.70, height, radialSegs, heightSegs, false);
             const pos = geo.attributes.position;
-            // Redondear vértices para simular curvatura anatómica dental
+            const halfH = height * 0.5;
+
             for (let i = 0; i < pos.count; i++) {
                 let x = pos.getX(i);
                 let y = pos.getY(i);
                 let z = pos.getZ(i);
 
-                // Convexidad vestibular y conicidad oclusal
-                if (toothType === "canine" && z > height * 0.2) {
-                    const factor = 1.0 - (z - height * 0.2) / (height * 0.4);
-                    x *= Math.max(0.3, factor);
-                    y *= Math.max(0.4, factor);
-                } else if ((toothType === "central" || toothType === "lateral") && z > height * 0.25) {
-                    // Adelgazar borde incisal
-                    y *= 0.45;
+                // u = 0 en cervical (unión con encía), u = 1 en borde incisal/oclusal
+                const u = (y + halfH) / height;
+
+                x *= (rx / 4.0);
+                let depthY = z * (ry / 4.0);
+
+                // Ecuador anatómico del diente a u = 0.45
+                const contour = Math.sin(u * Math.PI * 0.95) * 0.22;
+                x *= (1.0 + contour);
+                depthY *= (1.0 + contour);
+
+                if (toothType === "central" || toothType === "lateral") {
+                    if (u > 0.55) {
+                        const incFactor = (u - 0.55) / 0.45;
+                        depthY *= (1.0 - incFactor * 0.78);
+                        x *= (1.0 + incFactor * 0.18);
+                    }
+                    if (depthY < 0 && u > 0.35 && u < 0.85) {
+                        depthY += Math.sin((u - 0.35) / 0.5 * Math.PI) * 0.38;
+                    }
+                    if (depthY < 0 && u < 0.35) {
+                        depthY -= Math.sin(u / 0.35 * Math.PI) * 0.30;
+                    }
+                } else if (toothType === "canine") {
+                    if (u > 0.45) {
+                        const cusp = (u - 0.45) / 0.55;
+                        x *= (1.0 - cusp * 0.72);
+                        depthY *= (1.0 - cusp * 0.65);
+                    }
+                    if (depthY > 0 && u > 0.35) {
+                        depthY += Math.sin((u - 0.35) / 0.65 * Math.PI) * 0.45;
+                    }
+                } else if (toothType === "premolar") {
+                    if (u > 0.72) {
+                        const occ = (u - 0.72) / 0.28;
+                        if (Math.abs(depthY) < 1.0) {
+                            y -= occ * 0.6;
+                        }
+                    }
+                } else if (toothType === "molar") {
+                    if (u > 0.68) {
+                        const occ = (u - 0.68) / 0.32;
+                        const rDist = Math.sqrt(x * x + depthY * depthY);
+                        if (rDist < 2.4) {
+                            y -= occ * 0.85;
+                        } else {
+                            y += Math.sin(Math.atan2(depthY, x) * 4) * 0.3 * occ;
+                        }
+                    }
                 }
-                pos.setXYZ(i, x, y, z);
+
+                pos.setXYZ(i, x, depthY, -y);
             }
+
             geo.computeVertexNormals();
             return geo;
         }
@@ -9758,19 +9817,22 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             clincheckScene.add(clincheckUpperArchGroup);
             clincheckScene.add(clincheckLowerArchGroup);
 
-            // Materiales PBR
+            // Materiales PBR Esmalte VITA A1/A2 y Encía Saludable
             const naturalToothMat = new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color("#fbf9f5"),
-                roughness: 0.22,
-                metalness: 0.04,
-                clearcoat: 0.9,
-                clearcoatRoughness: 0.1
+                color: new THREE.Color("#fbf9f4"),
+                roughness: 0.14,
+                metalness: 0.02,
+                clearcoat: 0.92,
+                clearcoatRoughness: 0.06,
+                reflectivity: 0.65
             });
 
-            const gingivaMat = new THREE.MeshStandardMaterial({
-                color: new THREE.Color("#c86878"),
-                roughness: 0.5,
-                metalness: 0.05
+            const gingivaMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#c85268"),
+                roughness: 0.58,
+                metalness: 0.02,
+                clearcoat: 0.18,
+                clearcoatRoughness: 0.3
             });
 
             // Parámetros de Catenaria / Arco Parabólico (Superior e Inferior)
@@ -9800,33 +9862,29 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                 const gingivaPoints = [];
 
                 conf.fdiList.forEach((fdi, idx) => {
-                    // Ángulo a lo largo de la herradura dental (-PI/2 a +PI/2)
-                    const angleNorm = (idx / (total - 1)) * 2 - 1; // -1 a 1
+                    const angleNorm = (idx / (total - 1)) * 2 - 1;
                     const angle = angleNorm * (Math.PI * 0.42);
 
-                    // Posición objetivo ideal (Setup Final)
                     const targetX = Math.sin(angle) * conf.scaleX;
                     const targetY = -Math.cos(angle) * conf.scaleY + conf.scaleY * 0.5;
                     const targetZ = conf.zBase;
 
-                    // Rotación tangencial al arco
                     const targetRotZ = -angle;
                     const targetRotX = conf.signZ * 0.05;
 
-                    // Posición inicial con maloclusión típica (Etapa 0)
                     let malocclusionDx = 0, malocclusionDy = 0, malocclusionDz = 0, malocclusionRotZ = 0;
                     if (fdi === 11 || fdi === 21) {
-                        malocclusionDy = conf.signZ * 1.2; // Apiñamiento / leve protrusión
+                        malocclusionDy = conf.signZ * 1.2;
                         malocclusionRotZ = 0.12;
                     } else if (fdi === 12 || fdi === 22) {
-                        malocclusionDy = -conf.signZ * 2.2; // Palatoversión
+                        malocclusionDy = -conf.signZ * 2.2;
                         malocclusionRotZ = -0.18;
                     } else if (fdi === 13 || fdi === 23) {
                         malocclusionDx = 0.8;
-                        malocclusionDy = conf.signZ * 1.5; // Canino ectópico alto
+                        malocclusionDy = conf.signZ * 1.5;
                         malocclusionDz = conf.signZ * 1.2;
                     } else if (fdi === 41 || fdi === 31 || fdi === 42 || fdi === 32) {
-                        malocclusionDy = -conf.signZ * 1.4; // Apiñamiento inferior
+                        malocclusionDy = -conf.signZ * 1.4;
                         malocclusionRotZ = 0.15;
                     }
 
@@ -9835,7 +9893,6 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                     const targetPos = new THREE.Vector3(targetX, targetY, targetZ);
                     const targetRot = new THREE.Euler(targetRotX, 0, targetRotZ);
 
-                    // Tipo de diente anatómico
                     let toothType = "central";
                     const lastDigit = fdi % 10;
                     if (lastDigit === 1) toothType = "central";
@@ -9844,7 +9901,7 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                     else if (lastDigit === 4 || lastDigit === 5) toothType = "premolar";
                     else toothType = "molar";
 
-                    const geo = createAnatomicToothGeometry(toothType);
+                    const geo = createHighDefToothGeometry(toothType);
                     const mat = naturalToothMat.clone();
                     const mesh = new THREE.Mesh(geo, mat);
                     mesh.castShadow = true;
@@ -9855,8 +9912,12 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                     group.name = `tooth_group_${fdi}`;
                     group.position.copy(initialPos);
                     group.rotation.copy(initialRot);
-                    group.add(mesh);
 
+                    if (conf.arch === "lower") {
+                        mesh.rotation.x = Math.PI;
+                    }
+
+                    group.add(mesh);
                     conf.group.add(group);
 
                     clincheckTeeth[fdi] = {
@@ -9874,13 +9935,13 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                         offsetRot: new THREE.Euler(0, 0, 0)
                     };
 
-                    gingivaPoints.push(new THREE.Vector3(targetX, targetY, targetZ - conf.signZ * 5.0));
+                    const neckZ = targetZ + conf.signZ * 4.6;
+                    gingivaPoints.push(new THREE.Vector3(targetX, targetY, neckZ));
                 });
 
-                // Crear encía curva anatómica como base
                 if (gingivaPoints.length > 2) {
                     const curve = new THREE.CatmullRomCurve3(gingivaPoints);
-                    const gingivaGeo = new THREE.TubeGeometry(curve, 32, 5.5, 12, false);
+                    const gingivaGeo = new THREE.TubeGeometry(curve, 64, 2.6, 16, false);
                     const gingivaMesh = new THREE.Mesh(gingivaGeo, gingivaMat);
                     gingivaMesh.userData = { isGingiva: true };
                     conf.group.add(gingivaMesh);
@@ -9889,9 +9950,7 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                 }
             });
 
-            // Generar funda transparente de alineador
             buildClincheckAlignerShell();
-            // Calcular colisiones IPR iniciales
             calculateClincheckIpr();
         }
 
@@ -9955,12 +10014,14 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             clincheckCamera = new THREE.PerspectiveCamera(38, aspect, 0.1, 1000);
             clincheckCamera.position.set(0, -95, 65);
 
-            // 3. Renderer WebGL
+            // 3. Renderer WebGL con Tone Mapping Clínico
             clincheckRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
             clincheckRenderer.setSize(container.clientWidth, container.clientHeight);
             clincheckRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             clincheckRenderer.shadowMap.enabled = true;
             clincheckRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            clincheckRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+            clincheckRenderer.toneMappingExposure = 1.15;
             container.innerHTML = "";
             container.appendChild(clincheckRenderer.domElement);
 
@@ -9984,19 +10045,21 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             });
             clincheckScene.add(clincheckTransformControls);
 
-            // 6. Iluminación de Estudio Clínico Multidireccional
-            clincheckScene.add(new THREE.AmbientLight(0xffffff, 0.75));
-            const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-            keyLight.position.set(60, 100, 90);
+            // 6. Iluminación de Estudio Fotográfico Dental (Key + Fill + Rim + Hemisphere)
+            clincheckScene.add(new THREE.AmbientLight(0xffffff, 0.60));
+            clincheckScene.add(new THREE.HemisphereLight(0xfff8f2, 0x141424, 0.80));
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.30);
+            keyLight.position.set(40, -60, 60);
             keyLight.castShadow = true;
             clincheckScene.add(keyLight);
 
-            const fillLight = new THREE.DirectionalLight(0x94b4ff, 0.55);
-            fillLight.position.set(-60, -90, -40);
+            const fillLight = new THREE.DirectionalLight(0xa5c5ff, 0.70);
+            fillLight.position.set(-45, -70, -20);
             clincheckScene.add(fillLight);
 
-            const rimLight = new THREE.DirectionalLight(0xa7f3d0, 0.45);
-            rimLight.position.set(0, -110, 40);
+            const rimLight = new THREE.DirectionalLight(0xffeedb, 0.60);
+            rimLight.position.set(0, 80, 50);
             clincheckScene.add(rimLight);
 
             // 7. Raycaster para seleccionar dientes al hacer clic en 3D
@@ -10453,13 +10516,13 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             }).join("");
         }
 
-        // Alternar Shaders / Modos de Visualización (Esmalte, Segmentado FDI, Funda Plástica)
+        // Alternar Shaders / Modos de Visualización (Esmalte HD, Segmentado FDI, Funda Plástica, Malla Escáner, Superposición)
         function setClincheckShadingMode(mode) {
             clincheckShadingMode = mode;
-            ["natural", "segmentation", "aligner"].forEach(m => {
+            ["natural", "segmentation", "aligner", "raw_scan", "ghost"].forEach(m => {
                 const btn = document.getElementById(`ccShadingBtn-${m}`);
                 if (btn) {
-                    btn.className = (m === mode) ? "px-2 py-0.5 rounded bg-zinc-800 text-white font-bold transition" : "px-2 py-0.5 rounded text-zinc-400 hover:text-white transition";
+                    btn.className = (m === mode) ? "px-2 py-0.5 rounded bg-zinc-800 text-white font-bold transition shadow-xs" : "px-2 py-0.5 rounded text-zinc-400 hover:text-white transition";
                 }
             });
 
@@ -10475,6 +10538,8 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             if (clincheckAlignerShellGroup) {
                 clincheckAlignerShellGroup.visible = (mode === "aligner");
             }
+
+            updateClincheckVisibilityByMode();
         }
 
         // Presets de Cámara Rápida
@@ -10508,6 +10573,8 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
 
             if (clincheckUpperArchGroup) clincheckUpperArchGroup.visible = (filter === "both" || filter === "upper");
             if (clincheckLowerArchGroup) clincheckLowerArchGroup.visible = (filter === "both" || filter === "lower");
+
+            updateClincheckVisibilityByMode();
 
             if (filter === "upper") setStlCameraPreset("occlusal_up");
             else if (filter === "lower") setStlCameraPreset("occlusal_low");
@@ -10627,22 +10694,90 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             exportCurrentStageStl();
         }
 
-        // Compatibilidad con carga de archivos .STL crudos del escáner
+        // =====================================================================
+        // INTEGRACIÓN DEL ESCÁNER INTRAORAL REAL (.STL) Y MODO GHOSTING
+        // =====================================================================
+        let clincheckRawScanGroup = null;
+
+        function updateClincheckVisibilityByMode() {
+            const isRawScan = (clincheckShadingMode === "raw_scan");
+            const isGhost = (clincheckShadingMode === "ghost");
+
+            // Visibilidad de dientes segmentados y encías
+            if (clincheckUpperArchGroup) clincheckUpperArchGroup.visible = !isRawScan && (clincheckArchFilter === "both" || clincheckArchFilter === "upper");
+            if (clincheckLowerArchGroup) clincheckLowerArchGroup.visible = !isRawScan && (clincheckArchFilter === "both" || clincheckArchFilter === "lower");
+
+            // Visibilidad y estilo de la malla del escáner intraoral
+            if (clincheckRawScanGroup) {
+                clincheckRawScanGroup.visible = (isRawScan || isGhost);
+                clincheckRawScanGroup.traverse(child => {
+                    if (child.isMesh) {
+                        if (isGhost) {
+                            child.material = new THREE.MeshPhysicalMaterial({
+                                color: new THREE.Color("#38bdf8"),
+                                transparent: true,
+                                opacity: 0.35,
+                                roughness: 0.35,
+                                clearcoat: 0.6
+                            });
+                        } else {
+                            child.material = new THREE.MeshPhysicalMaterial({
+                                color: new THREE.Color("#fbf9f4"),
+                                roughness: 0.16,
+                                metalness: 0.02,
+                                clearcoat: 0.90,
+                                clearcoatRoughness: 0.08
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        // Carga y procesamiento de archivos .STL crudos del escáner
         function loadRawStlOverlays(upperSource, lowerSource) {
-            const toothMat = new THREE.MeshPhysicalMaterial({ color: 0xded8cb, roughness: 0.35, clearcoat: 0.8 });
+            if (!clincheckScene) return;
+            if (!clincheckRawScanGroup) {
+                clincheckRawScanGroup = new THREE.Group();
+                clincheckScene.add(clincheckRawScanGroup);
+            }
+
+            const rawToothMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#fbf9f4"),
+                roughness: 0.16,
+                metalness: 0.02,
+                clearcoat: 0.90,
+                clearcoatRoughness: 0.08
+            });
 
             const processBuf = (buf, isUpper) => {
                 const geo = parseStlArrayBuffer(buf);
-                const mesh = new THREE.Mesh(geo, toothMat);
-                mesh.position.set(0, 0, isUpper ? 0 : -3);
-                mesh.scale.set(0.9, 0.9, 0.9);
+                geo.computeVertexNormals();
+                geo.computeBoundingBox();
+
+                const mesh = new THREE.Mesh(geo, rawToothMat.clone());
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+
+                // Centrado compartido de oclusión
+                const box = geo.boundingBox;
+                const center = box.getCenter(new THREE.Vector3());
+                mesh.position.sub(center);
+
                 if (isUpper) {
+                    if (clincheckRawUpperMesh && clincheckRawUpperMesh.parent) {
+                        clincheckRawUpperMesh.parent.remove(clincheckRawUpperMesh);
+                    }
                     clincheckRawUpperMesh = mesh;
-                    if (clincheckUpperArchGroup) clincheckUpperArchGroup.add(mesh);
                 } else {
+                    if (clincheckRawLowerMesh && clincheckRawLowerMesh.parent) {
+                        clincheckRawLowerMesh.parent.remove(clincheckRawLowerMesh);
+                    }
                     clincheckRawLowerMesh = mesh;
-                    if (clincheckLowerArchGroup) clincheckLowerArchGroup.add(mesh);
                 }
+                clincheckRawScanGroup.add(mesh);
+
+                updateClincheckVisibilityByMode();
             };
 
             const loadSource = (src, isUpper) => {
@@ -10657,6 +10792,74 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
 
             if (upperSource) loadSource(upperSource, true);
             if (lowerSource) loadSource(lowerSource, false);
+        }
+
+        // Cargar Escaneo Clínico Demo HD
+        function loadClincheckDemoScan() {
+            if (!clincheckScene) return;
+
+            if (!clincheckRawScanGroup) {
+                clincheckRawScanGroup = new THREE.Group();
+                clincheckScene.add(clincheckRawScanGroup);
+            } else {
+                while(clincheckRawScanGroup.children.length > 0) {
+                    clincheckRawScanGroup.remove(clincheckRawScanGroup.children[0]);
+                }
+            }
+
+            const demoScanMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#fbf9f4"),
+                roughness: 0.16,
+                metalness: 0.02,
+                clearcoat: 0.90,
+                clearcoatRoughness: 0.08
+            });
+
+            const createArchScanGroup = (conf) => {
+                const group = new THREE.Group();
+                conf.fdiList.forEach((fdi, idx) => {
+                    const total = conf.fdiList.length;
+                    const angleNorm = (idx / (total - 1)) * 2 - 1;
+                    const angle = angleNorm * (Math.PI * 0.42);
+
+                    const targetX = Math.sin(angle) * conf.scaleX;
+                    const targetY = -Math.cos(angle) * conf.scaleY + conf.scaleY * 0.5;
+                    const targetZ = conf.zBase;
+
+                    let toothType = "central";
+                    const lastDigit = fdi % 10;
+                    if (lastDigit === 1) toothType = "central";
+                    else if (lastDigit === 2) toothType = "lateral";
+                    else if (lastDigit === 3) toothType = "canine";
+                    else if (lastDigit === 4 || lastDigit === 5) toothType = "premolar";
+                    else toothType = "molar";
+
+                    const geo = createHighDefToothGeometry(toothType);
+                    const mesh = new THREE.Mesh(geo, demoScanMat.clone());
+                    mesh.position.set(targetX, targetY, targetZ);
+                    mesh.rotation.z = -angle;
+                    if (conf.arch === "lower") mesh.rotation.x = Math.PI;
+                    group.add(mesh);
+                });
+                return group;
+            };
+
+            const upperScan = createArchScanGroup({
+                arch: "upper", zBase: 3.5, scaleX: 27.5, scaleY: 34.0,
+                fdiList: [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28]
+            });
+            const lowerScan = createArchScanGroup({
+                arch: "lower", zBase: -4.0, scaleX: 25.0, scaleY: 31.0,
+                fdiList: [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38]
+            });
+
+            clincheckRawUpperMesh = upperScan;
+            clincheckRawLowerMesh = lowerScan;
+            clincheckRawScanGroup.add(upperScan);
+            clincheckRawScanGroup.add(lowerScan);
+
+            setClincheckShadingMode("raw_scan");
+            alert("✓ Escaneo Intraoral Clínico HD cargado con éxito en el visor 3D.\nPuedes alternar entre 'Malla Escáner' (escaneo intraoral original), 'Esmalte HD' (segmentación activa para movimientos) y 'Superposición Inicial' (malla fantasma para comparar movimientos).");
         }
 
         // ---------------------------------------------------------------------
