@@ -245,7 +245,6 @@ export default function PatientCalendarAndCheckin({
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 onChange={(e) => handlePhotoCapture(e, 1)}
                 className="hidden"
               />
@@ -266,7 +265,6 @@ export default function PatientCalendarAndCheckin({
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 onChange={(e) => handlePhotoCapture(e, 2)}
                 className="hidden"
               />

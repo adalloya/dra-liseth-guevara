@@ -256,12 +256,11 @@ export default function PatientWorkspacePage() {
                 <div key={i} className="border border-slate-200 rounded-2xl p-3 bg-slate-50 flex flex-col justify-between h-44">
                   <span className="text-xs font-bold text-slate-700">{label}</span>
                   <div className="my-auto text-center">
-                    <label className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline">
-                      Tomar foto / Subir archivo
+                    <label className="text-xs text-indigo-600 font-semibold cursor-pointer hover:underline flex items-center justify-center gap-1">
+                      <span>Cargar archivo</span>
                       <input
                         type="file"
-                        accept="image/*"
-                        capture="environment"
+                        accept="image/*,application/pdf"
                         className="hidden"
                         onChange={(e) => {
                           if (e.target.files?.[0]) {
