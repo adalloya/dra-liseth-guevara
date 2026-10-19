@@ -33,6 +33,8 @@
     <!-- Three.js (Solo se instancia bajo demanda cuando se abre el Visor .STL) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -3054,116 +3056,586 @@
             </form>
         </div>
     </div>
-    <div id="stlViewerModal" class="hidden fixed inset-0 bg-[#121214] z-50 flex flex-col text-white font-sans no-print">
-        <!-- Barra Superior ClinCheck Pro Dark Studio -->
-        <header class="flex flex-wrap justify-between items-center px-6 py-3 border-b border-zinc-800 bg-zinc-900/95 gap-3">
+    <div id="stlViewerModal" class="hidden fixed inset-0 bg-[#0d0d11] z-50 flex flex-col text-white font-sans no-print select-none">
+        
+        <!-- =====================================================================
+             BARRA SUPERIOR: CLINCHECK STUDIO PRO (CAD ORTODÓNTICO IN-HOUSE)
+        ====================================================================== -->
+        <header class="flex flex-wrap justify-between items-center px-4 sm:px-6 py-2.5 border-b border-zinc-800/90 bg-zinc-950/95 gap-3 shrink-0 shadow-lg">
+            <!-- Marca y Estado Clínico -->
             <div class="flex items-center gap-3">
-                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <h2 class="text-xs font-bold tracking-wide text-zinc-200">
-                    Visor 3D Clínico • Base de Escáner Intraoral
-                </h2>
-                <span id="stlPersistenceBadge" class="hidden sm:inline-flex items-center gap-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
-                    Oclusión Natural Real
-                </span>
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 flex items-center justify-center text-white text-base shadow-md">
+                    <i class="ph-bold ph-cube"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <h2 class="text-xs sm:text-sm font-black tracking-wide text-zinc-100">
+                            ClinCheck Studio Pro <span class="text-indigo-400 font-normal">| Laboratorio In-House de Alineadores</span>
+                        </h2>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 flex items-center gap-1.5">
+                        <span id="clincheckPatientBadge" class="text-zinc-300 font-bold">Paciente Activo</span>
+                        <span>•</span>
+                        <span class="text-emerald-400">Dra. Liseth Guevara (Ortodoncista Validadora)</span>
+                    </p>
+                </div>
             </div>
 
-            <!-- Controles de Vista y Arcada -->
-            <div class="flex items-center gap-1.5 bg-zinc-800/80 p-1 rounded-xl border border-zinc-700">
-                <button
-                    onclick="setStlArchFilter('both')"
-                    id="stlBtn-both"
-                    class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition"
-                >
+            <!-- Selector de Arcada y Vistas de Cámara -->
+            <div class="flex items-center gap-1.5 bg-zinc-900 p-1 rounded-xl border border-zinc-800">
+                <!-- Filtro Arcada -->
+                <button onclick="setStlArchFilter('both')" id="stlBtn-both" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition">
                     ═ Ambas
                 </button>
-                <button
-                    onclick="setStlArchFilter('upper')"
-                    id="stlBtn-upper"
-                    class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition"
-                >
+                <button onclick="setStlArchFilter('upper')" id="stlBtn-upper" class="px-2.5 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition">
                     ∩ Sup
                 </button>
-                <button
-                    onclick="setStlArchFilter('lower')"
-                    id="stlBtn-lower"
-                    class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition"
-                >
+                <button onclick="setStlArchFilter('lower')" id="stlBtn-lower" class="px-2.5 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition">
                     ∪ Inf
                 </button>
-                <span class="w-px h-4 bg-zinc-700 mx-1"></span>
-                <button onclick="setStlCameraView(0, -100, 70)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
+
+                <span class="w-px h-4 bg-zinc-800 mx-1"></span>
+
+                <!-- Vistas de Cámara -->
+                <button onclick="setStlCameraPreset('frontal')" class="px-2 py-1 text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition" title="Vista Frontal">
                     Frontal
                 </button>
-                <button onclick="setStlCameraView(110, 0, 10)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
+                <button onclick="setStlCameraPreset('occlusal_up')" class="px-2 py-1 text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition" title="Oclusal Superior">
+                    Ocl. Sup
+                </button>
+                <button onclick="setStlCameraPreset('occlusal_low')" class="px-2 py-1 text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition" title="Oclusal Inferior">
+                    Ocl. Inf
+                </button>
+                <button onclick="setStlCameraPreset('right')" class="px-2 py-1 text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition" title="Lateral Derecha">
                     Der
                 </button>
-                <button onclick="setStlCameraView(-110, 0, 10)" class="px-2.5 py-1 text-xs text-zinc-400 hover:text-white transition">
+                <button onclick="setStlCameraPreset('left')" class="px-2 py-1 text-[11px] font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition" title="Lateral Izquierda">
                     Izq
                 </button>
             </div>
 
-            <!-- Botones de Carga Persistente y Cierre -->
+            <!-- Modos de Visualización y Acciones -->
             <div class="flex items-center gap-2">
-                <label class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-medium px-3.5 py-1.5 rounded-xl cursor-pointer transition">
-                    <span id="stlUploadBtnSupText">+ Cargar .STL Sup</span>
+                <!-- Toggle Panel CAD -->
+                <button
+                    onclick="toggleClincheckSidebar()"
+                    id="btnToggleClincheckSidebar"
+                    class="bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-300 text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 font-bold"
+                    title="Abrir/Cerrar Panel de Herramientas CAD"
+                >
+                    <i class="ph-bold ph-sliders"></i>
+                    <span class="hidden sm:inline">Panel CAD</span>
+                </button>
+
+                <!-- Botón Guía In-House -->
+                <button
+                    onclick="openStlManufacturingGuideModal()"
+                    class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 font-semibold"
+                    title="Guía de Termoformado e Impresión 3D In-House"
+                >
+                    <i class="ph-bold ph-book-open text-amber-400"></i>
+                    <span class="hidden md:inline">Guía In-House</span>
+                </button>
+
+                <!-- Subir STL o Cargar Demo -->
+                <label class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer transition flex items-center gap-1.5 text-zinc-300">
+                    <i class="ph-bold ph-upload-simple"></i>
+                    <span id="stlUploadBtnSupText" class="hidden sm:inline">+ .STL Sup</span>
                     <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, true)" />
                 </label>
-                <label class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-medium px-3.5 py-1.5 rounded-xl cursor-pointer transition">
-                    <span id="stlUploadBtnInfText">+ Cargar .STL Inf</span>
+                <label class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold px-3 py-1.5 rounded-xl cursor-pointer transition flex items-center gap-1.5 text-zinc-300">
+                    <i class="ph-bold ph-upload-simple"></i>
+                    <span id="stlUploadBtnInfText" class="hidden sm:inline">+ .STL Inf</span>
                     <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, false)" />
                 </label>
+
+                <!-- Botón Cerrar -->
                 <button
                     onclick="closeStlViewerModal()"
-                    class="bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-300 text-xs px-3.5 py-1.5 rounded-xl transition font-semibold"
+                    class="bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-300 text-xs px-3 py-1.5 rounded-xl transition font-bold flex items-center gap-1"
                 >
-                    ✕ Cerrar Visor
+                    ✕ <span class="hidden sm:inline">Cerrar</span>
                 </button>
             </div>
         </header>
 
-        <!-- Lienzo WebGL 3D Principal -->
-        <div id="stlMountContainer" class="flex-1 w-full relative overflow-hidden cursor-grab active:cursor-grabbing"></div>
+        <!-- =====================================================================
+             ÁREA PRINCIPAL: PANEL CAD LATERAL + LIENZO 3D THREE.JS
+        ====================================================================== -->
+        <div class="flex-1 flex overflow-hidden relative">
 
-        <!-- Barra Inferior de Herramientas ClinCheck & Línea de Tiempo (0 a 18 Meses) -->
-        <footer class="bg-zinc-900/95 border-t border-zinc-800 px-6 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <!-- Toggles de Herramientas -->
-            <div class="flex items-center gap-2">
+            <!-- PANEL CAD LATERAL (Herramientas Biomecánicas) -->
+            <aside id="clincheckSidebar" class="w-80 sm:w-88 bg-zinc-950/95 border-r border-zinc-800/90 flex flex-col z-20 shrink-0 shadow-2xl transition-all duration-300 overflow-hidden">
+                <!-- Tabs del Panel CAD -->
+                <div class="grid grid-cols-4 border-b border-zinc-800 text-[11px] font-bold text-center bg-zinc-900/60 shrink-0">
+                    <button onclick="setClincheckTab('teeth')" id="ccTabBtn-teeth" class="py-2.5 border-b-2 border-indigo-500 text-indigo-400 bg-zinc-900/90 transition flex flex-col items-center gap-0.5">
+                        <i class="ph-bold ph-tooth text-sm"></i>
+                        <span>Dientes</span>
+                    </button>
+                    <button onclick="setClincheckTab('attachments')" id="ccTabBtn-attachments" class="py-2.5 border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 transition flex flex-col items-center gap-0.5">
+                        <i class="ph-bold ph-push-pin text-sm"></i>
+                        <span>Ataches</span>
+                    </button>
+                    <button onclick="setClincheckTab('ipr')" id="ccTabBtn-ipr" class="py-2.5 border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 transition flex flex-col items-center gap-0.5">
+                        <i class="ph-bold ph-diamonds-four text-sm"></i>
+                        <span>IPR</span>
+                    </button>
+                    <button onclick="setClincheckTab('doctor')" id="ccTabBtn-doctor" class="py-2.5 border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 transition flex flex-col items-center gap-0.5">
+                        <i class="ph-bold ph-user-check text-sm"></i>
+                        <span>Validar</span>
+                    </button>
+                </div>
+
+                <!-- Contenido con Scroll de las pestañas -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
+
+                    <!-- TAB 1: DIENTES Y GIZMO 3D -->
+                    <div id="ccTabSec-teeth" class="space-y-4">
+                        <!-- Odontograma Rápido FDI de Selección -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[10px] font-extrabold uppercase text-zinc-400 tracking-wider">
+                                    Odontograma 3D • Selección de Diente
+                                </span>
+                                <span id="ccSelectedToothFdiBadge" class="bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                    FDI #11
+                                </span>
+                            </div>
+
+                            <!-- Arcada Superior (18 a 28) -->
+                            <div class="space-y-1 bg-zinc-900/80 p-2.5 rounded-2xl border border-zinc-800">
+                                <div class="text-[9px] font-bold text-zinc-500 uppercase text-center mb-1">Arcada Superior (Maxilar)</div>
+                                <div class="grid grid-cols-8 gap-1 text-center font-mono text-[10.5px]">
+                                    <button onclick="selectClincheckTooth(18)" id="fdiBtn-18" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">18</button>
+                                    <button onclick="selectClincheckTooth(17)" id="fdiBtn-17" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">17</button>
+                                    <button onclick="selectClincheckTooth(16)" id="fdiBtn-16" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">16</button>
+                                    <button onclick="selectClincheckTooth(15)" id="fdiBtn-15" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">15</button>
+                                    <button onclick="selectClincheckTooth(14)" id="fdiBtn-14" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">14</button>
+                                    <button onclick="selectClincheckTooth(13)" id="fdiBtn-13" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">13</button>
+                                    <button onclick="selectClincheckTooth(12)" id="fdiBtn-12" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">12</button>
+                                    <button onclick="selectClincheckTooth(11)" id="fdiBtn-11" class="p-1 rounded bg-indigo-600 text-white font-bold transition">11</button>
+                                </div>
+                                <div class="grid grid-cols-8 gap-1 text-center font-mono text-[10.5px] pt-0.5">
+                                    <button onclick="selectClincheckTooth(21)" id="fdiBtn-21" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">21</button>
+                                    <button onclick="selectClincheckTooth(22)" id="fdiBtn-22" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">22</button>
+                                    <button onclick="selectClincheckTooth(23)" id="fdiBtn-23" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">23</button>
+                                    <button onclick="selectClincheckTooth(24)" id="fdiBtn-24" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">24</button>
+                                    <button onclick="selectClincheckTooth(25)" id="fdiBtn-25" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">25</button>
+                                    <button onclick="selectClincheckTooth(26)" id="fdiBtn-26" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">26</button>
+                                    <button onclick="selectClincheckTooth(27)" id="fdiBtn-27" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">27</button>
+                                    <button onclick="selectClincheckTooth(28)" id="fdiBtn-28" class="p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition">28</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel de Control del Diente Activo -->
+                        <div class="bg-zinc-900/90 rounded-2xl p-3.5 border border-zinc-800 space-y-3">
+                            <div>
+                                <h4 id="ccSelectedToothTitle" class="font-extrabold text-sm text-zinc-100">
+                                    Incisivo Central Superior Derecho (#11)
+                                </h4>
+                                <p class="text-[10px] text-zinc-400 mt-0.5">
+                                    Haz clic en la malla 3D o usa los botones para afinar el movimiento por alineador.
+                                </p>
+                            </div>
+
+                            <!-- Selector de Modo de Gizmo 3D -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button
+                                    onclick="setClincheckGizmoMode('translate')"
+                                    id="ccGizmoBtn-translate"
+                                    class="py-1.5 px-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow transition"
+                                >
+                                    <i class="ph-bold ph-arrows-out-cardinal"></i>
+                                    <span>Trasladar</span>
+                                </button>
+                                <button
+                                    onclick="setClincheckGizmoMode('rotate')"
+                                    id="ccGizmoBtn-rotate"
+                                    class="py-1.5 px-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition"
+                                >
+                                    <i class="ph-bold ph-arrows-clockwise"></i>
+                                    <span>Rotar / Torque</span>
+                                </button>
+                            </div>
+
+                            <!-- Micro-controles de precisión (0.1 mm y 1.0°) -->
+                            <div class="space-y-2 pt-1 border-t border-zinc-800/80">
+                                <span class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                    Micro-Ajustes Numéricos (Setup Final):
+                                </span>
+
+                                <!-- Mesiodistal -->
+                                <div class="flex justify-between items-center bg-zinc-950 px-2.5 py-1.5 rounded-xl border border-zinc-800">
+                                    <span class="text-[11px] text-zinc-400">Mesiodistal (X):</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="nudgeTooth('x', -0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">-</button>
+                                        <span id="ccVal-x" class="font-mono text-indigo-300 font-bold w-12 text-center text-xs">0.0 mm</span>
+                                        <button onclick="nudgeTooth('x', 0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Vestibulolingual -->
+                                <div class="flex justify-between items-center bg-zinc-950 px-2.5 py-1.5 rounded-xl border border-zinc-800">
+                                    <span class="text-[11px] text-zinc-400">Vestibulolingual (Y):</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="nudgeTooth('y', -0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">-</button>
+                                        <span id="ccVal-y" class="font-mono text-indigo-300 font-bold w-12 text-center text-xs">0.0 mm</span>
+                                        <button onclick="nudgeTooth('y', 0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Intrusión / Extrusión -->
+                                <div class="flex justify-between items-center bg-zinc-950 px-2.5 py-1.5 rounded-xl border border-zinc-800">
+                                    <span class="text-[11px] text-zinc-400">Intrusión / Extrusión (Z):</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="nudgeTooth('z', -0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">-</button>
+                                        <span id="ccVal-z" class="font-mono text-indigo-300 font-bold w-12 text-center text-xs">0.0 mm</span>
+                                        <button onclick="nudgeTooth('z', 0.1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Rotación Axial -->
+                                <div class="flex justify-between items-center bg-zinc-950 px-2.5 py-1.5 rounded-xl border border-zinc-800">
+                                    <span class="text-[11px] text-zinc-400">Rotación Axial:</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="nudgeToothRot('z', -1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">-</button>
+                                        <span id="ccVal-rot" class="font-mono text-emerald-300 font-bold w-12 text-center text-xs">0.0°</span>
+                                        <button onclick="nudgeToothRot('z', 1)" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medidor Biomecánico de Velocidad Segura -->
+                            <div class="bg-zinc-950/70 p-2.5 rounded-xl border border-zinc-800 space-y-1">
+                                <div class="flex justify-between text-[10px]">
+                                    <span class="text-zinc-400">Tasa por Alineador:</span>
+                                    <span id="ccVelocityStatus" class="text-emerald-400 font-bold">✓ Seguro (&lt; 0.25 mm / etapa)</span>
+                                </div>
+                                <div class="w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                                    <div id="ccVelocityBar" class="bg-emerald-500 h-full rounded-full transition-all" style="width: 45%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Acciones de Setup -->
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <button
+                                    onclick="applyAlgorithmicIdealSetup()"
+                                    class="py-2 px-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 font-bold text-[10.5px] transition flex items-center justify-center gap-1"
+                                    title="Alinear toda la arcada a la curva ideal de arco parabólico"
+                                >
+                                    <i class="ph-bold ph-magic-wand"></i>
+                                    <span>Setup Ideal IA</span>
+                                </button>
+                                <button
+                                    onclick="resetClincheckToInitialMalocclusion()"
+                                    class="py-2 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-[10.5px] transition flex items-center justify-center gap-1"
+                                    title="Restaurar a la posición inicial del escáner"
+                                >
+                                    <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                                    <span>Reiniciar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ATACHES BIOMECÁNICOS -->
+                    <div id="ccTabSec-attachments" class="hidden space-y-4">
+                        <div class="bg-zinc-900/90 rounded-2xl p-3.5 border border-zinc-800 space-y-3">
+                            <div>
+                                <h4 class="font-extrabold text-sm text-zinc-100 flex items-center gap-1.5">
+                                    <i class="ph-bold ph-push-pin text-indigo-400"></i>
+                                    <span>Colocación de Ataches</span>
+                                </h4>
+                                <p class="text-[10.5px] text-zinc-400 mt-0.5 leading-relaxed">
+                                    Pega figuras geométricas sobre la cara vestibular del diente para que el plástico transparente haga palanca y logre movimientos difíciles.
+                                </p>
+                            </div>
+
+                            <!-- Selector de Figura -->
+                            <div>
+                                <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                                    Tipo de Atache:
+                                </label>
+                                <select id="ccAttachmentTypeSelect" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    <option value="rect_horiz">Rectangular Biselado Horizontal (Extrusión)</option>
+                                    <option value="rect_vert">Rectangular Biselado Vertical (Control Radicular)</option>
+                                    <option value="ellipsoid">Elipsoidal / Semiesférico (Rotación)</option>
+                                    <option value="double_wedge">Doble Cuña de Desrotación Activa</option>
+                                </select>
+                            </div>
+
+                            <button
+                                onclick="addAttachmentToSelectedTooth()"
+                                class="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow transition flex items-center justify-center gap-1.5"
+                            >
+                                <i class="ph-bold ph-plus-circle text-sm"></i>
+                                <span>+ Colocar Atache en Diente Seleccionado</span>
+                            </button>
+                        </div>
+
+                        <!-- Lista de Ataches Activos -->
+                        <div class="space-y-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                                Ataches Colocados en el Plan (<span id="ccAttachmentsCount">0</span>)
+                            </span>
+                            <div id="ccAttachmentsList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                                <!-- Inyectado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: IPR & COLISIONES -->
+                    <div id="ccTabSec-ipr" class="hidden space-y-4">
+                        <div class="bg-zinc-900/90 rounded-2xl p-3.5 border border-zinc-800 space-y-2.5">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-extrabold text-sm text-zinc-100 flex items-center gap-1.5">
+                                    <i class="ph-bold ph-diamonds-four text-amber-400"></i>
+                                    <span>Cálculo de IPR (Stripping)</span>
+                                </h4>
+                                <span class="bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    Colisiones 3D
+                                </span>
+                            </div>
+                            <p class="text-[10.5px] text-zinc-400 leading-relaxed">
+                                El motor geométrico detecta intersecciones entre dientes adyacentes y programa el desgaste interproximal necesario para evitar apiñamiento.
+                            </p>
+                        </div>
+
+                        <!-- Tabla de IPR por Contacto -->
+                        <div class="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden">
+                            <div class="p-2.5 bg-zinc-900/80 border-b border-zinc-800 flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase">
+                                <span>Tronera / Contacto</span>
+                                <span>Desgaste</span>
+                                <span>Etapa</span>
+                            </div>
+                            <div id="ccIprTableList" class="divide-y divide-zinc-850 text-xs">
+                                <!-- Inyectado dinámicamente por calculateClincheckIpr() -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: VALIDACIÓN DE LA DOCTORA (HUMAN-IN-THE-LOOP) -->
+                    <div id="ccTabSec-doctor" class="hidden space-y-4">
+                        <div class="bg-zinc-900/90 rounded-2xl p-3.5 border border-zinc-800 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                                    <i class="ph-bold ph-stethoscope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-zinc-100">Validación de la Ortodoncista</h4>
+                                    <span class="text-[10px] text-zinc-400">Aprobación obligatoria del ClinCheck</span>
+                                </div>
+                            </div>
+
+                            <!-- Control de Sobrecorrección (+20%) -->
+                            <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-zinc-300 flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="ccOvercorrectionToggle" checked onchange="toggleClincheckOvercorrection()" class="rounded accent-indigo-500" />
+                                        <span>Sobrecorrección Elástica</span>
+                                    </label>
+                                    <span id="ccOvercorrectionBadge" class="bg-indigo-500/20 text-indigo-300 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded">
+                                        +20%
+                                    </span>
+                                </div>
+                                <p class="text-[9.5px] text-zinc-400 leading-tight">
+                                    Compensa la pérdida de fuerza elástica del plástico (SmartTrack/PETG) para garantizar que el movimiento prescrito ocurra en boca real.
+                                </p>
+                            </div>
+
+                            <!-- Checklist Clínico -->
+                            <div class="space-y-1.5 text-[11px] bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded accent-emerald-500" />
+                                    <span class="text-zinc-300">Raíces dentales contenidas en cortical ósea</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded accent-emerald-500" />
+                                    <span class="text-zinc-300">Sin contactos prematuros en céntrica</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded accent-emerald-500" />
+                                    <span class="text-zinc-300">Anclaje de molares protegido en etapa 1-6</span>
+                                </label>
+                            </div>
+
+                            <!-- Botón Aprobar -->
+                            <button
+                                onclick="approveClincheckPlan()"
+                                class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-lg transition flex items-center justify-center gap-2"
+                            >
+                                <i class="ph-bold ph-seal-check text-base"></i>
+                                <span>✓ Aprobar y Firmar Plan ClinCheck</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- LIENZO 3D CENTRAL (Three.js WebGL) -->
+            <div class="flex-1 h-full relative overflow-hidden bg-[#101014]">
+                <div id="stlMountContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+                <!-- HUD Flotante de Visualización -->
+                <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2 pointer-events-none">
+                    <div class="bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-xs font-medium text-zinc-300 shadow pointer-events-auto flex items-center gap-2">
+                        <span id="ccHudStageName" class="font-bold text-indigo-400">Etapa 0 / 14</span>
+                        <span class="text-zinc-600">•</span>
+                        <span id="ccHudToothName" class="text-zinc-400">Diente: FDI #11</span>
+                    </div>
+
+                    <!-- Selector Rápido de Shaders / Visualización -->
+                    <div class="bg-zinc-950/80 backdrop-blur-md p-1 rounded-xl border border-zinc-800 text-[10.5px] font-bold text-zinc-400 shadow pointer-events-auto flex items-center gap-1">
+                        <button onclick="setClincheckShadingMode('natural')" id="ccShadingBtn-natural" class="px-2 py-0.5 rounded bg-zinc-800 text-white transition">Esmalte</button>
+                        <button onclick="setClincheckShadingMode('segmentation')" id="ccShadingBtn-segmentation" class="px-2 py-0.5 rounded hover:text-white transition">Segmentado FDI</button>
+                        <button onclick="setClincheckShadingMode('aligner')" id="ccShadingBtn-aligner" class="px-2 py-0.5 rounded hover:text-white transition">Funda Plástico</button>
+                    </div>
+                </div>
+
+                <!-- Botón Flotante para Alternar Sidebar en Pantallas Pequeñas -->
                 <button
-                    id="btnToggleStlIpr"
-                    onclick="toggleStlIpr()"
-                    class="text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-amber-500/20 border-amber-500/50 text-amber-300"
+                    onclick="toggleClincheckSidebar()"
+                    class="absolute top-4 right-4 z-10 bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 w-9 h-9 rounded-xl flex items-center justify-center text-base shadow transition sm:hidden"
                 >
-                    💎 IPR (Activo)
-                </button>
-                <button
-                    id="btnToggleStlTads"
-                    onclick="toggleStlTads()"
-                    class="text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
-                >
-                    📌 TADs + ATP (Activo)
+                    <i class="ph-bold ph-sidebar"></i>
                 </button>
             </div>
 
-            <!-- Simulador de Tiempo Mes a Mes (0 a 18 Meses) -->
-            <div class="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-md mx-4">
-                <span id="stlMonthLabel" class="text-xs font-bold text-indigo-400 whitespace-nowrap">
-                    Mes 0 / 18
+        </div>
+
+        <!-- =====================================================================
+             BARRA INFERIOR: TIMELINE DE ETAPAS (STAGING) & EXPORTADOR 3D STL
+        ====================================================================== -->
+        <footer class="bg-zinc-950/98 border-t border-zinc-800 px-4 sm:px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-3 shrink-0 shadow-2xl">
+            
+            <!-- Controles de Reproducción y Etapa -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="setClincheckStage(0)" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center transition" title="Etapa Inicial (0)">
+                    <i class="ph-bold ph-skip-back"></i>
+                </button>
+                <button onclick="stepClincheckStage(-1)" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center transition" title="Etapa Anterior">
+                    <i class="ph-bold ph-caret-left"></i>
+                </button>
+                <button onclick="toggleClincheckPlay()" id="ccBtnPlay" class="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition shadow-md" title="Reproducir Evolución">
+                    <i class="ph-bold ph-play" id="ccBtnPlayIcon"></i>
+                </button>
+                <button onclick="stepClincheckStage(1)" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center transition" title="Etapa Siguiente">
+                    <i class="ph-bold ph-caret-right"></i>
+                </button>
+                <button onclick="setClincheckStage(clincheckTotalStages)" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 flex items-center justify-center transition" title="Etapa Final">
+                    <i class="ph-bold ph-skip-forward"></i>
+                </button>
+            </div>
+
+            <!-- Slider Interactivo de Etapas (0 a N) -->
+            <div class="flex-1 flex items-center gap-3 w-full max-w-xl mx-2">
+                <span id="ccStageNumberBadge" class="text-xs font-mono font-bold text-indigo-400 whitespace-nowrap bg-indigo-500/10 px-2 py-1 rounded-lg border border-indigo-500/20">
+                    Etapa 0 / 14
                 </span>
                 <input
-                    id="stlMonthSlider"
+                    id="ccStageSlider"
                     type="range"
                     min="0"
-                    max="18"
+                    max="14"
                     step="1"
                     value="0"
-                    oninput="setStlMonth(Number(this.value))"
-                    class="w-full accent-indigo-500 cursor-pointer h-1.5 bg-zinc-700 rounded-lg"
+                    oninput="setClincheckStage(Number(this.value))"
+                    class="w-full accent-indigo-500 cursor-pointer h-2 bg-zinc-800 rounded-lg"
                 />
-                <span id="stlStageBadge" class="text-[11px] text-zinc-400 whitespace-nowrap">
+                <span id="ccStageDescriptionBadge" class="text-[11px] font-medium text-zinc-400 whitespace-nowrap hidden sm:inline">
                     Maloclusión Inicial
                 </span>
             </div>
+
+            <!-- Botones de Manufactura 3D In-House -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button
+                    onclick="exportCurrentStageStl()"
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-md transition flex items-center gap-1.5"
+                    title="Descargar archivo .STL de la etapa seleccionada para imprimir en resina 3D"
+                >
+                    <i class="ph-bold ph-download-simple"></i>
+                    <span>Exportar .STL Etapa</span>
+                </button>
+                <button
+                    onclick="exportAllStagesZip()"
+                    class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+                    title="Exportar lote completo de todas las etapas para producción"
+                >
+                    <i class="ph-bold ph-package"></i>
+                    <span class="hidden sm:inline">Lote Completo</span>
+                </button>
+            </div>
+
         </footer>
+
+    </div>
+
+    <!-- =====================================================================
+         MODAL GUÍA: MANUFACTURA IN-HOUSE (IMPRESIÓN 3D + TERMOFORMADO)
+    ====================================================================== -->
+    <div id="stlManufacturingGuideModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto no-print">
+        <div class="bg-zinc-900 rounded-3xl max-w-2xl w-full p-6 border border-zinc-800 text-zinc-200 space-y-4 shadow-2xl my-auto" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                        <i class="ph-bold ph-factory"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-base text-white">Manual Clínico de Fabricación In-House</h3>
+                        <p class="text-xs text-zinc-400">Flujo de laboratorio para producción de alineadores transparentes</p>
+                    </div>
+                </div>
+                <button onclick="closeStlManufacturingGuideModal()" class="text-zinc-400 hover:text-white text-base">✕</button>
+            </div>
+
+            <div class="space-y-3.5 text-xs text-zinc-300 leading-relaxed max-h-[70vh] overflow-y-auto pr-1">
+                <div class="p-3 bg-zinc-950 rounded-2xl border border-zinc-800 space-y-1.5">
+                    <strong class="text-indigo-400 font-extrabold flex items-center gap-1.5">
+                        <span>1. Impresión 3D del Modelo Dental (Resina)</span>
+                    </strong>
+                    <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11.5px]">
+                        <li><strong>Impresora recomendada:</strong> Formlabs Form 4B, Phrozen Sonic Mighty 8K o Anycubic Photon M5s.</li>
+                        <li><strong>Resina:</strong> Resina para modelos de ortodoncia de alta temperatura (resistente a termoformado &gt; 90°C).</li>
+                        <li><strong>Parámetros:</strong> Altura de capa 50 micras (0.05 mm), orientación a 25°-35° sobre la base con soportes en talón.</li>
+                        <li><strong>Post-procesamiento:</strong> Lavado en alcohol isopropílico 99% por 3 minutos, secado con aire y curado UV 5 minutos a 60°C.</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-zinc-950 rounded-2xl border border-zinc-800 space-y-1.5">
+                    <strong class="text-emerald-400 font-extrabold flex items-center gap-1.5">
+                        <span>2. Termoformado de Precisión (Plásticos Multicapa)</span>
+                    </strong>
+                    <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11.5px]">
+                        <li><strong>Materiales equivalentes a SmartTrack:</strong> Discos de poliuretano/PETG tricapa grado médico como <em>Zendura FLX</em>, <em>Taglus Premium</em> o <em>Duran+</em> (calibre 0.75 mm / 0.030").</li>
+                        <li><strong>Equipo:</strong> Termoformadora a presión positiva (Biostar, Ministar o Drufomat a 4-6 bar) para un copiado exacto de ataches.</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-zinc-950 rounded-2xl border border-zinc-800 space-y-1.5">
+                    <strong class="text-amber-400 font-extrabold flex items-center gap-1.5">
+                        <span>3. Recorte, Festoneado y Pulido</span>
+                    </strong>
+                    <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11.5px]">
+                        <li><strong>Margen:</strong> Corte recto a 2 mm sobre el cenit gingival (mayor retención mecánica) o festoneado siguiendo el margen papilar.</li>
+                        <li><strong>Pulido:</strong> Fresas de goma de silicona para alisar bordes y evitar laceraciones en mucosa y lengua.</li>
+                    </ul>
+                </div>
+
+                <div class="p-3 bg-indigo-950/40 border border-indigo-800/60 rounded-2xl text-[11.5px] text-indigo-300">
+                    💡 <strong>Regla de oro clínica:</strong> Cambio de alineador cada 10 a 14 días. Uso diario de 22 horas. Control presencial cada 4 a 6 etapas para corroborar el tracking con ataches y checar desgastes de IPR.
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-zinc-800">
+                <button onclick="closeStlManufacturingGuideModal()" class="bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs px-5 py-2 rounded-xl transition">
+                    Entendido
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- =====================================================================
@@ -9140,7 +9612,64 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             }
         }
 
-        // Parser binario/ASCII ligero para geometrías .STL reales (SIN .center() individual para preservar oclusión natural)
+        // =====================================================================
+        // 7C. CLINCHECK STUDIO PRO (MOTOR CAD 3D DE ALINEADORES IN-HOUSE)
+        //     Three.js + TransformControls + Biomecánica + Ataches + IPR + STLExporter
+        // =====================================================================
+        let clincheckScene = null;
+        let clincheckCamera = null;
+        let clincheckRenderer = null;
+        let clincheckControls = null;
+        let clincheckTransformControls = null;
+        let clincheckReqId = null;
+        let clincheckRaycaster = null;
+        let clincheckMouse = null;
+
+        let clincheckCurrentStage = 0;
+        const clincheckTotalStages = 14;
+        let clincheckIsPlaying = false;
+        let clincheckPlayTimer = null;
+        let clincheckSelectedToothFdi = 11;
+        let clincheckGizmoMode = "translate";
+        let clincheckShadingMode = "natural";
+        let clincheckOvercorrection = true;
+        let clincheckArchFilter = "both";
+        let clincheckAttachments = [];
+
+        let clincheckUpperArchGroup = null;
+        let clincheckLowerArchGroup = null;
+        let clincheckGingivaUpper = null;
+        let clincheckGingivaLower = null;
+        let clincheckAlignerShellGroup = null;
+        let clincheckIprDiscsGroup = null;
+
+        let clincheckRawUpperMesh = null;
+        let clincheckRawLowerMesh = null;
+        let clincheckTeeth = {}; // { fdi: { fdi, name, arch, group, crownMesh, initialPos, initialRot, targetPos, targetRot, offsetPos, offsetRot } }
+
+        const FDI_TOOTH_NAMES = {
+            18: "Tercer Molar Sup. Der.", 17: "Segundo Molar Sup. Der.", 16: "Primer Molar Sup. Der.",
+            15: "Segundo Premolar Sup. Der.", 14: "Primer Premolar Sup. Der.", 13: "Canino Sup. Der.",
+            12: "Incisivo Lateral Sup. Der.", 11: "Incisivo Central Sup. Der.",
+            21: "Incisivo Central Sup. Izq.", 22: "Incisivo Lateral Sup. Izq.", 23: "Canino Sup. Izq.",
+            24: "Primer Premolar Sup. Izq.", 25: "Segundo Premolar Sup. Izq.", 26: "Primer Molar Sup. Izq.",
+            27: "Segundo Molar Sup. Izq.", 28: "Tercer Molar Sup. Izq.",
+            38: "Tercer Molar Inf. Izq.", 37: "Segundo Molar Inf. Izq.", 36: "Primer Molar Inf. Izq.",
+            35: "Segundo Premolar Inf. Izq.", 34: "Primer Premolar Inf. Izq.", 33: "Canino Inf. Izq.",
+            32: "Incisivo Lateral Inf. Izq.", 31: "Incisivo Central Inf. Izq.",
+            41: "Incisivo Central Inf. Der.", 42: "Incisivo Lateral Inf. Der.", 43: "Canino Inf. Der.",
+            44: "Primer Premolar Inf. Der.", 45: "Segundo Premolar Inf. Der.", 46: "Primer Molar Inf. Der.",
+            47: "Segundo Molar Inf. Der.", 48: "Tercer Molar Inf. Der."
+        };
+
+        const FDI_SEGMENTATION_COLORS = {
+            11: 0x3b82f6, 12: 0x06b6d4, 13: 0x10b981, 14: 0x84cc16, 15: 0xeab308, 16: 0xf97316, 17: 0xef4444, 18: 0xec4899,
+            21: 0x6366f1, 22: 0x0ea5e9, 23: 0x14b8a6, 24: 0x22c55e, 25: 0xfacc15, 26: 0xf59e0b, 27: 0xd97706, 28: 0xa855f7,
+            31: 0x6366f1, 32: 0x0ea5e9, 33: 0x14b8a6, 34: 0x22c55e, 35: 0xfacc15, 36: 0xf59e0b, 37: 0xd97706, 38: 0xa855f7,
+            41: 0x3b82f6, 42: 0x06b6d4, 43: 0x10b981, 44: 0x84cc16, 45: 0xeab308, 46: 0xf97316, 47: 0xef4444, 48: 0xec4899
+        };
+
+        // Parser STL Binario / ASCII
         function parseStlArrayBuffer(buffer) {
             const dv = new DataView(buffer);
             const isAscii = () => {
@@ -9159,16 +9688,14 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
                         positions[i * 9 + v] = dv.getFloat32(offset, true);
                         offset += 4;
                     }
-                    offset += 2; // Skip attribute byte count
+                    offset += 2;
                 }
                 const geo = new THREE.BufferGeometry();
                 geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-                // NOTA: No aplicamos geo.center() individual para preservar la mordida oclusal original del escáner
                 geo.computeVertexNormals();
                 return geo;
             }
 
-            // Fallback ASCII STL
             const text = new TextDecoder().decode(buffer);
             const vertexPattern = /vertex\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)\s+([\d.+\-eE]+)/g;
             const verts = [];
@@ -9178,154 +9705,227 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
             }
             const geo = new THREE.BufferGeometry();
             geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
-            // NOTA: No aplicamos geo.center() individual para preservar la mordida oclusal original del escáner
             geo.computeVertexNormals();
             return geo;
         }
 
-        function buildClinicalOverlaysForScan(referenceBox) {
-            if (!stlUpperGroup || !stlLowerGroup || !referenceBox) return;
+        // Generador de Geometría Dental Anatómica por Tipo de Diente
+        function createAnatomicToothGeometry(toothType) {
+            let width = 7.5, height = 9.5, depth = 7.5;
+            if (toothType === "central") {
+                width = 8.5; height = 10.0; depth = 7.0;
+            } else if (toothType === "lateral") {
+                width = 6.8; height = 8.8; depth = 6.2;
+            } else if (toothType === "canine") {
+                width = 7.8; height = 10.5; depth = 8.0;
+            } else if (toothType === "premolar") {
+                width = 7.2; height = 8.0; depth = 8.8;
+            } else if (toothType === "molar") {
+                width = 10.5; height = 7.5; depth = 10.8;
+            }
 
-            const size = referenceBox.getSize(new THREE.Vector3());
-            const center = referenceBox.getCenter(new THREE.Vector3());
+            const geo = new THREE.BoxGeometry(width, depth, height, 4, 4, 4);
+            const pos = geo.attributes.position;
+            // Redondear vértices para simular curvatura anatómica dental
+            for (let i = 0; i < pos.count; i++) {
+                let x = pos.getX(i);
+                let y = pos.getY(i);
+                let z = pos.getZ(i);
 
-            // Limpiar overlays previos
-            if (stlIprOverlayGroup && stlLowerGroup) stlLowerGroup.remove(stlIprOverlayGroup);
-            if (stlTadsOverlayGroup && stlUpperGroup) stlUpperGroup.remove(stlTadsOverlayGroup);
+                // Convexidad vestibular y conicidad oclusal
+                if (toothType === "canine" && z > height * 0.2) {
+                    const factor = 1.0 - (z - height * 0.2) / (height * 0.4);
+                    x *= Math.max(0.3, factor);
+                    y *= Math.max(0.4, factor);
+                } else if ((toothType === "central" || toothType === "lateral") && z > height * 0.25) {
+                    // Adelgazar borde incisal
+                    y *= 0.45;
+                }
+                pos.setXYZ(i, x, y, z);
+            }
+            geo.computeVertexNormals();
+            return geo;
+        }
 
-            stlIprOverlayGroup = new THREE.Group();
-            stlIprOverlayGroup.visible = stlShowIpr;
+        // Construir modelo completo de arcada segmentada
+        function buildClincheckSegmentedArches() {
+            clincheckTeeth = {};
+            if (clincheckUpperArchGroup) clincheckScene.remove(clincheckUpperArchGroup);
+            if (clincheckLowerArchGroup) clincheckScene.remove(clincheckLowerArchGroup);
 
-            stlTadsOverlayGroup = new THREE.Group();
-            stlTadsOverlayGroup.visible = stlShowTads;
+            clincheckUpperArchGroup = new THREE.Group();
+            clincheckLowerArchGroup = new THREE.Group();
+            clincheckScene.add(clincheckUpperArchGroup);
+            clincheckScene.add(clincheckLowerArchGroup);
 
-            // 1. Marcadores 3D de Stripping Interproximal (💎 IPR 0.2-0.3 mm en zona anterior)
-            const iprMat = new THREE.MeshBasicMaterial({
-                color: 0xf59e0b,
+            // Materiales PBR
+            const naturalToothMat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color("#fbf9f5"),
+                roughness: 0.22,
+                metalness: 0.04,
+                clearcoat: 0.9,
+                clearcoatRoughness: 0.1
+            });
+
+            const gingivaMat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color("#c86878"),
+                roughness: 0.5,
+                metalness: 0.05
+            });
+
+            // Parámetros de Catenaria / Arco Parabólico (Superior e Inferior)
+            const archesConfig = [
+                {
+                    arch: "upper",
+                    group: clincheckUpperArchGroup,
+                    zBase: 3.5,
+                    fdiList: [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28],
+                    scaleX: 27.5,
+                    scaleY: 34.0,
+                    signZ: 1
+                },
+                {
+                    arch: "lower",
+                    group: clincheckLowerArchGroup,
+                    zBase: -4.0,
+                    fdiList: [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38],
+                    scaleX: 25.0,
+                    scaleY: 31.0,
+                    signZ: -1
+                }
+            ];
+
+            archesConfig.forEach(conf => {
+                const total = conf.fdiList.length;
+                const gingivaPoints = [];
+
+                conf.fdiList.forEach((fdi, idx) => {
+                    // Ángulo a lo largo de la herradura dental (-PI/2 a +PI/2)
+                    const angleNorm = (idx / (total - 1)) * 2 - 1; // -1 a 1
+                    const angle = angleNorm * (Math.PI * 0.42);
+
+                    // Posición objetivo ideal (Setup Final)
+                    const targetX = Math.sin(angle) * conf.scaleX;
+                    const targetY = -Math.cos(angle) * conf.scaleY + conf.scaleY * 0.5;
+                    const targetZ = conf.zBase;
+
+                    // Rotación tangencial al arco
+                    const targetRotZ = -angle;
+                    const targetRotX = conf.signZ * 0.05;
+
+                    // Posición inicial con maloclusión típica (Etapa 0)
+                    let malocclusionDx = 0, malocclusionDy = 0, malocclusionDz = 0, malocclusionRotZ = 0;
+                    if (fdi === 11 || fdi === 21) {
+                        malocclusionDy = conf.signZ * 1.2; // Apiñamiento / leve protrusión
+                        malocclusionRotZ = 0.12;
+                    } else if (fdi === 12 || fdi === 22) {
+                        malocclusionDy = -conf.signZ * 2.2; // Palatoversión
+                        malocclusionRotZ = -0.18;
+                    } else if (fdi === 13 || fdi === 23) {
+                        malocclusionDx = 0.8;
+                        malocclusionDy = conf.signZ * 1.5; // Canino ectópico alto
+                        malocclusionDz = conf.signZ * 1.2;
+                    } else if (fdi === 41 || fdi === 31 || fdi === 42 || fdi === 32) {
+                        malocclusionDy = -conf.signZ * 1.4; // Apiñamiento inferior
+                        malocclusionRotZ = 0.15;
+                    }
+
+                    const initialPos = new THREE.Vector3(targetX + malocclusionDx, targetY + malocclusionDy, targetZ + malocclusionDz);
+                    const initialRot = new THREE.Euler(targetRotX, 0, targetRotZ + malocclusionRotZ);
+                    const targetPos = new THREE.Vector3(targetX, targetY, targetZ);
+                    const targetRot = new THREE.Euler(targetRotX, 0, targetRotZ);
+
+                    // Tipo de diente anatómico
+                    let toothType = "central";
+                    const lastDigit = fdi % 10;
+                    if (lastDigit === 1) toothType = "central";
+                    else if (lastDigit === 2) toothType = "lateral";
+                    else if (lastDigit === 3) toothType = "canine";
+                    else if (lastDigit === 4 || lastDigit === 5) toothType = "premolar";
+                    else toothType = "molar";
+
+                    const geo = createAnatomicToothGeometry(toothType);
+                    const mat = naturalToothMat.clone();
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    mesh.userData = { fdi, isToothMesh: true };
+
+                    const group = new THREE.Group();
+                    group.name = `tooth_group_${fdi}`;
+                    group.position.copy(initialPos);
+                    group.rotation.copy(initialRot);
+                    group.add(mesh);
+
+                    conf.group.add(group);
+
+                    clincheckTeeth[fdi] = {
+                        fdi,
+                        name: FDI_TOOTH_NAMES[fdi] || `Diente FDI #${fdi}`,
+                        arch: conf.arch,
+                        group,
+                        crownMesh: mesh,
+                        naturalMat: mat,
+                        initialPos,
+                        initialRot,
+                        targetPos,
+                        targetRot,
+                        offsetPos: new THREE.Vector3(0, 0, 0),
+                        offsetRot: new THREE.Euler(0, 0, 0)
+                    };
+
+                    gingivaPoints.push(new THREE.Vector3(targetX, targetY, targetZ - conf.signZ * 5.0));
+                });
+
+                // Crear encía curva anatómica como base
+                if (gingivaPoints.length > 2) {
+                    const curve = new THREE.CatmullRomCurve3(gingivaPoints);
+                    const gingivaGeo = new THREE.TubeGeometry(curve, 32, 5.5, 12, false);
+                    const gingivaMesh = new THREE.Mesh(gingivaGeo, gingivaMat);
+                    gingivaMesh.userData = { isGingiva: true };
+                    conf.group.add(gingivaMesh);
+                    if (conf.arch === "upper") clincheckGingivaUpper = gingivaMesh;
+                    else clincheckGingivaLower = gingivaMesh;
+                }
+            });
+
+            // Generar funda transparente de alineador
+            buildClincheckAlignerShell();
+            // Calcular colisiones IPR iniciales
+            calculateClincheckIpr();
+        }
+
+        // Funda Plástica Transparente de Alineador (0.75 mm)
+        function buildClincheckAlignerShell() {
+            if (clincheckAlignerShellGroup) clincheckScene.remove(clincheckAlignerShellGroup);
+            clincheckAlignerShellGroup = new THREE.Group();
+            clincheckAlignerShellGroup.visible = (clincheckShadingMode === "aligner");
+
+            const alignerMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,
                 transparent: true,
-                opacity: 0.85,
-                side: THREE.DoubleSide
-            });
-            const iprOffsetsX = [-10, -6, -2, 2, 6, 10];
-            const antY = center.y - size.y * 0.32;
-            const antZ = center.z - 2;
-            iprOffsetsX.forEach((dx) => {
-                const discGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.28, 20);
-                const disc = new THREE.Mesh(discGeo, iprMat);
-                disc.rotation.z = Math.PI / 2;
-                disc.position.set(center.x + dx, antY, antZ);
-                stlIprOverlayGroup.add(disc);
-            });
-            stlLowerGroup.add(stlIprOverlayGroup);
-
-            // 2. Microtornillos Infracigomáticos (📌 TADs IZC) + Barra Transpalatina (ATP)
-            const tadMat = new THREE.MeshStandardMaterial({
-                color: 0x10b981,
-                metalness: 0.75,
-                roughness: 0.2
-            });
-            [-1, 1].forEach((side) => {
-                const tadGeo = new THREE.CylinderGeometry(0.9, 0.45, 7, 16);
-                const tad = new THREE.Mesh(tadGeo, tadMat);
-                tad.rotation.z = side * 0.45;
-                tad.position.set(center.x + side * (size.x * 0.46), center.y + size.y * 0.08, center.z + 6);
-                stlTadsOverlayGroup.add(tad);
+                opacity: 0.38,
+                roughness: 0.08,
+                transmission: 0.92,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.05,
+                ior: 1.48 // Índice de refracción del PETG / Poliuretano
             });
 
-            // Arco Transpalatino (ATP)
-            const atpCurve = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(center.x - size.x * 0.34, center.y + size.y * 0.1, center.z + 2),
-                new THREE.Vector3(center.x, center.y + size.y * 0.14, center.z + 6),
-                new THREE.Vector3(center.x + size.x * 0.34, center.y + size.y * 0.1, center.z + 2)
-            ]);
-            const atpGeo = new THREE.TubeGeometry(atpCurve, 24, 0.55, 10, false);
-            const atpMesh = new THREE.Mesh(atpGeo, tadMat);
-            stlTadsOverlayGroup.add(atpMesh);
+            // Generar mallas envolventes translúcidas para superior e inferior
+            [clincheckGingivaUpper, clincheckGingivaLower].forEach(gMesh => {
+                if (gMesh && gMesh.geometry) {
+                    const shellGeo = gMesh.geometry.clone();
+                    shellGeo.scale(1.15, 1.15, 1.15);
+                    const shellMesh = new THREE.Mesh(shellGeo, alignerMat);
+                    clincheckAlignerShellGroup.add(shellMesh);
+                }
+            });
 
-            stlUpperGroup.add(stlTadsOverlayGroup);
+            clincheckScene.add(clincheckAlignerShellGroup);
         }
 
-        function applySharedOcclusionCenter() {
-            if (!stlUpperGroup || !stlLowerGroup) return;
-
-            let refGroup = null;
-            if (stlUpperGroup.children.length > 0) {
-                refGroup = stlUpperGroup;
-            } else if (stlLowerGroup.children.length > 0) {
-                refGroup = stlLowerGroup;
-            }
-            if (!refGroup) return;
-
-            // Resetear transformaciones antes de medir caja envolvente original
-            stlUpperGroup.position.set(0, 0, 0);
-            stlLowerGroup.position.set(0, 0, 0);
-            stlLowerGroup.rotation.set(0, 0, 0);
-
-            const targetMesh = refGroup.children[0];
-            const box = new THREE.Box3().setFromObject(targetMesh);
-            stlSharedCenter = box.getCenter(new THREE.Vector3());
-
-            // Aplicar exactamente el mismo vector de traslación a ambas arcadas para respetar su mordida real
-            stlUpperGroup.position.copy(stlSharedCenter).negate();
-            stlLowerGroup.position.copy(stlSharedCenter).negate();
-
-            buildClinicalOverlaysForScan(box);
-            applyStlMonthTransform();
-        }
-
-        function applyStlMonthTransform() {
-            if (!stlLowerGroup) return;
-            const baseX = stlSharedCenter ? -stlSharedCenter.x : 0;
-            const baseY = stlSharedCenter ? -stlSharedCenter.y : 0;
-            const baseZ = stlSharedCenter ? -stlSharedCenter.z : 0;
-
-            const progressFactor = stlCurrentMonth / 18;
-            stlLowerGroup.position.set(baseX, baseY, baseZ + progressFactor * 1.5);
-            stlLowerGroup.rotation.x = progressFactor * 0.03;
-        }
-
-        function setStlMonth(month) {
-            stlCurrentMonth = Number(month) || 0;
-            const lbl = document.getElementById("stlMonthLabel");
-            const badge = document.getElementById("stlStageBadge");
-            const slider = document.getElementById("stlMonthSlider");
-            if (slider && Number(slider.value) !== stlCurrentMonth) slider.value = String(stlCurrentMonth);
-            if (lbl) lbl.innerText = `Mes ${stlCurrentMonth} / 18`;
-            if (badge) {
-                badge.innerText =
-                    stlCurrentMonth === 0
-                        ? "Maloclusión Inicial"
-                        : stlCurrentMonth < 18
-                        ? "Progresión"
-                        : "Finalización";
-            }
-            applyStlMonthTransform();
-        }
-
-        function toggleStlIpr() {
-            stlShowIpr = !stlShowIpr;
-            const btn = document.getElementById("btnToggleStlIpr");
-            if (btn) {
-                btn.className = stlShowIpr
-                    ? "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-amber-500/20 border-amber-500/50 text-amber-300"
-                    : "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-zinc-800 border-zinc-700 text-zinc-400";
-                btn.innerText = `💎 IPR (${stlShowIpr ? "Activo" : "Oculto"})`;
-            }
-            if (stlIprOverlayGroup) stlIprOverlayGroup.visible = stlShowIpr;
-        }
-
-        function toggleStlTads() {
-            stlShowTads = !stlShowTads;
-            const btn = document.getElementById("btnToggleStlTads");
-            if (btn) {
-                btn.className = stlShowTads
-                    ? "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
-                    : "text-xs px-3 py-1.5 rounded-xl font-semibold border transition bg-zinc-800 border-zinc-700 text-zinc-400";
-                btn.innerText = `📌 TADs + ATP (${stlShowTads ? "Activo" : "Oculto"})`;
-            }
-            if (stlTadsOverlayGroup) stlTadsOverlayGroup.visible = stlShowTads;
-        }
-
+        // Abrir y montar el Visor ClinCheck Studio Pro
         function openStlViewerModal() {
             const modal = document.getElementById("stlViewerModal");
             const container = document.getElementById("stlMountContainer");
@@ -9333,156 +9933,730 @@ Devuelve un objeto JSON válido con la estructura exacta ClinicalStudyData: { "d
 
             modal.classList.remove("hidden");
 
-            const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
-            const upperSource = uploadedUpperStlFile || activeUpperStlUrl || patient?.stl_upper_url || patient?.medical_history?.stl_upper_url || null;
-            const lowerSource = uploadedLowerStlFile || activeLowerStlUrl || patient?.stl_lower_url || patient?.medical_history?.stl_lower_url || null;
-
-            if (!upperSource && !lowerSource) {
-                if (stlReqId) cancelAnimationFrame(stlReqId);
-                if (stlRenderer) {
-                    stlRenderer.dispose();
-                    stlRenderer = null;
-                }
-                container.innerHTML = `
-                    <div class="h-full w-full flex flex-col items-center justify-center p-6 text-center bg-[#121214]">
-                        <div class="max-w-md w-full bg-zinc-900/90 border border-zinc-800 rounded-3xl p-8 space-y-4 shadow-2xl">
-                            <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto text-2xl">
-                                <i class="ph-bold ph-cube"></i>
-                            </div>
-                            <div class="space-y-1.5">
-                                <h3 class="text-base font-bold text-white">Visor 3D Clínico • Escaneos .STL Reales</h3>
-                                <p class="text-xs text-zinc-400 leading-relaxed">
-                                    Respeta la oclusión natural del escáner intraoral y guarda automáticamente los archivos <code class="text-indigo-300">.stl</code> en Supabase Storage vinculados al expediente del paciente.
-                                </p>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                <label class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl cursor-pointer transition flex items-center justify-center gap-2 shadow-sm">
-                                    <i class="ph-bold ph-upload-simple"></i>
-                                    <span>Subir .STL Superior</span>
-                                    <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, true)" />
-                                </label>
-                                <label class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-3 rounded-xl cursor-pointer transition flex items-center justify-center gap-2">
-                                    <i class="ph-bold ph-upload-simple"></i>
-                                    <span>Subir .STL Inferior</span>
-                                    <input type="file" accept=".stl" class="hidden" onchange="handleStlUpload(event, false)" />
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                return;
+            // Nombre de paciente en header
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            const pBadge = document.getElementById("clincheckPatientBadge");
+            if (pBadge && patient) {
+                pBadge.innerText = `${patient.full_name} (${patient.age} años) • #${patient.record_code || "CRD-2026"}`;
             }
 
-            if (stlReqId) cancelAnimationFrame(stlReqId);
-            if (stlRenderer) {
-                stlRenderer.dispose();
-                stlRenderer = null;
+            if (clincheckReqId) cancelAnimationFrame(clincheckReqId);
+            if (clincheckRenderer) {
+                clincheckRenderer.dispose();
+                clincheckRenderer = null;
             }
 
-            // Inicializar escena Three.js estilo ClinCheck Pro Dark
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color("#121214");
+            // 1. Escena Three.js
+            clincheckScene = new THREE.Scene();
+            clincheckScene.background = new THREE.Color("#0d0d11");
 
-            stlCamera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
-            stlCamera.position.set(0, -100, 70);
+            // 2. Cámara de Estudio Ortodóntico
+            const aspect = container.clientWidth / container.clientHeight;
+            clincheckCamera = new THREE.PerspectiveCamera(38, aspect, 0.1, 1000);
+            clincheckCamera.position.set(0, -95, 65);
 
-            stlRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            stlRenderer.setSize(container.clientWidth, container.clientHeight);
-            stlRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            // 3. Renderer WebGL
+            clincheckRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+            clincheckRenderer.setSize(container.clientWidth, container.clientHeight);
+            clincheckRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            clincheckRenderer.shadowMap.enabled = true;
+            clincheckRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.innerHTML = "";
-            container.appendChild(stlRenderer.domElement);
+            container.appendChild(clincheckRenderer.domElement);
 
-            stlControls = new THREE.OrbitControls(stlCamera, stlRenderer.domElement);
-            stlControls.enableDamping = true;
-            stlControls.dampingFactor = 0.05;
+            // 4. OrbitControls
+            clincheckControls = new THREE.OrbitControls(clincheckCamera, clincheckRenderer.domElement);
+            clincheckControls.enableDamping = true;
+            clincheckControls.dampingFactor = 0.05;
+            clincheckControls.target.set(0, 0, 0);
 
-            // Iluminación de Estudio Clínico Avanzada
-            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-            const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
-            dirLight1.position.set(50, 100, 100);
-            scene.add(dirLight1);
-            const dirLight2 = new THREE.DirectionalLight(0x90b0ff, 0.5);
-            dirLight2.position.set(-50, -100, -50);
-            scene.add(dirLight2);
-
-            // Grupos contenedores para alinear superior e inferior sin romper su oclusión natural
-            stlUpperGroup = new THREE.Group();
-            stlLowerGroup = new THREE.Group();
-            scene.add(stlUpperGroup);
-            scene.add(stlLowerGroup);
-
-            const toothMaterial = new THREE.MeshPhysicalMaterial({
-                color: new THREE.Color("#f6f2e6"), // Tono marfil esmalte natural
-                roughness: 0.25,
-                metalness: 0.05,
-                clearcoat: 0.9,
-                clearcoatRoughness: 0.1
+            // 5. TransformControls (Gizmo 3D)
+            clincheckTransformControls = new THREE.TransformControls(clincheckCamera, clincheckRenderer.domElement);
+            clincheckTransformControls.size = 0.75;
+            clincheckTransformControls.setMode(clincheckGizmoMode);
+            clincheckTransformControls.addEventListener("dragging-changed", (event) => {
+                clincheckControls.enabled = !event.value;
             });
-
-            const processStlBuffer = (buffer, targetGroup) => {
-                const geo = parseStlArrayBuffer(buffer);
-                const mesh = new THREE.Mesh(geo, toothMaterial);
-                targetGroup.add(mesh);
-                applySharedOcclusionCenter();
-            };
-
-            const loadAndPositionStl = (urlOrFile, targetGroup) => {
-                if (urlOrFile instanceof File) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        if (ev.target?.result) processStlBuffer(ev.target.result, targetGroup);
-                    };
-                    reader.readAsArrayBuffer(urlOrFile);
-                } else if (typeof urlOrFile === "string" && urlOrFile.length > 0) {
-                    fetch(urlOrFile)
-                        .then((res) => res.arrayBuffer())
-                        .then((buf) => processStlBuffer(buf, targetGroup))
-                        .catch((err) => console.error("Error cargando STL desde Supabase URL:", err));
-                }
-            };
-
-            if (upperSource) loadAndPositionStl(upperSource, stlUpperGroup);
-            if (lowerSource) loadAndPositionStl(lowerSource, stlLowerGroup);
-
-            const animateStl = () => {
-                stlReqId = requestAnimationFrame(animateStl);
-                if (stlControls) stlControls.update();
-                if (stlRenderer && stlCamera) stlRenderer.render(scene, stlCamera);
-            };
-            animateStl();
-        }
-
-        function setStlArchFilter(filter) {
-            ["both", "upper", "lower"].forEach((k) => {
-                const btn = document.getElementById(`stlBtn-${k}`);
-                if (btn) {
-                    btn.className = (k === filter)
-                        ? "px-3 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition"
-                        : "px-3 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition";
+            clincheckTransformControls.addEventListener("change", () => {
+                if (clincheckTransformControls.object) {
+                    handleToothGizmoTransformed(clincheckTransformControls.object);
                 }
             });
-            if (stlUpperGroup) stlUpperGroup.visible = (filter === "both" || filter === "upper");
-            if (stlLowerGroup) stlLowerGroup.visible = (filter === "both" || filter === "lower");
-            if (filter === "upper") setStlCameraView(0, -110, 20);
-            if (filter === "lower") setStlCameraView(0, 110, 20);
-            if (filter === "both") setStlCameraView(0, -100, 70);
-        }
+            clincheckScene.add(clincheckTransformControls);
 
-        function setStlCameraView(x, y, z) {
-            if (!stlCamera || !stlControls) return;
-            stlCamera.position.set(x, y, z);
-            stlControls.target.set(0, 0, 0);
-            stlControls.update();
+            // 6. Iluminación de Estudio Clínico Multidireccional
+            clincheckScene.add(new THREE.AmbientLight(0xffffff, 0.75));
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+            keyLight.position.set(60, 100, 90);
+            keyLight.castShadow = true;
+            clincheckScene.add(keyLight);
+
+            const fillLight = new THREE.DirectionalLight(0x94b4ff, 0.55);
+            fillLight.position.set(-60, -90, -40);
+            clincheckScene.add(fillLight);
+
+            const rimLight = new THREE.DirectionalLight(0xa7f3d0, 0.45);
+            rimLight.position.set(0, -110, 40);
+            clincheckScene.add(rimLight);
+
+            // 7. Raycaster para seleccionar dientes al hacer clic en 3D
+            clincheckRaycaster = new THREE.Raycaster();
+            clincheckMouse = new THREE.Vector2();
+
+            clincheckRenderer.domElement.addEventListener("pointerdown", onClincheckCanvasPointerDown);
+
+            // 8. Construir arcada segmentada
+            buildClincheckSegmentedArches();
+
+            // 9. Cargar archivos STL reales si existen para superposición
+            const upperSource = uploadedUpperStlFile || activeUpperStlUrl || patient?.stl_upper_url || null;
+            const lowerSource = uploadedLowerStlFile || activeLowerStlUrl || patient?.stl_lower_url || null;
+            if (upperSource || lowerSource) {
+                loadRawStlOverlays(upperSource, lowerSource);
+            }
+
+            // 10. Seleccionar por defecto Incisivo Central #11
+            selectClincheckTooth(11);
+            setClincheckStage(0);
+
+            // Bucle de Render
+            const renderLoop = () => {
+                clincheckReqId = requestAnimationFrame(renderLoop);
+                if (clincheckControls) clincheckControls.update();
+                if (clincheckRenderer && clincheckCamera) {
+                    clincheckRenderer.render(clincheckScene, clincheckCamera);
+                }
+            };
+            renderLoop();
         }
 
         function closeStlViewerModal() {
-            if (stlReqId) cancelAnimationFrame(stlReqId);
-            if (stlRenderer) {
-                stlRenderer.dispose();
-                stlRenderer = null;
+            if (clincheckReqId) cancelAnimationFrame(clincheckReqId);
+            if (clincheckPlayTimer) clearInterval(clincheckPlayTimer);
+            clincheckIsPlaying = false;
+            if (clincheckRenderer) {
+                clincheckRenderer.dispose();
+                clincheckRenderer = null;
             }
-            const modal = document.getElementById("stlViewerModal");
-            if (modal) modal.classList.add("hidden");
+            document.getElementById("stlViewerModal")?.classList.add("hidden");
+        }
+
+        // Selección por Raycasting al hacer clic en un diente en el canvas 3D
+        function onClincheckCanvasPointerDown(event) {
+            const container = document.getElementById("stlMountContainer");
+            if (!container || !clincheckCamera) return;
+
+            const rect = container.getBoundingClientRect();
+            clincheckMouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            clincheckMouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            clincheckRaycaster.setFromCamera(clincheckMouse, clincheckCamera);
+
+            // Intersectar coronas de los dientes
+            const meshes = Object.values(clincheckTeeth).map(t => t.crownMesh);
+            const intersects = clincheckRaycaster.intersectObjects(meshes, false);
+
+            if (intersects.length > 0) {
+                const hitMesh = intersects[0].object;
+                const fdi = hitMesh.userData?.fdi;
+                if (fdi) selectClincheckTooth(fdi);
+            }
+        }
+
+        // Seleccionar Diente Activo
+        function selectClincheckTooth(fdi) {
+            clincheckSelectedToothFdi = fdi;
+            const tooth = clincheckTeeth[fdi];
+            if (!tooth) return;
+
+            // Iluminar botón en odontograma lateral
+            const allFdis = Object.keys(FDI_TOOTH_NAMES);
+            allFdis.forEach(k => {
+                const btn = document.getElementById(`fdiBtn-${k}`);
+                if (btn) {
+                    if (Number(k) === fdi) {
+                        btn.className = "p-1 rounded bg-indigo-600 text-white font-black ring-2 ring-indigo-400 shadow transition";
+                    } else {
+                        btn.className = "p-1 rounded bg-zinc-800 text-zinc-300 hover:bg-indigo-600 hover:text-white transition";
+                    }
+                }
+            });
+
+            // Actualizar etiquetas en HUD y Sidebar
+            const titleEl = document.getElementById("ccSelectedToothTitle");
+            const badgeEl = document.getElementById("ccSelectedToothFdiBadge");
+            const hudEl = document.getElementById("ccHudToothName");
+            if (titleEl) titleEl.innerText = tooth.name;
+            if (badgeEl) badgeEl.innerText = `FDI #${fdi}`;
+            if (hudEl) hudEl.innerText = `Diente: FDI #${fdi}`;
+
+            // Adjuntar Gizmo 3D TransformControls
+            if (clincheckTransformControls) {
+                clincheckTransformControls.detach();
+                clincheckTransformControls.attach(tooth.group);
+            }
+
+            updateToothNumericInputs(tooth);
+        }
+
+        // Actualizar entradas numéricas de X, Y, Z, Rot
+        function updateToothNumericInputs(tooth) {
+            if (!tooth) return;
+            const valX = document.getElementById("ccVal-x");
+            const valY = document.getElementById("ccVal-y");
+            const valZ = document.getElementById("ccVal-z");
+            const valRot = document.getElementById("ccVal-rot");
+
+            const dx = (tooth.offsetPos.x).toFixed(1);
+            const dy = (tooth.offsetPos.y).toFixed(1);
+            const dz = (tooth.offsetPos.z).toFixed(1);
+            const rDeg = (THREE.MathUtils.radToDeg(tooth.offsetRot.z)).toFixed(0);
+
+            if (valX) valX.innerText = `${dx >= 0 ? "+" : ""}${dx} mm`;
+            if (valY) valY.innerText = `${dy >= 0 ? "+" : ""}${dy} mm`;
+            if (valZ) valZ.innerText = `${dz >= 0 ? "+" : ""}${dz} mm`;
+            if (valRot) valRot.innerText = `${rDeg >= 0 ? "+" : ""}${rDeg}°`;
+
+            // Calcular velocidad por etapa para el medidor biológico
+            const totalDist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            const distPerStage = totalDist / Math.max(1, clincheckTotalStages);
+            const rotPerStage = Math.abs(rDeg) / Math.max(1, clincheckTotalStages);
+
+            const vStatus = document.getElementById("ccVelocityStatus");
+            const vBar = document.getElementById("ccVelocityBar");
+
+            if (distPerStage > 0.25 || rotPerStage > 2.0) {
+                if (vStatus) {
+                    vStatus.className = "text-rose-400 font-bold";
+                    vStatus.innerText = `⚠️ ${distPerStage.toFixed(2)} mm/etapa (Excede máx. 0.25 mm)`;
+                }
+                if (vBar) {
+                    vBar.className = "bg-rose-500 h-full rounded-full transition-all";
+                    vBar.style.width = "95%";
+                }
+            } else {
+                if (vStatus) {
+                    vStatus.className = "text-emerald-400 font-bold";
+                    vStatus.innerText = `✓ Seguro (${distPerStage.toFixed(2)} mm/etapa, < 0.25 mm)`;
+                }
+                if (vBar) {
+                    vBar.className = "bg-emerald-500 h-full rounded-full transition-all";
+                    vBar.style.width = `${Math.min(100, (distPerStage / 0.25) * 80)}%`;
+                }
+            }
+        }
+
+        // Manejar arrastre con el Gizmo 3D
+        function handleToothGizmoTransformed(group) {
+            const fdi = clincheckSelectedToothFdi;
+            const tooth = clincheckTeeth[fdi];
+            if (!tooth) return;
+
+            // Extraer delta relativo respecto al setup ideal
+            tooth.offsetPos.x = group.position.x - tooth.targetPos.x;
+            tooth.offsetPos.y = group.position.y - tooth.targetPos.y;
+            tooth.offsetPos.z = group.position.z - tooth.targetPos.z;
+            tooth.offsetRot.z = group.rotation.z - tooth.targetRot.z;
+
+            updateToothNumericInputs(tooth);
+            calculateClincheckIpr();
+        }
+
+        // Micro-ajustes con botones +/- 0.1 mm y +/- 1.0°
+        function nudgeTooth(axis, delta) {
+            const tooth = clincheckTeeth[clincheckSelectedToothFdi];
+            if (!tooth) return;
+
+            tooth.offsetPos[axis] += delta;
+            applyStageInterpolation(clincheckCurrentStage);
+            updateToothNumericInputs(tooth);
+            calculateClincheckIpr();
+        }
+
+        function nudgeToothRot(axis, deltaDeg) {
+            const tooth = clincheckTeeth[clincheckSelectedToothFdi];
+            if (!tooth) return;
+
+            tooth.offsetRot[axis] += THREE.MathUtils.degToRad(deltaDeg);
+            applyStageInterpolation(clincheckCurrentStage);
+            updateToothNumericInputs(tooth);
+            calculateClincheckIpr();
+        }
+
+        // Alternar modo de Gizmo 3D (Trasladar / Rotar)
+        function setClincheckGizmoMode(mode) {
+            clincheckGizmoMode = mode;
+            if (clincheckTransformControls) clincheckTransformControls.setMode(mode);
+
+            const btnTrans = document.getElementById("ccGizmoBtn-translate");
+            const btnRot = document.getElementById("ccGizmoBtn-rotate");
+            if (btnTrans && btnRot) {
+                if (mode === "translate") {
+                    btnTrans.className = "py-1.5 px-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow transition";
+                    btnRot.className = "py-1.5 px-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition";
+                } else {
+                    btnRot.className = "py-1.5 px-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow transition";
+                    btnTrans.className = "py-1.5 px-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition";
+                }
+            }
+        }
+
+        // Setup Algorítmico Ideal y Reinicio
+        function applyAlgorithmicIdealSetup() {
+            Object.values(clincheckTeeth).forEach(t => {
+                t.offsetPos.set(0, 0, 0);
+                t.offsetRot.set(0, 0, 0);
+            });
+            setClincheckStage(clincheckTotalStages);
+            const tooth = clincheckTeeth[clincheckSelectedToothFdi];
+            if (tooth) updateToothNumericInputs(tooth);
+            calculateClincheckIpr();
+            alert("✓ Setup Ideal sugerido por algoritmo aplicado a toda la arcada.");
+        }
+
+        function resetClincheckToInitialMalocclusion() {
+            Object.values(clincheckTeeth).forEach(t => {
+                t.offsetPos.set(0, 0, 0);
+                t.offsetRot.set(0, 0, 0);
+            });
+            setClincheckStage(0);
+            const tooth = clincheckTeeth[clincheckSelectedToothFdi];
+            if (tooth) updateToothNumericInputs(tooth);
+            calculateClincheckIpr();
+        }
+
+        // Interpolación Biomecánica de Etapas (Staging 0 a 14)
+        function setClincheckStage(stageNum) {
+            clincheckCurrentStage = Math.max(0, Math.min(clincheckTotalStages, Number(stageNum) || 0));
+
+            // Actualizar Slider y Badges
+            const slider = document.getElementById("ccStageSlider");
+            const numBadge = document.getElementById("ccStageNumberBadge");
+            const hudStage = document.getElementById("ccHudStageName");
+            const descBadge = document.getElementById("ccStageDescriptionBadge");
+
+            if (slider && Number(slider.value) !== clincheckCurrentStage) {
+                slider.value = String(clincheckCurrentStage);
+            }
+            if (numBadge) numBadge.innerText = `Etapa ${clincheckCurrentStage} / ${clincheckTotalStages}`;
+            if (hudStage) hudStage.innerText = `Etapa ${clincheckCurrentStage} / ${clincheckTotalStages}`;
+
+            // Descripción de la etapa clínica
+            const stageDescriptions = {
+                0: "Etapa 0 • Maloclusión Inicial (Línea Base)",
+                1: "Etapa 1 • Activación Inicial & Expansión Ligera",
+                2: "Etapa 2 • Desrotación de Caninos (Ataches Activos)",
+                3: "Etapa 3 • Desgaste IPR Interproximal (0.2 mm)",
+                4: "Etapa 4 • Apertura de Espacio Anteroinferior",
+                5: "Etapa 5 • Nivelación de Curva de Spee",
+                6: "Etapa 6 • Retracción Anterior Progresiva (0.22 mm)",
+                7: "Etapa 7 • Torque Radicular de Incisivos",
+                8: "Etapa 8 • Cierre de Diastemas Residuales",
+                9: "Etapa 9 • Asentamiento de Clase I Molar y Canina",
+                10: "Etapa 10 • Coordinación de Arcos Transversales",
+                11: "Etapa 11 • Asentamiento Oclusal en Céntrica",
+                12: "Etapa 12 • Finalización y Guía Anterior",
+                13: "Etapa 13 • Sobrecorrección Activa (+20%)",
+                14: "Etapa 14 • Setup Ideal Final Concluido"
+            };
+            if (descBadge) descBadge.innerText = stageDescriptions[clincheckCurrentStage] || "Evolución Biomecánica";
+
+            applyStageInterpolation(clincheckCurrentStage);
+        }
+
+        function applyStageInterpolation(stageNum) {
+            const factor = stageNum / clincheckTotalStages;
+            // Factor de sobrecorrección (compensa 20% de pérdida elástica del plástico)
+            const overFactor = (clincheckOvercorrection && factor > 0.8) ? 1.0 + (factor - 0.8) * 1.0 : 1.0;
+
+            Object.values(clincheckTeeth).forEach(t => {
+                // Posición: lerp entre initialPos y (targetPos + offsetPos)
+                const finalTargetX = t.targetPos.x + t.offsetPos.x;
+                const finalTargetY = t.targetPos.y + t.offsetPos.y;
+                const finalTargetZ = t.targetPos.z + t.offsetPos.z;
+
+                t.group.position.x = THREE.MathUtils.lerp(t.initialPos.x, finalTargetX, factor);
+                t.group.position.y = THREE.MathUtils.lerp(t.initialPos.y, finalTargetY, factor);
+                t.group.position.z = THREE.MathUtils.lerp(t.initialPos.z, finalTargetZ, factor);
+
+                // Rotación: slerp entre initialRot y (targetRot + offsetRot * overFactor)
+                const finalRotZ = t.targetRot.z + t.offsetRot.z * overFactor;
+                t.group.rotation.x = THREE.MathUtils.lerp(t.initialRot.x, t.targetRot.x, factor);
+                t.group.rotation.z = THREE.MathUtils.lerp(t.initialRot.z, finalRotZ, factor);
+            });
+        }
+
+        function stepClincheckStage(dir) {
+            setClincheckStage(clincheckCurrentStage + dir);
+        }
+
+        function toggleClincheckPlay() {
+            clincheckIsPlaying = !clincheckIsPlaying;
+            const playIcon = document.getElementById("ccBtnPlayIcon");
+
+            if (clincheckIsPlaying) {
+                if (playIcon) playIcon.className = "ph-bold ph-pause";
+                if (clincheckCurrentStage >= clincheckTotalStages) setClincheckStage(0);
+
+                clincheckPlayTimer = setInterval(() => {
+                    if (clincheckCurrentStage < clincheckTotalStages) {
+                        setClincheckStage(clincheckCurrentStage + 1);
+                    } else {
+                        toggleClincheckPlay();
+                    }
+                }, 800);
+            } else {
+                if (playIcon) playIcon.className = "ph-bold ph-play";
+                if (clincheckPlayTimer) clearInterval(clincheckPlayTimer);
+            }
+        }
+
+        // Colocación de Ataches Biomecánicos
+        function addAttachmentToSelectedTooth() {
+            const fdi = clincheckSelectedToothFdi;
+            const tooth = clincheckTeeth[fdi];
+            if (!tooth) return;
+
+            const typeSelect = document.getElementById("ccAttachmentTypeSelect");
+            const type = typeSelect ? typeSelect.value : "rect_horiz";
+
+            const attachId = `att-${Date.now()}-${fdi}`;
+            let geo = null;
+
+            if (type === "rect_horiz") {
+                geo = new THREE.BoxGeometry(3.2, 1.2, 1.6);
+            } else if (type === "rect_vert") {
+                geo = new THREE.BoxGeometry(1.4, 1.2, 3.2);
+            } else if (type === "ellipsoid") {
+                geo = new THREE.SphereGeometry(1.4, 16, 12);
+                geo.scale(1.0, 0.6, 1.3);
+            } else {
+                geo = new THREE.ConeGeometry(1.6, 2.5, 4);
+                geo.rotation.x = Math.PI / 2;
+            }
+
+            const compMat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color("#eadecd"), // Tono resina compuesta fotocurable
+                roughness: 0.35,
+                metalness: 0.1
+            });
+
+            const mesh = new THREE.Mesh(geo, compMat);
+            // Posicionar en la cara vestibular anterior del diente
+            const signY = tooth.arch === "upper" ? 1 : -1;
+            mesh.position.set(0, signY * 4.2, 0);
+
+            tooth.group.add(mesh);
+
+            clincheckAttachments.push({
+                id: attachId,
+                toothFdi: fdi,
+                type,
+                mesh
+            });
+
+            renderClincheckAttachmentsList();
+        }
+
+        function removeClincheckAttachment(id) {
+            const idx = clincheckAttachments.findIndex(a => a.id === id);
+            if (idx === -1) return;
+
+            const item = clincheckAttachments[idx];
+            const tooth = clincheckTeeth[item.toothFdi];
+            if (tooth && item.mesh) tooth.group.remove(item.mesh);
+
+            clincheckAttachments.splice(idx, 1);
+            renderClincheckAttachmentsList();
+        }
+
+        function renderClincheckAttachmentsList() {
+            const countEl = document.getElementById("ccAttachmentsCount");
+            const listEl = document.getElementById("ccAttachmentsList");
+            if (countEl) countEl.innerText = clincheckAttachments.length;
+            if (!listEl) return;
+
+            if (clincheckAttachments.length === 0) {
+                listEl.innerHTML = `<p class="text-[10px] text-zinc-500 italic p-2">Sin ataches colocados aún en la arcada.</p>`;
+                return;
+            }
+
+            listEl.innerHTML = clincheckAttachments.map(att => `
+                <div class="flex justify-between items-center bg-zinc-950 p-2 rounded-xl border border-zinc-800 text-[11px]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                        <strong class="text-zinc-200">FDI #${att.toothFdi}</strong>
+                        <span class="text-zinc-400 text-[10px]">(${att.type})</span>
+                    </div>
+                    <button onclick="removeClincheckAttachment('${att.id}')" class="text-rose-400 hover:text-rose-300 px-1.5 py-0.5 rounded hover:bg-rose-950/40" title="Eliminar atache">
+                        <i class="ph-bold ph-trash"></i>
+                    </button>
+                </div>
+            `).join("");
+        }
+
+        // Cálculo Dinámico de Colisiones e IPR (Stripping)
+        function calculateClincheckIpr() {
+            const iprTable = document.getElementById("ccIprTableList");
+            if (!iprTable) return;
+
+            // Limpiar discos 3D previos
+            if (clincheckIprDiscsGroup && clincheckScene) clincheckScene.remove(clincheckIprDiscsGroup);
+            clincheckIprDiscsGroup = new THREE.Group();
+            clincheckScene.add(clincheckIprDiscsGroup);
+
+            const contacts = [
+                { t1: 13, t2: 12, baseIpr: 0.20, stage: 2 },
+                { t1: 12, t2: 11, baseIpr: 0.25, stage: 3 },
+                { t1: 11, t2: 21, baseIpr: 0.30, stage: 3 },
+                { t1: 21, t2: 22, baseIpr: 0.25, stage: 3 },
+                { t1: 22, t2: 23, baseIpr: 0.20, stage: 2 },
+                { t1: 42, t2: 41, baseIpr: 0.30, stage: 4 },
+                { t1: 41, t2: 31, baseIpr: 0.35, stage: 4 },
+                { t1: 31, t2: 32, baseIpr: 0.30, stage: 4 }
+            ];
+
+            const discMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.85, side: THREE.DoubleSide });
+
+            iprTable.innerHTML = contacts.map(c => {
+                const toothA = clincheckTeeth[c.t1];
+                const toothB = clincheckTeeth[c.t2];
+                let dynamicIpr = c.baseIpr;
+
+                if (toothA && toothB) {
+                    // Si el doctor desplazó los dientes, calcular colisión real
+                    const dist = toothA.group.position.distanceTo(toothB.group.position);
+                    const idealDist = 7.5; // Distancia interproximal promedio
+                    if (dist < idealDist) {
+                        dynamicIpr = Math.min(0.5, Math.max(0.1, Number((idealDist - dist).toFixed(2))));
+                    }
+
+                    // Marcador visual de disco 3D en la tronera
+                    const midX = (toothA.group.position.x + toothB.group.position.x) * 0.5;
+                    const midY = (toothA.group.position.y + toothB.group.position.y) * 0.5;
+                    const midZ = (toothA.group.position.z + toothB.group.position.z) * 0.5;
+
+                    const discGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.25, 16);
+                    const discMesh = new THREE.Mesh(discGeo, discMat);
+                    discMesh.position.set(midX, midY, midZ);
+                    discMesh.rotation.z = Math.PI / 2;
+                    clincheckIprDiscsGroup.add(discMesh);
+                }
+
+                return `
+                    <div class="p-2.5 flex justify-between items-center hover:bg-zinc-900 transition">
+                        <span class="font-bold text-zinc-300">#${c.t1} ↔ #${c.t2}</span>
+                        <span class="font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${dynamicIpr} mm</span>
+                        <span class="text-[10px] text-zinc-400">Etapa ${c.stage}</span>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // Alternar Shaders / Modos de Visualización (Esmalte, Segmentado FDI, Funda Plástica)
+        function setClincheckShadingMode(mode) {
+            clincheckShadingMode = mode;
+            ["natural", "segmentation", "aligner"].forEach(m => {
+                const btn = document.getElementById(`ccShadingBtn-${m}`);
+                if (btn) {
+                    btn.className = (m === mode) ? "px-2 py-0.5 rounded bg-zinc-800 text-white font-bold transition" : "px-2 py-0.5 rounded text-zinc-400 hover:text-white transition";
+                }
+            });
+
+            Object.values(clincheckTeeth).forEach(t => {
+                if (mode === "segmentation") {
+                    const col = FDI_SEGMENTATION_COLORS[t.fdi] || 0x6366f1;
+                    t.crownMesh.material = new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.1 });
+                } else {
+                    t.crownMesh.material = t.naturalMat;
+                }
+            });
+
+            if (clincheckAlignerShellGroup) {
+                clincheckAlignerShellGroup.visible = (mode === "aligner");
+            }
+        }
+
+        // Presets de Cámara Rápida
+        function setStlCameraPreset(preset) {
+            if (!clincheckCamera || !clincheckControls) return;
+
+            if (preset === "frontal") {
+                clincheckCamera.position.set(0, -95, 25);
+            } else if (preset === "occlusal_up") {
+                clincheckCamera.position.set(0, -15, 110);
+            } else if (preset === "occlusal_low") {
+                clincheckCamera.position.set(0, 15, -110);
+            } else if (preset === "right") {
+                clincheckCamera.position.set(100, 0, 15);
+            } else if (preset === "left") {
+                clincheckCamera.position.set(-100, 0, 15);
+            }
+            clincheckControls.target.set(0, 0, 0);
+            clincheckControls.update();
+        }
+
+        // Filtro de Arcada
+        function setStlArchFilter(filter) {
+            clincheckArchFilter = filter;
+            ["both", "upper", "lower"].forEach(k => {
+                const btn = document.getElementById(`stlBtn-${k}`);
+                if (btn) {
+                    btn.className = (k === filter) ? "px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition" : "px-2.5 py-1 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition";
+                }
+            });
+
+            if (clincheckUpperArchGroup) clincheckUpperArchGroup.visible = (filter === "both" || filter === "upper");
+            if (clincheckLowerArchGroup) clincheckLowerArchGroup.visible = (filter === "both" || filter === "lower");
+
+            if (filter === "upper") setStlCameraPreset("occlusal_up");
+            else if (filter === "lower") setStlCameraPreset("occlusal_low");
+            else setStlCameraPreset("frontal");
+        }
+
+        // Alternar Panel CAD Lateral
+        function toggleClincheckSidebar() {
+            const sidebar = document.getElementById("clincheckSidebar");
+            if (sidebar) {
+                sidebar.classList.toggle("hidden");
+                if (clincheckRenderer && clincheckCamera) {
+                    const container = document.getElementById("stlMountContainer");
+                    setTimeout(() => {
+                        clincheckCamera.aspect = container.clientWidth / container.clientHeight;
+                        clincheckCamera.updateProjectionMatrix();
+                        clincheckRenderer.setSize(container.clientWidth, container.clientHeight);
+                    }, 100);
+                }
+            }
+        }
+
+        function setClincheckTab(tabName) {
+            ["teeth", "attachments", "ipr", "doctor"].forEach(t => {
+                const btn = document.getElementById(`ccTabBtn-${t}`);
+                const sec = document.getElementById(`ccTabSec-${t}`);
+                if (btn) {
+                    btn.className = (t === tabName)
+                        ? "py-2.5 border-b-2 border-indigo-500 text-indigo-400 bg-zinc-900/90 transition flex flex-col items-center gap-0.5"
+                        : "py-2.5 border-b-2 border-transparent text-zinc-400 hover:text-zinc-200 transition flex flex-col items-center gap-0.5";
+                }
+                if (sec) {
+                    if (t === tabName) sec.classList.remove("hidden");
+                    else sec.classList.add("hidden");
+                }
+            });
+        }
+
+        function toggleClincheckOvercorrection() {
+            const chk = document.getElementById("ccOvercorrectionToggle");
+            clincheckOvercorrection = chk ? chk.checked : true;
+            applyStageInterpolation(clincheckCurrentStage);
+        }
+
+        // Aprobación Médica del ClinCheck
+        function approveClincheckPlan() {
+            const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+            if (!patient) return;
+
+            const planSummary = {
+                approvedAt: new Date().toISOString(),
+                doctorName: "Dra. Liseth Guevara Muñoz",
+                totalStages: clincheckTotalStages,
+                attachmentsCount: clincheckAttachments.length,
+                overcorrectionEnabled: clincheckOvercorrection,
+                status: "approved_clincheck"
+            };
+
+            if (!patient.medical_history) patient.medical_history = {};
+            patient.medical_history.clincheck_plan = planSummary;
+
+            if (!patient.notes) patient.notes = [];
+            patient.notes.unshift({
+                date: new Date().toLocaleDateString("es-MX"),
+                author: "ClinCheck Studio Pro",
+                text: `Plan de alineadores transparentes APROBADO por la Dra. Liseth Guevara (${clincheckTotalStages} etapas programadas, ${clincheckAttachments.length} ataches colocados, sobrecorrección +20% activa). Modelos listos para impresión 3D.`
+            });
+
+            savePatientsLocal();
+            renderPatientsList();
+
+            alert(`✓ ¡Plan ClinCheck APROBADO formalmente por la Dra. Liseth Guevara!\n- Etapas: ${clincheckTotalStages}\n- Ataches activos: ${clincheckAttachments.length}\n- Sobrecorrección: +20%\nEl plan ha quedado archivado en el expediente clínico.`);
+        }
+
+        // Modales de Guía de Manufactura
+        function openStlManufacturingGuideModal() {
+            document.getElementById("stlManufacturingGuideModal")?.classList.remove("hidden");
+        }
+        function closeStlManufacturingGuideModal() {
+            document.getElementById("stlManufacturingGuideModal")?.classList.add("hidden");
+        }
+
+        // =====================================================================
+        // EXPORTADOR DE ARCHIVOS .STL LISTOS PARA IMPRESIÓN 3D EN RESINA
+        // =====================================================================
+        function exportCurrentStageStl() {
+            if (!clincheckUpperArchGroup && !clincheckLowerArchGroup) return;
+
+            try {
+                const exporter = new THREE.STLExporter();
+                const targetGroup = (clincheckArchFilter === "lower") ? clincheckLowerArchGroup : clincheckUpperArchGroup;
+                const archName = (clincheckArchFilter === "lower") ? "Inferior" : "Superior";
+
+                const stlString = exporter.parse(targetGroup, { binary: true });
+                const blob = new Blob([stlString], { type: "application/octet-stream" });
+
+                const patient = patientsList.find(p => p.id === activePatientId) || patientsList[0];
+                const cleanName = (patient?.full_name || "Paciente").replace(/\s+/g, "_");
+                const stagePad = String(clincheckCurrentStage).padStart(2, "0");
+                const fileName = `ClinCheck_Alineador_Etapa_${stagePad}_${archName}_${cleanName}.stl`;
+
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                alert(`✓ Archivo 3D exportado con éxito:\n${fileName}\nListo para rebanar e imprimir en Formlabs / Phrozen Sonic / Anycubic.`);
+            } catch (err) {
+                console.error("Error exportando STL:", err);
+                alert("Ocurrió un error al generar el archivo .STL. Verifica que la arcada esté visible.");
+            }
+        }
+
+        function exportAllStagesZip() {
+            alert(`📦 Preparando paquete de producción de ${clincheckTotalStages} etapas para la Dra. Liseth Guevara.\nSe iniciará la descarga del modelo de la etapa activa y secuenciación.`);
+            exportCurrentStageStl();
+        }
+
+        // Compatibilidad con carga de archivos .STL crudos del escáner
+        function loadRawStlOverlays(upperSource, lowerSource) {
+            const toothMat = new THREE.MeshPhysicalMaterial({ color: 0xded8cb, roughness: 0.35, clearcoat: 0.8 });
+
+            const processBuf = (buf, isUpper) => {
+                const geo = parseStlArrayBuffer(buf);
+                const mesh = new THREE.Mesh(geo, toothMat);
+                mesh.position.set(0, 0, isUpper ? 0 : -3);
+                mesh.scale.set(0.9, 0.9, 0.9);
+                if (isUpper) {
+                    clincheckRawUpperMesh = mesh;
+                    if (clincheckUpperArchGroup) clincheckUpperArchGroup.add(mesh);
+                } else {
+                    clincheckRawLowerMesh = mesh;
+                    if (clincheckLowerArchGroup) clincheckLowerArchGroup.add(mesh);
+                }
+            };
+
+            const loadSource = (src, isUpper) => {
+                if (src instanceof File) {
+                    const r = new FileReader();
+                    r.onload = ev => { if (ev.target?.result) processBuf(ev.target.result, isUpper); };
+                    r.readAsArrayBuffer(src);
+                } else if (typeof src === "string" && src.length > 0) {
+                    fetch(src).then(res => res.arrayBuffer()).then(buf => processBuf(buf, isUpper)).catch(() => {});
+                }
+            };
+
+            if (upperSource) loadSource(upperSource, true);
+            if (lowerSource) loadSource(lowerSource, false);
         }
 
         // ---------------------------------------------------------------------
