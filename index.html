@@ -634,27 +634,42 @@
 
                         <!-- Location 1: Norte (Plaza Carey) -->
                         <div class="location-item active"
-                            data-map-url="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.658897576974!2d-89.5886766850672!3d21.0463289859888!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5676e5b6b6b6b7%3A0x1234567890abcdef!2sDra.%20Liseth%20Guevara%20-%20Ortodoncia%20%26%20Odontolog%C3%ADa%20Integral!5e0!3m2!1ses!2smx!4v1625680000000!5m2!1ses!2smx">
-                            <h5>Sede 1 (Norte)</h5>
+                            data-map-url="https://maps.google.com/maps?q=21.0063986,-89.5823046&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                            data-external-url="https://maps.app.goo.gl/nx2ShRooKnHrP4hS8">
+                            <h5>Sede 1 (Norte - Plaza Carey)</h5>
                             <p>Av. Yucatán #351, Plaza Carey, 2do Piso, Local 4.</p>
-                            <small class="click-hint"><i class="fas fa-hand-pointer"></i> Ver en mapa</small>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px;">
+                                <small class="click-hint"><i class="fas fa-hand-pointer"></i> Ver en mapa</small>
+                                <a href="https://maps.app.goo.gl/nx2ShRooKnHrP4hS8" target="_blank" rel="noopener noreferrer" class="btn-open-maps" onclick="event.stopPropagation()" style="font-size: 0.72rem; font-weight: 700; color: #0071e3; background: rgba(0, 113, 227, 0.08); padding: 4px 10px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
+                                    <i class="fas fa-external-link-alt"></i> Abrir en Google Maps
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Location 2: Francisco de Montejo -->
                         <div class="location-item"
-                            data-map-url="https://maps.google.com/maps?q=Calle+50+114+entre+37+y+39+Francisco+de+Montejo+Merida+Yucatan&t=&z=16&ie=UTF8&iwloc=&output=embed">
+                            data-map-url="https://maps.google.com/maps?q=21.0422696,-89.641689&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                            data-external-url="https://maps.app.goo.gl/WJb414oQ3krA4zD8A">
                             <h5>Sede 2 (Francisco de Montejo)</h5>
                             <p>Calle 50 #114 entre 37 y 39, Francisco de Montejo.</p>
-                            <small class="click-hint"><i class="fas fa-hand-pointer"></i> Ver en mapa</small>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px;">
+                                <small class="click-hint"><i class="fas fa-hand-pointer"></i> Ver en mapa</small>
+                                <a href="https://maps.app.goo.gl/WJb414oQ3krA4zD8A" target="_blank" rel="noopener noreferrer" class="btn-open-maps" onclick="event.stopPropagation()" style="font-size: 0.72rem; font-weight: 700; color: #0071e3; background: rgba(0, 113, 227, 0.08); padding: 4px 10px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;">
+                                    <i class="fas fa-external-link-alt"></i> Abrir en Google Maps
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Map Column -->
-                <div class="contact-map">
+                <div class="contact-map" style="position: relative;">
                     <iframe id="map-frame"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.136036830799!2d-89.5886766850683!3d21.012228986008264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5676e5b6b6b6b7%3A0x1234567890abcdef!2sM%C3%A9rida%2C%20Yuc.!5e0!3m2!1ses!2smx!4v1625680000000!5m2!1ses!2smx"
+                        src="https://maps.google.com/maps?q=21.0063986,-89.5823046&t=&z=17&ie=UTF8&iwloc=&output=embed"
                         class="map-frame" allowfullscreen="" loading="lazy"></iframe>
+                    <a id="btn-map-directions" href="https://maps.app.goo.gl/nx2ShRooKnHrP4hS8" target="_blank" rel="noopener noreferrer" style="position: absolute; bottom: 16px; right: 16px; background: #0071e3; color: #ffffff; padding: 9px 16px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 14px rgba(0,0,0,0.28); display: flex; align-items: center; gap: 6px; z-index: 5; transition: transform 0.2s, background 0.2s;">
+                        <i class="fas fa-directions"></i> Cómo llegar en Google Maps
+                    </a>
                 </div>
             </div>
         </div>

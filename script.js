@@ -41,11 +41,18 @@ function initMobileDrawer() {
 function initMapInteractivity() {
     const locationItems = document.querySelectorAll('.location-item');
     const mapFrame = document.getElementById('map-frame');
+    const mapDirectionsBtn = document.getElementById('btn-map-directions');
 
-    // Set initial map if not set
+    // Set initial map and directions if not set
     const activeItem = document.querySelector('.location-item.active');
-    if (activeItem && mapFrame && !mapFrame.src) {
-        mapFrame.src = activeItem.getAttribute('data-map-url');
+    if (activeItem) {
+        if (mapFrame && !mapFrame.src) {
+            mapFrame.src = activeItem.getAttribute('data-map-url');
+        }
+        if (mapDirectionsBtn) {
+            const extUrl = activeItem.getAttribute('data-external-url');
+            if (extUrl) mapDirectionsBtn.href = extUrl;
+        }
     }
 
     locationItems.forEach(item => {
@@ -58,6 +65,12 @@ function initMapInteractivity() {
             const mapUrl = item.getAttribute('data-map-url');
             if (mapUrl && mapFrame) {
                 mapFrame.src = mapUrl;
+            }
+
+            // Update directions external URL
+            const extUrl = item.getAttribute('data-external-url');
+            if (extUrl && mapDirectionsBtn) {
+                mapDirectionsBtn.href = extUrl;
             }
         });
     });
