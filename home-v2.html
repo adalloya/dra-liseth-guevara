@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Dra. Liseth Guevara | Brackets Estéticos y Ortodoncia en Mérida</title>
+  <meta name="description" content="Especialista en Brackets Estéticos de Zafiro, Autoligado e Invisalign en Mérida. Evaluación Gratuita y Facilidades de Pago en Sede Norte (Plaza Carey) y Poniente (Yucalpetén)." />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tipografía Estilo Apple (Plus Jakarta Sans + Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Three.js & Lucide Icons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            display: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            apple: {
+              bg: '#F5F5F7',
+              dark: '#1D1D1F',
+              gray: '#6E6E73',
+              blue: '#0066CC',
+              pearl: '#FAFAFC'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F5F5F7;
+      color: #1D1D1F;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .glass-header {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    .glass-pill {
+      background: rgba(29, 29, 31, 0.88);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    .bento-card {
+      background: #FFFFFF;
+      border-radius: 28px;
+      box-shadow: 0 4px 28px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+    }
+    /* Placeholder Visual Guide Overlay */
+    .photo-placeholder {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+      border: 1.5px dashed #cbd5e1;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Custom Apple Slider */
+    input[type=range].apple-range {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range].apple-range::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #E5E5EA;
+    }
+    input[type=range].apple-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 28px;
+      width: 28px;
+      border-radius: 50%;
+      background: #1D1D1F;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      margin-top: -10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="pb-24 md:pb-0">
+
+  <!-- TOP BANNER DE VISTA PREVIA (V2) CON BOTÓN PARA VOLVER AL HOME ACTUAL -->
+  <div class="bg-gradient-to-r from-sky-700 via-indigo-700 to-sky-700 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-medium tracking-wide border-b border-white/10 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="inline-flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span><strong>Propuesta de Rediseño (Home v2)</strong> · El diseño original sigue activo como predeterminado.</span>
+      </div>
+      <a href="index.html" class="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white text-white hover:text-slate-900 font-bold px-3 py-1 rounded-full text-[11px] transition">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        <span>Volver al Diseño Actual (Default)</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- TOP PROMO BAR: EVALUACIÓN GRATUITA & FACILIDADES DE PAGO -->
+  <div class="bg-apple-dark text-white text-[11px] sm:text-xs py-2 px-4 text-center font-medium tracking-wide">
+    <span class="inline-flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <strong>Beneficio Exclusivo Online:</strong> Cita de Evaluación Gratuita + Facilidades de Pago en Brackets Estéticos · 
+      <a href="#agendar" class="underline text-sky-300 hover:text-white ml-1">Reservar por WhatsApp →</a>
+    </span>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 glass-header border-b border-black/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <img src="logo-icon.jpg" alt="Logo Dra. Liseth Guevara" class="w-9 h-9 rounded-xl object-cover shadow-xs">
+        <div>
+          <span class="font-display font-bold text-sm sm:text-base tracking-tight block leading-none">Dra. Liseth Guevara</span>
+          <span class="text-[11px] text-apple-gray font-medium">Ortodoncista · Mérida, Yuc.</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-xs font-semibold text-apple-dark/80">
+        <a href="#casos" class="hover:text-black transition">Antes y Después</a>
+        <a href="#brackets-3d" class="hover:text-black transition">Brackets Estéticos</a>
+        <a href="#experiencia" class="hover:text-black transition">Experiencia Premium</a>
+        <a href="#opiniones" class="hover:text-black transition">Opiniones (9.8★)</a>
+        <a href="#ubicacion" class="hover:text-black transition">2 Sedes en Mérida</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-apple-gray hover:text-apple-dark px-2.5 sm:px-3 py-1.5 rounded-full border border-black/10 bg-white hover:bg-gray-50 transition" title="Regresar al diseño predeterminado">
+          <i data-lucide="arrow-left" class="w-3 h-3"></i>
+          <span>Default</span>
+        </a>
+        <a href="#agendar" class="bg-apple-dark hover:bg-black text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition flex items-center gap-1.5 shadow-sm">
+          <span>Evaluación</span>
+          <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION + THREE.JS INTERACTIVE SAPPHIRE BRACKETS -->
+  <section id="brackets-3d" class="relative overflow-hidden bg-gradient-to-b from-white via-[#F5F5F7] to-[#F5F5F7] pt-8 pb-16 lg:py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Left Copy (Mobile-First Conversion Focus) -->
+      <div class="lg:col-span-6 space-y-5 text-center lg:text-left z-10">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/5 shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sky-600"></i>
+          <span class="text-xs font-semibold text-apple-dark">Especialista en Brackets Estéticos & Invisalign®</span>
+        </div>
+
+        <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-[56px] tracking-tight text-apple-dark leading-[1.06]">
+          Realza tu belleza con la <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-600 to-indigo-600">Dra. Liseth Guevara.</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-apple-gray max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          Tu transformación comienza aquí. Alinea tu sonrisa en Mérida con <strong class="text-apple-dark">Brackets Estéticos de Zafiro/Cerámica</strong> casi imperceptibles, sin dolor y viendo cambios desde las primeras semanas.
+        </p>
+
+        <!-- Value Badges: Evaluación Gratuita + Facilidades de Pago -->
+        <div class="grid grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0 pt-1">
+          <div class="bg-white p-3.5 rounded-2xl border border-black/5 flex items-center gap-3 text-left shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <i data-lucide="gift" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="font-display font-bold text-xs sm:text-sm text-apple-dark">Evaluación Gratuita</p>
+              <p class="text-[11px] text-apple-gray">Diagnóstico directo con la Dra.</p>
+            </div>
+          </div>
+          <div class="bg-white p-3.5 rounded-2xl border border-black/5 flex items-center gap-3 text-left shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+              <i data-lucide="credit-card" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="font-display font-bold text-xs sm:text-sm text-apple-dark">Facilidades de Pago</p>
+              <p class="text-[11px] text-apple-gray">Planes mensuales a tu medida</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+          <a href="#agendar" class="w-full sm:w-auto px-7 py-4 rounded-full bg-apple-dark hover:bg-black text-white font-display font-bold text-sm sm:text-base shadow-lg shadow-black/10 transition flex items-center justify-center gap-2">
+            <i data-lucide="message-circle" class="w-5 h-5 text-emerald-400"></i>
+            <span>Agendar Evaluación Gratis</span>
+          </a>
+          <a href="#casos" class="w-full sm:w-auto px-6 py-4 rounded-full bg-white hover:bg-gray-50 text-apple-dark border border-black/10 font-semibold text-sm sm:text-base transition flex items-center justify-center gap-2">
+            <span>Ver Antes y Después</span>
+            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Three.js Interactive 3D Sapphire Bracket Viewer + Material Switcher -->
+      <div class="lg:col-span-6 relative">
+        <div class="bento-card p-4 sm:p-6 bg-gradient-to-b from-white to-[#F5F5F7] relative overflow-hidden">
+          <!-- Top Bar inside 3D Card -->
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2 relative z-10">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 flex items-center gap-1.5">
+              <i data-lucide="rotate-3d" class="w-4 h-4"></i> Simulador 3D Interactivo
+            </span>
+            <!-- Material Toggle: Estético vs Metálico -->
+            <div class="inline-flex p-1 rounded-full bg-black/5 border border-black/5 text-xs">
+              <button type="button" id="btn-mat-sapphire" onclick="setBracketMaterial('sapphire')" class="px-3 py-1 rounded-full bg-white text-apple-dark font-semibold shadow-sm transition">
+                💎 Bracket Estético (Zafiro)
+              </button>
+              <button type="button" id="btn-mat-metal" onclick="setBracketMaterial('metal')" class="px-3 py-1 rounded-full text-apple-gray font-medium transition">
+                ⚙️ Autoligado Metálico
+              </button>
+            </div>
+          </div>
+
+          <!-- Three.js Canvas Container -->
+          <div id="three-container" class="w-full h-[300px] sm:h-[360px] cursor-grab active:cursor-grabbing relative"></div>
+
+          <!-- Interactive 6-Month Scrubber integrated below 3D model -->
+          <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-black/5 mt-2 relative z-10">
+            <div class="flex justify-between items-center text-xs mb-1.5">
+              <span class="font-semibold text-apple-dark">Desliza para ver la corrección en 6 meses:</span>
+              <span id="month-label" class="font-display font-bold text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">Mes 6 · Sonrisa Alineada ✨</span>
+            </div>
+            <input id="arch-slider" type="range" min="0" max="100" value="95" class="w-full apple-range" aria-label="Progreso de alineación dental" />
+            <div class="flex justify-between text-[11px] text-apple-gray mt-1">
+              <span>Semana 1 (Apiñamiento)</span>
+              <span>Mes 3 (Nivelación)</span>
+              <span>Mes 6 (Nueva Sonrisa)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECCIÓN ANTES Y DESPUÉS (CON SLIDER TÁCTIL + FOTOS REALES) -->
+  <section id="casos" class="py-14 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <span class="text-xs font-semibold uppercase tracking-widest text-sky-600">Resultados Reales en Mérida</span>
+      <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight mt-2 text-apple-dark">
+        Antes y Después del Tratamiento.
+      </h2>
+      <p class="text-apple-gray text-sm sm:text-lg mt-3">
+        Descubre cómo solucionamos problemas similares al tuyo. Si bien solo la doctora determina el tiempo exacto en tu evaluación gratuita, <strong class="text-apple-dark">empezarás a ver cambios en semanas y una nueva sonrisa en tan solo 6 meses</strong>.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Interactive Before/After Image Comparison Slider -->
+      <div class="lg:col-span-7 bento-card p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Caso de Éxito · Brackets Estéticos</span>
+            <h3 class="font-display font-bold text-lg text-apple-dark mt-1">Alineación y Diseño de Sonrisa</h3>
+          </div>
+          <span class="text-xs text-apple-gray flex items-center gap-1">
+            <i data-lucide="move-horizontal" class="w-4 h-4"></i> Desliza la barra
+          </span>
+        </div>
+
+        <!-- Comparison Box -->
+        <div class="relative w-full h-[290px] sm:h-[360px] rounded-2xl overflow-hidden select-none bg-slate-900 border border-black/5" id="ba-container">
+          
+          <!-- IMAGEN DESPUÉS (FONDO COMPLETO) -->
+          <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-900">
+            <img src="case1_after.jpg" class="w-full h-full object-cover" alt="Después del tratamiento Dra Liseth Guevara" />
+            <span class="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-emerald-600/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-md backdrop-blur-sm">
+              DESPUÉS
+            </span>
+          </div>
+
+          <!-- IMAGEN ANTES (RECORTADA DINÁMICAMENTE POR EL SLIDER) -->
+          <div id="ba-before-layer" class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r-2 border-white shadow-xl bg-slate-900">
+            <img src="case1_before.jpg" class="w-[650px] max-w-none h-full object-cover" alt="Antes del tratamiento Dra Liseth Guevara" />
+            <span class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-apple-dark/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-md backdrop-blur-sm">
+              ANTES
+            </span>
+          </div>
+
+          <!-- Range Control Overlay -->
+          <input type="range" min="5" max="95" value="50" id="ba-slider" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30" aria-label="Comparador antes y después" />
+
+          <!-- Visual Handle -->
+          <div id="ba-handle" class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-lg border border-black/10 flex items-center justify-center pointer-events-none z-20">
+            <i data-lucide="chevrons-left-right" class="w-5 h-5 text-apple-dark"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Additional Case Cards + Retrato de la Dra. Liseth -->
+      <div class="lg:col-span-5 space-y-5">
+        <!-- Retrato Dra. Liseth Real -->
+        <div class="bento-card p-5 flex flex-col sm:flex-row items-center gap-5">
+          <div class="w-28 h-32 sm:w-32 sm:h-36 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-black/5">
+            <img src="dr-standing.jpg" alt="Dra. Liseth Guevara Ortodoncista" class="w-full h-full object-cover" />
+          </div>
+          <div>
+            <span class="text-[11px] font-bold uppercase text-sky-600">Atención 100% Personalizada</span>
+            <h3 class="font-display font-bold text-lg text-apple-dark mt-0.5">Dra. Liseth Guevara</h3>
+            <p class="text-xs text-apple-gray mt-1 leading-relaxed">
+              Especialista en Ortodoncia y Ortopedia Maxilar (Céd. Prof. 11152197). Certificada en Invisalign® Align Technology. Ella misma te atiende en cada ajuste.
+            </p>
+            <a href="#agendar" class="inline-flex items-center gap-1 text-xs font-bold text-apple-dark mt-3 hover:text-sky-600">
+              <span>Agendar valoración gratuita con la Dra.</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Segundo Caso Antes/Después Resumen -->
+        <div class="bento-card p-5">
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div class="h-28 rounded-xl overflow-hidden relative border border-black/5">
+              <img src="case2_before.jpg" alt="Caso 2 Antes" class="w-full h-full object-cover" />
+              <span class="absolute bottom-1.5 left-1.5 text-[9px] font-bold bg-black/80 text-white px-2 py-0.5 rounded-full">ANTES</span>
+            </div>
+            <div class="h-28 rounded-xl overflow-hidden relative border border-black/5">
+              <img src="case2_after.jpg" alt="Caso 2 Después" class="w-full h-full object-cover" />
+              <span class="absolute bottom-1.5 right-1.5 text-[9px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">DESPUÉS</span>
+            </div>
+          </div>
+          <p class="text-xs font-semibold text-apple-dark">Corrección de Apiñamiento y Mordida</p>
+          <p class="text-[11px] text-apple-gray">Tratamiento con Brackets Estéticos de alta precisión · Sin extracciones innecesarias.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SEGMENTOS: ADULTOS, ADOLESCENTES Y NIÑOS (RESPETANDO TODO EL CONTENIDO ORIGINAL) -->
+  <section class="py-12 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <span class="text-xs font-semibold uppercase tracking-widest text-apple-gray">Para Todas las Edades</span>
+      <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight mt-2">
+        Cada sonrisa cuenta una historia. ¿Cuál será la tuya?
+      </h2>
+      <p class="text-apple-gray text-sm sm:text-base mt-3">
+        ¿Una sensación de confianza renovada? ¿Mejores relaciones con las personas? ¿O simplemente sentirte mejor contigo mismo? Funciona para adultos, adolescentes y niños.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Adultos -->
+      <div class="bento-card p-7 flex flex-col justify-between border-t-4 border-t-sky-600">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-3 py-1 rounded-full">Más Solicitado</span>
+          <h3 class="font-display font-bold text-2xl text-apple-dark mt-4">Adultos</h3>
+          <p class="text-sm text-apple-gray mt-2 leading-relaxed">
+            Nunca es tarde para mejorar tu sonrisa. Consigue la alineación perfecta con tratamientos discretos, invisibles y rápidos que se adaptan a tu vida profesional y social.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-black/5">
+          <p class="text-xs font-semibold text-apple-dark mb-3">Ideal con: Brackets Estéticos de Zafiro o Invisalign®</p>
+          <a href="#agendar" onclick="preselectTreatment('Brackets Estéticos (Adulto)')" class="w-full py-2.5 rounded-xl bg-[#F5F5F7] hover:bg-apple-dark hover:text-white text-apple-dark font-semibold text-xs transition flex items-center justify-center gap-1.5">
+            <span>Evaluación Gratis para Adultos</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Adolescentes -->
+      <div class="bento-card p-7 flex flex-col justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Estética & Confianza</span>
+          <h3 class="font-display font-bold text-2xl text-apple-dark mt-4">Adolescentes</h3>
+          <p class="text-sm text-apple-gray mt-2 leading-relaxed">
+            Sabemos que la imagen lo es todo. Ofrecemos opciones discretas como <strong class="text-apple-dark">brackets estéticos e Invisalign</strong> para que logren la sonrisa de sus sueños sin perder confianza en sus fotos.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-black/5">
+          <p class="text-xs font-semibold text-apple-dark mb-3">Ideal con: Brackets Estéticos o Autoligado Rápido</p>
+          <a href="#agendar" onclick="preselectTreatment('Brackets para Adolescente')" class="w-full py-2.5 rounded-xl bg-[#F5F5F7] hover:bg-apple-dark hover:text-white text-apple-dark font-semibold text-xs transition flex items-center justify-center gap-1.5">
+            <span>Evaluación Gratis Adolescentes</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Niños -->
+      <div class="bento-card p-7 flex flex-col justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Detección Temprana</span>
+          <h3 class="font-display font-bold text-2xl text-apple-dark mt-4">Niños</h3>
+          <p class="text-sm text-apple-gray mt-2 leading-relaxed">
+            La detección temprana es clave. Guiamos el crecimiento de los maxilares y dientes de tu hijo para evitar problemas complejos en el futuro. ¡Una sonrisa sana desde el inicio!
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-black/5">
+          <p class="text-xs font-semibold text-apple-dark mb-3">Ideal con: Ortopedia Maxilar e Intercepción</p>
+          <a href="#agendar" onclick="preselectTreatment('Valoración Infantil (Niños)')" class="w-full py-2.5 rounded-xl bg-[#F5F5F7] hover:bg-apple-dark hover:text-white text-apple-dark font-semibold text-xs transition flex items-center justify-center gap-1.5">
+            <span>Evaluación Gratis Infantil</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCIA PREMIUM: LOS 4 PILARES DEL SITIO ORIGINAL EN FORMATO APPLE BENTO -->
+  <section id="experiencia" class="py-12 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="mb-10 text-center sm:text-left">
+      <span class="text-xs font-semibold uppercase tracking-widest text-sky-600">Por qué elegir a la Dra. Liseth</span>
+      <h2 class="font-display font-bold text-3xl sm:text-5xl tracking-tight mt-1">
+        Experiencia Premium.
+      </h2>
+      <p class="text-apple-gray text-sm sm:text-base mt-2">
+        Tecnología avanzada en un ambiente diseñado para tu confort, con facilidades de pago claras desde el primer día.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- 1. Instalaciones de Primer Nivel -->
+      <div class="bento-card p-7">
+        <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-bold text-xl sm:text-2xl text-apple-dark">Instalaciones de Primer Nivel</h3>
+        <p class="text-sm text-apple-gray mt-2">
+          Tu comodidad es nuestra prioridad. Hemos diseñado un espacio moderno y relajante donde la ansiedad dental desaparece.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs sm:text-sm text-apple-dark font-medium">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Sillones ergonómicos de última generación.</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Ambiente climatizado y relajante.</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Estrictos protocolos de esterilización.</li>
+        </ul>
+      </div>
+
+      <!-- 2. Atención 100% Personalizada -->
+      <div class="bento-card p-7">
+        <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+          <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-bold text-xl sm:text-2xl text-apple-dark">Atención 100% Personalizada</h3>
+        <p class="text-sm text-apple-gray mt-2">
+          No eres un número más. La Dra. Liseth Guevara diseña cada plan de tratamiento específicamente para tu anatomía y objetivos.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs sm:text-sm text-apple-dark font-medium">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Diagnóstico facial y dental completo (Sin costo en tu 1ª visita).</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Acompañamiento en cada cita por la doctora.</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Comunicación directa por WhatsApp para dudas.</li>
+        </ul>
+      </div>
+
+      <!-- 3. Expertise Certificado -->
+      <div class="bento-card p-7 bg-apple-dark text-white">
+        <div class="w-11 h-11 rounded-2xl bg-white/10 text-sky-400 flex items-center justify-center mb-4">
+          <i data-lucide="award" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-bold text-xl sm:text-2xl">Expertise Certificado</h3>
+        <p class="text-sm text-white/75 mt-2">
+          Tu sonrisa está en manos expertas. La Dra. Liseth combina años de experiencia clínica en México (desde 2015) con educación continua en las últimas técnicas.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs sm:text-sm text-white/90 font-medium">
+          <li class="flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-sky-400"></i> Especialista en Ortodoncia y Ortopedia Maxilar.</li>
+          <li class="flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-sky-400"></i> Certificada en Invisalign® y Ortodoncia Invisible.</li>
+          <li class="flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-sky-400"></i> Más de 111 reseñas verificadas con calificación 9.8/10.</li>
+        </ul>
+      </div>
+
+      <!-- 4. Tecnología, Precisión y Facilidades -->
+      <div class="bento-card p-7">
+        <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+          <i data-lucide="cpu" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-display font-bold text-xl sm:text-2xl text-apple-dark">Tecnología y Precisión</h3>
+        <p class="text-sm text-apple-gray mt-2">
+          Utilizamos herramientas digitales avanzadas para garantizar diagnósticos exactos y tratamientos más rápidos y cómodos.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs sm:text-sm text-apple-dark font-medium">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Planificación digital de sonrisa.</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Brackets estéticos y de autoligado de alta tecnología.</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Menos tiempo en el sillón y planes de pago mensuales.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPINIONES DE PACIENTES -->
+  <section id="opiniones" class="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold mb-2">
+        <span>★ 9.8 / 10 Calificación en Mérida (+111 opiniones)</span>
+      </div>
+      <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight">
+        Lo que dicen nuestros pacientes.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="bento-card p-6 flex flex-col justify-between">
+        <p class="text-sm text-apple-dark leading-relaxed">
+          “La evaluación gratuita me resolvió todas mis dudas. Elegí los brackets estéticos con facilidades de pago y casi no se notan. La Dra. Liseth es sumamente cuidadosa.”
+        </p>
+        <div class="mt-4 pt-3 border-t border-black/5 flex justify-between items-center">
+          <div>
+            <p class="font-display font-bold text-sm">Sofía Rodríguez</p>
+            <p class="text-xs text-sky-600 font-medium">Brackets Estéticos & Diseño de Sonrisa</p>
+          </div>
+          <span class="text-amber-400 text-sm">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="bento-card p-6 flex flex-col justify-between">
+        <p class="text-sm text-apple-dark leading-relaxed">
+          “Excelente atención personalizada en Plaza Carey. En pocos meses mis dientes se alinearon muchísimo sin dolor. Recomiendo ampliamente a la doctora.”
+        </p>
+        <div class="mt-4 pt-3 border-t border-black/5 flex justify-between items-center">
+          <div>
+            <p class="font-display font-bold text-sm">Ana Pérez</p>
+            <p class="text-xs text-sky-600 font-medium">Invisalign Full</p>
+          </div>
+          <span class="text-amber-400 text-sm">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="bento-card p-6 flex flex-col justify-between">
+        <p class="text-sm text-apple-dark leading-relaxed">
+          “Llevamos a nuestro hijo a valoración y el trato fue de primera. Nos explicó todo el plan con mucha honestidad y pagos súper accesibles.”
+        </p>
+        <div class="mt-4 pt-3 border-t border-black/5 flex justify-between items-center">
+          <div>
+            <p class="font-display font-bold text-sm">Carlos Méndez</p>
+            <p class="text-xs text-sky-600 font-medium">Ortodoncia Infantil</p>
+          </div>
+          <span class="text-amber-400 text-sm">★★★★★</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UBICACIONES EXACTAS EN MÉRIDA + AGENDADOR WHATSAPP -->
+  <section id="agendar" class="py-14 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="bento-card p-6 sm:p-12 bg-white border border-black/10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- Columna Izquierda: Las 2 Sedes Reales con Ligas a Google Maps y Horario Lun-Sáb 9 a 7 -->
+        <div id="ubicacion" class="lg:col-span-6 space-y-6">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-widest text-sky-600">2 Ubicaciones en Mérida</span>
+            <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-tight text-apple-dark mt-1">
+              Agenda tu Evaluación Gratuita.
+            </h2>
+            <p class="text-apple-gray text-sm sm:text-base mt-2">
+              Visítanos en la zona Norte o Poniente de Mérida. Contamos con estacionamiento y planes de pago flexibles.
+            </p>
+          </div>
+
+          <!-- SEDE 1 (NORTE) -->
+          <div class="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-apple-dark text-white flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="map-pin" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600">Sede 1 (Norte · Los Pinos / Altabrisa)</span>
+                <h3 class="font-display font-bold text-base text-apple-dark">Av. Yucatán #351, Plaza Carey</h3>
+                <p class="text-xs text-apple-gray mt-0.5">2do Piso, Local 4 (Calle 17 entre 40 y 23, CP 97138, Mérida).</p>
+              </div>
+            </div>
+            <a href="https://maps.app.goo.gl/nx2ShRooKnHrP4hS8" target="_blank" rel="noopener" class="px-4 py-2.5 rounded-xl bg-white border border-black/10 text-xs font-bold text-apple-dark hover:bg-apple-dark hover:text-white transition flex items-center justify-center gap-1.5 shrink-0">
+              <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+              <span>Ver en Mapa</span>
+            </a>
+          </div>
+
+          <!-- SEDE 2 (PONIENTE) -->
+          <div class="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-apple-dark text-white flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="map-pin" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600">Sede 2 (Poniente · Yucalpetén)</span>
+                <h3 class="font-display font-bold text-base text-apple-dark">Calle 128 (Av. Mérida 2000) #623</h3>
+                <p class="text-xs text-apple-gray mt-0.5">Fracc. Yucalpetén, Mérida, Yucatán.</p>
+              </div>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Calle+128+623+Yucalpeten+Merida+2000" target="_blank" rel="noopener" class="px-4 py-2.5 rounded-xl bg-white border border-black/10 text-xs font-bold text-apple-dark hover:bg-apple-dark hover:text-white transition flex items-center justify-center gap-1.5 shrink-0">
+              <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+              <span>Ver en Mapa</span>
+            </a>
+          </div>
+
+          <!-- HORARIO ACTUALIZADO: LUNES A SÁBADO 9 A 7 -->
+          <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between text-xs sm:text-sm">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="clock" class="w-5 h-5 text-emerald-700"></i>
+              <span class="font-bold text-apple-dark">Horario Corrido:</span>
+            </div>
+            <div class="text-right">
+              <p class="font-display font-bold text-apple-dark">Lunes a Sábado: 9:00 am – 7:00 pm</p>
+              <p class="text-[11px] text-emerald-700 font-medium">Previa cita por WhatsApp</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Configurador Rápido de WhatsApp -->
+        <div class="lg:col-span-6 bg-[#F5F5F7] p-6 sm:p-8 rounded-3xl border border-black/5 flex flex-col justify-between">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Costo de Valoración: $0 MXN</span>
+              <span class="text-xs text-apple-gray font-medium">Respuesta inmediata</span>
+            </div>
+
+            <h3 class="font-display font-bold text-xl sm:text-2xl text-apple-dark">
+              Reserva tu Evaluación Gratuita por WhatsApp
+            </h3>
+
+            <!-- 1. Selección de Tratamiento (Con Brackets Estéticos por defecto) -->
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-apple-gray block mb-2">1. Tratamiento de interés</label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button type="button" onclick="setBooking('treat', 'Brackets Estéticos (Zafiro/Cerámica)', this)" class="b-treat p-3 rounded-xl bg-apple-dark text-white text-xs font-semibold text-left transition">
+                  💎 Brackets Estéticos
+                </button>
+                <button type="button" onclick="setBooking('treat', 'Brackets de Autoligado', this)" class="b-treat p-3 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-left transition">
+                  ✨ Brackets Autoligado
+                </button>
+                <button type="button" onclick="setBooking('treat', 'Invisalign / Ortodoncia Invisible', this)" class="b-treat p-3 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-left transition">
+                  🫧 Invisalign®
+                </button>
+                <button type="button" onclick="setBooking('treat', 'Ortodoncia Infantil / Niños', this)" class="b-treat p-3 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-left transition">
+                  🦷 Valoración Niños
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Selección de Sede -->
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-apple-gray block mb-2">2. Elige tu Sede en Mérida</label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button type="button" onclick="setBooking('sede', 'Sede 1 Norte (Plaza Carey, Av. Yucatán #351)', this)" class="b-sede p-3 rounded-xl bg-apple-dark text-white text-xs font-semibold text-left transition">
+                  📍 Sede 1 · Norte (Plaza Carey)
+                </button>
+                <button type="button" onclick="setBooking('sede', 'Sede 2 Poniente (Av. Mérida 2000 #623, Yucalpetén)', this)" class="b-sede p-3 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-left transition">
+                  📍 Sede 2 · Poniente (Yucalpetén)
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Turno preferido (Lun-Sáb 9am a 7pm) -->
+            <div>
+              <label class="text-xs font-bold uppercase tracking-wider text-apple-gray block mb-2">3. Horario preferido (Lun a Sáb 9:00 am - 7:00 pm)</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setBooking('turno', 'Por la mañana (9am - 1pm)', this)" class="b-turno p-2.5 rounded-xl bg-apple-dark text-white text-xs font-semibold text-center transition">
+                  Mañana (9-1)
+                </button>
+                <button type="button" onclick="setBooking('turno', 'Por la tarde (1pm - 7pm)', this)" class="b-turno p-2.5 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-center transition">
+                  Tarde (1-7)
+                </button>
+                <button type="button" onclick="setBooking('turno', 'Sábado', this)" class="b-turno p-2.5 rounded-xl bg-white text-apple-dark border border-black/5 text-xs font-semibold text-center transition">
+                  Sábado
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-black/5">
+            <button type="button" onclick="openWhatsAppBooking()" class="w-full py-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-display font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2">
+              <i data-lucide="message-circle" class="w-5 h-5"></i>
+              <span>Enviar WhatsApp y Reclamar Evaluación Gratis</span>
+            </button>
+            <p class="text-[11px] text-center text-apple-gray mt-2">
+              WhatsApp Directo: <strong>+52 999 602 5731</strong> · Pregunta también por nuestras facilidades de pago.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-10 px-4 sm:px-6 border-t border-black/5 text-center text-xs text-apple-gray">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>© 2026 Dra. Liseth Guevara · Ortodoncia Especializada y Estética Dental en Mérida, Yucatán.</p>
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="underline font-semibold hover:text-black">Diseño Actual (Default)</a>
+        <span>·</span>
+        <p>Sede Norte (Plaza Carey) · Sede Poniente (Yucalpetén) · Céd. Prof. 11152197</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BARRA FLOTANTE MOBILE-FIRST (Para agendar con el pulgar en todo momento) -->
+  <div class="fixed bottom-3 left-3 right-3 z-50 md:hidden glass-pill text-white p-2.5 rounded-2xl shadow-2xl border border-white/10 flex items-center justify-between gap-2">
+    <div class="pl-2">
+      <p class="font-display font-bold text-xs">Evaluación Gratis + Pagos Flexibles</p>
+      <p class="text-[10px] text-emerald-400">Lun a Sáb 9:00 am – 7:00 pm · Mérida</p>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <a href="index.html" class="bg-white/20 text-white text-[10px] font-bold px-2.5 py-2 rounded-xl" title="Regresar al inicio actual">
+        Original
+      </a>
+      <button onclick="openWhatsAppBooking()" class="bg-emerald-500 text-white font-display font-bold text-xs px-4 py-2.5 rounded-xl shrink-0 flex items-center gap-1">
+        <span>WhatsApp</span>
+        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SCRIPTS: THREE.JS SAPPHIRE BRACKETS + SLIDER ANTES/DESPUÉS + WHATSAPP -->
+  <script>
+    lucide.createIcons();
+
+    // --- 1. COMPARADOR TÁCTIL ANTES Y DESPUÉS ---
+    const baSlider = document.getElementById('ba-slider');
+    const baBeforeLayer = document.getElementById('ba-before-layer');
+    const baHandle = document.getElementById('ba-handle');
+
+    baSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      baBeforeLayer.style.width = `${val}%`;
+      baHandle.style.left = `${val}%`;
+    });
+
+    // --- 2. AGENDADOR INTELIGENTE DE WHATSAPP ---
+    const booking = {
+      treat: 'Brackets Estéticos (Zafiro/Cerámica)',
+      sede: 'Sede 1 Norte (Plaza Carey, Av. Yucatán #351)',
+      turno: 'Por la mañana (9am - 1pm)'
+    };
+
+    function setBooking(key, val, btn) {
+      booking[key] = val;
+      const cls = key === 'treat' ? '.b-treat' : key === 'sede' ? '.b-sede' : '.b-turno';
+      document.querySelectorAll(cls).forEach(el => {
+        el.classList.remove('bg-apple-dark', 'text-white');
+        el.classList.add('bg-white', 'text-apple-dark', 'border', 'border-black/5');
+      });
+      btn.classList.remove('bg-white', 'text-apple-dark', 'border', 'border-black/5');
+      btn.classList.add('bg-apple-dark', 'text-white');
+    }
+
+    function preselectTreatment(treatName) {
+      booking.treat = treatName;
+    }
+
+    function openWhatsAppBooking() {
+      const text = `Hola Dra. Liseth Guevara ✨, vi su página web y me gustaría agendar mi *Evaluación Gratuita*.\n\n• *Interés:* ${booking.treat}\n• *Ubicación:* ${booking.sede}\n• *Horario preferido:* ${booking.turno}\n\nTambién me gustaría recibir información sobre las facilidades de pago. ¡Gracias!`;
+      window.open(`https://wa.me/529996025731?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // --- 3. THREE.JS: SIMULADOR 3D DE BRACKETS ESTÉTICOS DE ZAFIRO ---
+    (function initSapphireArch3D() {
+      const container = document.getElementById('three-container');
+      if (!container) return;
+
+      const scene = new THREE.Scene();
+
+      const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 1.2, 7.6);
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Iluminación de estudio clínico Apple
+      scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      keyLight.position.set(4, 7, 6);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.PointLight(0x38bdf8, 1.4, 15);
+      rimLight.position.set(-4, -1, 4);
+      scene.add(rimLight);
+
+      const archGroup = new THREE.Group();
+      scene.add(archGroup);
+
+      // Material de Esmalte Dental
+      const enamelMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        roughness: 0.12,
+        metalness: 0.02,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.08
+      });
+
+      // Material 1: Bracket Estético de Zafiro/Cerámica (Translúcido / Casi invisible)
+      const sapphireBracketMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.58,
+        roughness: 0.08,
+        metalness: 0.1,
+        clearcoat: 1.0
+      });
+
+      // Material 2: Bracket Metálico de Autoligado (Para que el paciente compare)
+      const metalBracketMat = new THREE.MeshStandardMaterial({
+        color: 0x64748b,
+        metalness: 0.9,
+        roughness: 0.18
+      });
+
+      // Arco Estético Recubierto de Rodio Blanco vs Titanio
+      const wireMat = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        metalness: 0.75,
+        roughness: 0.15
+      });
+
+      const teeth = [];
+      const brackets = [];
+      const count = 10;
+      const toothGeo = new THREE.BoxGeometry(0.54, 0.76, 0.35);
+      const bracketGeo = new THREE.BoxGeometry(0.22, 0.18, 0.11);
+
+      for (let i = 0; i < count; i++) {
+        const t = (i / (count - 1)) * 2 - 1;
+        const angle = t * 1.12;
+        const radius = 2.05;
+
+        const targetX = Math.sin(angle) * radius;
+        const targetZ = Math.cos(angle) * radius - 1.25;
+        const targetRotY = angle;
+
+        // Desviación inicial (cuando el slider está en Semana 1)
+        const crowdY = (i % 2 === 0 ? 0.22 : -0.18);
+        const crowdZ = (i % 2 === 0 ? 0.25 : -0.22);
+        const crowdRot = (i % 2 === 0 ? 0.28 : -0.26);
+
+        const group = new THREE.Group();
+
+        const tooth = new THREE.Mesh(toothGeo, enamelMat);
+        const s = 1.12 - Math.abs(t) * 0.26;
+        tooth.scale.set(s, s, 1);
+        group.add(tooth);
+
+        // Bracket con aletas de precisión
+        const bracket = new THREE.Mesh(bracketGeo, sapphireBracketMat);
+        bracket.position.set(0, 0, 0.21);
+        group.add(bracket);
+        brackets.push(bracket);
+
+        group.position.set(targetX, 0, targetZ);
+        group.rotation.y = targetRotY;
+        archGroup.add(group);
+
+        teeth.push({ group, targetZ, crowdY, crowdZ, crowdRot });
+      }
+
+      // Alambre ortodóntico
+      const curvePts = [];
+      for (let i = 0; i <= 40; i++) {
+        const t = (i / 40) * 2 - 1;
+        const angle = t * 1.14;
+        const r = 2.27;
+        curvePts.push(new THREE.Vector3(Math.sin(angle) * r, 0, Math.cos(angle) * r - 1.25));
+      }
+      const wireCurve = new THREE.CatmullRomCurve3(curvePts);
+      const wireMesh = new THREE.Mesh(new THREE.TubeGeometry(wireCurve, 64, 0.03, 12, false), wireMat);
+      archGroup.add(wireMesh);
+
+      // Cambio en vivo entre Bracket Estético y Metálico
+      window.setBracketMaterial = (type) => {
+        const isSapphire = type === 'sapphire';
+        brackets.forEach(b => {
+          b.material = isSapphire ? sapphireBracketMat : metalBracketMat;
+        });
+        document.getElementById('btn-mat-sapphire').className = isSapphire
+          ? 'px-3 py-1 rounded-full bg-white text-apple-dark font-semibold shadow-sm transition'
+          : 'px-3 py-1 rounded-full text-apple-gray font-medium transition';
+        document.getElementById('btn-mat-metal').className = !isSapphire
+          ? 'px-3 py-1 rounded-full bg-white text-apple-dark font-semibold shadow-sm transition'
+          : 'px-3 py-1 rounded-full text-apple-gray font-medium transition';
+      };
+
+      // Control del Slider de 6 Meses
+      let progress = 0.95;
+      const archSlider = document.getElementById('arch-slider');
+      const monthLabel = document.getElementById('month-label');
+      if (archSlider && monthLabel) {
+        archSlider.addEventListener('input', (e) => {
+          const val = Number(e.target.value);
+          progress = val / 100;
+          const month = Math.max(1, Math.ceil((val / 100) * 6));
+          monthLabel.textContent = val > 85
+            ? `Mes 6 · Sonrisa Alineada ✨`
+            : `Mes ${month} · Alineando (${val}%)`;
+        });
+      }
+
+      // Rotación táctil / mouse sobre el lienzo
+      let targetRotX = 0.18;
+      let targetRotY = 0;
+      container.addEventListener('pointermove', (e) => {
+        const rect = container.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        targetRotY = x * 0.55;
+        targetRotX = 0.2 - y * 0.25;
+      });
+
+      window.addEventListener('resize', () => {
+        if (!container.clientWidth || !container.clientHeight) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        archGroup.rotation.y += (targetRotY + Math.sin(t * 0.7) * 0.12 - archGroup.rotation.y) * 0.06;
+        archGroup.rotation.x += (targetRotX - archGroup.rotation.x) * 0.06;
+
+        const disorder = 1 - progress;
+        teeth.forEach(item => {
+          item.group.position.y += (item.crowdY * disorder - item.group.position.y) * 0.12;
+          item.group.position.z += (item.targetZ + item.crowdZ * disorder - item.group.position.z) * 0.12;
+          item.group.rotation.z += (item.crowdRot * disorder - item.group.rotation.z) * 0.12;
+        });
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+  </script>
+</body>
+</html>
