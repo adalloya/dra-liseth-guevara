@@ -155,7 +155,17 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const patientName = (formData.get("patientName") as string) || "Paciente";
     const patientAge = (formData.get("patientAge") as string) || "30";
+    const patientPhone = (formData.get("patientPhone") as string) || "";
+    const recordCode = (formData.get("recordCode") as string) || "#CRD-2026";
+    const chiefComplaint = (formData.get("chiefComplaint") as string) || "Valoración ortodóntica integral";
+    const habitsPerio = (formData.get("habitsPerio") as string) || "En evaluación clínica";
+    const allergies = (formData.get("allergies") as string) || "Ninguna reportada";
+    const consentRisks = (formData.get("consentRisks") as string) || "";
+    const evolutionNotes = (formData.get("evolutionNotes") as string) || "";
+    const manualOverrides = (formData.get("manualOverrides") as string) || "";
+    const stlTelemetryText = (formData.get("stlTelemetryText") as string) || "";
     const orthoPreferencesRaw = (formData.get("orthoPreferences") as string) || "";
+    const photosJsonRaw = (formData.get("photosJson") as string) || "";
 
     let parsedPrefs: any = null;
     try {
@@ -179,10 +189,10 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
 
     const contents: any[] = [];
 
-    // 1. Procesar Archivos .STL (Si existen) para extraer telemetría espacial 3D
+    // 1. Procesar Archivos .STL (Si existen) o Telemetría 3D previa
     const stlUpper = formData.get("stlUpper") as File | null;
     const stlLower = formData.get("stlLower") as File | null;
-    let stlContext = "No se adjuntaron archivos .STL; basar volumetría en fotografías oclusales.";
+    let stlContext = stlTelemetryText || "No se adjuntaron archivos .STL; basar volumetría en fotografías oclusales y radiografías.";
 
     if (stlUpper || stlLower) {
       const parts: string[] = [];
@@ -194,20 +204,14 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
         const buf = await stlLower.arrayBuffer();
         parts.push(extractStlTelemetry(buf, "Arcada Inferior Mandibular"));
       }
+      if (stlTelemetryText) parts.push(stlTelemetryText);
       stlContext = parts.join("\n\n");
     }
 
-    // 2. Construir contexto clínico inicial
-    contents.push(
-      `Analiza este caso ortodóntico completo para la Dra. Liseth Guevara Muñoz.
-      Paciente: ${patientName} (${patientAge} años).
-      
-      TELEMETRÍA DE ESCÁNER INTRAORAL 3D (.STL):
-      ${stlContext}
-      ${prefsContext}`
-    );
+    // 2. Adjuntar Radiografías (Panorámica y Lateral, incluyendo PDF) y Fotografías Intraorales
+    let attachedMediaCount = 0;
+    const attachedMediaLabels: string[] = [];
 
-    // 3. Adjuntar Radiografías (Panorámica y Lateral) y Fotografías Intraorales
     const imageFiles = formData.getAll("images") as File[];
     for (const file of imageFiles) {
       if (file && file.size > 0) {
@@ -219,29 +223,102 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
             mimeType: file.type || "image/jpeg",
           },
         });
+        attachedMediaCount++;
+        attachedMediaLabels.push(file.name || `Imagen ${attachedMediaCount}`);
       }
     }
 
-    // 4. Llamada a Gemini IA
-    const modelName = process.env.GEMINI_MODEL_ID || "gemini-3.8-flash";
+    if (photosJsonRaw) {
+      try {
+        const photosMap = JSON.parse(photosJsonRaw);
+        if (photosMap && typeof photosMap === "object") {
+          for (const [slotName, dataUrl] of Object.entries(photosMap)) {
+            if (typeof dataUrl === "string") {
+              const m = dataUrl.match(/^data:((?:image\/[a-zA-Z0-9+.-]+)|application\/pdf);base64,(.+)$/);
+              if (m) {
+                contents.push({ text: `Registro clínico multimedia (${slotName}):` });
+                contents.push({
+                  inlineData: {
+                    mimeType: m[1],
+                    data: m[2],
+                  },
+                });
+                attachedMediaCount++;
+                attachedMediaLabels.push(slotName);
+              }
+            }
+          }
+        }
+      } catch (_) {}
+    }
 
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: contents,
-      config: {
-        systemInstruction: `Eres el Sistema Experto de Ortodoncia y Biomecánica Avanzada de CRD Ortodoncia para la Dra. Liseth Guevara Muñoz.
-        Analiza las radiografías (Panorámica y Lateral de Cráneo), las fotografías intraorales, las dimensiones del escáner .STL y las Preferencias Clínicas de Ortodoncia seleccionadas por la doctora.
-        Reglas obligatorias:
-        1. Evalúa proporción corona-raíz, reabsorciones radiculares previas, nivel óseo alveolar, terceros molares y ausencias previas.
-        2. Para CADA diente que requiera Stripping (IPR), especifica con precisión milimétrica cuánto corresponde a la cara MESIAL (iprMesial) y cuánto a la cara DISTAL (iprDistal), respetando la filosofía de ganancia de espacio y límites periodontales configurados por la doctora.
-        3. Diseña la secuencia mes a mes (roadmap) utilizando estrictamente la prescripción de brackets, el calibre de slot, la secuencia de arcos de Fase 1, Fase 2 y Fase 3, el sistema de anclaje y el protocolo de retención configurados por la Dra. Liseth Guevara.`,
-        responseMimeType: "application/json",
-        responseSchema: orthoResponseSchema,
-        temperature: 0.1,
-      },
-    });
+    // 3. Construir contexto clínico completo con TODOS los datos ingresados del paciente
+    contents.push(
+      `Analiza este caso ortodóntico completo y personalizado para la Dra. Liseth Guevara Muñoz.
+      DATOS COMPLETOS DEL PACIENTE E HISTORIA CLÍNICA:
+      - Nombre del Paciente: ${patientName} (${patientAge} años)
+      - Folio / Expediente: ${recordCode} ${patientPhone ? `• Tel: ${patientPhone}` : ""}
+      - Motivo de Consulta y Antecedentes: ${chiefComplaint}
+      - Hábitos Funcionales y Estado Periodontal: ${habitsPerio}
+      - Alergias y Condiciones Sistémicas: ${allergies}
+      - Riesgos y Observaciones de Consentimiento: ${consentRisks || "Estándar"}
+      ${evolutionNotes ? `- Bitácora / Notas de Evolución Previas:\n${evolutionNotes}` : ""}
+      ${manualOverrides ? `- Ajustes u Overrides Manuales Previos de la Doctora (RESPETAR ESTRICTAMENTE):\n${manualOverrides}` : ""}
+      - Registros Visuales y Radiográficos Analizados (${attachedMediaCount}): ${attachedMediaLabels.join(", ") || "Evaluación por historia clínica"}
+      
+      TELEMETRÍA DE ESCÁNER INTRAORAL 3D (.STL):
+      ${stlContext}
+      ${prefsContext}`
+    );
 
-    const rawJson = JSON.parse(response.text || "{}");
+    // 4. Llamada a Gemini IA con fallback automático de modelos activos
+    const candidateModels = [
+      process.env.GEMINI_MODEL_ID,
+      "gemini-flash-lite-latest",
+      "gemini-3-flash-preview",
+      "gemini-3.5-flash",
+      "gemini-3.1-flash-lite",
+      "gemini-3.6-flash",
+    ].filter(Boolean) as string[];
+
+    let rawJson: any = null;
+    let modelUsed = candidateModels[0];
+    let lastError: any = null;
+
+    for (const modelName of candidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: contents,
+          config: {
+            systemInstruction: `Eres el Sistema Experto de Ortodoncia y Biomecánica Avanzada de CRD Ortodoncia para la Dra. Liseth Guevara Muñoz.
+            Analiza TODOS los datos ingresados del paciente: motivo de consulta, edad, hábitos funcionales y estado periodontal, alergias, notas de evolución, radiografías (Panorámica y Lateral de Cráneo), fotografías intraorales, dimensiones del escáner .STL y las Preferencias Clínicas de Ortodoncia seleccionadas por la doctora.
+            Reglas obligatorias:
+            1. El diagnóstico (summary, cephalometrics, risks, additionalTreatments, odontogramList y roadmap) DEBE reflejar directamente el motivo de consulta, hábitos/periodonto, edad, alergias y hallazgos radiográficos/fotográficos de ESTE paciente.
+            2. Evalúa proporción corona-raíz, reabsorciones radiculares previas, nivel óseo alveolar, terceros molares y ausencias previas.
+            3. Para CADA diente en odontogramList (incluyendo dientes anteriores 13-23, 33-43 y posteriores relevantes 18-14, 24-28, 38-34, 44-48), especifica su estado (aligned, ipr, critical o missing), diagnóstico individual, milímetros exactos en cara MESIAL (iprMesial) y DISTAL (iprDistal), y mecánica biomecánica.
+            4. Diseña la secuencia mes a mes (roadmap de 6 etapas: MES 0, MES 1-3, MES 4-6, MES 7-10, MES 11-14, MES 15-18) utilizando estrictamente la prescripción de brackets, calibre de slot, secuencia de arcos Fase 1, 2 y 3, sistema de anclaje y protocolo de retención configurados por la Dra. Liseth Guevara.`,
+            responseMimeType: "application/json",
+            responseSchema: orthoResponseSchema,
+            temperature: 0.15,
+          },
+        });
+
+        const parsed = JSON.parse(response.text || "{}");
+        if (parsed && (parsed.summary || parsed.odontogramList)) {
+          rawJson = parsed;
+          modelUsed = modelName;
+          break;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`Intento con modelo ${modelName} falló:`, err?.message || err);
+      }
+    }
+
+    if (!rawJson) {
+      throw lastError || new Error("No se pudo obtener respuesta de los modelos Gemini disponibles.");
+    }
 
     // 5. Transformar odontogramList en el diccionario Record<number, ToothIPR> que usa la UI
     const odontogramRecord: Record<number, any> = {};
@@ -266,11 +343,13 @@ PREFERENCIAS CLÍNICAS OBLIGATORIAS DE LA DRA. LISETH GUEVARA MUÑOZ:
 
     return NextResponse.json({
       success: true,
-      modelUsed: modelName,
+      modelUsed,
+      attachedMediaCount,
+      attachedMediaLabels,
       data: finalClinicalStudyData,
     });
   } catch (error: any) {
-    console.error("Error en análisis con Gemini 4 Argon:", error);
+    console.error("Error en análisis con Gemini Argon:", error);
     return NextResponse.json(
       { success: false, error: error.message || "Error al procesar el estudio con IA" },
       { status: 500 }

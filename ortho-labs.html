@@ -2096,8 +2096,16 @@
                 <section class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-2xs space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
                         <div>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Paso 4 de 6 • Resultados Clínicos</span>
-                            <h2 class="text-base sm:text-lg font-bold text-slate-900">Resumen de Diagnóstico</h2>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Paso 4 de 6 • Resultados Clínicos</span>
+                                <span id="step4ComplexityBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                                    Complejidad: Por determinar
+                                </span>
+                                <span id="diagSummaryAnchorageBadge" class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">
+                                    Anclaje: Por definir
+                                </span>
+                            </div>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">Resumen de Diagnóstico</h2>
                         </div>
                         <button
                             type="button"
@@ -2107,6 +2115,17 @@
                             <i class="ph-bold ph-note-pencil"></i>
                             <span>Editar Resumen Manualmente</span>
                         </button>
+                    </div>
+
+                    <div id="geminiAnalyzedVerifyBanner" class="hidden bg-emerald-50/90 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-start sm:items-center gap-2">
+                            <i class="ph-fill ph-check-circle text-emerald-600 text-base shrink-0 mt-0.5 sm:mt-0"></i>
+                            <div>
+                                <p id="geminiAnalyzedVerifyTitle" class="font-bold text-emerald-950">Diagnóstico sincronizado con todos los datos del expediente</p>
+                                <p id="geminiAnalyzedVerifySub" class="text-[11px] text-emerald-800 mt-0.5"></p>
+                            </div>
+                        </div>
+                        <span id="geminiAnalyzedVerifyModelBadge" class="text-[10px] font-bold mono bg-white text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md self-start sm:self-center shrink-0"></span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -5888,44 +5907,50 @@ create table if not exists public.patients (
                             const stlUpperUrl = latestStudy?.stl_upper_url || p.medical_history?.stl_upper_url || localMatch?.stl_upper_url || "";
                             const stlLowerUrl = latestStudy?.stl_lower_url || p.medical_history?.stl_lower_url || localMatch?.stl_lower_url || "";
                             const resolvedStudy =
-                                latestStudy?.clinical_data ||
-                                p.medical_history?.study_data ||
-                                localMatch?.study_data ||
-                                (demoMatch ? demoMatch.study_data : createBlankStudyData());
+                                (localMatch?.ai_analyzed_once && localMatch?.study_data && !localMatch.study_data.is_uninitialized)
+                                    ? localMatch.study_data
+                                    : (latestStudy?.clinical_data ||
+                                       p.medical_history?.study_data ||
+                                       localMatch?.study_data ||
+                                       (demoMatch ? demoMatch.study_data : createBlankStudyData()));
                             const isBlank = Boolean(resolvedStudy?.is_uninitialized);
                             const resolvedComplexity = isBlank
                                 ? "Por determinar"
-                                : (p.medical_history?.complexity || latestStudy?.clinical_data?.complexity || localMatch?.complexity || (demoMatch ? demoMatch.complexity : "Por determinar"));
-                            const mergedHistory = Object.assign({}, demoMatch ? demoMatch.medical_history : {}, localMatch?.medical_history || {}, p.medical_history || {});
-                            const resolvedTimeline = Array.isArray(p.medical_history?.timeline_appointments) && p.medical_history.timeline_appointments.length > 0
-                                ? p.medical_history.timeline_appointments
-                                : (Array.isArray(localMatch?.timeline_appointments) && localMatch.timeline_appointments.length > 0 ? localMatch.timeline_appointments : undefined);
+                                : (localMatch?.ai_analyzed_once ? localMatch.complexity : (p.medical_history?.complexity || latestStudy?.clinical_data?.complexity || localMatch?.complexity || (demoMatch ? demoMatch.complexity : "Por determinar")));
+                            const mergedHistory = Object.assign({}, demoMatch ? demoMatch.medical_history : {}, p.medical_history || {}, localMatch?.medical_history || {});
+                            const resolvedTimeline = Array.isArray(localMatch?.timeline_appointments) && localMatch.timeline_appointments.length > 0
+                                ? localMatch.timeline_appointments
+                                : (Array.isArray(p.medical_history?.timeline_appointments) && p.medical_history.timeline_appointments.length > 0 ? p.medical_history.timeline_appointments : undefined);
 
                             return {
                                 id: p.id,
                                 study_id: latestStudy?.id || "",
-                                record_code: demoMatch ? demoMatch.record_code : `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`,
-                                full_name: p.full_name,
-                                age: p.age,
-                                phone: p.phone || "Sin teléfono",
+                                record_code: demoMatch ? demoMatch.record_code : (localMatch?.record_code || `#SUP-${String(p.id).substring(0, 4).toUpperCase()}`),
+                                full_name: localMatch?.full_name || p.full_name,
+                                age: localMatch?.age || p.age,
+                                phone: localMatch?.phone || p.phone || "Sin teléfono",
                                 referring_doctor: p.referring_doctor || "Dra. Liseth Guevara Muñoz",
                                 created_at: new Date(p.created_at).toISOString().split("T")[0],
-                                case_summary: demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || localMatch?.case_summary || "Valoración ortodóntica inicial — Pendiente de análisis"),
+                                case_summary: localMatch?.case_summary || (demoMatch ? demoMatch.case_summary : (p.medical_history?.chief_complaint || "Valoración ortodóntica inicial — Pendiente de análisis")),
                                 complexity: resolvedComplexity,
+                                ai_analyzed_once: Boolean(localMatch?.ai_analyzed_once || p.medical_history?.ai_analyzed_once),
                                 has_stl: Boolean(stlUpperUrl || stlLowerUrl || demoMatch),
                                 stl_upper_url: stlUpperUrl,
                                 stl_lower_url: stlLowerUrl,
                                 medical_history: mergedHistory,
                                 timeline_appointments: resolvedTimeline,
-                                patient_signature: p.patient_signature || localMatch?.patient_signature || "",
-                                doctor_signature: p.doctor_signature || localMatch?.doctor_signature || "",
-                                photos: Object.assign({}, demoMatch ? demoMatch.photos : {}, localMatch?.photos || {}, p.medical_history?.photos || {}, latestStudy?.photos_urls || {}),
-                                notes: p.medical_history?.notes || localMatch?.notes || (demoMatch ? demoMatch.notes : []),
-                                consensus_history: p.medical_history?.consensus_history || localMatch?.consensus_history || [],
+                                patient_signature: localMatch?.patient_signature || p.patient_signature || "",
+                                doctor_signature: localMatch?.doctor_signature || p.doctor_signature || "",
+                                photos: Object.assign({}, demoMatch ? demoMatch.photos : {}, p.medical_history?.photos || {}, latestStudy?.photos_urls || {}, localMatch?.photos || {}),
+                                notes: (localMatch?.notes && localMatch.notes.length > 0) ? localMatch.notes : (p.medical_history?.notes || (demoMatch ? demoMatch.notes : [])),
+                                consensus_history: (localMatch?.consensus_history && localMatch.consensus_history.length > 0) ? localMatch.consensus_history : (p.medical_history?.consensus_history || []),
                                 study_data: resolvedStudy
                             };
                         });
-                        patientsList = cloudMapped;
+                        // Preservar también pacientes locales recién creados que aún no estén en cloudMapped
+                        const cloudIds = new Set(cloudMapped.map((cp) => cp.id));
+                        const localOnlyPatients = patientsList.filter((lp) => !cloudIds.has(lp.id));
+                        patientsList = [...localOnlyPatients, ...cloudMapped];
                         savePatientsLocal();
                         renderPatientsList();
                     }
@@ -6540,15 +6565,53 @@ create table if not exists public.patients (
                 else uninitBanner.classList.add("hidden");
             }
 
+            const compValue = (study.complexity && study.complexity !== "Por determinar")
+                ? study.complexity
+                : (patient.complexity || "Por determinar");
+            const compClass = String(compValue).includes("Alta")
+                ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-50 text-rose-700 border border-rose-200"
+                : compValue === "Por determinar"
+                ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-slate-100 text-slate-700 border border-slate-200"
+                : "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-amber-50 text-amber-700 border border-amber-200";
+            const compLabel = compValue === "Por determinar" ? "Complejidad: Por determinar" : `Complejidad: ${compValue}`;
+
             const compBadge = document.getElementById("diagSummaryComplexityBadge");
-            const compValue = patient.complexity || study.complexity || "Por determinar";
             if (compBadge) {
-                compBadge.innerText = compValue === "Por determinar" ? "Complejidad: Por determinar" : `Complejidad: ${compValue}`;
-                compBadge.className = String(compValue).includes("Alta")
-                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-50 text-rose-700 border border-rose-200"
-                    : compValue === "Por determinar"
-                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-slate-100 text-slate-700 border border-slate-200"
-                    : "text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-amber-50 text-amber-700 border border-amber-200";
+                compBadge.innerText = compLabel;
+                compBadge.className = compClass;
+            }
+            const step4CompBadge = document.getElementById("step4ComplexityBadge");
+            if (step4CompBadge) {
+                step4CompBadge.innerText = compLabel;
+                step4CompBadge.className = compClass;
+            }
+
+            const anchBadge = document.getElementById("diagSummaryAnchorageBadge");
+            if (anchBadge) {
+                const anchVal = study.anchorage || "Por definir";
+                anchBadge.innerText = `Anclaje: ${anchVal}`;
+            }
+
+            const verifyBanner = document.getElementById("geminiAnalyzedVerifyBanner");
+            const verifyTitle = document.getElementById("geminiAnalyzedVerifyTitle");
+            const verifySub = document.getElementById("geminiAnalyzedVerifySub");
+            const verifyModelBadge = document.getElementById("geminiAnalyzedVerifyModelBadge");
+            if (verifyBanner) {
+                const meta = study.analysis_metadata || patient.medical_history?.analysis_metadata || null;
+                if (!isUninitialized && (meta || patient.ai_analyzed_once)) {
+                    verifyBanner.classList.remove("hidden");
+                    if (verifyTitle) {
+                        verifyTitle.innerText = meta?.title || `Diagnóstico personalizado generado para ${patient.full_name} (${patient.age} años)`;
+                    }
+                    if (verifySub) {
+                        verifySub.innerText = meta?.details || `Datos procesados: Historia Clínica + Motivo de Consulta + Hábitos/Periodonto + Alergias + Registros Multimedia + Protocolo Dra. Liseth Guevara`;
+                    }
+                    if (verifyModelBadge) {
+                        verifyModelBadge.innerText = meta?.modelUsed ? `IA: ${meta.modelUsed}` : "Gemini Argon Activo";
+                    }
+                } else {
+                    verifyBanner.classList.add("hidden");
+                }
             }
 
             document.getElementById("sumSkeletal").innerText = study.summary?.skeletal || "Pendiente de análisis";
@@ -8517,12 +8580,52 @@ create table if not exists public.patients (
             const habitsVal = document.getElementById("histHabitsPerio")?.value?.trim() || "";
             const allergiesVal = document.getElementById("histAllergies")?.value?.trim() || "";
 
+            // Si hay una nota de evolución escrita en el input pero aún no agregada con el botón "+", incorporarla automáticamente
+            const pendingNoteInput = document.getElementById("newClinicalNoteInput");
+            const pendingNoteText = pendingNoteInput?.value?.trim() || "";
+            if (pendingNoteText) {
+                if (!patient.notes) patient.notes = [];
+                patient.notes.unshift({
+                    date: new Date().toLocaleDateString("es-MX"),
+                    author: "Dra. Liseth Guevara",
+                    text: pendingNoteText
+                });
+                pendingNoteInput.value = "";
+            }
+
+            // Si el panel de edición manual de diagnóstico está abierto con datos capturados, respaldarlos para que Gemini los considere
+            const manualPanel = document.getElementById("manualDiagnosisFormPanel");
+            let manualDraft = null;
+            if (manualPanel && !manualPanel.classList.contains("hidden")) {
+                const mComp = document.getElementById("editDiagComplexity")?.value || "";
+                const mDur = document.getElementById("editDiagDuration")?.value || "";
+                const mAnch = document.getElementById("editDiagAnchorage")?.value?.trim() || "";
+                const mSkel = document.getElementById("editSumSkeletal")?.value?.trim() || "";
+                const mVert = document.getElementById("editSumVertical")?.value?.trim() || "";
+                const mForm = document.getElementById("editSumFormula")?.value?.trim() || "";
+                const mRoot = document.getElementById("editSumRootAlert")?.value?.trim() || "";
+                const mRet = document.getElementById("editRetentionProtocol")?.value?.trim() || "";
+                if (mAnch || mSkel || mVert || mForm || mRoot) {
+                    manualDraft = {
+                        complexity: mComp,
+                        durationMonths: mDur,
+                        anchorage: mAnch,
+                        skeletal: mSkel,
+                        vertical: mVert,
+                        dentalFormula: mForm,
+                        rootAlert: mRoot,
+                        retentionProtocol: mRet
+                    };
+                }
+            }
+
             patient.medical_history = Object.assign({}, patient.medical_history || {}, {
                 phone: patient.phone || "",
                 chief_complaint: chiefVal,
                 consent_risks: risksVal,
                 habits_perio: habitsVal,
-                allergies: allergiesVal
+                allergies: allergiesVal,
+                ...(manualDraft ? { manual_draft_inputs: manualDraft } : {})
             });
             if (chiefVal && (!patient.case_summary || patient.case_summary.includes("Pendiente"))) {
                 patient.case_summary = chiefVal;
@@ -9773,6 +9876,10 @@ create table if not exists public.patients (
 
         async function compressDataUrlForGemini(dataUrl, maxDim = 1024, quality = 0.78) {
             if (!dataUrl || typeof dataUrl !== "string") return null;
+            if (dataUrl.startsWith("data:application/pdf")) {
+                const pdfMatch = dataUrl.match(/^data:(application\/pdf);base64,(.+)$/);
+                return pdfMatch ? { mimeType: pdfMatch[1], data: pdfMatch[2] } : null;
+            }
             if (!dataUrl.startsWith("data:image/")) return null;
             return new Promise((resolve) => {
                 const img = new Image();
@@ -9815,7 +9922,13 @@ create table if not exists public.patients (
         async function callGeminiApiJson(parts, temperature = 0.15, timeoutMs = 28000) {
             const apiKey = DEFAULT_GEMINI_API_KEY;
             if (!apiKey) return null;
-            const models = ["gemini-3.5-flash", "gemini-3-flash-preview", "gemini-3.6-flash", "gemini-3.8-flash"];
+            const models = [
+                "gemini-flash-lite-latest",
+                "gemini-3-flash-preview",
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite",
+                "gemini-3.6-flash"
+            ];
             for (const modelName of models) {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -9842,7 +9955,12 @@ create table if not exists public.patients (
                         const textPart = partsArr.find((p) => !p.thought && p.text) || partsArr[partsArr.length - 1];
                         const textOut = textPart?.text;
                         if (textOut) {
-                            const cleanJson = textOut.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                            let cleanJson = textOut.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+                            const firstBrace = cleanJson.indexOf("{");
+                            const lastBrace = cleanJson.lastIndexOf("}");
+                            if (firstBrace >= 0 && lastBrace > firstBrace) {
+                                cleanJson = cleanJson.slice(firstBrace, lastBrace + 1);
+                            }
                             const parsed = JSON.parse(cleanJson);
                             if (parsed && typeof parsed === "object") {
                                 return { parsed, modelUsed: modelName };
@@ -9857,40 +9975,191 @@ create table if not exists public.patients (
             return null;
         }
 
+        function synthesizeClinicalStudyFromPatientInputs(patient, doctorPrefs, stlSummary) {
+            const mh = patient.medical_history || {};
+            const chief = (mh.chief_complaint || patient.case_summary || "Valoración ortodóntica integral").trim();
+            const habits = (mh.habits_perio || "En evaluación clínica").trim();
+            const allergies = (mh.allergies || "Ninguna reportada").trim();
+            const risksNote = (mh.consent_risks || "").trim();
+            const combinedText = `${chief} ${habits} ${allergies} ${risksNote}`.toLowerCase();
+
+            const isClassII = /clase\s*ii|clase\s*2|retrognat|sobremordida horizontal|overjet|protrusi/i.test(combinedText);
+            const isClassIII = /clase\s*iii|clase\s*3|prognat|borde a borde|cruzada anterior/i.test(combinedText);
+            const isOpenBite = /mordida abierta|interposici[oó]n lingual|degluci[oó]n at[ií]pica|empalamiento lingual|h[aá]bito de lengua/i.test(combinedText);
+            const isDeepBite = /mordida profunda|sobremordida vertical|bruxismo|apretamiento/i.test(combinedText);
+            const isCrossBite = /mordida cruzada|colapso transversal|compresi[oó]n maxilar/i.test(combinedText);
+            const isSevereCrowding = /api[nñ]amiento severo|falta de espacio severa|ect[oó]pico|retenido/i.test(combinedText);
+            const isThinPerio = /delgado|recesi[oó]n|ra[ií]ces cortas|reabsorci[oó]n|periodont|gingivitis|movilidad/i.test(combinedText);
+            const hasNickelOrLatexAllergy = /n[ií]quel|l[aá]tex|metal|acr[ií]lico|alergia/i.test(allergies.toLowerCase()) && !/ninguna|no refier|sin alergia/i.test(allergies.toLowerCase());
+
+            const complexity = (isOpenBite || isClassIII || isSevereCrowding || isThinPerio) ? "Alta" : (isClassII || isDeepBite || isCrossBite) ? "Moderada" : "Moderada";
+            const durationMonths = complexity === "Alta" ? 20 : 16;
+            const anchorage = isOpenBite
+                ? `Intrusión posterior controlada (${doctorPrefs.anchorageSystem}) + Control de hábito`
+                : isClassII
+                ? `Distalización / Elásticos Clase II + ${doctorPrefs.anchorageSystem}`
+                : isClassIII
+                ? `Elásticos Clase III + Anclaje mandibular (${doctorPrefs.anchorageSystem})`
+                : doctorPrefs.anchorageSystem;
+
+            const skeletalDiag = isClassIII
+                ? `Relación Clase III Dentoalveolar/Esquelética • ${chief}`
+                : isClassII
+                ? `Relación Clase II Dentoalveolar con resalte aumentado • ${chief}`
+                : `Clase I Dentoalveolar con discrepancia de espacio • ${chief}`;
+
+            const verticalDiag = isOpenBite
+                ? "Mordida abierta / tendencia hiperdivergente con requerimiento de control vertical e intrusión molar"
+                : isDeepBite
+                ? "Mordida profunda anterior con curva de Spee acentuada (nivelación y desprogramación oclusal)"
+                : isCrossBite
+                ? "Compresión transversal / mordida cruzada con necesidad de desarrollo de arcada"
+                : "Overbite y guía incisiva en ajuste biomecánico hacia norma (+2.0 a +2.5 mm)";
+
+            const formulaDiag = `${chief} • Protocolo ${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`;
+            const rootAlertDiag = `${habits}${hasNickelOrLatexAllergy ? ` • Precaución Alergia: ${allergies}` : " • Fuerzas ligeras continuas y control radiográfico semestral"}`;
+
+            const iprPerFace = isThinPerio ? 0.15 : isSevereCrowding ? 0.25 : 0.2;
+            const round1 = (n) => Number(n.toFixed(1));
+
+            const study = createBlankStudyData();
+            applyPreferencesToStudyRoadmap(study, doctorPrefs);
+            study.durationMonths = durationMonths;
+            study.complexity = complexity;
+            study.anchorage = anchorage;
+            study.summary = {
+                skeletal: skeletalDiag,
+                vertical: verticalDiag,
+                dentalFormula: formulaDiag,
+                rootAlert: rootAlertDiag
+            };
+            study.cephalometrics = [
+                {
+                    parameter: "Relación Sagital & Motivo Clínico",
+                    finding: isClassIII ? "Tendencia Clase III" : isClassII ? "Tendencia Clase II" : "Clase I con discrepancia",
+                    norm: "Clase I (ANB 2°)",
+                    implication: `Caso de ${patient.full_name} (${patient.age} años): ${chief}`
+                },
+                {
+                    parameter: "Componente Vertical & Oclusal",
+                    finding: isOpenBite ? "Mordida Abierta / Hiperdivergente" : isDeepBite ? "Sobremordida Profunda" : "Normodivergente en ajuste",
+                    norm: "Overbite +2.0 a +2.5 mm",
+                    implication: verticalDiag
+                },
+                {
+                    parameter: "Estado Periodontal y Hábitos",
+                    finding: habits,
+                    norm: "Periodonto sano y función muscular neutra",
+                    implication: isThinPerio ? "Limitar stripping (IPR ≤ 0.2 mm) y emplear arcos termoactivados de baja carga." : "Monitoreo periodontal e higiene interproximal en cada cita."
+                },
+                {
+                    parameter: "Alergias y Bioseguridad en Sillón",
+                    finding: allergies,
+                    norm: "Sin hipersensibilidad",
+                    implication: hasNickelOrLatexAllergy ? `Usar insumos libres de alérgeno reportado (${allergies}).` : "Protocolo estándar de bioseguridad y adhesión."
+                }
+            ];
+            study.additionalTreatments = [
+                `Motivo prioritario atendido: ${chief}`,
+                `Manejo periodontal y funcional: ${habits}`,
+                hasNickelOrLatexAllergy ? `Alerta de Alergias en charola: ${allergies} (usar ligaduras/insumos hipoalergénicos)` : `Control profiláctico y radiográfico cada 6 meses`,
+                `Secuencia configurada: ${doctorPrefs.archwirePhase1} → ${doctorPrefs.archwirePhase2} → ${doctorPrefs.archwirePhase3}`
+            ];
+            study.risks = [
+                {
+                    title: isThinPerio ? "Biotipo Periodontal / Longitud Radicular" : "Control Radicular y Periodontal",
+                    level: isThinPerio ? "Alto" : "Moderado",
+                    mitigation: `${habits}. Aplicar fuerzas ligeras con arcos CuNiTi y tomar Rx periapical de control al mes 6.`
+                },
+                {
+                    title: hasNickelOrLatexAllergy ? `Hipersensibilidad / Alergia (${allergies})` : "Estabilidad Oclusal y Hábitos",
+                    level: hasNickelOrLatexAllergy || isOpenBite ? "Alto" : "Moderado",
+                    mitigation: hasNickelOrLatexAllergy
+                        ? `Verificar en cada cita materiales libres de ${allergies}.`
+                        : `${risksNote || "Reeducación funcional y doble retención final fija + Essix."}`
+                }
+            ];
+
+            // Poblar odontograma coherente en las arcadas
+            const anteriorIprTeeth = [31, 32, 33, 41, 42, 43, 12, 11, 21, 22];
+            anteriorIprTeeth.forEach((fdi) => {
+                study.odontogram[fdi] = {
+                    toothFDI: fdi,
+                    name: FDI_STANDARD_NAMES[fdi] || `OD ${fdi}`,
+                    status: "ipr",
+                    diagnosis: `Apiñamiento / ajuste de espacio (${chief.slice(0, 45)})`,
+                    iprMesial: round1(iprPerFace),
+                    iprDistal: round1(iprPerFace),
+                    biomechanics: `Stripping selectivo y alineación con ${doctorPrefs.archwirePhase1}`
+                };
+            });
+            [16, 26, 36, 46].forEach((fdi) => {
+                study.odontogram[fdi] = {
+                    toothFDI: fdi,
+                    name: FDI_STANDARD_NAMES[fdi] || `OD ${fdi}`,
+                    status: isOpenBite ? "critical" : "aligned",
+                    diagnosis: isOpenBite ? "Pilar de control vertical / intrusión molar" : "Anclaje molar principal en arco",
+                    iprMesial: 0,
+                    iprDistal: 0,
+                    biomechanics: isOpenBite ? `Control vertical con ${doctorPrefs.anchorageSystem}` : `Control de torque y anclaje con ${doctorPrefs.archwirePhase2}`
+                };
+            });
+
+            return study;
+        }
+
+        function syncPatientTimelineFromStudyRoadmap(patient, study) {
+            if (!patient || !study || !Array.isArray(study.roadmap) || study.roadmap.length === 0) return;
+            const existingTimeline = Array.isArray(patient.timeline_appointments) ? patient.timeline_appointments : [];
+            const hasCompleted = existingTimeline.some((a) => a.status === "completed" || a.hasTwoPhotos);
+            if (hasCompleted) return; // No sobreescribir si el paciente ya tiene citas completadas con fotos
+
+            const baseDate = new Date();
+            baseDate.setHours(11, 0, 0, 0);
+
+            patient.timeline_appointments = study.roadmap.map((stage, idx) => {
+                const prev = existingTimeline[idx];
+                const apptDate = prev?.startIso
+                    ? new Date(prev.startIso)
+                    : new Date(baseDate.getTime() + idx * 28 * 24 * 60 * 60 * 1000);
+                return {
+                    id: prev?.id || `appt-${patient.id}-stage-${idx + 1}`,
+                    stageNumber: idx + 1,
+                    stageMonths: stage.months || `ETAPA ${idx + 1}`,
+                    title: stage.title || `Fase ${idx + 1}`,
+                    archwire: stage.archwire || "Secuencia activa",
+                    chairsideAction: stage.chairsideAction || stage.expectedMovement || "Control clínico en sillón",
+                    startIso: idx === 0 ? apptDate.toISOString() : (prev?.startIso || ""),
+                    durationMinutes: idx === 0 ? 45 : 30,
+                    chair: "Sillón Clínico",
+                    status: idx === 0 ? "current" : "pending",
+                    completedDate: null,
+                    notes: stage.expectedMovement || "",
+                    hasTwoPhotos: false
+                };
+            });
+        }
+
         async function runArgonAnalysis() {
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             if (!patient) return;
 
-            // Sincronizar cualquier dato recién escrito en el Paso 1 antes de analizar
+            // 1. Sincronizar TODOS los inputs escritos en pantalla (Paso 1, notas de evolución, borradores manuales)
             syncPatientInfoInputsToModel(patient);
 
             const btn = document.getElementById("btnRunArgonAnalysis");
             const txt = document.getElementById("btnRunArgonText");
             if (btn) btn.disabled = true;
-            if (txt) txt.innerText = "Analizando Historia, Fotografías y Rx con Gemini Argon...";
+            if (txt) txt.innerText = "Analizando Historia, Fotos, Rx y STL con Gemini Argon...";
 
             const doctorPrefs = getOrthoPreferences();
 
             try {
                 let updatedStudy = null;
+                let modelUsedForDiagnosis = "";
 
-                // 1. Intentar primero el endpoint Next.js (/api/analyze-ortho) si corre bajo servidor Next
-                try {
-                    const fd = new FormData();
-                    fd.append("patientName", patient.full_name);
-                    fd.append("patientAge", String(patient.age));
-                    fd.append("orthoPreferences", JSON.stringify(doctorPrefs));
-                    if (uploadedUpperStlFile) fd.append("stlUpper", uploadedUpperStlFile);
-                    if (uploadedLowerStlFile) fd.append("stlLower", uploadedLowerStlFile);
-                    const resp = await fetch("/api/analyze-ortho", { method: "POST", body: fd });
-                    if (resp.ok) {
-                        const json = await resp.json();
-                        if (json.success && json.data) updatedStudy = json.data;
-                    }
-                } catch (_) {}
-
-                // 2. Llamada directa a Gemini API Multimodal con header x-goog-api-key
                 const stlSummary = [stlUpperTelemetryText, stlLowerTelemetryText].filter(Boolean).join(" | ") ||
+                    patient.medical_history?.stl_telemetry ||
                     "Sin archivos .STL cargados (evaluación clínica y fotográfica/radiográfica)";
                 const mh = patient.medical_history || {};
                 const chiefComplaint = mh.chief_complaint || patient.case_summary || "Valoración ortodóntica integral";
@@ -9898,40 +10167,120 @@ create table if not exists public.patients (
                 const allergies = mh.allergies || "Ninguna reportada";
                 const consentRisks = mh.consent_risks || "";
 
+                // Recopilar bitácora de notas de evolución y registros de avance
+                const evolutionNotesList = Array.isArray(patient.notes)
+                    ? patient.notes.map((n) => `[${n.date} - ${n.author}]: ${n.text}`).join(" | ")
+                    : "";
+                const evolutionCheckinsList = Array.isArray(patient.evolution_records) && patient.evolution_records.length > 0
+                    ? patient.evolution_records.map((r) => `Mes ${r.month} (${r.stageTitle}): Overbite ${r.overbiteMm}mm - ${r.notes || ""}`).join(" | ")
+                    : "";
+                const fullEvolutionContext = [evolutionNotesList, evolutionCheckinsList].filter(Boolean).join("\n");
+
+                // Recopilar overrides manuales por diente y borradores manuales de diagnóstico
+                const previousManualTeeth = {};
+                if (patient.study_data?.odontogram) {
+                    Object.entries(patient.study_data.odontogram).forEach(([fdiKey, toothObj]) => {
+                        if (toothObj && toothObj.manually_overridden) {
+                            previousManualTeeth[fdiKey] = toothObj;
+                        }
+                    });
+                }
+                const manualDraftInputs = mh.manual_draft_inputs || null;
+                const manualOverridesSummary = JSON.stringify({
+                    manualTeeth: previousManualTeeth,
+                    manualSummaryDraft: manualDraftInputs
+                });
+
+                // Unificar todas las fotografías y radiografías (incluyendo PDFs y fotos de evolución)
                 const mergedPhotos = Object.assign({}, mh.photos || {}, patient.photos || {});
+                if (Array.isArray(patient.evolution_records)) {
+                    patient.evolution_records.forEach((rec, idx) => {
+                        if (rec.photoFrontalUrl && rec.photoFrontalUrl.startsWith("data:")) {
+                            mergedPhotos[`Evolución Mes ${rec.month || idx} Frontal`] = rec.photoFrontalUrl;
+                        }
+                        if (rec.photoOverjetUrl && rec.photoOverjetUrl.startsWith("data:")) {
+                            mergedPhotos[`Evolución Mes ${rec.month || idx} Sobremordida`] = rec.photoOverjetUrl;
+                        }
+                    });
+                }
                 const photoEntries = Object.entries(mergedPhotos);
                 let attachedImagesCount = 0;
+                const attachedSlotNames = [];
 
-                if (!updatedStudy) {
-                    const parts = [];
-                    for (const [slotName, dataUrl] of photoEntries) {
-                        if (typeof dataUrl === "string" && dataUrl.startsWith("data:image/")) {
-                            const compressed = await compressDataUrlForGemini(dataUrl, 1024, 0.78);
-                            if (compressed) {
-                                parts.push({ text: `Registro clínico fotográfico/radiográfico (${slotName}):` });
-                                parts.push({
-                                    inlineData: {
-                                        mimeType: compressed.mimeType,
-                                        data: compressed.data
-                                    }
-                                });
-                                attachedImagesCount++;
-                            }
+                // Preparar partes multimedia comprimidas (imágenes JPG/PNG y radiografías PDF)
+                const mediaParts = [];
+                const compressedPhotosMapForApi = {};
+                for (const [slotName, dataUrl] of photoEntries) {
+                    if (typeof dataUrl === "string" && (dataUrl.startsWith("data:image/") || dataUrl.startsWith("data:application/pdf"))) {
+                        const processed = await compressDataUrlForGemini(dataUrl, 1024, 0.78);
+                        if (processed) {
+                            mediaParts.push({ text: `Registro clínico fotográfico/radiográfico (${slotName}):` });
+                            mediaParts.push({
+                                inlineData: {
+                                    mimeType: processed.mimeType,
+                                    data: processed.data
+                                }
+                            });
+                            compressedPhotosMapForApi[slotName] = `data:${processed.mimeType};base64,${processed.data}`;
+                            attachedImagesCount++;
+                            attachedSlotNames.push(slotName);
+                        }
+                    } else if (typeof dataUrl === "string" && dataUrl.startsWith("http")) {
+                        attachedSlotNames.push(`${slotName} (URL en expediente)`);
+                    }
+                }
+
+                // 2. Intentar primero el endpoint Next.js (/api/analyze-ortho) enviando TODOS los datos del paciente
+                try {
+                    const fd = new FormData();
+                    fd.append("patientName", patient.full_name || "Paciente");
+                    fd.append("patientAge", String(patient.age || 30));
+                    fd.append("patientPhone", patient.phone || "");
+                    fd.append("recordCode", patient.record_code || "#CRD-2026");
+                    fd.append("chiefComplaint", chiefComplaint);
+                    fd.append("habitsPerio", habitsPerio);
+                    fd.append("allergies", allergies);
+                    fd.append("consentRisks", consentRisks);
+                    fd.append("evolutionNotes", fullEvolutionContext);
+                    fd.append("manualOverrides", manualOverridesSummary);
+                    fd.append("stlTelemetryText", stlSummary);
+                    fd.append("orthoPreferences", JSON.stringify(doctorPrefs));
+                    if (Object.keys(compressedPhotosMapForApi).length > 0) {
+                        fd.append("photosJson", JSON.stringify(compressedPhotosMapForApi));
+                    }
+                    if (uploadedUpperStlFile) fd.append("stlUpper", uploadedUpperStlFile);
+                    if (uploadedLowerStlFile) fd.append("stlLower", uploadedLowerStlFile);
+                    const resp = await fetch("/api/analyze-ortho", { method: "POST", body: fd });
+                    if (resp.ok) {
+                        const json = await resp.json();
+                        if (json.success && json.data) {
+                            updatedStudy = json.data;
+                            modelUsedForDiagnosis = json.modelUsed || "gemini-3-flash-preview";
                         }
                     }
+                } catch (_) {}
 
+                // 3. Llamada directa a Gemini API Multimodal con header x-goog-api-key si no respondió el servidor Next.js
+                if (!updatedStudy) {
+                    const parts = [...mediaParts];
                     const prompt = `Eres un especialista experto en Ortodoncia y Ortopedia Maxilar asistiendo a la Dra. Liseth Guevara Muñoz en Mérida, Yucatán.
-Analiza de forma específica, rigurosa y personalizada el caso clínico de este paciente (NO inventes datos de otros pacientes ni uses plantillas genéricas):
+Analiza de forma específica, rigurosa y personalizada TODOS los datos ingresados de este paciente (NO uses plantillas genéricas; cada campo devuelto debe responder directamente a los datos reales de este paciente):
+
+DATOS COMPLETOS DEL PACIENTE E HISTORIA CLÍNICA:
 - Nombre del Paciente: ${patient.full_name}
 - Edad: ${patient.age} años
-- Motivo de Consulta y Antecedentes: ${chiefComplaint}
+- Folio de Expediente: ${patient.record_code || "#CRD-2026"} • Teléfono: ${patient.phone || "No registrado"}
+- Motivo de Consulta y Antecedentes Clínicos: ${chiefComplaint}
 - Hábitos Funcionales y Estado Periodontal: ${habitsPerio}
 - Alergias y Condiciones Sistémicas: ${allergies}
-- Notas de Riesgos / Observaciones: ${consentRisks}
-- Telemetría 3D (.STL): ${stlSummary}
-- Fotografías / Radiografías adjuntas en este análisis: ${attachedImagesCount} imágenes clínicas.
+- Riesgos de Consentimiento / Observaciones: ${consentRisks || "Estándar"}
+${fullEvolutionContext ? `- Bitácora de Notas de Evolución y Controles Previos: ${fullEvolutionContext}` : ""}
+${Object.keys(previousManualTeeth).length > 0 ? `- Dientes editados manualmente por la Dra. Liseth (RESPETAR): ${JSON.stringify(previousManualTeeth)}` : ""}
+${manualDraftInputs ? `- Notas de diagnóstico capturadas manualmente por la Dra. Liseth: ${JSON.stringify(manualDraftInputs)}` : ""}
+- Telemetría 3D de Modelos (.STL): ${stlSummary}
+- Registros Fotográficos y Radiográficos analizados (${attachedImagesCount} archivos adjuntos): ${attachedSlotNames.join(", ") || "Evaluación basada en historia clínica completa"}
 
-PREFERENCIAS BIOMECÁNICAS DE LA DRA. LISETH GUEVARA MUÑOZ (diseña el plan, anclaje, stripping IPR y las 6 fases del roadmap respetando estas preferencias):
+PREFERENCIAS BIOMECÁNICAS DE LA DRA. LISETH GUEVARA MUÑOZ (diseña el plan, anclaje, stripping IPR y las 6 fases del roadmap respetando estrictamente estas preferencias):
 - Sistema y Prescripción de Brackets: ${doctorPrefs.bracketPrescription}
 - Calibre de Ranura (Slot): ${doctorPrefs.slotSize}
 - Secuencia de Arcos Fase 1 (Alineación y Nivelación): ${doctorPrefs.archwirePhase1}
@@ -9943,49 +10292,64 @@ PREFERENCIAS BIOMECÁNICAS DE LA DRA. LISETH GUEVARA MUÑOZ (diseña el plan, an
 - Frecuencia de Fotografías de Avance: Cada ${doctorPrefs.photoProgressInterval || 3} meses
 - Reglas Biomecánicas de la Doctora: ${doctorPrefs.customRules}
 
-INSTRUCCIONES DE SALIDA JSON:
-Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta:
+REGLAS OBLIGATORIAS PARA EL DIAGNÓSTICO:
+1. En "summary":
+   - "skeletal": Diagnostica relación sagital/esquelética integrando el motivo de consulta ("${chiefComplaint}").
+   - "vertical": Diagnostica sobremordida vertical/horizontal y componente funcional ("${habitsPerio}").
+   - "dentalFormula": Detalla apiñamiento, discrepancia, ausencias o terceros molares y la prescripción seleccionada.
+   - "rootAlert": Integra estado periodontal/radicular ("${habitsPerio}") y alergias/condiciones sistémicas ("${allergies}").
+2. En "cephalometrics": Incluye al menos 4 parámetros clínicos específicos para este paciente (Relación Sagital, Componente Vertical, Discrepancia Dentoalveolar/Apiñamiento, Estado Periodontal/Inclinación Incisiva).
+3. En "additionalTreatments": Incluye de 3 a 5 medidas terapéuticas específicas (control de hábitos reportados, manejo periodontal, precauciones por alergias si existen, elásticos o TADs).
+4. En "risks": Incluye de 2 a 3 riesgos clínicos reales para este paciente (periodontal/radicular, recidiva por hábitos, alergias o anclaje) con su mitigación.
+5. En "odontogram": Evalúa tanto los dientes anteriores (13-23, 33-43) como los premolares y molares relevantes (16, 15, 14, 24, 25, 26, 36, 35, 34, 44, 45, 46, y 18, 28, 38, 48 si aplica) con milímetros exactos de stripping mesial ("iprMesial") y distal ("iprDistal").
+6. En "roadmap": Diseña las 6 etapas completas (MES 0, Mes 1 - 3, Mes 4 - 6, Mes 7 - 10, Mes 11 - 14, Mes 15 - 18) adaptadas a este paciente.
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura:
 {
-  "durationMonths": number (ej. 14, 18, 24 según la complejidad real del caso),
+  "durationMonths": 18,
   "complexity": "Baja" | "Moderada" | "Alta",
   "anchorage": "Descripción clara del anclaje requerido para este paciente",
   "summary": {
-    "skeletal": "Diagnóstico esquelético y sagital específico del paciente",
-    "vertical": "Diagnóstico vertical y sobremordida (overbite/overjet) específico",
-    "dentalFormula": "Estado de la dentición, apiñamiento o ausencias observadas",
-    "rootAlert": "Estado radicular/periodontal y precauciones específicas"
+    "skeletal": "...",
+    "vertical": "...",
+    "dentalFormula": "...",
+    "rootAlert": "..."
   },
   "cephalometrics": [
     { "parameter": "Relación Esquelética Sagital", "finding": "...", "norm": "Clase I (ANB 2°)", "implication": "..." },
     { "parameter": "Componente Vertical / Overbite", "finding": "...", "norm": "+2.0 a +2.5 mm", "implication": "..." },
     { "parameter": "Discrepancia Dentoalveolar / Apiñamiento", "finding": "...", "norm": "0 mm", "implication": "..." },
-    { "parameter": "Inclinación Incisiva y Perfil Labial", "finding": "...", "norm": "IMPA 90° / U1-SN 103°", "implication": "..." }
+    { "parameter": "Estado Periodontal, Hábitos y Bioseguridad", "finding": "...", "norm": "Periodonto sano", "implication": "..." }
   ],
-  "additionalTreatments": ["Lista de 3 a 4 indicaciones auxiliares específicas para este paciente"],
+  "additionalTreatments": ["..."],
   "risks": [
-    { "title": "Título del riesgo 1", "level": "Bajo" | "Moderado" | "Alto", "mitigation": "Medida clínica de prevención" },
-    { "title": "Título del riesgo 2", "level": "Bajo" | "Moderado" | "Alto", "mitigation": "Medida clínica de prevención" }
+    { "title": "...", "level": "Bajo" | "Moderado" | "Alto", "mitigation": "..." }
   ],
   "odontogram": {
+    "16": { "toothFDI": 16, "name": "1er Molar Sup. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "13": { "toothFDI": 13, "name": "Canino Sup. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "12": { "toothFDI": 12, "name": "Incisivo Lateral Sup. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "11": { "toothFDI": 11, "name": "Incisivo Central Sup. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "21": { "toothFDI": 21, "name": "Incisivo Central Sup. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "22": { "toothFDI": 22, "name": "Incisivo Lateral Sup. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "23": { "toothFDI": 23, "name": "Canino Sup. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
+    "26": { "toothFDI": 26, "name": "1er Molar Sup. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
+    "36": { "toothFDI": 36, "name": "1er Molar Inf. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "33": { "toothFDI": 33, "name": "Canino Inf. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "32": { "toothFDI": 32, "name": "Incisivo Lateral Inf. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "31": { "toothFDI": 31, "name": "Incisivo Central Inf. Izq.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "41": { "toothFDI": 41, "name": "Incisivo Central Inf. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
     "42": { "toothFDI": 42, "name": "Incisivo Lateral Inf. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
-    "43": { "toothFDI": 43, "name": "Canino Inf. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." }
+    "43": { "toothFDI": 43, "name": "Canino Inf. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." },
+    "46": { "toothFDI": 46, "name": "1er Molar Inf. Der.", "status": "aligned"|"ipr"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.0, "iprDistal": 0.0, "biomechanics": "..." }
   },
   "roadmap": [
-    { "phase": "fase1", "months": "Mes 1 - 3", "archwire": "...", "title": "...", "chairsideAction": "...", "expectedMovement": "..." },
-    { "phase": "fase1", "months": "Mes 4 - 6", "archwire": "...", "title": "...", "chairsideAction": "...", "expectedMovement": "..." },
-    { "phase": "fase2", "months": "Mes 7 - 10", "archwire": "...", "title": "...", "chairsideAction": "...", "expectedMovement": "..." },
-    { "phase": "fase2", "months": "Mes 11 - 14", "archwire": "...", "title": "...", "chairsideAction": "...", "expectedMovement": "..." },
-    { "phase": "fase3", "months": "Mes 15 - 18", "archwire": "...", "title": "...", "chairsideAction": "...", "expectedMovement": "..." }
+    { "phase": "fase1", "months": "MES 0", "archwire": "Estudio Clínico, Profilaxis y Adhesión", "title": "Preparación y Cementado Diferencial", "chairsideAction": "...", "expectedMovement": "..." },
+    { "phase": "fase1", "months": "MES 1 - 3", "archwire": "${doctorPrefs.archwirePhase1}", "title": "Alineación, Nivelación y Control de Hábitos", "chairsideAction": "...", "expectedMovement": "..." },
+    { "phase": "fase1", "months": "MES 4 - 6", "archwire": "${doctorPrefs.archwirePhase1}", "title": "Desarrollo de Arcada y Stripping (IPR) Selectivo", "chairsideAction": "...", "expectedMovement": "..." },
+    { "phase": "fase2", "months": "MES 7 - 10", "archwire": "${doctorPrefs.archwirePhase2}", "title": "Biomecánica de Trabajo y Control de Torque/Anclaje", "chairsideAction": "...", "expectedMovement": "..." },
+    { "phase": "fase2", "months": "MES 11 - 14", "archwire": "${doctorPrefs.archwirePhase2}", "title": "Consolidación Sagital/Vertical y Cierre de Espacios", "chairsideAction": "...", "expectedMovement": "..." },
+    { "phase": "fase3", "months": "MES 15 - 18", "archwire": "${doctorPrefs.archwirePhase3}", "title": "Asentamiento Oclusal, Intercuspidación y Retención", "chairsideAction": "...", "expectedMovement": "..." }
   ],
   "retentionProtocol": "${doctorPrefs.retentionProtocol}"
 }`;
@@ -9994,31 +10358,22 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
                     const apiRes = await callGeminiApiJson(parts, 0.15, 32000);
                     if (apiRes && apiRes.parsed && (apiRes.parsed.summary || apiRes.parsed.odontogram)) {
                         updatedStudy = apiRes.parsed;
+                        modelUsedForDiagnosis = apiRes.modelUsed || "gemini-3-flash-preview";
                     }
                 }
 
-                // 3. Construir el estudio a partir de una plantilla limpia (NUNCA sobreescribir con los datos de Martha)
-                const previousManualTeeth = {};
-                if (patient.study_data?.odontogram) {
-                    Object.entries(patient.study_data.odontogram).forEach(([fdiKey, toothObj]) => {
-                        if (toothObj && toothObj.manually_overridden) {
-                            previousManualTeeth[fdiKey] = toothObj;
-                        }
-                    });
-                }
-
-                const argonSynthesizedStudy = createBlankStudyData();
-                applyPreferencesToStudyRoadmap(argonSynthesizedStudy, doctorPrefs);
+                // 4. Construir el estudio integrando respuesta de Gemini + todos los datos del paciente
+                const argonSynthesizedStudy = synthesizeClinicalStudyFromPatientInputs(patient, doctorPrefs, stlSummary);
 
                 if (updatedStudy && updatedStudy.summary) {
-                    argonSynthesizedStudy.durationMonths = Number(updatedStudy.durationMonths) || 18;
-                    argonSynthesizedStudy.complexity = updatedStudy.complexity || "Moderada";
-                    argonSynthesizedStudy.anchorage = updatedStudy.anchorage || doctorPrefs.anchorageSystem;
+                    argonSynthesizedStudy.durationMonths = Number(updatedStudy.durationMonths) || argonSynthesizedStudy.durationMonths || 18;
+                    argonSynthesizedStudy.complexity = updatedStudy.complexity || argonSynthesizedStudy.complexity || "Moderada";
+                    argonSynthesizedStudy.anchorage = updatedStudy.anchorage || argonSynthesizedStudy.anchorage || doctorPrefs.anchorageSystem;
                     argonSynthesizedStudy.summary = {
-                        skeletal: updatedStudy.summary.skeletal || "Clase I Dentoalveolar",
-                        vertical: updatedStudy.summary.vertical || "Sobremordida en ajuste biomecánico",
-                        dentalFormula: updatedStudy.summary.dentalFormula || "Dentición permanente en evaluación",
-                        rootAlert: updatedStudy.summary.rootAlert || "Monitoreo radiográfico periódico"
+                        skeletal: updatedStudy.summary.skeletal || argonSynthesizedStudy.summary.skeletal,
+                        vertical: updatedStudy.summary.vertical || argonSynthesizedStudy.summary.vertical,
+                        dentalFormula: updatedStudy.summary.dentalFormula || argonSynthesizedStudy.summary.dentalFormula,
+                        rootAlert: updatedStudy.summary.rootAlert || argonSynthesizedStudy.summary.rootAlert
                     };
                     if (Array.isArray(updatedStudy.cephalometrics) && updatedStudy.cephalometrics.length > 0) {
                         argonSynthesizedStudy.cephalometrics = updatedStudy.cephalometrics;
@@ -10052,49 +10407,79 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
                         });
                     }
                 } else {
-                    argonSynthesizedStudy.complexity = "Moderada";
-                    argonSynthesizedStudy.durationMonths = 18;
-                    argonSynthesizedStudy.anchorage = doctorPrefs.anchorageSystem;
-                    argonSynthesizedStudy.summary = {
-                        skeletal: `Valoración para ${patient.full_name} (${patient.age} años): ${chiefComplaint}`,
-                        vertical: "Overbite y guía anterior en ajuste biomecánico",
-                        dentalFormula: `Aparatología: ${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`,
-                        rootAlert: habitsPerio !== "En evaluación clínica" ? habitsPerio : "Control radiográfico periapical a los 6 meses"
-                    };
+                    modelUsedForDiagnosis = "Motor Clínico Local (Fallback)";
                 }
 
-                // Asegurar prescripción seleccionada en tabla cefalométrica
-                argonSynthesizedStudy.cephalometrics = [
-                    ...(argonSynthesizedStudy.cephalometrics || []),
-                    {
-                        parameter: "Prescripción & Secuencia Configurada",
-                        finding: `${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`,
-                        norm: doctorPrefs.archwirePhase1,
-                        implication: `Fase 2: ${doctorPrefs.archwirePhase2} • Fase 3: ${doctorPrefs.archwirePhase3}`
+                // Completar los 32 órganos dentarios FDI para que cualquier diente seleccionado en el Odontograma 2D tenga diagnóstico coherente
+                const all32Fdi = [...UPPER_RIGHT, ...UPPER_LEFT, ...LOWER_RIGHT, ...LOWER_LEFT];
+                all32Fdi.forEach((fdiNum) => {
+                    if (!argonSynthesizedStudy.odontogram[fdiNum]) {
+                        const isThirdMolar = [18, 28, 38, 48].includes(fdiNum);
+                        argonSynthesizedStudy.odontogram[fdiNum] = {
+                            toothFDI: fdiNum,
+                            name: FDI_STANDARD_NAMES[fdiNum] || `Órgano Dentario ${fdiNum}`,
+                            status: "aligned",
+                            diagnosis: isThirdMolar
+                                ? "3er Molar en vigilancia radiográfica (valorar espacio retromolar)"
+                                : `En arco • ${argonSynthesizedStudy.summary.skeletal.slice(0, 55)}`,
+                            iprMesial: 0,
+                            iprDistal: 0,
+                            biomechanics: isThirdMolar
+                                ? "Monitoreo en Rx Panorámica"
+                                : `Alineación y control tridimensional (${doctorPrefs.bracketPrescription})`
+                        };
                     }
-                ];
+                });
 
-                // Respetar overrides manuales hechos por la doctora
-                if (!argonSynthesizedStudy.odontogram) argonSynthesizedStudy.odontogram = {};
+                // Asegurar que la prescripción y secuencia configurada por la Dra. Liseth esté presente en la tabla cefalométrica
+                const hasPrefsRow = (argonSynthesizedStudy.cephalometrics || []).some((c) =>
+                    String(c.parameter || "").toLowerCase().includes("prescripción")
+                );
+                if (!hasPrefsRow) {
+                    argonSynthesizedStudy.cephalometrics = [
+                        ...(argonSynthesizedStudy.cephalometrics || []),
+                        {
+                            parameter: "Prescripción & Secuencia Configurada",
+                            finding: `${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize.split(" (")[0]})`,
+                            norm: doctorPrefs.archwirePhase1,
+                            implication: `Fase 2: ${doctorPrefs.archwirePhase2} • Fase 3: ${doctorPrefs.archwirePhase3}`
+                        }
+                    ];
+                }
+
+                // Respetar overrides manuales hechos por la doctora en dientes específicos
                 Object.assign(argonSynthesizedStudy.odontogram, previousManualTeeth);
                 argonSynthesizedStudy.is_uninitialized = false;
 
+                const hasStlLoaded = Boolean(uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl || activeLowerStlUrl || stlUpperTelemetryText || stlLowerTelemetryText);
+                const analysisMeta = {
+                    modelUsed: modelUsedForDiagnosis || "gemini-3-flash-preview",
+                    analyzedAt: new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" }),
+                    title: `✓ Diagnóstico generado para ${patient.full_name} (${patient.age} años) con todos los datos del expediente`,
+                    details: `Procesado: Motivo ("${chiefComplaint.slice(0, 55)}") • Hábitos/Perio ("${habitsPerio.slice(0, 45)}") • Alergias ("${allergies}") • ${attachedImagesCount} Foto(s)/Rx${hasStlLoaded ? " • Telemetría 3D .STL" : ""} • ${doctorPrefs.bracketPrescription}`
+                };
+                argonSynthesizedStudy.analysis_metadata = analysisMeta;
+
                 patient.study_data = argonSynthesizedStudy;
                 patient.complexity = argonSynthesizedStudy.complexity || "Moderada";
-                patient.has_stl = Boolean(uploadedUpperStlFile || uploadedLowerStlFile || activeUpperStlUrl || activeLowerStlUrl);
+                patient.has_stl = hasStlLoaded;
                 patient.case_summary = `${argonSynthesizedStudy.summary.skeletal} • ${doctorPrefs.bracketPrescription}`;
                 patient.ai_analyzed_once = true;
+
+                // Sincronizar Timeline del Paso 5 con la nueva hoja de ruta si no hay citas completadas aún
+                syncPatientTimelineFromStudyRoadmap(patient, argonSynthesizedStudy);
 
                 if (!patient.medical_history) patient.medical_history = {};
                 patient.medical_history.ai_analyzed_once = true;
                 patient.medical_history.complexity = patient.complexity;
                 patient.medical_history.study_data = patient.study_data;
+                patient.medical_history.analysis_metadata = analysisMeta;
                 patient.medical_history.ortho_preferences_applied = doctorPrefs;
 
                 if (!patient.consensus_history) patient.consensus_history = [];
                 patient.consensus_history.push({
                     role: "ai",
-                    text: `✓ Diagnóstico Gemini Argon actualizado para ${patient.full_name} (${patient.age} años) con ${attachedImagesCount} registro(s) visuales y protocolo ${doctorPrefs.bracketPrescription}.`
+                    text: `✓ Diagnóstico (${analysisMeta.modelUsed}) completado para ${patient.full_name} (${patient.age} años). Integrados: Motivo de consulta, Hábitos/Periodonto, Alergias, ${attachedImagesCount} registro(s) multimedia y protocolo ${doctorPrefs.bracketPrescription}.`
                 });
 
                 savePatientsLocal();
@@ -10113,7 +10498,7 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
                         .insert([
                             {
                                 patient_id: patient.id,
-                                center_name: "Valoración Dra. Liseth Guevara + Gemini Argon",
+                                center_name: `Valoración Dra. Liseth Guevara + ${analysisMeta.modelUsed}`,
                                 photos_urls: mergedPhotos,
                                 stl_upper_url: activeUpperStlUrl || patient.stl_upper_url || null,
                                 stl_lower_url: activeLowerStlUrl || patient.stl_lower_url || null,
@@ -10170,6 +10555,9 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
             const patient = patientsList.find((p) => p.id === activePatientId) || patientsList[0];
             if (!patient) return;
 
+            // Sincronizar cualquier cambio en los campos de Historia Clínica antes de refinar
+            syncPatientInfoInputsToModel(patient);
+
             const btn = document.getElementById("btnSendConsensus");
             if (btn) {
                 btn.disabled = true;
@@ -10179,13 +10567,50 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
             try {
                 if (!patient.study_data) patient.study_data = createBlankStudyData();
                 const study = patient.study_data;
+                const mh = patient.medical_history || {};
+                const doctorPrefs = getOrthoPreferences();
                 let aiExplanation = "";
                 let refinedFromApi = null;
 
-                // 1. Intentar refinamiento directo con Gemini API usando x-goog-api-key
+                const patientContext = {
+                    fullName: patient.full_name,
+                    age: patient.age,
+                    chiefComplaint: mh.chief_complaint || patient.case_summary || "",
+                    habitsPerio: mh.habits_perio || "",
+                    allergies: mh.allergies || "",
+                    consentRisks: mh.consent_risks || ""
+                };
+
+                // 1. Intentar primero vía endpoint /api/refine-ortho si está disponible
                 try {
-                    const refinePrompt = `Eres el asistente ortodóntico Gemini Argon de la Dra. Liseth Guevara Muñoz.
+                    const resp = await fetch("/api/refine-ortho", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            currentStudyData: study,
+                            doctorArgument: argument,
+                            patientContext,
+                            orthoPreferences: doctorPrefs
+                        })
+                    });
+                    if (resp.ok) {
+                        const rJson = await resp.json();
+                        if (rJson.success && rJson.data && rJson.data.summary) {
+                            Object.assign(study, rJson.data);
+                            study.is_uninitialized = false;
+                            refinedFromApi = study;
+                            aiExplanation = rJson.message || `Ajuste clínico aplicado para ${patient.full_name}.`;
+                        }
+                    }
+                } catch (_) {}
+
+                // 2. Intentar refinamiento directo con Gemini API usando x-goog-api-key
+                if (!refinedFromApi) {
+                    try {
+                        const refinePrompt = `Eres el asistente ortodóntico Gemini Argon de la Dra. Liseth Guevara Muñoz.
 Paciente: ${patient.full_name} (${patient.age} años).
+Historia Clínica: Motivo: "${patientContext.chiefComplaint}" | Hábitos/Perio: "${patientContext.habitsPerio}" | Alergias: "${patientContext.allergies}".
+Preferencias de la Doctora: ${doctorPrefs.bracketPrescription} (${doctorPrefs.slotSize}) • Arcos: ${doctorPrefs.archwirePhase1} -> ${doctorPrefs.archwirePhase2} -> ${doctorPrefs.archwirePhase3}.
 Diagnóstico actual resumido: ${JSON.stringify({
     durationMonths: study.durationMonths,
     complexity: study.complexity,
@@ -10198,6 +10623,9 @@ Indicación clínica o ajuste solicitado por la Dra. Liseth Guevara: "${argument
 Devuelve un JSON con los ajustes aplicados:
 {
   "explanation": "Explicación concisa de los cambios aplicados al diagnóstico, stripping IPR o secuencia de arcos",
+  "durationMonths": ${study.durationMonths || 18},
+  "complexity": "${study.complexity || "Moderada"}",
+  "anchorage": "${study.anchorage || doctorPrefs.anchorageSystem}",
   "summary": { "skeletal": "...", "vertical": "...", "dentalFormula": "...", "rootAlert": "..." },
   "updatedTeeth": {
     "42": { "toothFDI": 42, "status": "ipr"|"aligned"|"critical"|"missing", "diagnosis": "...", "iprMesial": 0.2, "iprDistal": 0.2, "biomechanics": "..." }
@@ -10205,43 +10633,47 @@ Devuelve un JSON con los ajustes aplicados:
   "roadmap": [ ... ],
   "additionalTreatmentNote": "Directriz clínica agregada"
 }`;
-                    const apiRes = await callGeminiApiJson([{ text: refinePrompt }], 0.15, 20000);
-                    if (apiRes && apiRes.parsed) {
-                        const p = apiRes.parsed;
-                        if (p.summary && typeof p.summary === "object") {
-                            study.summary = Object.assign({}, study.summary || {}, p.summary);
+                        const apiRes = await callGeminiApiJson([{ text: refinePrompt }], 0.15, 22000);
+                        if (apiRes && apiRes.parsed) {
+                            const p = apiRes.parsed;
+                            if (p.durationMonths) study.durationMonths = Number(p.durationMonths) || study.durationMonths;
+                            if (p.complexity) study.complexity = p.complexity;
+                            if (p.anchorage) study.anchorage = p.anchorage;
+                            if (p.summary && typeof p.summary === "object") {
+                                study.summary = Object.assign({}, study.summary || {}, p.summary);
+                            }
+                            if (p.updatedTeeth && typeof p.updatedTeeth === "object") {
+                                Object.entries(p.updatedTeeth).forEach(([k, v]) => {
+                                    const fdi = Number(k);
+                                    if (fdi && v && typeof v === "object") {
+                                        study.odontogram[fdi] = Object.assign({}, study.odontogram[fdi] || { toothFDI: fdi, name: FDI_STANDARD_NAMES[fdi] || `OD ${fdi}` }, {
+                                            status: v.status || "ipr",
+                                            diagnosis: v.diagnosis || "Ajustado por especialista",
+                                            iprMesial: Number(v.iprMesial ?? 0),
+                                            iprDistal: Number(v.iprDistal ?? 0),
+                                            biomechanics: v.biomechanics || argument
+                                        });
+                                        selectedFDI = fdi;
+                                    }
+                                });
+                            }
+                            if (Array.isArray(p.roadmap) && p.roadmap.length > 0) {
+                                study.roadmap = p.roadmap;
+                            }
+                            if (p.additionalTreatmentNote) {
+                                study.additionalTreatments = [p.additionalTreatmentNote, ...(study.additionalTreatments || [])];
+                            }
+                            study.is_uninitialized = false;
+                            refinedFromApi = study;
+                            aiExplanation = p.explanation || `Ajuste clínico aplicado para ${patient.full_name}.`;
                         }
-                        if (p.updatedTeeth && typeof p.updatedTeeth === "object") {
-                            Object.entries(p.updatedTeeth).forEach(([k, v]) => {
-                                const fdi = Number(k);
-                                if (fdi && v && typeof v === "object") {
-                                    study.odontogram[fdi] = Object.assign({}, study.odontogram[fdi] || { toothFDI: fdi, name: FDI_STANDARD_NAMES[fdi] || `OD ${fdi}` }, {
-                                        status: v.status || "ipr",
-                                        diagnosis: v.diagnosis || "Ajustado por especialista",
-                                        iprMesial: Number(v.iprMesial ?? 0),
-                                        iprDistal: Number(v.iprDistal ?? 0),
-                                        biomechanics: v.biomechanics || argument
-                                    });
-                                    selectedFDI = fdi;
-                                }
-                            });
-                        }
-                        if (Array.isArray(p.roadmap) && p.roadmap.length > 0) {
-                            study.roadmap = p.roadmap;
-                        }
-                        if (p.additionalTreatmentNote) {
-                            study.additionalTreatments = [p.additionalTreatmentNote, ...(study.additionalTreatments || [])];
-                        }
-                        study.is_uninitialized = false;
-                        refinedFromApi = study;
-                        aiExplanation = p.explanation || `Ajuste clínico aplicado para ${patient.full_name}.`;
-                    }
-                } catch (_) {}
+                    } catch (_) {}
+                }
 
                 if (refinedFromApi && refinedFromApi.odontogram) {
                     patient.study_data = refinedFromApi;
                 } else {
-                    // 2. Motor de Consenso Clínico Local de respaldo (aplica cambios en FDI, mm de stripping Mesial/Distal y arcos)
+                    // 3. Motor de Consenso Clínico Local de respaldo (aplica cambios en FDI, mm de stripping Mesial/Distal y arcos)
                     const appliedChanges = [];
                     const fdiMatches = argument.match(/\b([1-4][1-8])\b/g) || [];
                     const mmMatch = argument.match(/(\d+(?:\.\d+)?)\s*mm/i);
@@ -10316,7 +10748,7 @@ Devuelve un JSON con los ajustes aplicados:
             } finally {
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = `<i class="ph-bold ph-sparkle text-indigo-400"></i><span>Enviar Objeción y Recalcular Consenso</span>`;
+                    btn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i><span>Aplicar Ajuste al Diagnóstico</span>`;
                 }
             }
         }
