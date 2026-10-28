@@ -18,7 +18,7 @@
 
     <!-- Open Graph / Social & Link Thumbnail -->
     <meta property="og:title" content="CRD OrthoAI Hub | Dra. Liseth Guevara Muñoz">
-    <meta property="og:description" content="Expediente Clínico Ortodóncico 3D, IA Gemini 4 Argon, Agenda Inteligente y Marketing Hub.">
+    <meta property="og:description" content="Historia Clínica Ortodóntica, IA Gemini Argon, Agenda Inteligente y Marketing Hub.">
     <meta property="og:image" content="ortho-hub-thumbnail.png">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -1114,24 +1114,15 @@
                         </div>
                     </div>
 
-                    <!-- Filtro Rápido por Sillón y Capacidad -->
+                    <!-- Indicador de Sillón Clínico Único -->
                     <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
                         <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-bold text-slate-600">Sillón Activo:</span>
-                            <select
-                                id="calChairFilterSelect"
-                                onchange="onCalendarChairFilterChange(this.value)"
-                                class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                            >
-                                <option value="all">═ Todos los Sillones</option>
-                                <option value="Sillón 1 (Ortodoncia Principal)">🦷 Sillón 1 (Ortodoncia Principal)</option>
-                                <option value="Sillón 2 (Escáner 3D / Urgencias)">🔬 Sillón 2 (Escáner 3D / Urgencias)</option>
-                            </select>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-xs font-bold text-slate-800">🦷 Sillón Clínico de Ortodoncia</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-1.5 text-[10px]">
-                            <span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-md">Sillón 1: Tratamientos & TADs</span>
-                            <span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">Sillón 2: Escáner 3D & Urgencias</span>
-                        </div>
+                        <span class="bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold text-[10px] px-2.5 py-0.5 rounded-md">
+                            Atención personalizada • 1 Sillón activo
+                        </span>
                     </div>
 
                     <!-- Tira de 7 días de la semana (Responsive con scroll táctil suave si es necesario) -->
@@ -1162,7 +1153,7 @@
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <div>
                                 <h2 class="text-sm font-bold text-slate-900">🦷 Control de Citas & Preparación de Charola</h2>
-                                <p class="text-xs text-slate-500">Edita hora, abre el expediente 3D o confirma por WhatsApp</p>
+                                <p class="text-xs text-slate-500">Edita hora, abre la historia clínica o confirma por WhatsApp</p>
                             </div>
                         </div>
                         <div id="calHubAllAppointmentsList" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
@@ -1196,7 +1187,7 @@
                             <span>Tiempos de Sillón y Buffers de Desinfección (9 Procedimientos)</span>
                         </h2>
                         <p class="text-xs text-slate-500">
-                            Personaliza la duración de cada procedimiento, el tiempo de buffer para sanitización, el sillón predeterminado y los protocolos clínicos.
+                            Personaliza la duración de cada procedimiento, el tiempo de buffer para sanitización y los protocolos clínicos en sillón.
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
@@ -3585,7 +3576,7 @@
                             </span>
                         </div>
                         <p class="text-xs text-slate-500">
-                            Expedientes clínicos integrales, modelos 3D y planes biomecánicos
+                            Historias clínicas integrales, diagnóstico y planes biomecánicos
                         </p>
                     </div>
                 </div>
@@ -3620,7 +3611,7 @@
                     <span id="statStlCount" class="font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">0 Activos</span>
                 </div>
                 <div class="text-[11px] text-slate-500">
-                    💡 Selecciona cualquier expediente para consultar la historia y visor 3D
+                    💡 Selecciona cualquier paciente para consultar su historia clínica
                 </div>
             </div>
 
@@ -5120,7 +5111,7 @@ create table if not exists public.patients (
                         onclick="closePatientSelfServicePortal()"
                         class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-6 py-3 rounded-xl transition flex items-center justify-center gap-1.5"
                     >
-                        <span>Cerrar y Volver al Expediente</span>
+                        <span>Cerrar y Volver a la Historia Clínica</span>
                     </button>
                 </div>
                 <p class="text-[11px] text-slate-400 text-center pt-1">
@@ -5893,7 +5884,7 @@ create table if not exists public.patients (
                                     class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
                                 >
                                     <i class="ph-bold ph-folder-open"></i>
-                                    <span>Abrir Expediente 3D</span>
+                                    <span>Abrir Historia Clínica</span>
                                 </button>
                             ` : ""}
                             <a
@@ -6058,7 +6049,7 @@ create table if not exists public.patients (
                                             class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition inline-flex items-center gap-1.5 shadow-2xs"
                                         >
                                             <i class="ph-bold ph-folder-open"></i>
-                                            <span>Expediente 3D</span>
+                                            <span>Historia Clínica</span>
                                         </button>
                                     ` : ""}
                                     <a
@@ -6111,7 +6102,7 @@ create table if not exists public.patients (
                 grid.innerHTML = `
                     <div class="col-span-full bg-white rounded-2xl border border-slate-200 p-8 text-center">
                         <p class="text-sm font-bold text-slate-700">No se encontraron pacientes con "${query}"</p>
-                        <p class="text-xs text-slate-500 mt-1">Intenta con otro nombre o registra un nuevo expediente.</p>
+                        <p class="text-xs text-slate-500 mt-1">Intenta con otro nombre o registra una nueva historia clínica.</p>
                     </div>
                 `;
                 return;
@@ -6187,7 +6178,7 @@ create table if not exists public.patients (
                                 </span>
                             </div>
                             <span class="font-semibold text-indigo-600 group-hover:translate-x-0.5 transition">
-                                ${isPending ? "Cargar Estudios →" : "Abrir Expediente →"}
+                                ${isPending ? "Cargar Estudios →" : "Abrir Historia Clínica →"}
                             </span>
                         </div>
                     </div>
@@ -6233,8 +6224,8 @@ create table if not exists public.patients (
             }
 
             // Actualizar encabezados y título del documento (para nombre del archivo PDF y cabecera de impresión)
-            document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
-            document.getElementById("workspaceRecordCode").innerText = `Expediente ${patient.record_code || "#CRD-2026"}`;
+            document.title = `Historia Clínica - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+            document.getElementById("workspaceRecordCode").innerText = `Historia Clínica ${patient.record_code || "#CRD-2026"}`;
             document.getElementById("workspacePatientTitle").innerText = `${patient.full_name} (${patient.age} años)`;
             const printTitleEl = document.getElementById("printPatientTitle");
             if (printTitleEl) printTitleEl.innerText = `${patient.full_name} (${patient.age} años)`;
@@ -6510,7 +6501,7 @@ create table if not exists public.patients (
                             </div>
                             <div class="text-right shrink-0">
                                 <span class="inline-block bg-slate-900 text-white text-[10px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                                    Expediente Clínico Integral
+                                    Historia Clínica Integral
                                 </span>
                                 <p class="text-[11px] font-bold text-slate-800 mono mt-1">
                                     Folio: ${patient.record_code || "#CRD-2026"}
@@ -6918,7 +6909,7 @@ create table if not exists public.patients (
                 if (isPortal) {
                     document.title = `Contrato_Consentimiento_Ortodoncia_${cleanName}`;
                 } else {
-                    document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                    document.title = `Historia Clínica - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
                 }
                 renderPrintFullReport(patient);
             }
@@ -6934,7 +6925,7 @@ create table if not exists public.patients (
                 if (isPortal) {
                     document.title = `Contrato_Consentimiento_Ortodoncia_${cleanName}`;
                 } else {
-                    document.title = `Expediente Clínico - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
+                    document.title = `Historia Clínica - ${patient.full_name} (${patient.age} años) | Dra. Liseth Guevara`;
                 }
                 renderPrintFullReport(patient);
             }
@@ -7590,24 +7581,24 @@ create table if not exists public.patients (
             baseDate.setHours(11, 0, 0, 0);
 
             const roadmapStages = [
-                { months: "Mes 1", title: "Cementado Diferencial + Espuelas Linguales", archwire: '.014" CuNiTi', duration: 60, chair: "Sillón 1 (Ortodoncia Principal)", action: "Bonding completo, adhesión de spurs, kit de higiene" },
-                { months: "Mes 2", title: "Control de Hábito y Desrotación Inicial", archwire: '.014" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Revisar espuelas y reactivar ligaduras" },
-                { months: "Mes 3", title: "IPR Anteroinferior (31-41) + Desrotación", archwire: '.016" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Stripping inicial selectivo y pulido con tiras" },
-                { months: "Mes 4", title: "IPR Caninos y Premolares (33-43)", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Completar ganancia de espacio anteroinferior" },
-                { months: "Mes 5", title: "Nivelación Transversal y Control de Torque", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Revisar curvatura de Spee inferior" },
-                { months: "Mes 6", title: "Preparación de Anclaje Esquelético + Rx Control", archwire: '.019"x.025" SS', duration: 30, chair: "Sillón 1 (Ortodoncia Principal)", action: "Evaluación periapical y toma de medidas para TADs" },
-                { months: "Mes 7", title: "Colocación de 2 Microtornillos TADs IZC + ATP", archwire: '.019"x.025" SS + 150g', duration: 45, chair: "Sillón 1 (Ortodoncia Principal)", action: "Inserción de 2 TADs IZC 2x12mm y carga inmediata" },
-                { months: "Mes 8", title: "Reactivación de Intrusión Molar (150g)", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Cambio de cadenas elásticas hacia TADs" },
-                { months: "Mes 9", title: "Control de Cierre Vertical y Autorrotación", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Medición milimétrica del overbite anterior" },
-                { months: "Mes 10", title: "Evaluación de Guía Anterior y Resalte", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Chequeo de contactos posteriores prematuros" },
-                { months: "Mes 11", title: "Consolidación de Cierre de Mordida Abierta", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Retiro programado de espuelas linguales" },
-                { months: "Mes 12", title: "Retiro de TADs y Escaneo de Progreso 3D", archwire: '.019"x.025" TMA', duration: 35, chair: "Sillón 2 (Escáner 3D / Urgencias)", action: "Retiro atraumático de TADs y escaneo intraoral" },
-                { months: "Mes 13", title: "Inicio de Asentamiento Oclusal", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Elásticos en caja 3/16 4.5 oz nocturnos" },
-                { months: "Mes 14", title: "Intercuspidación y Guía Canina Bilateral", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Ajuste de torque fino y oclusión céntrica" },
-                { months: "Mes 15", title: "Dobleces de Tercer Orden / Finalización", archwire: '.019"x.025" TMA', duration: 30, chair: "Sillón 1 (Ortodoncia Principal)", action: "Detallado estético de sonrisa y márgenes" },
-                { months: "Mes 16", title: "Estabilización y Desprogramación Muscular", archwire: '.019"x.025" TMA', duration: 25, chair: "Sillón 1 (Ortodoncia Principal)", action: "Prueba de estabilidad sin elásticos" },
-                { months: "Mes 17", title: "Toma de Registros Finales y Profilaxis", archwire: "Fase Final", duration: 30, chair: "Sillón 2 (Escáner 3D / Urgencias)", action: "Escaneo para retenedores fijos y Essix" },
-                { months: "Mes 18", title: "Retiro Completo (Debonding) + Retención Fija", archwire: "Retención Final", duration: 60, chair: "Sillón 1 (Ortodoncia Principal)", action: "Retiro de brackets, pulido y cementado de retenedor 3-3" }
+                { months: "Mes 1", title: "Cementado Diferencial + Espuelas Linguales", archwire: '.014" CuNiTi', duration: 60, chair: "Sillón Clínico", action: "Bonding completo, adhesión de spurs, kit de higiene" },
+                { months: "Mes 2", title: "Control de Hábito y Desrotación Inicial", archwire: '.014" CuNiTi', duration: 25, chair: "Sillón Clínico", action: "Revisar espuelas y reactivar ligaduras" },
+                { months: "Mes 3", title: "IPR Anteroinferior (31-41) + Desrotación", archwire: '.016" CuNiTi', duration: 25, chair: "Sillón Clínico", action: "Stripping inicial selectivo y pulido con tiras" },
+                { months: "Mes 4", title: "IPR Caninos y Premolares (33-43)", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón Clínico", action: "Completar ganancia de espacio anteroinferior" },
+                { months: "Mes 5", title: "Nivelación Transversal y Control de Torque", archwire: '.016"x.022" CuNiTi', duration: 25, chair: "Sillón Clínico", action: "Revisar curvatura de Spee inferior" },
+                { months: "Mes 6", title: "Preparación de Anclaje Esquelético + Rx Control", archwire: '.019"x.025" SS', duration: 30, chair: "Sillón Clínico", action: "Evaluación periapical y toma de medidas para TADs" },
+                { months: "Mes 7", title: "Colocación de 2 Microtornillos TADs IZC + ATP", archwire: '.019"x.025" SS + 150g', duration: 45, chair: "Sillón Clínico", action: "Inserción de 2 TADs IZC 2x12mm y carga inmediata" },
+                { months: "Mes 8", title: "Reactivación de Intrusión Molar (150g)", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón Clínico", action: "Cambio de cadenas elásticas hacia TADs" },
+                { months: "Mes 9", title: "Control de Cierre Vertical y Autorrotación", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón Clínico", action: "Medición milimétrica del overbite anterior" },
+                { months: "Mes 10", title: "Evaluación de Guía Anterior y Resalte", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón Clínico", action: "Chequeo de contactos posteriores prematuros" },
+                { months: "Mes 11", title: "Consolidación de Cierre de Mordida Abierta", archwire: '.019"x.025" SS', duration: 25, chair: "Sillón Clínico", action: "Retiro programado de espuelas linguales" },
+                { months: "Mes 12", title: "Retiro de TADs y Escaneo de Progreso 3D", archwire: '.019"x.025" TMA', duration: 35, chair: "Sillón Clínico", action: "Retiro atraumático de TADs y escaneo intraoral" },
+                { months: "Mes 13", title: "Inicio de Asentamiento Oclusal", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón Clínico", action: "Elásticos en caja 3/16 4.5 oz nocturnos" },
+                { months: "Mes 14", title: "Intercuspidación y Guía Canina Bilateral", archwire: '.019"x.025" Braided', duration: 25, chair: "Sillón Clínico", action: "Ajuste de torque fino y oclusión céntrica" },
+                { months: "Mes 15", title: "Dobleces de Tercer Orden / Finalización", archwire: '.019"x.025" TMA', duration: 30, chair: "Sillón Clínico", action: "Detallado estético de sonrisa y márgenes" },
+                { months: "Mes 16", title: "Estabilización y Desprogramación Muscular", archwire: '.019"x.025" TMA', duration: 25, chair: "Sillón Clínico", action: "Prueba de estabilidad sin elásticos" },
+                { months: "Mes 17", title: "Toma de Registros Finales y Profilaxis", archwire: "Fase Final", duration: 30, chair: "Sillón Clínico", action: "Escaneo para retenedores fijos y Essix" },
+                { months: "Mes 18", title: "Retiro Completo (Debonding) + Retención Fija", archwire: "Retención Final", duration: 60, chair: "Sillón Clínico", action: "Retiro de brackets, pulido y cementado de retenedor 3-3" }
             ];
 
             const generatedTimeline = [];
@@ -8272,7 +8263,7 @@ create table if not exists public.patients (
             const titleEl = document.getElementById("workspacePatientTitle");
             if (titleEl) titleEl.innerText = `${patient.full_name} (${patient.age} años)`;
             const codeEl = document.getElementById("workspaceRecordCode");
-            if (codeEl) codeEl.innerText = `Expediente ${patient.record_code || "#CRD-2026"}`;
+            if (codeEl) codeEl.innerText = `Historia Clínica ${patient.record_code || "#CRD-2026"}`;
         }
 
         async function saveClinicalHistoryForm() {
@@ -11964,7 +11955,10 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
 
             const savedAppts = localStorage.getItem("crd_ortho_appointments_v1");
             if (savedAppts) {
-                scheduledAppointments = JSON.parse(savedAppts);
+                scheduledAppointments = JSON.parse(savedAppts).map((a) => ({
+                    ...a,
+                    chair: "Sillón Clínico"
+                }));
             }
 
             // Si no hay citas registradas para hoy, prellenar un control de sillón activo de hoy
@@ -12200,7 +12194,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
         }
 
         // =====================================================================
-        // MOTOR AVANZADO DEL CALENDARIO: 9 PROCEDIMIENTOS, HORARIOS Y SILLONES
+        // MOTOR AVANZADO DEL CALENDARIO: 9 PROCEDIMIENTOS Y HORARIOS DE SILLÓN
         // (src/components/modules/OrthoCalendarHub.tsx)
         // =====================================================================
         const DEFAULT_ORTHO_PROCEDURES = [
@@ -12214,7 +12208,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "9",
                 requiresTwoPhotos: false,
                 requiresLabReady: false,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["8 Fotos Intraorales", "Orden Rx IDI", "Escaneo Dual .STL", "Firma Consentimiento"]
             },
             {
@@ -12227,7 +12221,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "10",
                 requiresTwoPhotos: true,
                 requiresLabReady: false,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Profilaxis previa", "Cementado diferencial", "Arco .014 CuNiTi", "Kit higiene"]
             },
             {
@@ -12240,7 +12234,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "7",
                 requiresTwoPhotos: true,
                 requiresLabReady: true,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Revisar set de alineadores", "Adhesión de attachments", "IPR inicial"]
             },
             {
@@ -12253,7 +12247,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "1",
                 requiresTwoPhotos: true,
                 requiresLabReady: false,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Tomar 2 Fotos de Evolución", "Evaluar oclusión", "Activar arco"]
             },
             {
@@ -12266,7 +12260,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "5",
                 requiresTwoPhotos: true,
                 requiresLabReady: false,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Revisar Odontograma IPR", "Calibrar con galgas", "Pulido interproximal"]
             },
             {
@@ -12279,7 +12273,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "11",
                 requiresTwoPhotos: true,
                 requiresLabReady: true,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Anestesia local", "Inserción 2 TADs IZC", "Activar 150g por lado", "Rx control"]
             },
             {
@@ -12292,7 +12286,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "4",
                 requiresTwoPhotos: false,
                 requiresLabReady: false,
-                defaultChair: "Sillón 2 (Escáner 3D / Urgencias)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Recementar bracket", "Cortar extremo distal"]
             },
             {
@@ -12305,7 +12299,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "3",
                 requiresTwoPhotos: true,
                 requiresLabReady: true,
-                defaultChair: "Sillón 1 (Ortodoncia Principal)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Retiro cuidadoso", "Limpieza de resina", "Escaneo final", "Colocación de retenedores"]
             },
             {
@@ -12318,7 +12312,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 googleColorId: "6",
                 requiresTwoPhotos: true,
                 requiresLabReady: false,
-                defaultChair: "Sillón 2 (Escáner 3D / Urgencias)",
+                defaultChair: "Sillón Clínico",
                 checklist: ["Calibrar escáner", "Escaneo maxilar y mandibular", "Registro de mordida", "Exportar a nube"]
             }
         ];
@@ -12335,13 +12329,17 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
 
         let orthoProceduresList = null;
         let clinicScheduleList = null;
-        let selectedCalendarChairFilter = "all";
 
         function getCalendarProceduresList() {
             if (orthoProceduresList) return orthoProceduresList;
             try {
                 const saved = localStorage.getItem("crd_ortho_procedures_v1");
-                if (saved) orthoProceduresList = JSON.parse(saved);
+                if (saved) {
+                    orthoProceduresList = JSON.parse(saved).map((p) => ({
+                        ...p,
+                        defaultChair: "Sillón Clínico"
+                    }));
+                }
             } catch (e) {}
             if (!orthoProceduresList || orthoProceduresList.length === 0) {
                 orthoProceduresList = JSON.parse(JSON.stringify(DEFAULT_ORTHO_PROCEDURES));
@@ -12354,13 +12352,12 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             list.forEach((proc) => {
                 const durEl = document.getElementById(`procDur_${proc.id}`);
                 const bufEl = document.getElementById(`procBuf_${proc.id}`);
-                const chairEl = document.getElementById(`procChair_${proc.id}`);
                 const photoEl = document.getElementById(`procPhoto_${proc.id}`);
                 const labEl = document.getElementById(`procLab_${proc.id}`);
 
                 if (durEl) proc.durationMinutes = Number(durEl.value) || proc.durationMinutes;
                 if (bufEl) proc.bufferMinutes = Number(bufEl.value) || proc.bufferMinutes;
-                if (chairEl) proc.defaultChair = chairEl.value;
+                proc.defaultChair = "Sillón Clínico";
                 if (photoEl) proc.requiresTwoPhotos = photoEl.checked;
                 if (labEl) proc.requiresLabReady = labEl.checked;
             });
@@ -12369,7 +12366,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             } catch (e) {}
             renderCalendarProceduresConfig();
             renderCalendarHub();
-            alert("✓ Configuración de tiempos, buffers y sillones guardada con éxito.");
+            alert("✓ Configuración de tiempos y buffers de sillón guardada con éxito.");
         }
 
         function resetCalendarProceduresToDefault() {
@@ -12424,17 +12421,6 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                 class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900"
                             />
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[9.5px] font-bold text-slate-500 uppercase mb-0.5">Sillón Predeterminado</label>
-                        <select
-                            id="procChair_${p.id}"
-                            class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-900"
-                        >
-                            <option value="Sillón 1 (Ortodoncia Principal)" ${p.defaultChair.includes("Sillón 1") ? "selected" : ""}>🦷 Sillón 1 (Ortodoncia Principal)</option>
-                            <option value="Sillón 2 (Escáner 3D / Urgencias)" ${p.defaultChair.includes("Sillón 2") ? "selected" : ""}>🔬 Sillón 2 (Escáner 3D / Urgencias)</option>
-                        </select>
                     </div>
 
                     <div class="space-y-1.5 pt-1 border-t border-slate-200/60 text-[11px]">
@@ -12564,11 +12550,6 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             `).join("");
         }
 
-        function onCalendarChairFilterChange(chair) {
-            selectedCalendarChairFilter = chair;
-            renderCalendarHub();
-        }
-
         function setCalendarHubSubView(mode) {
             const secAgenda = document.getElementById("calHubInteractiveSection");
             const secProcs = document.getElementById("calHubProceduresSection");
@@ -12684,10 +12665,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
             // Ordenar citas cronológicamente
             scheduledAppointments.sort((a, b) => new Date(a.startIso || 0).getTime() - new Date(b.startIso || 0).getTime());
 
-            // Filtrar por sillón si está seleccionado
-            const filteredAppointments = selectedCalendarChairFilter === "all"
-                ? scheduledAppointments
-                : scheduledAppointments.filter((a) => (a.chair || "Sillón 1").includes(selectedCalendarChairFilter));
+            const filteredAppointments = scheduledAppointments;
 
             // KPIs
             const totalAppts = filteredAppointments.length;
@@ -12797,7 +12775,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                     </div>
                                     <p class="text-[11px] font-semibold text-indigo-700 mt-0.5">${appt.procedureTitle}</p>
                                     <div class="flex flex-wrap items-center gap-1.5 mt-1">
-                                        <span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-white border border-slate-200 text-slate-600">${appt.chair || "Sillón 1"}</span>
+                                        <span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-white border border-slate-200 text-slate-600">Sillón Clínico</span>
                                         ${appt.hasTwoPhotos ? `<span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">📸 2 Fotos OK</span>` : `<span class="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-800">📸 Requiere 2 Fotos</span>`}
                                     </div>
                                 </div>
@@ -12823,12 +12801,12 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                 `;
             }).join("");
 
-            // Lista derecha de todas las citas (o filtradas)
+            // Lista derecha de todas las citas
             const listToShow = calHubShowAllDays ? filteredAppointments : (dayAppts.length > 0 ? dayAppts : filteredAppointments);
             if (listToShow.length === 0) {
                 allListEl.innerHTML = `
                     <div class="p-6 text-center rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-500 space-y-2">
-                        <p class="font-bold text-slate-700">No hay citas registradas en este filtro de sillón</p>
+                        <p class="font-bold text-slate-700">No hay citas registradas en el sillón</p>
                         <button type="button" onclick="openHubAppointmentModal(null)" class="bg-indigo-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs">+ Agendar primera cita</button>
                     </div>
                 `;
@@ -12864,7 +12842,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                         🗓️ ${dtFmt} • ${appt.durationMinutes || 30} min
                                     </span>
                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">
-                                        ${appt.chair || "Sillón 1 (Ortodoncia Principal)"}
+                                        Sillón Clínico
                                     </span>
                                 </div>
                                 <h3 class="text-xs font-extrabold text-slate-900 mt-1">${appt.patientName}</h3>
@@ -12908,7 +12886,7 @@ create policy "Permitir actualizacion de revisiones" on public.clinical_revision
                                     class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition inline-flex items-center gap-1"
                                 >
                                     <i class="ph-bold ph-folder-open"></i>
-                                    <span>Expediente</span>
+                                    <span>Historia Clínica</span>
                                 </button>
                                 <button
                                     type="button"
@@ -15137,7 +15115,7 @@ Devuelve EXCLUSIVAMENTE un JSON válido con esta estructura exacta:
                             alert("¡Registro y consentimiento completados con éxito! Dra. Liseth Guevara y su equipo se comunicarán contigo para confirmar tu cita de colocación.");
                         };
                     } else {
-                        closeBtn.innerHTML = `<span>Cerrar y Volver al Expediente</span>`;
+                        closeBtn.innerHTML = `<span>Cerrar y Volver a la Historia Clínica</span>`;
                         closeBtn.onclick = () => closePatientSelfServicePortal();
                     }
                 }
